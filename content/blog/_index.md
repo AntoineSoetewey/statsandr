@@ -1,5 +1,5 @@
 ---
-description: Jane Doe's blog
+description: Stats and R blog
 menu: main
 title: Blog
 ---
