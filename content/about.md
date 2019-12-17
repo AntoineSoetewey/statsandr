@@ -9,4 +9,4 @@ Hello, my name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a P
 
 This blog aims at helping academics (mainly students) and professionals (working with data) to grasp important concepts in statistics and to apply them in R.
 
-If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me]("/contact/").
+If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me](/contact/).

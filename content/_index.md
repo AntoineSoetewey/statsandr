@@ -12,4 +12,4 @@ Welcome to the blog [Stats and R](/). As the name suggests, this blog is about s
 
 See [all articles here](/blog/) or [articles by categories here](/categories/).
 
-If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me]("/contact/").
+If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me](/contact/).

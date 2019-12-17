@@ -1,5 +1,5 @@
 ---
-description: Jane Doe's blog
+description: Antoine Soetewey's blog
 menu: main
 title: Blog
 ---
