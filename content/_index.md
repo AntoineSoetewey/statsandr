@@ -1,6 +1,6 @@
 ---
 date: "2019-12-16"
-description: A blog about statistics and R.
+description: A blog about statistics and applications in R.
 menu: main
 title: Stats and R
 ---
