@@ -7,4 +7,6 @@ title: Stats and R
 
 Welcome to the blog "Stats and R". This blog is for ...
 
+I will cover different topics, from simple statistical concepts such as
+
 [Contact me]("/contact/").
