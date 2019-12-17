@@ -1,12 +1,15 @@
 ---
-date: "2018-11-09"
-description: Website description.
+title: Stats and R
+date: "2019-12-16"
+description: A blog about statistics and applications in R.
 menu: main
-title: The Renga Theme for Hugo
 ---
 
-Lorem ipsum dolor sit amet, ex has sale ullum corrumpit, sea dicam nostrum sensibus ad. Porro tritani persecuti te sed. Omittam dissentias pro ex. Atqui luptatum duo id. Eros minim eam ex, novum elitr accusam quo in. Nec ne audire euripidis, [mea qualisque consetetur cu](https://nanx.me). Suspendisse volutpat sem a risus euismod convallis.
+Welcome to the blog [Stats and R](/). As the name suggests, this blog is about statistics and applications in R (statistical program). It aims at helping academics (mainly students) and professionals (working with data) to grasp important concepts in statistics and to apply them in R. Most of the time, for each topic I selected there are two articles: 
 
-In modus congue feugait eos. In nec nonumy volutpat corrumpit, sea assentior quaerendum no, cum affert scripta ea. No nihil voluptaria pro. [Erat democritum mei no](https://nanx.me), homero quodsi aliquando id mel, ridens civibus molestiae et nam.
+1. one from the theoritical perspective and how to apply it "by hand"
+2. how to apply the concepts in R
 
-Ea eam postea facilisi. Nullam forensibus consequuntur usu ea, no ius consul delectus periculis. Eam veri numquam an. Et partiendo gubergren eam. Quod iudicabit has ex, eam diam facilisi eu, elitr aliquip no eum.
+See [all articles here](/blog/) or [articles by categories here](/categories/).
+
+If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me]("/contact/").
