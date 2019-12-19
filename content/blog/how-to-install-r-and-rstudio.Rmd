@@ -11,7 +11,6 @@ meta_img: image/image.png
 output:
   blogdown::html_page:
     toc: true
-    # toc_float: true
 # draft: true
 ---
 
@@ -81,17 +80,102 @@ The last pane (blue) is where you will find everything else such as your files, 
 * Packages: where you see all your installed packages. Remind that RStudio is open source; everyone can write code and publish it as a package. You are then able to use this package (and all functions built inside this package) for free. Some packages are installed by default, others can be easily installed by running `install.packages("name of the package")` (do not forget `""` around the name of the package!). Once the package is installed, you must load the package and only after it has been loaded you can use all the functions it contains. To load a package, run `library(name of the package)` (this time `""` around the name of the package are not needed, but can still be used if you wish). Note that you will need to install packages **only once**, but load packages **each time** you open RStudio,
 * Help: documentation about all functions written for R. To access the help of a function, run `help(name of the function)` or simply `?name of the function`. For example, to see the help about the mean function, run `?mean`.
 
-# Further applications
+# Examples of code
 
 Now that you have installed R and RStudio and you know its main components, below are some examples of basic code. More advanced code and analyses are presented in [other articles about R](/tags/R/).
 
-## Use RStudio as a calculator
+## Calculator
 
+Compute $5*5$
 
+```{r}
+5 * 5
+```
 
-If you want to learn more, visit:
+Compute $\frac{1}{\sqrt{50\pi}}\, e^{-\frac{(10 - 11)^2}{50}}$. As you can see, some values like $\pi$ are stored by default so you do not need to specify its value.
 
-* article 1
-* article 2
-* 
+```{r}
+1 / sqrt(50 * pi) * exp(-(10 - 11)^2 / 50)
+```
 
+## Comments
+
+To add comments in your code, use `#` before the code:
+
+```{r}
+# A comment
+#Another comment
+1+1
+```
+
+## Store and print values
+
+Note that in order to store a value inside an object, using `=` or `<-` is equivalent. I however recommend using `<-` to follow the guidelines of R programming. You can name your objects (A and B in our case) as you like. However, it is recommended to use short and concise names (as you will most likely type them several times) and avoid special characters.
+
+```{r}
+A <- 5
+B = 6
+```
+
+When storing values, RStudio does not display it on the console. To store a value AND print it in the console, use:
+
+```{r}
+(A <- 5)
+```
+
+or:
+
+```{r}
+A <- 5
+A
+```
+
+## Vectors
+
+It is also possible to store more than one value inside an object via the function `c()` (c stands for combine).
+
+```{r}
+A <- c(1/2, -1, 0)
+```
+
+## Matrices
+
+Or create a matrix via `matrix()` (help about this function via `?matrix`):
+
+```{r}
+my_mat <- matrix(c(-1,2,0,3), ncol = 2, nrow = 2)
+my_mat
+```
+
+## Generate random values
+
+To generate 10 values based on a normal distribution with mean $\mu = 400$ and standard deviation $\sigma = 10$:
+
+```{r}
+my_vec <- rnorm(10, mean = 400, sd = 10)
+# Display only the first 5 values:
+head(my_vec, 5)
+# Display only the last 5 values:
+tail(my_vec, 5)
+```
+
+You will most likely have different values than mines due to the fact that they are randomly generated. If you want to make sure to have always the same random values, use `set.seed()` (with any numeric inside the brackets). For instance, with the following code, you should have the exact same values:
+
+```{r}
+set.seed(42)
+rnorm(3, mean = 10, sd = 2)
+```
+
+## Plot
+
+```{r}
+plot(my_vec,
+     type = "l", # "l" stands for line
+     main = "Plot title",
+     ylab = "Y-axis label",
+     xlab = "X-axis label") 
+```
+
+This is only a very limited introduction to the possibilities of RStudio. If you want to learn more, I recommend that you read other [articles related to R](/tags/R/).
+
+As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/).

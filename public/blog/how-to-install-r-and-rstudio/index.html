@@ -120,7 +120,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            5 minute read
+                            7 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -152,8 +152,14 @@
 <li><a href="#rstudio">RStudio</a></li>
 </ul></li>
 <li><a href="#the-main-components-of-rstudio">The main components of RStudio</a></li>
-<li><a href="#further-applications">Further applications</a><ul>
-<li><a href="#use-rstudio-as-a-calculator">Use RStudio as a calculator</a></li>
+<li><a href="#examples-of-code">Examples of code</a><ul>
+<li><a href="#calculator">Calculator</a></li>
+<li><a href="#comments">Comments</a></li>
+<li><a href="#store-and-print-values">Store and print values</a></li>
+<li><a href="#vectors">Vectors</a></li>
+<li><a href="#matrices">Matrices</a></li>
+<li><a href="#generate-random-values">Generate random values</a></li>
+<li><a href="#plot">Plot</a></li>
 </ul></li>
 </ul>
 </div>
@@ -228,17 +234,78 @@
 <li>Help: documentation about all functions written for R. To access the help of a function, run <code>help(name of the function)</code> or simply <code>?name of the function</code>. For example, to see the help about the mean function, run <code>?mean</code>.</li>
 </ul>
 </div>
-<div id="further-applications" class="section level1">
-<h1>Further applications</h1>
+<div id="examples-of-code" class="section level1">
+<h1>Examples of code</h1>
 <p>Now that you have installed R and RStudio and you know its main components, below are some examples of basic code. More advanced code and analyses are presented in <a href="/tags/R/">other articles about R</a>.</p>
-<div id="use-rstudio-as-a-calculator" class="section level2">
-<h2>Use RStudio as a calculator</h2>
-<p>If you want to learn more, visit:</p>
-<ul>
-<li>article 1</li>
-<li>article 2</li>
-<li></li>
-</ul>
+<div id="calculator" class="section level2">
+<h2>Calculator</h2>
+<p>Compute <span class="math inline">\(5*5\)</span></p>
+<pre class="r"><code>5 * 5</code></pre>
+<pre><code>## [1] 25</code></pre>
+<p>Compute <span class="math inline">\(\frac{1}{\sqrt{50\pi}}\, e^{-\frac{(10 - 11)^2}{50}}\)</span>. As you can see, some values like <span class="math inline">\(\pi\)</span> are stored by default so you do not need to specify its value.</p>
+<pre class="r"><code>1 / sqrt(50 * pi) * exp(-(10 - 11)^2 / 50)</code></pre>
+<pre><code>## [1] 0.07820854</code></pre>
+</div>
+<div id="comments" class="section level2">
+<h2>Comments</h2>
+<p>To add comments in your code, use <code>#</code> before the code:</p>
+<pre class="r"><code># A comment
+#Another comment
+1+1</code></pre>
+<pre><code>## [1] 2</code></pre>
+</div>
+<div id="store-and-print-values" class="section level2">
+<h2>Store and print values</h2>
+<p>Note that in order to store a value inside an object, using <code>=</code> or <code>&lt;-</code> is equivalent. I however recommend using <code>&lt;-</code> to follow the guidelines of R programming. You can name your objects (A and B in our case) as you like. However, it is recommended to use short and concise names (as you will most likely type them several times) and avoid special characters.</p>
+<pre class="r"><code>A &lt;- 5
+B = 6</code></pre>
+<p>When storing values, RStudio does not display it on the console. To store a value AND print it in the console, use:</p>
+<pre class="r"><code>(A &lt;- 5)</code></pre>
+<pre><code>## [1] 5</code></pre>
+<p>or:</p>
+<pre class="r"><code>A &lt;- 5
+A</code></pre>
+<pre><code>## [1] 5</code></pre>
+</div>
+<div id="vectors" class="section level2">
+<h2>Vectors</h2>
+<p>It is also possible to store more than one value inside an object via the function <code>c()</code> (c stands for combine).</p>
+<pre class="r"><code>A &lt;- c(1/2, -1, 0)</code></pre>
+</div>
+<div id="matrices" class="section level2">
+<h2>Matrices</h2>
+<p>Or create a matrix via <code>matrix()</code> (help about this function via <code>?matrix</code>):</p>
+<pre class="r"><code>my_mat &lt;- matrix(c(-1,2,0,3), ncol = 2, nrow = 2)
+my_mat</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]   -1    0
+## [2,]    2    3</code></pre>
+</div>
+<div id="generate-random-values" class="section level2">
+<h2>Generate random values</h2>
+<p>To generate 10 values based on a normal distribution with mean <span class="math inline">\(\mu = 400\)</span> and standard deviation <span class="math inline">\(\sigma = 10\)</span>:</p>
+<pre class="r"><code>my_vec &lt;- rnorm(10, mean = 400, sd = 10)
+# Display only the first 5 values:
+head(my_vec, 5)</code></pre>
+<pre><code>## [1] 396.9061 392.7578 421.2659 400.7778 409.8870</code></pre>
+<pre class="r"><code># Display only the last 5 values:
+tail(my_vec, 5)</code></pre>
+<pre><code>## [1] 395.8982 415.9888 404.0735 405.6407 416.1875</code></pre>
+<p>You will most likely have different values than mines due to the fact that they are randomly generated. If you want to make sure to have always the same random values, use <code>set.seed()</code> (with any numeric inside the brackets). For instance, with the following code, you should have the exact same values:</p>
+<pre class="r"><code>set.seed(42)
+rnorm(3, mean = 10, sd = 2)</code></pre>
+<pre><code>## [1] 12.741917  8.870604 10.726257</code></pre>
+</div>
+<div id="plot" class="section level2">
+<h2>Plot</h2>
+<pre class="r"><code>plot(my_vec,
+     type = &quot;l&quot;, # &quot;l&quot; stands for line
+     main = &quot;Plot title&quot;,
+     ylab = &quot;Y-axis label&quot;,
+     xlab = &quot;X-axis label&quot;) </code></pre>
+<p><img src="/blog/how-to-install-r-and-rstudio_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>This is only a very limited introduction to the possibilities of RStudio. If you want to learn more, I recommend that you read other <a href="/tags/R/">articles related to R</a>.</p>
+<p>As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>.</p>
 </div>
 </div>
 
@@ -390,6 +457,9 @@ if (!doNotTrack) {
 
     
         
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
 
     
 </body>
