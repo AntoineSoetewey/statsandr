@@ -6,6 +6,6 @@ meta_img: "image/image.png"
 
 Below I list of additional resources:
 
-* <a href="https://r4ds.had.co.nz/" target="_blank" rel="noopener">https://r4ds.had.co.nz</a>: R for Data Science
-* <a href="https://www.r-bloggers.com/" target="_blank" rel="noopener">www.r-bloggers.com</a>
-* <a href="https://statistique-et-logiciel-r.com/" target="_blank" rel="noopener">www.statistique-et-logiciel-r.com</a> (in french)
+* [R for Data Science](https://r4ds.had.co.nz/)
+* [www.r-bloggers.com](https://www.r-bloggers.com)
+* [www.statistique-et-logiciel-r.com](https://statistique-et-logiciel-r.com/) (in french)
