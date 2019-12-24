@@ -121,7 +121,6 @@ This is equivalent than removing the distance variable:
 head(select(dat, -dist))
 ```
 
-
 ## Based on one or multiple criterion
 
 Instead of subsetting a dataset based on row/column numbers or variable names, you can also subset it based on one or multiple criterion:
@@ -163,6 +162,18 @@ head(dat) # 6 is the default in head()
 
 Note than in programming, a character string is generally surrounded by quotes (`"character string"`).
 
+## Discretize a continuous variable
+
+To transform a continuous variable into a discrete variable:
+
+```{r}
+dat$speed_discr <- cut(dat$speed,
+  breaks = c(0, 12, 15, 19, 26), # cut points
+  right = FALSE # closed on the left, open on the right
+)
+dat[c(1:2, 23:24, 49:50), ] # display some observations
+```
+
 # Categorical variables and labels management
 
 For categorical variables, it is a good practice to use the factor format and to name the different levels of the variables.
@@ -192,6 +203,25 @@ class(dat$dist_cat)
 str(dat$dist_cat)
 ```
 
+This will be sufficient if you need to format only a limited number of variables. However, if you need to do it for a large amount of categorical variables, it quickly becomes time consuming to write the same code many times. As you can imagine, it possible to format many variables without having to write the entire code for each variable one by one by using the `within()` command:
+
+```{r}
+dat <- within(dat, {
+  speed_cat <- factor(speed_cat, labels = c(
+    "high speed",
+    "low speed"
+  ))
+  dist_cat <- factor(dist_cat, labels = c(
+    "small distance",
+    "big distance"
+  ))
+})
+head(dat)
+str(dat)
+```
+
+
+
 ## Recode categorical variables
 
 It is possible to recode labels of a categorical variable if you are not satisfied with the current labels. In this example, we change the labels as follows:
@@ -206,6 +236,23 @@ dat$dist_cat <- recode(dat$dist_cat,
 )
 head(dat)
 ```
+
+<!-- This will be sufficient if you need to recode only one variable. However, if you need to recode more than one variables without having to recode them one by one, another piece of code is necessary: -->
+
+<!-- ```{r} -->
+<!-- dat2 <- select(dat, c(speed_cat, dist_cat)) -->
+<!-- dat2$speed_cat <- as.factor(dat$speed_cat) -->
+<!-- dat2 <- apply(dat2, 2, function(x) { -->
+<!--   x <- recode( -->
+<!--     x, -->
+<!--     "'small distance' = 'short distance'; -->
+<!--     'big distance' = 'large distance'; -->
+<!--     'low speed' = 'slow'; -->
+<!--     'high speed' = 'fast'" -->
+<!--   ) -->
+<!--   x -->
+<!-- }) -->
+<!-- ``` -->
 
 ## Change reference level
 
@@ -244,9 +291,54 @@ dat <- rename(dat,
 names(dat) # display variable names
 ```
 
+# Create a dataframe manually
 
+Although most analyses are performed on an imported dataset, it is also possible to create a dataframe directly in R:
 
+```{r}
+# Create the data frame named dat
+dat <- data.frame(
+  "variable1" = c(6, 12, NA, 3), # presence of 1 missing value
+  "variable2" = c(3, 7, 9, 1),
+  row.names = c(1:4),
+  stringsAsFactors = FALSE
+)
+# Print the data frame
+dat
+```
 
+# Missing values (NA)
+
+Missing values (represented by NA in RStudio, for "Not Applicable") are often problematic for many analyses. For instance, the mean of a series or variable with at least one NA will give a NA (the dataframe created in the previous section is used for this example):
+
+```{r}
+mean(dat$variable1)
+```
+
+Several alternatives exist to remove or impute missing values.
+
+## Complete cases
+
+A simple solution is to remove all observations with at least one missing value. This is done by keeping observations with complete cases:
+
+```{r}
+dat_complete <- dat[complete.cases(dat), ]
+dat_complete
+```
+
+Be careful before removing observations with missing values, especially if missing values are not "missing at random". This is, however, beyond the scope of the present article.
+
+## Impute missing values
+
+Instead of removing observations with at least one NA, it is possible to impute them, that is, replace them by some values such as the median, the mode or the mean of the variable with the command `impute()` from the package `imputeMissings`
+
+```{r}
+library(imputeMissings)
+dat_imputed <- impute(dat) # default method is median/mode
+dat_imputed
+```
+
+When the median/mode method is used, character vectors and factors are imputed with the mode. Numeric and integer vectors are imputed with the median. Again, use imputations carefully.
 
 Thanks for reading. I hope this article helped you to manipulate your data in RStudio. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/).
 

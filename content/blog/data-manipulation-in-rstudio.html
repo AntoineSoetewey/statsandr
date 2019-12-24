@@ -26,12 +26,19 @@ output:
 <li><a href="#based-on-variable-names">Based on variable names</a></li>
 <li><a href="#based-on-one-or-multiple-criterion">Based on one or multiple criterion</a></li>
 </ul></li>
-<li><a href="#create-a-new-variable">Create a new variable</a></li>
+<li><a href="#create-a-new-variable">Create a new variable</a><ul>
+<li><a href="#discretize-a-continuous-variable">Discretize a continuous variable</a></li>
+</ul></li>
 <li><a href="#categorical-variables-and-labels-management">Categorical variables and labels management</a><ul>
 <li><a href="#recode-categorical-variables">Recode categorical variables</a></li>
 <li><a href="#change-reference-level">Change reference level</a></li>
 </ul></li>
 <li><a href="#rename-variable-names">Rename variable names</a></li>
+<li><a href="#create-a-dataframe-manually">Create a dataframe manually</a></li>
+<li><a href="#missing-values-na">Missing values (NA)</a><ul>
+<li><a href="#complete-cases">Complete cases</a></li>
+<li><a href="#impute-missing-values">Impute missing values</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -145,9 +152,9 @@ dat # display the entire dataset</code></pre>
 sample_n(dat, 4, replace = FALSE)</code></pre>
 <pre><code>##   speed dist
 ## 1    10   34
-## 2    18   84
-## 3    20   56
-## 4    20   48</code></pre>
+## 2    20   52
+## 3    16   40
+## 4     7   22</code></pre>
 </div>
 <div id="based-on-row-or-column-number" class="section level2">
 <h2>Based on row or column number</h2>
@@ -302,6 +309,22 @@ head(dat) # 6 is the default in head()</code></pre>
 ## 5     8   16        128 high speed
 ## 6     9   10         90 high speed</code></pre>
 <p>Note than in programming, a character string is generally surrounded by quotes (<code>&quot;character string&quot;</code>).</p>
+<div id="discretize-a-continuous-variable" class="section level2">
+<h2>Discretize a continuous variable</h2>
+<p>To transform a continuous variable into a discrete variable:</p>
+<pre class="r"><code>dat$speed_discr &lt;- cut(dat$speed,
+  breaks = c(0, 12, 15, 19, 26), # cut points
+  right = FALSE # closed on the left, open on the right
+)
+dat[c(1:2, 23:24, 49:50), ] # display some observations</code></pre>
+<pre><code>##    speed dist speed_dist  speed_cat speed_discr
+## 1      4    2          8  low speed      [0,12)
+## 2      4   10         40  low speed      [0,12)
+## 23    14   80       1120 high speed     [12,15)
+## 24    15   20        300 high speed     [15,19)
+## 49    24  120       2880 high speed     [19,26)
+## 50    25   85       2125 high speed     [19,26)</code></pre>
+</div>
 </div>
 <div id="categorical-variables-and-labels-management" class="section level1">
 <h1>Categorical variables and labels management</h1>
@@ -321,13 +344,13 @@ dat$dist_cat &lt;- factor(dat$dist_cat,
 )
 
 head(dat)</code></pre>
-<pre><code>##   speed dist speed_dist  speed_cat       dist_cat
-## 1     4    2          8  low speed small distance
-## 2     4   10         40  low speed small distance
-## 3     7    4         28  low speed small distance
-## 4     7   22        154  low speed   big distance
-## 5     8   16        128 high speed   big distance
-## 6     9   10         90 high speed small distance</code></pre>
+<pre><code>##   speed dist speed_dist  speed_cat speed_discr       dist_cat
+## 1     4    2          8  low speed      [0,12) small distance
+## 2     4   10         40  low speed      [0,12) small distance
+## 3     7    4         28  low speed      [0,12) small distance
+## 4     7   22        154  low speed      [0,12)   big distance
+## 5     8   16        128 high speed      [0,12)   big distance
+## 6     9   10         90 high speed      [0,12) small distance</code></pre>
 <ul>
 <li>to check the format of a variable:</li>
 </ul>
@@ -336,6 +359,33 @@ head(dat)</code></pre>
 <pre class="r"><code># or
 str(dat$dist_cat)</code></pre>
 <pre><code>##  Factor w/ 2 levels &quot;small distance&quot;,..: 1 1 1 2 2 1 2 2 2 2 ...</code></pre>
+<p>This will be sufficient if you need to format only a limited number of variables. However, if you need to do it for a large amount of categorical variables, it quickly becomes time consuming to write the same code many times. As you can imagine, it possible to format many variables without having to write the entire code for each variable one by one by using the <code>within()</code> command:</p>
+<pre class="r"><code>dat &lt;- within(dat, {
+  speed_cat &lt;- factor(speed_cat, labels = c(
+    &quot;high speed&quot;,
+    &quot;low speed&quot;
+  ))
+  dist_cat &lt;- factor(dist_cat, labels = c(
+    &quot;small distance&quot;,
+    &quot;big distance&quot;
+  ))
+})
+head(dat)</code></pre>
+<pre><code>##   speed dist speed_dist  speed_cat speed_discr       dist_cat
+## 1     4    2          8  low speed      [0,12) small distance
+## 2     4   10         40  low speed      [0,12) small distance
+## 3     7    4         28  low speed      [0,12) small distance
+## 4     7   22        154  low speed      [0,12)   big distance
+## 5     8   16        128 high speed      [0,12)   big distance
+## 6     9   10         90 high speed      [0,12) small distance</code></pre>
+<pre class="r"><code>str(dat)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    50 obs. of  6 variables:
+##  $ speed      : num  4 4 7 7 8 9 10 10 10 11 ...
+##  $ dist       : num  2 10 4 22 16 10 18 26 34 17 ...
+##  $ speed_dist : num  8 40 28 154 128 90 180 260 340 187 ...
+##  $ speed_cat  : Factor w/ 2 levels &quot;high speed&quot;,&quot;low speed&quot;: 2 2 2 2 1 1 1 1 1 1 ...
+##  $ speed_discr: Factor w/ 4 levels &quot;[0,12)&quot;,&quot;[12,15)&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ dist_cat   : Factor w/ 2 levels &quot;small distance&quot;,..: 1 1 1 2 2 1 2 2 2 2 ...</code></pre>
 <div id="recode-categorical-variables" class="section level2">
 <h2>Recode categorical variables</h2>
 <p>It is possible to recode labels of a categorical variable if you are not satisfied with the current labels. In this example, we change the labels as follows:</p>
@@ -348,13 +398,28 @@ str(dat$dist_cat)</code></pre>
   &quot;big distance&quot; = &quot;large distance&quot;
 )
 head(dat)</code></pre>
-<pre><code>##   speed dist speed_dist  speed_cat       dist_cat
-## 1     4    2          8  low speed short distance
-## 2     4   10         40  low speed short distance
-## 3     7    4         28  low speed short distance
-## 4     7   22        154  low speed large distance
-## 5     8   16        128 high speed large distance
-## 6     9   10         90 high speed short distance</code></pre>
+<pre><code>##   speed dist speed_dist  speed_cat speed_discr       dist_cat
+## 1     4    2          8  low speed      [0,12) short distance
+## 2     4   10         40  low speed      [0,12) short distance
+## 3     7    4         28  low speed      [0,12) short distance
+## 4     7   22        154  low speed      [0,12) large distance
+## 5     8   16        128 high speed      [0,12) large distance
+## 6     9   10         90 high speed      [0,12) short distance</code></pre>
+<!-- This will be sufficient if you need to recode only one variable. However, if you need to recode more than one variables without having to recode them one by one, another piece of code is necessary: -->
+<!-- ```{r} -->
+<!-- dat2 <- select(dat, c(speed_cat, dist_cat)) -->
+<!-- dat2$speed_cat <- as.factor(dat$speed_cat) -->
+<!-- dat2 <- apply(dat2, 2, function(x) { -->
+<!--   x <- recode( -->
+<!--     x, -->
+<!--     "'small distance' = 'short distance'; -->
+<!--     'big distance' = 'large distance'; -->
+<!--     'low speed' = 'slow'; -->
+<!--     'high speed' = 'fast'" -->
+<!--   ) -->
+<!--   x -->
+<!-- }) -->
+<!-- ``` -->
 </div>
 <div id="change-reference-level" class="section level2">
 <h2>Change reference level</h2>
@@ -388,6 +453,60 @@ levels(dat$dist_cat)</code></pre>
 )
 names(dat) # display variable names</code></pre>
 <pre><code>## [1] &quot;speed&quot;          &quot;distance&quot;       &quot;speed_distance&quot; &quot;speed_cat&quot;     
-## [5] &quot;distance_cat&quot;</code></pre>
+## [5] &quot;speed_discr&quot;    &quot;distance_cat&quot;</code></pre>
+</div>
+<div id="create-a-dataframe-manually" class="section level1">
+<h1>Create a dataframe manually</h1>
+<p>Although most analyses are performed on an imported dataset, it is also possible to create a dataframe directly in R:</p>
+<pre class="r"><code># Create the data frame named dat
+dat &lt;- data.frame(
+  &quot;variable1&quot; = c(6, 12, NA, 3), # presence of 1 missing value
+  &quot;variable2&quot; = c(3, 7, 9, 1),
+  row.names = c(1:4),
+  stringsAsFactors = FALSE
+)
+# Print the data frame
+dat</code></pre>
+<pre><code>##   variable1 variable2
+## 1         6         3
+## 2        12         7
+## 3        NA         9
+## 4         3         1</code></pre>
+</div>
+<div id="missing-values-na" class="section level1">
+<h1>Missing values (NA)</h1>
+<p>Missing values (represented by NA in RStudio, for “Not Applicable”) are often problematic for many analyses. For instance, the mean of a series or variable with at least one NA will give a NA (the dataframe created in the previous section is used for this example):</p>
+<pre class="r"><code>mean(dat$variable1)</code></pre>
+<pre><code>## [1] NA</code></pre>
+<p>Several alternatives exist to remove or impute missing values.</p>
+<div id="complete-cases" class="section level2">
+<h2>Complete cases</h2>
+<p>A simple solution is to remove all observations with at least one missing value. This is done by keeping observations with complete cases:</p>
+<pre class="r"><code>dat_complete &lt;- dat[complete.cases(dat), ]
+dat_complete</code></pre>
+<pre><code>##   variable1 variable2
+## 1         6         3
+## 2        12         7
+## 4         3         1</code></pre>
+<p>Be careful before removing observations with missing values, especially if missing values are not “missing at random”. This is, however, beyond the scope of the present article.</p>
+</div>
+<div id="impute-missing-values" class="section level2">
+<h2>Impute missing values</h2>
+<p>Instead of removing observations with at least one NA, it is possible to impute them, that is, replace them by some values such as the median, the mode or the mean of the variable with the command <code>impute()</code> from the package <code>imputeMissings</code></p>
+<pre class="r"><code>library(imputeMissings)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;imputeMissings&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     compute</code></pre>
+<pre class="r"><code>dat_imputed &lt;- impute(dat) # default method is median/mode
+dat_imputed</code></pre>
+<pre><code>##   variable1 variable2
+## 1         6         3
+## 2        12         7
+## 3         6         9
+## 4         3         1</code></pre>
+<p>When the median/mode method is used, character vectors and factors are imputed with the mode. Numeric and integer vectors are imputed with the median. Again, use imputations carefully.</p>
 <p>Thanks for reading. I hope this article helped you to manipulate your data in RStudio. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>.</p>
+</div>
 </div>
