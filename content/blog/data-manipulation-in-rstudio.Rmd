@@ -1,0 +1,126 @@
+---
+title: Data manipulation in RStudio
+author: Antoine Soetewey
+date: '2019-12-24'
+slug: data-manipulation-in-rstudio
+categories: []
+tags:
+  - R
+meta_img: image/image.png
+# description: Description for the page.
+output:
+  blogdown::html_page:
+    toc: true
+draft: true
+---
+
+# Introduction
+
+Not all datasets are as clean and tidy as you would expect. Therefore, after [importing your dataset into RStudio](/blog/how-to-import-an-excel-file-in-rstudio/), most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor. Data manipulation include a broad range of tools and techniques. We present here in details the manipulations that you will most likely need for your projects. Do not hesitate to let me know (as a comment for example) if you find other data manipulations essential.
+
+# Dataset
+
+In this article, we use the dataset `cars` to illustrate the different data manipulation techniques. Note that the dataset is imported by default in RStudio (so you do not need to import it) and I use the generic name `dat` for the name of the dataset (see [here](/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way) why I always use a generic name instead of more specific names for dataset names). Here is a table of the dataset:
+
+```{r}
+dat <- cars # rename the dataset with a generic name
+dat # display the entire dataset
+```
+
+This dataset has `r nrow(dat)` observations with `r ncol(dat)` variables (speed and distance). You can check the number of observations and variables with `nrow(dat)` and `ncol(dat)`, or `dim(dat)`:
+
+```{r}
+nrow(dat) # number of rows
+ncol(dat) # number of columns
+dim(dat) # dimension: number of rows and columns
+```
+
+<!-- library(pander) -->
+<!-- pander(dat) -->
+<!-- Note that the `pander()` command is only used for aesthetic reasons. You do not necessarily have to use them when you work in R Studio. -->
+
+# Subset a dataset
+
+## Based on row or column number
+
+If you know what observation(s) or column(s) you want to keep, you can use the row or column number(s) to subset your dataset. We illustrate this with several examples:
+
+* keep all the variables for the $3^{rd}$ observation:
+```{r, eval = FALSE}
+dat[3, ]
+```
+* keep the $2^{nd}$ variable for all observations:
+```{r, eval = FALSE}
+dat[, 2]
+```
+* You can mix the two above methods to keep only the $2^{nd}$ variable of the $3^{rd}$ observation:
+```{r}
+dat[3, 2]
+```
+* keep several observations, for example the first 5, the $10^{th}$ and the $15^{th}$ observation for all variables:
+```{r}
+dat[c(1:5, 10, 15), ] # do not forget c()
+```
+* remove observations 5 to 45:
+```{r}
+dat[-c(5:45), ]
+```
+* tip: to keep only the last observation, use `nrow()` instead of the row number:
+```{r}
+dat[nrow(dat), ] # nrow() gives the number of rows
+```
+
+This way, no matter the number of observations, you will always select the last one. This technique of using a piece of code instead of a specific value is to avoid "hard coding". Hard coding is generally not recommended (unless you want to specify a parameter that you are sure will never change) because if your dataset changes, you will need to manually edit your code. 
+
+As you probably figured out by now, you can select observations and/or variables of a dataset by running `dataset_name[row_number, column_number]`. When the row or column number is left empty, the entire row/column is selected. Note that all examples presented above also works for matrices:
+
+```{r}
+mat <- matrix(c(-1, 2, 0, 3), ncol = 2, nrow = 2)
+mat[1, 2]
+```
+
+## Based on variable names
+
+To select one variable of the dataset based on its name rather than on its column number, use `dataset_name$variable_name`:
+
+```{r}
+dat$speed
+```
+
+If you are sure that the variable names will never change, I recommend using this technique. However, if the variable names may change, it is recommended to use the column number.
+
+## Based on one or multiple criterion
+
+Instead of subsetting a dataset based on row/column numbers or variable names, you can also subset it based on one or multiple criterion:
+
+* keep only observations with speed larger than 20. The first argument refers to the name of the dataset, while the second argument refers to the subset criteria:
+```{r}
+subset(dat, dat$speed > 20)
+```
+* keep only observations with distance smaller than or equal to 50 __and__ speed equal to 10:
+```{r}
+subset(dat, dat$dist <= 50 & dat$speed == 10)
+```
+
+Note the `==` (and not `=`) for the equal criteria. Moreover, use `|` to keep only observations with distance smaller than 20 __or__ speed equal to 10:
+```{r}
+subset(dat, dat$dist < 20 | dat$speed == 10)
+```
+
+# Create a new variable
+
+Often your dataset can be enhanced by creating new variables and then add them to your dataset. In this example, we create two new variables; one being the speed times the distance (which we call `speed_dist`) and the other being a categorization of the speed (which we call `speed_cat`). We then display the first 6 observations of this new dataset with the 4 variables:
+
+```{r}
+# create new variable speed_dist
+dat$speed_dist <- dat$speed * dat$dist # create speed_dist
+# create new variable speed_cat
+dat$speed_cat <- ifelse(dat$speed > 7,
+                        "high speed", "low speed") # the above function, ifelse(), means that if dat$speed > 7, then speed_cat is "high speed", otherwise it is "low_speed"
+# display first 6 observations
+head(dat) # 6 is the default in head()
+```
+
+
+Thanks for reading. I hope this article helped you to manipulate your data in RStudio. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/).
+
