@@ -159,7 +159,7 @@
 <li><a href="#subset-a-dataset">Subset a dataset</a><ul>
 <li><a href="#first-or-last-observations">First or last observations</a></li>
 <li><a href="#random-sample-of-observations">Random sample of observations</a></li>
-<li><a href="#based-on-row-or-column-number">Based on row or column number</a></li>
+<li><a href="#based-on-row-or-column-numbers">Based on row or column numbers</a></li>
 <li><a href="#based-on-variable-names">Based on variable names</a></li>
 <li><a href="#based-on-one-or-multiple-criterion">Based on one or multiple criterion</a></li>
 </ul></li>
@@ -172,7 +172,7 @@
 </ul></li>
 <li><a href="#rename-variable-names">Rename variable names</a></li>
 <li><a href="#create-a-dataframe-manually">Create a dataframe manually</a></li>
-<li><a href="#missing-values-na">Missing values (NA)</a><ul>
+<li><a href="#missing-values">Missing values</a><ul>
 <li><a href="#remove-nas">Remove NAs</a></li>
 <li><a href="#impute-nas">Impute NAs</a></li>
 </ul></li>
@@ -181,12 +181,12 @@
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Not all datasets are as clean and tidy as you would expect. Therefore, after <a href="/blog/how-to-import-an-excel-file-in-rstudio/">importing your dataset into RStudio</a>, most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor. Data manipulation include a broad range of tools and techniques. We present here in details the manipulations that you will most likely need for your projects. Do not hesitate to let me know (as a comment for example) if you find other data manipulations essential.</p>
+<p>Not all datasets are as clean and tidy as you would expect. Therefore, after <a href="/blog/how-to-import-an-excel-file-in-rstudio/">importing your dataset into RStudio</a>, most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor. Data manipulation include a broad range of tools and techniques. We present here in details the manipulations that you will most likely need for your projects. Do not hesitate to let me know (as a comment at the end of this article for example) if you find other data manipulations essential so that I can add them.</p>
 </div>
 <div id="dataset" class="section level1">
 <h1>Dataset</h1>
-<p>In this article, we use the dataset <code>cars</code> to illustrate the different data manipulation techniques. Note that the dataset is imported by default in RStudio (so you do not need to import it) and I use the generic name <code>dat</code> for the name of the dataset (see <a href="/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way">here</a> why I always use a generic name instead of more specific names for dataset names). Here is a table of the dataset:</p>
-<pre class="r"><code>dat &lt;- cars # rename the dataset with a generic name
+<p>In this article, we use the dataset <code>cars</code> to illustrate the different data manipulation techniques. Note that the dataset is installed by default in RStudio (so you do not need to import it) and I use the generic name <code>dat</code> as the name of the dataset throughout the article (see <a href="/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way">here</a> why I always use a generic name instead of more specific names). Here is a table of the whole dataset:</p>
+<pre class="r"><code>dat &lt;- cars # rename the cars dataset with a generic name
 dat # display the entire dataset</code></pre>
 <pre><code>##    speed dist
 ## 1      4    2
@@ -240,11 +240,11 @@ dat # display the entire dataset</code></pre>
 ## 49    24  120
 ## 50    25   85</code></pre>
 <p>This dataset has 50 observations with 2 variables (speed and distance). You can check the number of observations and variables with <code>nrow(dat)</code> and <code>ncol(dat)</code>, or <code>dim(dat)</code>:</p>
-<pre class="r"><code>nrow(dat) # number of rows</code></pre>
+<pre class="r"><code>nrow(dat) # number of rows/observations</code></pre>
 <pre><code>## [1] 50</code></pre>
-<pre class="r"><code>ncol(dat) # number of columns</code></pre>
+<pre class="r"><code>ncol(dat) # number of columns/variables</code></pre>
 <pre><code>## [1] 2</code></pre>
-<pre class="r"><code>dim(dat) # dimension: number of rows and columns</code></pre>
+<pre class="r"><code>dim(dat) # dimension: number of rows/observations and columns/variables</code></pre>
 <pre><code>## [1] 50  2</code></pre>
 <!-- library(pander) -->
 <!-- pander(dat) -->
@@ -288,13 +288,13 @@ dat # display the entire dataset</code></pre>
 <pre class="r"><code>library(dplyr)
 sample_n(dat, 4, replace = FALSE)</code></pre>
 <pre><code>##   speed dist
-## 1     8   16
-## 2    20   32
-## 3    24   70
-## 4    10   26</code></pre>
+## 1    17   40
+## 2    14   60
+## 3    10   34
+## 4    11   28</code></pre>
 </div>
-<div id="based-on-row-or-column-number" class="section level2">
-<h2>Based on row or column number</h2>
+<div id="based-on-row-or-column-numbers" class="section level2">
+<h2>Based on row or column numbers</h2>
 <p>If you know what observation(s) or column(s) you want to keep, you can use the row or column number(s) to subset your dataset. We illustrate this with several examples:</p>
 <ul>
 <li>keep all the variables for the <span class="math inline">\(3^{rd}\)</span> observation:</li>
@@ -310,7 +310,7 @@ sample_n(dat, 4, replace = FALSE)</code></pre>
 <pre class="r"><code>dat[3, 2]</code></pre>
 <pre><code>## [1] 4</code></pre>
 <ul>
-<li>keep several observations, for example the first 5, the <span class="math inline">\(10^{th}\)</span> and the <span class="math inline">\(15^{th}\)</span> observation for all variables:</li>
+<li>keep several observations; for example observations <span class="math inline">\(1\)</span> to <span class="math inline">\(5\)</span>, the <span class="math inline">\(10^{th}\)</span> and the <span class="math inline">\(15^{th}\)</span> observation for all variables:</li>
 </ul>
 <pre class="r"><code>dat[c(1:5, 10, 15), ] # do not forget c()</code></pre>
 <pre><code>##    speed dist
@@ -344,7 +344,11 @@ sample_n(dat, 4, replace = FALSE)</code></pre>
 <p>This way, no matter the number of observations, you will always select the last one. This technique of using a piece of code instead of a specific value is to avoid “hard coding”. Hard coding is generally not recommended (unless you want to specify a parameter that you are sure will never change) because if your dataset changes, you will need to manually edit your code.</p>
 <p>As you probably figured out by now, you can select observations and/or variables of a dataset by running <code>dataset_name[row_number, column_number]</code>. When the row or column number is left empty, the entire row/column is selected. Note that all examples presented above also works for matrices:</p>
 <pre class="r"><code>mat &lt;- matrix(c(-1, 2, 0, 3), ncol = 2, nrow = 2)
-mat[1, 2]</code></pre>
+mat</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]   -1    0
+## [2,]    2    3</code></pre>
+<pre class="r"><code>mat[1, 2]</code></pre>
 <pre><code>## [1] 0</code></pre>
 </div>
 <div id="based-on-variable-names" class="section level2">
@@ -353,7 +357,7 @@ mat[1, 2]</code></pre>
 <pre class="r"><code>dat$speed</code></pre>
 <pre><code>##  [1]  4  4  7  7  8  9 10 10 10 11 11 12 12 12 12 13 13 13 13 14 14 14 14 15 15
 ## [26] 15 16 16 17 17 17 18 18 18 18 19 19 19 20 20 20 20 20 22 23 24 24 24 24 25</code></pre>
-<p>Accessing variables inside a dataset with this second method is strongly recommended compared to the first if you intend to modify the structure of your database. Indeed, if a column is added or removed in the dataset, the numbering will change. Therefore, variables are generally referred to by its name rather than by its position (column number). In addition, it is always easier to understand and interpret code with the name of the variable written. There is only one reason why I would still use the column number; if the variables names are expected to change while the structure of the dataset do not change.</p>
+<p>Accessing variables inside a dataset with this second method is strongly recommended compared to the first if you intend to modify the structure of your database. Indeed, if a column is added or removed in the dataset, the numbering will change. Therefore, variables are generally referred to by its name rather than by its position (column number). In addition, it is easier to understand and interpret code with the name of the variable written (another reason to call variables with a concise but clear name). There is only one reason why I would still use the column number; if the variables names are expected to change while the structure of the dataset do not change.</p>
 <p>To select variables, it is also possible to use the <code>select()</code> command from the powerful <code>dplyr</code> package (for compactness only the first 6 observations are displayed thanks to the <code>head()</code> command):</p>
 <pre class="r"><code>head(select(dat, speed))</code></pre>
 <pre><code>##   speed
@@ -426,12 +430,12 @@ mat[1, 2]</code></pre>
 </div>
 <div id="create-a-new-variable" class="section level1">
 <h1>Create a new variable</h1>
-<p>Often your dataset can be enhanced by creating new variables and then add them to your dataset. In this example, we create two new variables; one being the speed times the distance (which we call <code>speed_dist</code>) and the other being a categorization of the speed (which we call <code>speed_cat</code>). We then display the first 6 observations of this new dataset with the 4 variables:</p>
-<pre class="r"><code># create new variable speed_dist:
+<p>Often a dataset can be enhanced by creating new variables based on other variables from the initial dataset. In this example, we create two new variables; one being the speed times the distance (which we call <code>speed_dist</code>) and the other being a categorization of the speed (which we call <code>speed_cat</code>). We then display the first 6 observations of this new dataset with the 4 variables:</p>
+<pre class="r"><code># create new variable speed_dist
 dat$speed_dist &lt;- dat$speed * dat$dist
 
 # create new variable speed_cat
-# the function ifelse() means that if dat$speed &gt; 7, then speed_cat is &quot;high speed&quot;, otherwise it is &quot;low_speed&quot;
+# the function ifelse() below means that if dat$speed &gt; 7, then speed_cat is &quot;high speed&quot;, otherwise it is &quot;low_speed&quot;
 dat$speed_cat &lt;- ifelse(dat$speed &gt; 7,
   &quot;high speed&quot;, &quot;low speed&quot;
 )
@@ -581,6 +585,7 @@ levels(dat$dist_cat)</code></pre>
 <p>To rename variable names, use the <code>rename()</code> command from the <code>dplyr</code> package as follows:</p>
 <ul>
 <li>dist <span class="math inline">\(\rightarrow\)</span> distance</li>
+<li>speed_dist <span class="math inline">\(\rightarrow\)</span> speed_distance</li>
 <li>dist_cat <span class="math inline">\(\rightarrow\)</span> distance_cat</li>
 </ul>
 <pre class="r"><code>dat &lt;- rename(dat,
@@ -599,7 +604,6 @@ names(dat) # display variable names</code></pre>
 dat &lt;- data.frame(
   &quot;variable1&quot; = c(6, 12, NA, 3), # presence of 1 missing value
   &quot;variable2&quot; = c(3, 7, 9, 1),
-  row.names = c(1:4),
   stringsAsFactors = FALSE
 )
 # Print the data frame
@@ -610,8 +614,8 @@ dat</code></pre>
 ## 3        NA         9
 ## 4         3         1</code></pre>
 </div>
-<div id="missing-values-na" class="section level1">
-<h1>Missing values (NA)</h1>
+<div id="missing-values" class="section level1">
+<h1>Missing values</h1>
 <p>Missing values (represented by NA in RStudio, for “Not Applicable”) are often problematic for many analyses. For instance, the mean of a series or variable with at least one NA will give a NA (the dataframe created in the previous section is used for this example):</p>
 <pre class="r"><code>mean(dat$variable1)</code></pre>
 <pre><code>## [1] NA</code></pre>
