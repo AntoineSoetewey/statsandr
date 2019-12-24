@@ -41,6 +41,26 @@ dim(dat) # dimension: number of rows and columns
 
 # Subset a dataset
 
+## First or last observations
+
+* To keep only the first 10 observations:
+```{r}
+head(dat, n = 10)
+```
+
+* To keep only the last 5 observations:
+```{r}
+tail(dat, n = 5)
+```
+
+## Random sample of observations
+
+* To draw a sample of 4 observations without replacement:
+```{r, message = FALSE}
+library(dplyr)
+sample_n(dat, 4, replace = FALSE)
+```
+
 ## Based on row or column number
 
 If you know what observation(s) or column(s) you want to keep, you can use the row or column number(s) to subset your dataset. We illustrate this with several examples:
@@ -87,7 +107,20 @@ To select one variable of the dataset based on its name rather than on its colum
 dat$speed
 ```
 
-If you are sure that the variable names will never change, I recommend using this technique. However, if the variable names may change, it is recommended to use the column number.
+Accessing variables inside a dataset with this second method is strongly recommended compared to the first if you intend to modify the structure of your database. Indeed, if a column is added or removed in the dataset, the numbering will change. Therefore, variables are generally referred to by its name rather than by its position (column number). In addition, it is always easier to understand and interpret code with the name of the variable written. There is only one reason why I would still use the column number; if the variables names are expected to change while the structure of the dataset do not change.
+
+To select variables, it is also possible to use the `select()` command from the powerful `dplyr` package (for compactness only the first 6 observations are displayed thanks to the `head()` command):
+
+```{r}
+head(select(dat, speed))
+```
+
+This is equivalent than removing the distance variable:
+
+```{r}
+head(select(dat, -dist))
+```
+
 
 ## Based on one or multiple criterion
 
@@ -97,14 +130,17 @@ Instead of subsetting a dataset based on row/column numbers or variable names, y
 ```{r}
 subset(dat, dat$speed > 20)
 ```
-* keep only observations with distance smaller than or equal to 50 __and__ speed equal to 10:
+* keep only observations with distance smaller than or equal to 50 __and__ speed equal to 10. Note the `==` (and not `=`) for the equal criteria:
 ```{r}
 subset(dat, dat$dist <= 50 & dat$speed == 10)
 ```
-
-Note the `==` (and not `=`) for the equal criteria. Moreover, use `|` to keep only observations with distance smaller than 20 __or__ speed equal to 10:
+* use `|` to keep only observations with distance smaller than 20 __or__ speed equal to 10:
 ```{r}
 subset(dat, dat$dist < 20 | dat$speed == 10)
+```
+* to filter out some observations, use `!=`. For instance, to keep observations with speed not equal to 24 and distance not equal to 120 (for compactness only the last 6 observations are displayed thanks to the `tail()` command):
+```{r}
+tail(subset(dat, dat$speed != 24 & dat$dist != 120))
 ```
 
 # Create a new variable
@@ -112,14 +148,104 @@ subset(dat, dat$dist < 20 | dat$speed == 10)
 Often your dataset can be enhanced by creating new variables and then add them to your dataset. In this example, we create two new variables; one being the speed times the distance (which we call `speed_dist`) and the other being a categorization of the speed (which we call `speed_cat`). We then display the first 6 observations of this new dataset with the 4 variables:
 
 ```{r}
-# create new variable speed_dist
-dat$speed_dist <- dat$speed * dat$dist # create speed_dist
+# create new variable speed_dist:
+dat$speed_dist <- dat$speed * dat$dist
+
 # create new variable speed_cat
+# the function ifelse() means that if dat$speed > 7, then speed_cat is "high speed", otherwise it is "low_speed"
 dat$speed_cat <- ifelse(dat$speed > 7,
-                        "high speed", "low speed") # the above function, ifelse(), means that if dat$speed > 7, then speed_cat is "high speed", otherwise it is "low_speed"
+  "high speed", "low speed"
+)
+
 # display first 6 observations
 head(dat) # 6 is the default in head()
 ```
+
+Note than in programming, a character string is generally surrounded by quotes (`"character string"`).
+
+# Categorical variables and labels management
+
+For categorical variables, it is a good practice to use the factor format and to name the different levels of the variables.
+
+* for this example, let's create another new variable called `dist_cat` based on the distance and then change its format from numeric to factor (while also specifying the labels of the levels):
+
+```{r}
+# create new variable dist_cat
+dat$dist_cat <- ifelse(dat$dist < 15,
+  1, 2
+)
+
+# change from numeric to factor and specify the labels
+dat$dist_cat <- factor(dat$dist_cat,
+  levels = c(1, 2),
+  labels = c("small distance", "big distance") # follow the order of the levels
+)
+
+head(dat)
+```
+
+* to check the format of a variable:
+
+```{r}
+class(dat$dist_cat)
+# or
+str(dat$dist_cat)
+```
+
+## Recode categorical variables
+
+It is possible to recode labels of a categorical variable if you are not satisfied with the current labels. In this example, we change the labels as follows:
+
+* "small distance" $\rightarrow$ "short distance"
+* "big distance" $\rightarrow$ "large distance"
+
+```{r}
+dat$dist_cat <- recode(dat$dist_cat,
+  "small distance" = "short distance",
+  "big distance" = "large distance"
+)
+head(dat)
+```
+
+## Change reference level
+
+For some analyses, you might want to change the order of the levels. For example, if you analyze data about a control group and a treatment group, you may want to set the control group as the reference group. By default, levels are ordered by alphabetical order or by its numeric value if it was change from numeric to factor.
+
+* to check the current order of the levels (the first level being the reference):
+
+```{r}
+levels(dat$dist_cat)
+```
+
+In this case, "short distance" being the first level it is the reference level. It is the first level because it was initially set with a value equal to 1 when creating the variable.
+
+* to change the reference level:
+
+```{r}
+dat$dist_cat <- relevel(dat$dist_cat, ref = "large distance")
+levels(dat$dist_cat)
+```
+
+Large distance is now the first and thus the reference level.
+
+# Rename variable names
+
+To rename variable names, use the `rename()` command from the `dplyr` package as follows:
+
+* dist $\rightarrow$ distance
+* dist_cat $\rightarrow$ distance_cat
+
+```{r}
+dat <- rename(dat,
+  distance = dist,
+  speed_distance = speed_dist,
+  distance_cat = dist_cat
+)
+names(dat) # display variable names
+```
+
+
+
 
 
 Thanks for reading. I hope this article helped you to manipulate your data in RStudio. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/).

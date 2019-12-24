@@ -20,11 +20,18 @@ output:
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#dataset">Dataset</a></li>
 <li><a href="#subset-a-dataset">Subset a dataset</a><ul>
+<li><a href="#first-or-last-observations">First or last observations</a></li>
+<li><a href="#random-sample-of-observations">Random sample of observations</a></li>
 <li><a href="#based-on-row-or-column-number">Based on row or column number</a></li>
 <li><a href="#based-on-variable-names">Based on variable names</a></li>
 <li><a href="#based-on-one-or-multiple-criterion">Based on one or multiple criterion</a></li>
 </ul></li>
 <li><a href="#create-a-new-variable">Create a new variable</a></li>
+<li><a href="#categorical-variables-and-labels-management">Categorical variables and labels management</a><ul>
+<li><a href="#recode-categorical-variables">Recode categorical variables</a></li>
+<li><a href="#change-reference-level">Change reference level</a></li>
+</ul></li>
+<li><a href="#rename-variable-names">Rename variable names</a></li>
 </ul>
 </div>
 
@@ -101,6 +108,47 @@ dat # display the entire dataset</code></pre>
 </div>
 <div id="subset-a-dataset" class="section level1">
 <h1>Subset a dataset</h1>
+<div id="first-or-last-observations" class="section level2">
+<h2>First or last observations</h2>
+<ul>
+<li>To keep only the first 10 observations:</li>
+</ul>
+<pre class="r"><code>head(dat, n = 10)</code></pre>
+<pre><code>##    speed dist
+## 1      4    2
+## 2      4   10
+## 3      7    4
+## 4      7   22
+## 5      8   16
+## 6      9   10
+## 7     10   18
+## 8     10   26
+## 9     10   34
+## 10    11   17</code></pre>
+<ul>
+<li>To keep only the last 5 observations:</li>
+</ul>
+<pre class="r"><code>tail(dat, n = 5)</code></pre>
+<pre><code>##    speed dist
+## 46    24   70
+## 47    24   92
+## 48    24   93
+## 49    24  120
+## 50    25   85</code></pre>
+</div>
+<div id="random-sample-of-observations" class="section level2">
+<h2>Random sample of observations</h2>
+<ul>
+<li>To draw a sample of 4 observations without replacement:</li>
+</ul>
+<pre class="r"><code>library(dplyr)
+sample_n(dat, 4, replace = FALSE)</code></pre>
+<pre><code>##   speed dist
+## 1    10   34
+## 2    18   84
+## 3    20   56
+## 4    20   48</code></pre>
+</div>
 <div id="based-on-row-or-column-number" class="section level2">
 <h2>Based on row or column number</h2>
 <p>If you know what observation(s) or column(s) you want to keep, you can use the row or column number(s) to subset your dataset. We illustrate this with several examples:</p>
@@ -161,7 +209,25 @@ mat[1, 2]</code></pre>
 <pre class="r"><code>dat$speed</code></pre>
 <pre><code>##  [1]  4  4  7  7  8  9 10 10 10 11 11 12 12 12 12 13 13 13 13 14 14 14 14 15 15
 ## [26] 15 16 16 17 17 17 18 18 18 18 19 19 19 20 20 20 20 20 22 23 24 24 24 24 25</code></pre>
-<p>If you are sure that the variable names will never change, I recommend using this technique. However, if the variable names may change, it is recommended to use the column number.</p>
+<p>Accessing variables inside a dataset with this second method is strongly recommended compared to the first if you intend to modify the structure of your database. Indeed, if a column is added or removed in the dataset, the numbering will change. Therefore, variables are generally referred to by its name rather than by its position (column number). In addition, it is always easier to understand and interpret code with the name of the variable written. There is only one reason why I would still use the column number; if the variables names are expected to change while the structure of the dataset do not change.</p>
+<p>To select variables, it is also possible to use the <code>select()</code> command from the powerful <code>dplyr</code> package (for compactness only the first 6 observations are displayed thanks to the <code>head()</code> command):</p>
+<pre class="r"><code>head(select(dat, speed))</code></pre>
+<pre><code>##   speed
+## 1     4
+## 2     4
+## 3     7
+## 4     7
+## 5     8
+## 6     9</code></pre>
+<p>This is equivalent than removing the distance variable:</p>
+<pre class="r"><code>head(select(dat, -dist))</code></pre>
+<pre><code>##   speed
+## 1     4
+## 2     4
+## 3     7
+## 4     7
+## 5     8
+## 6     9</code></pre>
 </div>
 <div id="based-on-one-or-multiple-criterion" class="section level2">
 <h2>Based on one or multiple criterion</h2>
@@ -179,14 +245,16 @@ mat[1, 2]</code></pre>
 ## 49    24  120
 ## 50    25   85</code></pre>
 <ul>
-<li>keep only observations with distance smaller than or equal to 50 <strong>and</strong> speed equal to 10:</li>
+<li>keep only observations with distance smaller than or equal to 50 <strong>and</strong> speed equal to 10. Note the <code>==</code> (and not <code>=</code>) for the equal criteria:</li>
 </ul>
 <pre class="r"><code>subset(dat, dat$dist &lt;= 50 &amp; dat$speed == 10)</code></pre>
 <pre><code>##   speed dist
 ## 7    10   18
 ## 8    10   26
 ## 9    10   34</code></pre>
-<p>Note the <code>==</code> (and not <code>=</code>) for the equal criteria. Moreover, use <code>|</code> to keep only observations with distance smaller than 20 <strong>or</strong> speed equal to 10:</p>
+<ul>
+<li>use <code>|</code> to keep only observations with distance smaller than 20 <strong>or</strong> speed equal to 10:</li>
+</ul>
 <pre class="r"><code>subset(dat, dat$dist &lt; 20 | dat$speed == 10)</code></pre>
 <pre><code>##    speed dist
 ## 1      4    2
@@ -199,16 +267,31 @@ mat[1, 2]</code></pre>
 ## 9     10   34
 ## 10    11   17
 ## 12    12   14</code></pre>
+<ul>
+<li>to filter out some observations, use <code>!=</code>. For instance, to keep observations with speed not equal to 24 and distance not equal to 120 (for compactness only the last 6 observations are displayed thanks to the <code>tail()</code> command):</li>
+</ul>
+<pre class="r"><code>tail(subset(dat, dat$speed != 24 &amp; dat$dist != 120))</code></pre>
+<pre><code>##    speed dist
+## 41    20   52
+## 42    20   56
+## 43    20   64
+## 44    22   66
+## 45    23   54
+## 50    25   85</code></pre>
 </div>
 </div>
 <div id="create-a-new-variable" class="section level1">
 <h1>Create a new variable</h1>
 <p>Often your dataset can be enhanced by creating new variables and then add them to your dataset. In this example, we create two new variables; one being the speed times the distance (which we call <code>speed_dist</code>) and the other being a categorization of the speed (which we call <code>speed_cat</code>). We then display the first 6 observations of this new dataset with the 4 variables:</p>
-<pre class="r"><code># create new variable speed_dist
-dat$speed_dist &lt;- dat$speed * dat$dist # create speed_dist
+<pre class="r"><code># create new variable speed_dist:
+dat$speed_dist &lt;- dat$speed * dat$dist
+
 # create new variable speed_cat
+# the function ifelse() means that if dat$speed &gt; 7, then speed_cat is &quot;high speed&quot;, otherwise it is &quot;low_speed&quot;
 dat$speed_cat &lt;- ifelse(dat$speed &gt; 7,
-                        &quot;high speed&quot;, &quot;low speed&quot;) # the above function, ifelse(), means that if dat$speed &gt; 7, then speed_cat is &quot;high speed&quot;, otherwise it is &quot;low_speed&quot;
+  &quot;high speed&quot;, &quot;low speed&quot;
+)
+
 # display first 6 observations
 head(dat) # 6 is the default in head()</code></pre>
 <pre><code>##   speed dist speed_dist  speed_cat
@@ -218,5 +301,93 @@ head(dat) # 6 is the default in head()</code></pre>
 ## 4     7   22        154  low speed
 ## 5     8   16        128 high speed
 ## 6     9   10         90 high speed</code></pre>
+<p>Note than in programming, a character string is generally surrounded by quotes (<code>&quot;character string&quot;</code>).</p>
+</div>
+<div id="categorical-variables-and-labels-management" class="section level1">
+<h1>Categorical variables and labels management</h1>
+<p>For categorical variables, it is a good practice to use the factor format and to name the different levels of the variables.</p>
+<ul>
+<li>for this example, let’s create another new variable called <code>dist_cat</code> based on the distance and then change its format from numeric to factor (while also specifying the labels of the levels):</li>
+</ul>
+<pre class="r"><code># create new variable dist_cat
+dat$dist_cat &lt;- ifelse(dat$dist &lt; 15,
+  1, 2
+)
+
+# change from numeric to factor and specify the labels
+dat$dist_cat &lt;- factor(dat$dist_cat,
+  levels = c(1, 2),
+  labels = c(&quot;small distance&quot;, &quot;big distance&quot;) # follow the order of the levels
+)
+
+head(dat)</code></pre>
+<pre><code>##   speed dist speed_dist  speed_cat       dist_cat
+## 1     4    2          8  low speed small distance
+## 2     4   10         40  low speed small distance
+## 3     7    4         28  low speed small distance
+## 4     7   22        154  low speed   big distance
+## 5     8   16        128 high speed   big distance
+## 6     9   10         90 high speed small distance</code></pre>
+<ul>
+<li>to check the format of a variable:</li>
+</ul>
+<pre class="r"><code>class(dat$dist_cat)</code></pre>
+<pre><code>## [1] &quot;factor&quot;</code></pre>
+<pre class="r"><code># or
+str(dat$dist_cat)</code></pre>
+<pre><code>##  Factor w/ 2 levels &quot;small distance&quot;,..: 1 1 1 2 2 1 2 2 2 2 ...</code></pre>
+<div id="recode-categorical-variables" class="section level2">
+<h2>Recode categorical variables</h2>
+<p>It is possible to recode labels of a categorical variable if you are not satisfied with the current labels. In this example, we change the labels as follows:</p>
+<ul>
+<li>“small distance” <span class="math inline">\(\rightarrow\)</span> “short distance”</li>
+<li>“big distance” <span class="math inline">\(\rightarrow\)</span> “large distance”</li>
+</ul>
+<pre class="r"><code>dat$dist_cat &lt;- recode(dat$dist_cat,
+  &quot;small distance&quot; = &quot;short distance&quot;,
+  &quot;big distance&quot; = &quot;large distance&quot;
+)
+head(dat)</code></pre>
+<pre><code>##   speed dist speed_dist  speed_cat       dist_cat
+## 1     4    2          8  low speed short distance
+## 2     4   10         40  low speed short distance
+## 3     7    4         28  low speed short distance
+## 4     7   22        154  low speed large distance
+## 5     8   16        128 high speed large distance
+## 6     9   10         90 high speed short distance</code></pre>
+</div>
+<div id="change-reference-level" class="section level2">
+<h2>Change reference level</h2>
+<p>For some analyses, you might want to change the order of the levels. For example, if you analyze data about a control group and a treatment group, you may want to set the control group as the reference group. By default, levels are ordered by alphabetical order or by its numeric value if it was change from numeric to factor.</p>
+<ul>
+<li>to check the current order of the levels (the first level being the reference):</li>
+</ul>
+<pre class="r"><code>levels(dat$dist_cat)</code></pre>
+<pre><code>## [1] &quot;short distance&quot; &quot;large distance&quot;</code></pre>
+<p>In this case, “short distance” being the first level it is the reference level. It is the first level because it was initially set with a value equal to 1 when creating the variable.</p>
+<ul>
+<li>to change the reference level:</li>
+</ul>
+<pre class="r"><code>dat$dist_cat &lt;- relevel(dat$dist_cat, ref = &quot;large distance&quot;)
+levels(dat$dist_cat)</code></pre>
+<pre><code>## [1] &quot;large distance&quot; &quot;short distance&quot;</code></pre>
+<p>Large distance is now the first and thus the reference level.</p>
+</div>
+</div>
+<div id="rename-variable-names" class="section level1">
+<h1>Rename variable names</h1>
+<p>To rename variable names, use the <code>rename()</code> command from the <code>dplyr</code> package as follows:</p>
+<ul>
+<li>dist <span class="math inline">\(\rightarrow\)</span> distance</li>
+<li>dist_cat <span class="math inline">\(\rightarrow\)</span> distance_cat</li>
+</ul>
+<pre class="r"><code>dat &lt;- rename(dat,
+  distance = dist,
+  speed_distance = speed_dist,
+  distance_cat = dist_cat
+)
+names(dat) # display variable names</code></pre>
+<pre><code>## [1] &quot;speed&quot;          &quot;distance&quot;       &quot;speed_distance&quot; &quot;speed_cat&quot;     
+## [5] &quot;distance_cat&quot;</code></pre>
 <p>Thanks for reading. I hope this article helped you to manipulate your data in RStudio. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>.</p>
 </div>
