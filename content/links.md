@@ -1,7 +1,8 @@
 ---
 title: 'Links'
-date: 2019-12-24T00:40:29+01:00
-meta_img: "image/image.png"
+date: "2019-12-24"
+# description: page description.
+menu: main
 ---
 
 Below I list of additional resources:
