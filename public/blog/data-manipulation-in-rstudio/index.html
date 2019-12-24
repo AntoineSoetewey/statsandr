@@ -288,10 +288,10 @@ dat # display the entire dataset</code></pre>
 <pre class="r"><code>library(dplyr)
 sample_n(dat, 4, replace = FALSE)</code></pre>
 <pre><code>##   speed dist
-## 1    17   40
-## 2    14   60
-## 3    10   34
-## 4    11   28</code></pre>
+## 1    14   60
+## 2    14   36
+## 3    14   26
+## 4    17   40</code></pre>
 </div>
 <div id="based-on-row-or-column-numbers" class="section level2">
 <h2>Based on row or column numbers</h2>
@@ -619,10 +619,13 @@ dat</code></pre>
 <p>Missing values (represented by NA in RStudio, for “Not Applicable”) are often problematic for many analyses. For instance, the mean of a series or variable with at least one NA will give a NA (the dataframe created in the previous section is used for this example):</p>
 <pre class="r"><code>mean(dat$variable1)</code></pre>
 <pre><code>## [1] NA</code></pre>
-<p>Several alternatives exist to remove or impute missing values.</p>
+<p>It is however possible to compute most measures for variables including at least one NA thanks to the argument <code>na.rm = TRUE</code>:</p>
+<pre class="r"><code>mean(dat$variable1, na.rm = TRUE)</code></pre>
+<pre><code>## [1] 7</code></pre>
+<p>Nonetheless, datasets with NAs are still problematic for some types of analysis. Several alternatives exist to remove or impute missing values.</p>
 <div id="remove-nas" class="section level2">
 <h2>Remove NAs</h2>
-<p>A simple solution is to remove all observations with at least one missing value. This is done by keeping observations with complete cases:</p>
+<p>A simple solution is to remove all observations (i.e., rows) containing at least one missing value. This is done by keeping observations with complete cases:</p>
 <pre class="r"><code>dat_complete &lt;- dat[complete.cases(dat), ]
 dat_complete</code></pre>
 <pre><code>##   variable1 variable2
@@ -633,21 +636,16 @@ dat_complete</code></pre>
 </div>
 <div id="impute-nas" class="section level2">
 <h2>Impute NAs</h2>
-<p>Instead of removing observations with at least one NA, it is possible to impute them, that is, replace them by some values such as the median, the mode or the mean of the variable with the command <code>impute()</code> from the package <code>imputeMissings</code></p>
-<pre class="r"><code>library(imputeMissings)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;imputeMissings&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     compute</code></pre>
-<pre class="r"><code>dat_imputed &lt;- impute(dat) # default method is median/mode
+<p>Instead of removing observations with at least one NA, it is possible to impute them, that is, replace them by some values such as the median or the mode of the variable. This can be done easily with the command <code>impute()</code> from the package <code>imputeMissings</code>:</p>
+<pre class="r"><code>library(imputeMissings)
+dat_imputed &lt;- impute(dat) # default method is median/mode
 dat_imputed</code></pre>
 <pre><code>##   variable1 variable2
 ## 1         6         3
 ## 2        12         7
 ## 3         6         9
 ## 4         3         1</code></pre>
-<p>When the median/mode method is used, character vectors and factors are imputed with the mode. Numeric and integer vectors are imputed with the median. Again, use imputations carefully. Other packages offer more advanced imputation techniques. However, we keep it simple and straightforward for this article as advanced imputations is beyond the scope of introductory data manipulations in R.</p>
+<p>When the median/mode method is used (the default), character vectors and factors are imputed with the mode. Numeric and integer vectors are imputed with the median. Again, use imputations carefully. Other packages offer more advanced imputation techniques. However, we keep it simple and straightforward for this article as advanced imputations is beyond the scope of introductory data manipulations in R.</p>
 <p>Thanks for reading. I hope this article helped you to manipulate your data in RStudio. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>.</p>
 </div>
 </div>
