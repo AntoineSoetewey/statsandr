@@ -5,7 +5,7 @@ date: "2019-12-24"
 menu: main
 ---
 
-Below I list of additional resources:
+Below a list of additional resources:
 
 * [R for Data Science](https://r4ds.had.co.nz/)
 * [www.r-bloggers.com](https://www.r-bloggers.com)
