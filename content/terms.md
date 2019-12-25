@@ -43,6 +43,10 @@ Amazon, a third party affiliate marketing network, uses cookies to help make sur
 
 Google Analytics is a web analytics tool I use to help understand how visitors engage with this website. It reports website trends using cookies and web beacons without identifying individual visitors. Read [Google's Privacy Policy](https://policies.google.com/privacy?hl=en).
 
+#### Netlify
+
+Netlify is a cloud computing company that offers hosting and serverless backend services for static websites. It features continuous deployment from Git across a global application delivery network, serverless form handling, support for AWS Lambda functions, and full integration with Let’s Encrypt. Read [Netlify’s Privacy Policy](https://www.netlify.com/privacy/).
+
 ## License
 
 All original content (e.g. articles, blog posts, codes, files, illustrations, artwork, photographs, etc.) available on [statsandr.com](/) is released under a [Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License](http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US) unless otherwise noted. Basically this means you are free to share, transmit, distribute, alter, transform, and build on my work just as long as you give appropriate credit and do not use it for commercial purposes without my prior written consent.
