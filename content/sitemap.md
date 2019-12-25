@@ -17,4 +17,5 @@ A list of all the pages found on the site. If you cannot find what you are looki
 * [About](/about/)
 * [Contact](/contact/)
 * [Links](/links/)
+* [Terms and policies](/terms/)
 * [Sitemap](/sitemap/)
