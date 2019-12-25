@@ -1,5 +1,5 @@
 ---
-title: 'Terms'
+title: 'Terms and policies'
 date: "2019-12-25"
 # description: "Description for the page."
 ---
