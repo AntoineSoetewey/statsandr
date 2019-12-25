@@ -1,0 +1,52 @@
+---
+title: 'Terms'
+date: "2019-12-25"
+# description: "Description for the page."
+---
+
+This is my personal blog written and edited by me. Your use of this website, in any and all forms, constitutes an acceptance of these terms and policies. This page is reviewed and revised from time to time.
+
+All content provided is for informational purposes only. The articles and posts on this website are my own and do not necessarily represent the positions, strategies, or opinions of my employer or its subsidiaries. I make no representations as to the accuracy or completeness of any information found here or by following any links. I will not be liable for any errors or omissions in this information nor for the availability of this information. I will not be liable for any losses, injuries, or damages from the display or use of this information.
+
+## Privacy policy
+
+At [statsandr.com](/), the privacy of my visitors is extremely important. This Privacy Policy outlines the types of personal information that is received and collected and how it is used.
+
+First and foremost, I will never share your email address or any other personal information to anyone without your direct consent.
+
+### Log files
+
+Like many other websites, [statsandr.com](/) uses log files to help learn about when, from where, and how often traffic flows to this site. The information in these log files include:
+
+- Internet Protocol addresses (IP)
+- Types of browser
+- Internet Service Provider (ISP)
+- Date and time stamp
+- Referring and exit pages
+- Number of clicks
+
+All of this information is not linked to anything that is personally identifiable.
+
+### Cookies and web beacons
+
+[statsandr.com](/) uses a cookie to trigger the loading of cached CSS on future page loads.
+
+Third-party advertisers may also place and read cookies on your browser and/or use web beacons to collect information. [statsandr.com](/) has no access or control over these cookies. You should review the respective privacy policies on any and all third-party ad servers for more information regarding their practices and how to opt-out.
+
+If you wish to <a href="https://cookies.insites.com/disable-cookies/" target="_blank" rel="noopener">disable cookies</a>, you may do so through your web browser options. Instructions for doing so can be found on the specific web browsers' websites.
+
+<!-- #### Amazon
+
+Amazon, a third party affiliate marketing network, uses cookies to help make sure I get a commission when you buy a product after clicking on a link or ad banner that takes you to the site of one of their merchants. Read [Amazon's Privacy Notice](https://www.amazon.com/gp/help/customer/display.html?nodeId=468496). -->
+
+#### Google Analytics
+
+Google Analytics is a web analytics tool I use to help understand how visitors engage with this website. It reports website trends using cookies and web beacons without identifying individual visitors. Read <a href="https://policies.google.com/privacy?hl=en" target="_blank" rel="noopener">Google's Privacy Policy</a>.
+
+## License
+
+All original content (e.g. articles, blog posts, codes, files, illustrations, artwork, photographs, etc.) available on [statsandr.com](/) is released under a <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US" target="_blank" rel="noopener">Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License</a> unless otherwise noted. Basically this means you are free to share, transmit, distribute, alter, transform, and build on my work just as long as you give appropriate credit and do not use it for commercial purposes without my prior written consent.
+
+### Attribution
+
+If you're inclined to give credit --- a link back to the source attributed to either [Antoine Soetewey](/) or [statsandr.com](/) is good enough for me. Talking about credits, thanks <a href="https://mademistakes.com" target="_blank" rel="noopener">Michael Rose</a> for this page and your template.
