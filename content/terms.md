@@ -33,7 +33,7 @@ All of this information is not linked to anything that is personally identifiabl
 
 Third-party advertisers may also place and read cookies on your browser and/or use web beacons to collect information. [statsandr.com](/) has no access or control over these cookies. You should review the respective privacy policies on any and all third-party ad servers for more information regarding their practices and how to opt-out.
 
-If you wish to <a href="https://cookies.insites.com/disable-cookies/" target="_blank" rel="noopener">disable cookies</a>, you may do so through your web browser options. Instructions for doing so can be found on the specific web browsers' websites.
+If you wish to [disable cookies](https://cookies.insites.com/disable-cookies/), you may do so through your web browser options. Instructions for doing so can be found on the specific web browsers' websites.
 
 <!-- #### Amazon
 
@@ -41,12 +41,12 @@ Amazon, a third party affiliate marketing network, uses cookies to help make sur
 
 #### Google Analytics
 
-Google Analytics is a web analytics tool I use to help understand how visitors engage with this website. It reports website trends using cookies and web beacons without identifying individual visitors. Read <a href="https://policies.google.com/privacy?hl=en" target="_blank" rel="noopener">Google's Privacy Policy</a>.
+Google Analytics is a web analytics tool I use to help understand how visitors engage with this website. It reports website trends using cookies and web beacons without identifying individual visitors. Read [Google's Privacy Policy](https://policies.google.com/privacy?hl=en).
 
 ## License
 
-All original content (e.g. articles, blog posts, codes, files, illustrations, artwork, photographs, etc.) available on [statsandr.com](/) is released under a <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US" target="_blank" rel="noopener">Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License</a> unless otherwise noted. Basically this means you are free to share, transmit, distribute, alter, transform, and build on my work just as long as you give appropriate credit and do not use it for commercial purposes without my prior written consent.
+All original content (e.g. articles, blog posts, codes, files, illustrations, artwork, photographs, etc.) available on [statsandr.com](/) is released under a [Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License](http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US) unless otherwise noted. Basically this means you are free to share, transmit, distribute, alter, transform, and build on my work just as long as you give appropriate credit and do not use it for commercial purposes without my prior written consent.
 
 ### Attribution
 
-If you're inclined to give credit --- a link back to the source attributed to either [Antoine Soetewey](/) or [statsandr.com](/) is good enough for me. Talking about credits, thanks <a href="https://mademistakes.com" target="_blank" rel="noopener">Michael Rose</a> for this page and your template.
+If you're inclined to give credit --- a link back to the source attributed to either [Antoine Soetewey](/) or [statsandr.com](/) is good enough for me. Talking about credits, thanks [Michael Rose](https://mademistakes.com) for the template of this page.
