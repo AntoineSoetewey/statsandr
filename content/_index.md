@@ -10,6 +10,6 @@ Welcome to the blog [Stats and R](/). As the name suggests, this blog is about s
 1. one from the theoritical perspective and how to apply it "by hand"
 2. how to apply the concepts in R
 
-See [all articles here](/blog/) or [articles by categories here](/categories/).
+See [all articles here](/blog/) or [articles by categories here](/tags/).
 
 If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me](/contact/).
