@@ -227,8 +227,9 @@
 </div>
 <p>We now import it into RStudio and rename the dataset as <code>dat</code> (see <a href="/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way">here</a> why I always use a generic name instead of more specific names):</p>
 <pre class="r"><code>dat &lt;- read.csv(&quot;booklist.csv&quot;, # name of your file with .csv extension
-                header = TRUE, # names of variables are present
-                sep = &quot;,&quot;) # values are separated by a comma</code></pre>
+  header = TRUE, # names of variables are present
+  sep = &quot;,&quot;
+) # values are separated by a comma</code></pre>
 <p>You can always check that your booklist is correctly imported by running <code>head(name_of_dataset)</code> or <code>View(name_of_dataset)</code>.</p>
 </div>
 <div id="create-it-directly-in-r" class="section level2">
@@ -236,12 +237,16 @@
 <p>You can create your booklist directly in R with the command <code>data.frame()</code>:</p>
 <pre class="r"><code># Create the data frame named dat
 dat &lt;- data.frame(
-  &quot;Title&quot; = c(&quot;A Random Walk Down Wall Street&quot;,
-              &quot;Naked Statistics&quot;,
-              &quot;Freakonomics&quot;),
-  &quot;Author&quot; = c(&quot;Burton G. Malkiel&quot;,
-               &quot;Charles Wheelan&quot;,
-               &quot;Steven D. Levitt and Stephen J. Dubner&quot;),
+  &quot;Title&quot; = c(
+    &quot;A Random Walk Down Wall Street&quot;,
+    &quot;Naked Statistics&quot;,
+    &quot;Freakonomics&quot;
+  ),
+  &quot;Author&quot; = c(
+    &quot;Burton G. Malkiel&quot;,
+    &quot;Charles Wheelan&quot;,
+    &quot;Steven D. Levitt and Stephen J. Dubner&quot;
+  ),
   stringsAsFactors = FALSE
 )
 # Print the data frame
@@ -315,9 +320,11 @@ datatable(dat)</code></pre>
 <h2>Append the book title to make it automatic</h2>
 <p>We are now going to concatenate (i.e., append several character strings together) the Amazon affiliate link (the code we just copied), the title of the book and then a closing HTML tag with the <code>paste0()</code> command. The result will be a URL which takes the affiliate link as the base and the title of the book as keywords, making it automatic and adapted for every book in your booklist. To do this, run the following command in R:</p>
 <pre class="r"><code># Do not mix &quot; and &#39;, they are different in this case!
-link &lt;- paste0(&#39;&lt;a target=&quot;_blank&quot; href=&quot;https://www.amazon.com/gp/search?ie=UTF8&amp;tag=antoinesoetew-20&amp;linkCode=ur2&amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;camp=1789&amp;creative=9325&amp;index=books&amp;keywords=&#39;, # affiliate link
-                         dat$Title, # book title
-                         &#39;&quot;&gt;Amazon&lt;/a&gt;&#39;) # closing HTML tag</code></pre>
+link &lt;- paste0(
+  &#39;&lt;a target=&quot;_blank&quot; href=&quot;https://www.amazon.com/gp/search?ie=UTF8&amp;tag=antoinesoetew-20&amp;linkCode=ur2&amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;camp=1789&amp;creative=9325&amp;index=books&amp;keywords=&#39;, # affiliate link
+  dat$Title, # book title
+  &#39;&quot;&gt;Amazon&lt;/a&gt;&#39;
+) # closing HTML tag</code></pre>
 <p>Your affiliate links should look something like this, with same affiliate links and closing tags but with different keywords, corresponding to book titles:</p>
 <pre class="r"><code>head(link)</code></pre>
 <pre><code>## [1] &quot;&lt;a target=\&quot;_blank\&quot; href=\&quot;https://www.amazon.com/gp/search?ie=UTF8&amp;tag=antoinesoetew-20&amp;linkCode=ur2&amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;camp=1789&amp;creative=9325&amp;index=books&amp;keywords=A Random Walk Down Wall Street\&quot;&gt;Amazon&lt;/a&gt;&quot;
@@ -340,7 +347,7 @@ link &lt;- paste0(&#39;&lt;a target=&quot;_blank&quot; href=&quot;https://www.am
     pageLength = 5, # show first 5 entries, default is 10
     order = list(0, &quot;asc&quot;) # order the title column by ascending order
   ),
-  escape = FALSE # to make URLs clickable 
+  escape = FALSE # to make URLs clickable
 )</code></pre>
 <p>This is exactly the same code than before except that we need to add <code>escape = FALSE</code> to make URLs clickable.</p>
 </div>
