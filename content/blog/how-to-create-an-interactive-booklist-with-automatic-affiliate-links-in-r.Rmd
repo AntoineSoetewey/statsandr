@@ -32,7 +32,7 @@ You have two options:
 1. create it in Excel then import it into R
 1. create it directly in R
 
-## Create in Excel then import it
+## Create it in Excel then import it
 
 The easiest way is to follow these steps:
 
@@ -163,7 +163,7 @@ dat$Link <- link
 
 Finally, we can display the interactive table with titles, authors and their URLs:
 
-```{r}
+```{r, eval = FALSE}
 datatable(dat,
   rownames = FALSE, # remove row numbers
   filter = "top", # add filter on top of columns
@@ -180,6 +180,24 @@ datatable(dat,
 ```
 
 This is exactly the same code than before except that we need to add `escape = FALSE` to make URLs clickable.
+
+# Final result
+
+```{r, echo = FALSE}
+datatable(dat,
+  rownames = FALSE, # remove row numbers
+  filter = "top", # add filter on top of columns
+  extensions = "Buttons", # add download buttons
+  options = list(
+    autoWidth = TRUE,
+    dom = "Blfrtip", # location of the download buttons
+    buttons = c("copy", "csv", "excel", "pdf", "print"), # download buttons
+    pageLength = 5, # show first 5 entries, default is 10
+    order = list(0, "asc") # order the title column by ascending order
+  ),
+  escape = FALSE # to make URLs clickable 
+)
+```
 
 Check that everything works properly by clicking on different links. If you did not miss any steps, it should redirect you to the Amazon store with the title of the book in the search bar and thus the book in question appearing in the search results.
 
