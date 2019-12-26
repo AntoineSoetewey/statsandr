@@ -113,7 +113,7 @@ datatable(dat,
 
 # Add URLs with your affiliate link to the table
 
-We are now going to add URLs (with your affiliate link) which depend on the title of the book in the interactive table presented above. For this, we first need to extract the affiliate link which will serve as the base of the URL, then add the title of the book at then end of the URL. The fact that we add the title of the book at the end of the URL makes it automatic. Indeed, the final URL will redirect to the search page of the book (thanks to the title of the book as keywords) and with your affiliate link included (as we use the affiliate link as the base URL).
+We are now going to add URLs (with your affiliate link) which depend on the title and author of the book in the interactive table presented above. For this, we first need to extract the affiliate link which will serve as the base of the URL, then add the title and author of the book at then end of the URL. The fact that we add the title and author of the book at the end of the URL makes it automatic. Indeed, the final URL will redirect to the search page of the book (thanks to the title and author of the book as keywords) and with your affiliate link included (as we use the affiliate link as the base URL).
 
 ## Extract affiliate link
 
@@ -141,20 +141,20 @@ From this long code, remove everything which follows `keywords=` but keep `keywo
 
 Copy this shortened code.
 
-## Append the book title to make it automatic
+## Append the book title and author to make it automatic
 
-We are now going to concatenate (i.e., append several character strings together) the Amazon affiliate link (the code we just copied), the title of the book and then a closing HTML tag with the `paste0()` command. The result will be a URL which takes the affiliate link as the base and the title of the book as keywords, making it automatic and adapted for every book in your booklist. To do this, run the following command in R:
+We are now going to concatenate (i.e., append several character strings together) the Amazon affiliate link (the code we just copied), the title and author of the book and then a closing HTML tag with the `paste0()` command. The result will be a URL which takes the affiliate link as the base and the title and author of the book as keywords, making it automatic and adapted for every book in your booklist. To do this, run the following command in R:
 
 ```{r}
 # Do not mix " and ', they are different in this case!
 link <- paste0(
   '<a target="_blank" href="https://www.amazon.com/gp/search?ie=UTF8&tag=antoinesoetew-20&linkCode=ur2&linkId=a587bdd780cbbfb6d3f4569f7fb358fc&camp=1789&creative=9325&index=books&keywords=', # affiliate link
-  dat$Title, # book title
+  dat$Title, " + ", dat$Author, # book title and author
   '">Amazon</a>' # closing HTML tag
 ) 
 ```
 
-Your links should look something like this, with same affiliate links and closing tags for all books but with different keywords, corresponding to book titles:
+Your links should look something like this, with same affiliate links and closing tags for all books but with different keywords, corresponding to book titles and authors:
 
 ```{r}
 head(link)
@@ -206,6 +206,6 @@ datatable(dat,
 )
 ```
 
-Check that everything works properly by clicking on different links. If you did not miss any steps, it should redirect you to the Amazon store with the title of the book in the search bar and thus the book in question appearing in the search results.
+Check that everything works properly by clicking on different links. If you did not miss any steps, it should redirect you to the Amazon store with the title and author of the book in the search bar and thus the book in question appearing in the search results.
 
 Thanks for reading. I hope this article helped you to build an interactive booklist with an automated affiliate link to each of the book in your list. If you would like to see a live example, see <a href="https://www.antoinesoetewey.com/files/booklist.html" target="_blank" rel="noopener">my personal booklist</a>. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/).
