@@ -1,0 +1,143 @@
+---
+title: Data types in R
+author: Antoine Soetewey
+date: '2019-12-30'
+slug: data-types-in-r
+# categories: []
+tags:
+  - R
+meta_img: image/image.png
+# description: Description for the page.
+output:
+  blogdown::html_page:
+    toc: true
+# draft: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#what-data-types-exist-in-r">What data types exist in R?</a></li>
+<li><a href="#numeric">Numeric</a></li>
+<li><a href="#integer">Integer</a></li>
+<li><a href="#character">Character</a></li>
+<li><a href="#logical">Logical</a></li>
+</ul>
+</div>
+
+<p>This article presents the different data types in R. To learn about the different variable types from a statistical point of view, read “<a href="/blog/variable-types-and-examples/">Variable types and examples</a>”.</p>
+<div id="what-data-types-exist-in-r" class="section level1">
+<h1>What data types exist in R?</h1>
+<p>There are five data types in R:</p>
+<ol style="list-style-type: decimal">
+<li>Numeric</li>
+<li>Integer</li>
+<li>Complex</li>
+<li>Character</li>
+<li>Logical</li>
+</ol>
+<p>Datasets in R are often a combination of these 5 different data types. Below we explore in more details each data types one by one, except the data type “complex” as we focus on the main ones and this data type is rarely used in practice.</p>
+</div>
+<div id="numeric" class="section level1">
+<h1>Numeric</h1>
+<p>The most common data type in R is numeric. A variable or a series will be stored as numeric data if the values are numbers or if the values contains decimals. For example, the following two series are stored as numeric by default:</p>
+<pre class="r"><code># numeric series without decimals
+num_data &lt;- c(3, 7, 2)
+num_data</code></pre>
+<pre><code>## [1] 3 7 2</code></pre>
+<pre class="r"><code>class(num_data)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code># numeric series with decimals
+num_data_dec &lt;- c(3.4, 7.1, 2.9)
+num_data_dec</code></pre>
+<pre><code>## [1] 3.4 7.1 2.9</code></pre>
+<pre class="r"><code>class(num_data_dec)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code># also possible to check the class thanks to str()
+str(num_data_dec)</code></pre>
+<pre><code>##  num [1:3] 3.4 7.1 2.9</code></pre>
+<p>In other words, if you assign one or several numbers to an object in R, it will be stored as numeric by default (numbers with decimals), unless specified otherwise.</p>
+</div>
+<div id="integer" class="section level1">
+<h1>Integer</h1>
+<p>Integer data type is actually a special case of numeric data. Integers are numeric data without decimals. It can be used if you are sure that the numbers you store will never contains decimals. For example, let’s say you are interested in the number of children in a sample of 10 families. This variable is a discrete variable (see a reminder on the <a href="/blog/variable-types-and-examples/">variable types</a> if needed) and will never have decimals. Therefore, it can be stored as integer data thanks to the <code>as.integer()</code> command:</p>
+<pre class="r"><code>children</code></pre>
+<pre><code>##  [1] 1 3 2 2 4 4 1 1 1 4</code></pre>
+<pre class="r"><code>children &lt;- as.integer(children)
+class(children)</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<p>Note that if your variable does not have decimals, R will automatically set the type as integers instead of numeric.</p>
+</div>
+<div id="character" class="section level1">
+<h1>Character</h1>
+<p>The data type character is used when storing text, known as strings in R. The simplest ways to store data under the character format is by using <code>&quot;&quot;</code> around the piece of text:</p>
+<pre class="r"><code>char &lt;- &quot;some text&quot;
+char</code></pre>
+<pre><code>## [1] &quot;some text&quot;</code></pre>
+<pre class="r"><code>class(char)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>If you want to force any kind of data to be stored as character, you can do it by using the command <code>as.character()</code>:</p>
+<pre class="r"><code>char2 &lt;- as.character(children)
+char2</code></pre>
+<pre><code>##  [1] &quot;1&quot; &quot;3&quot; &quot;2&quot; &quot;2&quot; &quot;4&quot; &quot;4&quot; &quot;1&quot; &quot;1&quot; &quot;1&quot; &quot;4&quot;</code></pre>
+<pre class="r"><code>class(char2)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>Note that everything inside <code>&quot;&quot;</code> will be considered as character, no matter if it looks like character or not. For example:</p>
+<pre class="r"><code>chars &lt;- c(&quot;7.42&quot;)
+chars</code></pre>
+<pre><code>## [1] &quot;7.42&quot;</code></pre>
+<pre class="r"><code>class(chars)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>Furthermore, as soon as there is at lease one character value inside a variable or vector, the whole variable or vector will have the character format:</p>
+<pre class="r"><code>char_num &lt;- c(&quot;text&quot;, 1, 3.72, 4)
+char_num</code></pre>
+<pre><code>## [1] &quot;text&quot; &quot;1&quot;    &quot;3.72&quot; &quot;4&quot;</code></pre>
+<pre class="r"><code>class(char_num)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>Last but not least, although space does not matter in numeric data, it does matter for character data:</p>
+<pre class="r"><code>num_space &lt;- c(1 )
+num_nospace &lt;- c(1)
+# is num_space equal to num_nospace?
+num_space == num_nospace</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>char_space &lt;- &quot;text &quot;
+char_nospace &lt;- &quot;text&quot;
+# is char_space equal to char_nospace?
+char_space == char_nospace</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>As you can see from the results above, a space within character data makes it a different string in R!</p>
+</div>
+<div id="logical" class="section level1">
+<h1>Logical</h1>
+<p>A logical variable is a variable with only two values: <code>TRUE</code> or <code>FALSE</code>:</p>
+<pre class="r"><code>value1 &lt;- 7
+value2 &lt;- 9
+
+# is value1 greater than value2?
+greater &lt;- value1 &gt; value2
+greater</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>class(greater)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<pre class="r"><code># is value1 less than or equal to value2?
+less &lt;- value1 &lt;= value2
+less</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>class(less)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<p>It is also possible to transform logical data into numeric data. After the transformation from logical to numeric with the <code>as.numeric()</code> command, <code>FALSE</code> values equal to 0 and <code>TRUE</code> values equal to 1:</p>
+<pre class="r"><code>greater_num &lt;- as.numeric(greater)
+sum(greater)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>less_num &lt;- as.numeric(less)
+sum(less)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<p>Conversely, numeric data can be converted to logical data, with <code>FALSE</code> for all values equal to 0 and <code>TRUE</code> for all other values.</p>
+<pre class="r"><code>x &lt;- 0
+as.logical(x)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>y &lt;- 5
+as.logical(y)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>Thanks for reading. I hope this article helped you to understand the basic data types in R and their particularities. If you would like to learn more about the different variable types from a statistical point of view, read “<a href="/blog/variable-types-and-examples/">Variable types and examples</a>”. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>.</p>
+</div>

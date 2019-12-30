@@ -1,0 +1,161 @@
+---
+title: Data types in R
+author: Antoine Soetewey
+date: '2019-12-30'
+slug: data-types-in-r
+# categories: []
+tags:
+  - R
+meta_img: image/image.png
+# description: Description for the page.
+output:
+  blogdown::html_page:
+    toc: true
+# draft: true
+---
+
+This article presents the different data types in R. To learn about the different variable types from a statistical point of view, read "[Variable types and examples](/blog/variable-types-and-examples/)".
+
+# What data types exist in R?
+
+There are five data types in R:
+
+1. Numeric
+1. Integer
+1. Complex
+1. Character
+1. Logical
+
+Datasets in R are often a combination of these 5 different data types. Below we explore in more details each data types one by one, except the data type "complex" as we focus on the main ones and this data type is rarely used in practice.
+
+# Numeric
+
+The most common data type in R is numeric. A variable or a series will be stored as numeric data if the values are numbers or if the values contains decimals. For example, the following two series are stored as numeric by default:
+
+```{r}
+# numeric series without decimals
+num_data <- c(3, 7, 2)
+num_data
+class(num_data)
+
+# numeric series with decimals
+num_data_dec <- c(3.4, 7.1, 2.9)
+num_data_dec
+class(num_data_dec)
+
+# also possible to check the class thanks to str()
+str(num_data_dec)
+```
+
+In other words, if you assign one or several numbers to an object in R, it will be stored as numeric by default (numbers with decimals), unless specified otherwise.
+
+# Integer
+
+Integer data type is actually a special case of numeric data. Integers are numeric data without decimals. It can be used if you are sure that the numbers you store will never contains decimals. For example, let's say you are interested in the number of children in a sample of 10 families. This variable is a discrete variable (see a reminder on the [variable types](/blog/variable-types-and-examples/) if needed) and will never have decimals. Therefore, it can be stored as integer data thanks to the `as.integer()` command:
+
+```{r, echo = FALSE}
+set.seed(30/12)
+children <- sample(1:4, size = 10, replace = TRUE)
+```
+
+```{r}
+children
+children <- as.integer(children)
+class(children)
+```
+
+Note that if your variable does not have decimals, R will automatically set the type as integers instead of numeric.
+
+# Character
+
+The data type character is used when storing text, known as strings in R. The simplest ways to store data under the character format is by using `""` around the piece of text:
+
+```{r}
+char <- "some text"
+char
+class(char)
+```
+
+If you want to force any kind of data to be stored as character, you can do it by using the command `as.character()`:
+
+```{r}
+char2 <- as.character(children)
+char2
+class(char2)
+```
+
+Note that everything inside `""` will be considered as character, no matter if it looks like character or not. For example:
+
+```{r}
+chars <- c("7.42")
+chars
+class(chars)
+```
+
+Furthermore, as soon as there is at lease one character value inside a variable or vector, the whole variable or vector will have the character format:
+
+```{r}
+char_num <- c("text", 1, 3.72, 4)
+char_num
+class(char_num)
+```
+
+Last but not least, although space does not matter in numeric data, it does matter for character data:
+
+```{r}
+num_space <- c(1 )
+num_nospace <- c(1)
+# is num_space equal to num_nospace?
+num_space == num_nospace
+
+char_space <- "text "
+char_nospace <- "text"
+# is char_space equal to char_nospace?
+char_space == char_nospace
+```
+
+As you can see from the results above, a space within character data makes it a different string in R!
+
+# Logical
+
+A logical variable is a variable with only two values: `TRUE` or `FALSE`:
+
+```{r}
+value1 <- 7
+value2 <- 9
+
+# is value1 greater than value2?
+greater <- value1 > value2
+greater
+class(greater)
+
+# is value1 less than or equal to value2?
+less <- value1 <= value2
+less
+class(less)
+```
+
+It is also possible to transform logical data into numeric data. After the transformation from logical to numeric with the `as.numeric()` command, `FALSE` values equal to 0 and `TRUE` values equal to 1:
+
+```{r}
+greater_num <- as.numeric(greater)
+sum(greater)
+
+less_num <- as.numeric(less)
+sum(less)
+```
+
+Conversely, numeric data can be converted to logical data, with `FALSE` for all values equal to 0 and `TRUE` for all other values.
+
+```{r}
+x <- 0
+as.logical(x)
+
+y <- 5
+as.logical(y)
+```
+
+Thanks for reading. I hope this article helped you to understand the basic data types in R and their particularities. If you would like to learn more about the different variable types from a statistical point of view, read "[Variable types and examples](/blog/variable-types-and-examples/)". As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/).
+
+
+
