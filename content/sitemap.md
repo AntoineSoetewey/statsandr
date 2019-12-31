@@ -16,6 +16,7 @@ A list of all the pages found on the site. If you cannot find what you are looki
   + [Miscellaneous](/tags/miscellaneous/)
 * [About](/about/)
 * [Contact](/contact/)
+* [Subscribe to this blog](/subscribe/)
 * [Links](/links/)
 * [Terms and policies](/terms/)
 * [Sitemap](/sitemap/)
