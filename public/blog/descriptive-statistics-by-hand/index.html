@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title> Data types in R - Stats and R </title>
+    <title> Descriptive statistics by hand - Stats and R </title>
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <meta name="referrer" content="no-referrer">
@@ -12,18 +12,18 @@
     <meta property="og:site_name" content="Stats and R" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="/blog/data-types-in-r/" />
-    <meta property="og:title" content="Data types in R" />
+    <meta property="og:url" content="/blog/descriptive-statistics-by-hand/" />
+    <meta property="og:title" content="Descriptive statistics by hand" />
     <meta property="og:image" content="/image/image.png" />
     <meta property="og:description" content="A blog about statistics and its applications in R." />
 
     <meta name="twitter:card" content="summary_large_image" />
     
-    <meta name="twitter:title" content="Data types in R" />
+    <meta name="twitter:title" content="Descriptive statistics by hand" />
     <meta name="twitter:description" content="A blog about statistics and its applications in R." />
     <meta name="twitter:image" content="/image/image.png" />
 
-    <link rel="canonical" href="/blog/data-types-in-r/">
+    <link rel="canonical" href="/blog/descriptive-statistics-by-hand/">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
 
@@ -118,7 +118,7 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-sm-12 col-md-10">
-                    <h1 class="mx-0 mx-md-4 blog-post-title">Data types in R</h1>
+                    <h1 class="mx-0 mx-md-4 blog-post-title">Descriptive statistics by hand</h1>
 
                     <div class="mb-md-4 meta">
                         
@@ -129,8 +129,8 @@
                             
                         
 
-                        <span class="date middot" title='Mon Dec 30 2019 00:00:00 UTC'>
-                            2019-12-30
+                        <span class="date middot" title='Thu Jan 2 2020 00:00:00 UTC'>
+                            2020-01-02
                         </span>
 
                         <span class="reading-time middot">
@@ -141,7 +141,7 @@
                             <ul class="list-unstyled d-inline">
                                 
                                     <li class="d-inline middot">
-                                        <a href="/tags/r">R</a>
+                                        <a href="/tags/statistics">Statistics</a>
                                     </li>
                                 
                             </ul>
@@ -161,129 +161,72 @@
 
 <div id="TOC">
 <ul>
-<li><a href="#what-data-types-exist-in-r">What data types exist in R?</a></li>
-<li><a href="#numeric">Numeric</a></li>
-<li><a href="#integer">Integer</a></li>
-<li><a href="#character">Character</a></li>
-<li><a href="#logical">Logical</a></li>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#location-versus-dispersion-measures">Location versus dispersion measures</a><ul>
+<li><a href="#location">Location</a><ul>
+<li><a href="#minimum-and-maximum">Minimum and maximum</a></li>
+<li><a href="#mean">Mean</a></li>
+</ul></li>
+<li><a href="#dispersion">Dispersion</a><ul>
+<li><a href="#range">Range</a></li>
+</ul></li>
+</ul></li>
 </ul>
 </div>
 
-<p>This article presents the different data types in R. To learn about the different variable types from a statistical point of view, read “<a href="/blog/variable-types-and-examples/">Variable types and examples</a>”.</p>
-<div id="what-data-types-exist-in-r" class="section level1">
-<h1>What data types exist in R?</h1>
-<p>There are five data types in R:</p>
-<ol style="list-style-type: decimal">
-<li>Numeric</li>
-<li>Integer</li>
-<li>Complex</li>
-<li>Character</li>
-<li>Logical</li>
-</ol>
-<p>Datasets in R are often a combination of these 5 different data types. Below we explore in more details each data types one by one, except the data type “complex” as we focus on the main ones and this data type is rarely used in practice.</p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This article explains how to compute the main descriptive statistics by hand. To learn how to compute these measures in R, read “<a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>”.</p>
+<p>Descriptive statistics (in the broad sense of the term) is a branch of statistics aiming at summarizing and describing a series of values or a dataset. Long series of values without any preparation or without any summary measures are often not informative due to the difficulty of recognizing any pattern in the data. Below an example with the height (in cm) of a sample of 100 adults:</p>
+<p><em>188.7</em>, <em>169.3</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em>, <em>173.9</em>, <em>190.1</em>, <em>174.1</em>, <em>195.2</em>, <em>174.4</em>, <em>188.1</em>, <em>197.9</em>, <em>161.1</em>, <em>172.2</em>, <em>173.7</em>, <em>181.4</em>, <em>172.2</em>, <em>148.4</em>, <em>150.6</em>, <em>188.2</em>, <em>171.9</em>, <em>157.2</em>, <em>173.3</em>, <em>187.2</em>, <em>193.9</em>, <em>170.7</em>, <em>172.4</em>, <em>157.4</em>, <em>179.6</em>, <em>168.6</em>, <em>179.6</em>, <em>182.1</em>, <em>185.3</em>, <em>168.9</em>, <em>180.1</em>, <em>157.8</em>, <em>167.2</em>, <em>166.5</em>, <em>150.9</em>, <em>175.4</em>, <em>177.1</em>, <em>171.4</em>, <em>182.6</em>, <em>167.7</em>, <em>161.3</em>, <em>179.3</em>, <em>166.9</em>, <em>189.4</em>, <em>170.7</em>, <em>181.6</em>, <em>178.2</em>, <em>167.2</em>, <em>190.8</em>, <em>181.4</em>, <em>175.9</em>, <em>177.8</em>, <em>181.8</em>, <em>175.9</em>, <em>145.1</em>, <em>177.8</em>, <em>171.3</em>, <em>176.8</em>, <em>180.8</em>, <em>189</em>, <em>167.7</em>, <em>188</em>, <em>178.4</em>, <em>185.4</em>, <em>184.2</em>, <em>182.2</em>, <em>164.6</em>, <em>174.1</em>, <em>181.2</em>, <em>165.5</em>, <em>169.6</em>, <em>180.8</em>, <em>182.7</em>, <em>179.6</em>, <em>166.1</em>, <em>164</em>, <em>190.1</em>, <em>177.6</em>, <em>175.9</em>, <em>173.8</em>, <em>163.1</em>, <em>181.1</em>, <em>172.8</em>, <em>173.2</em>, <em>184.3</em>, <em>183.2</em>, <em>188.9</em>, <em>170.2</em>, <em>181.5</em>, <em>188.9</em>, <em>163.9</em>, <em>166.4</em>, <em>163.7</em>, <em>160.4</em>, <em>175.8</em> and <em>181.5</em></p>
+<p>Facing this sample, it is hard (not to say impossible) for anyone to understand the data and have a clear view of the size of these adults (in a reasonable amount of time). Descriptive statistics allow to summarize, and thus have a better overview of the data. Of course, by summarizing data through one or several measures, some information will inevitably be lost. However, in many cases it is generally better to lose some information but in return gain an overview.</p>
 </div>
-<div id="numeric" class="section level1">
-<h1>Numeric</h1>
-<p>The most common data type in R is numeric. A variable or a series will be stored as numeric data if the values are numbers or if the values contains decimals. For example, the following two series are stored as numeric by default:</p>
-<pre class="r"><code># numeric series without decimals
-num_data &lt;- c(3, 7, 2)
-num_data</code></pre>
-<pre><code>## [1] 3 7 2</code></pre>
-<pre class="r"><code>class(num_data)</code></pre>
-<pre><code>## [1] &quot;numeric&quot;</code></pre>
-<pre class="r"><code># numeric series with decimals
-num_data_dec &lt;- c(3.4, 7.1, 2.9)
-num_data_dec</code></pre>
-<pre><code>## [1] 3.4 7.1 2.9</code></pre>
-<pre class="r"><code>class(num_data_dec)</code></pre>
-<pre><code>## [1] &quot;numeric&quot;</code></pre>
-<pre class="r"><code># also possible to check the class thanks to str()
-str(num_data_dec)</code></pre>
-<pre><code>##  num [1:3] 3.4 7.1 2.9</code></pre>
-<p>In other words, if you assign one or several numbers to an object in R, it will be stored as numeric by default (numbers with decimals), unless specified otherwise.</p>
+<div id="location-versus-dispersion-measures" class="section level1">
+<h1>Location versus dispersion measures</h1>
+<p>Several different measures (called statistics) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data.</p>
+<div id="location" class="section level2">
+<h2>Location</h2>
+<p>Location measures allow to see “where” the data are located, around which values. In other words, location measures give an understanding on what is the central tendency or the “position” of the data. It includes the following statistics:</p>
+<ul>
+<li>minimum</li>
+<li>maximum</li>
+<li>mean</li>
+<li>median</li>
+<li>first quartile</li>
+<li>third quartile</li>
+<li>mode</li>
+</ul>
+<p>We detail and compute (by hand) each of them in the following sections.</p>
+<div id="minimum-and-maximum" class="section level3">
+<h3>Minimum and maximum</h3>
+<p>Minimum (min) and maximum (max) are simply the lowest and largest values. Given the height (in cm) of a sample of 6 adults:</p>
+<p><em>188.7</em>, <em>169.3</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em> and <em>173.9</em></p>
+<p>The minimum is 169.35 and the maximum is 188.71. These two simple measures give a clear idea about the heights of the smallest and tallest persons.</p>
 </div>
-<div id="integer" class="section level1">
-<h1>Integer</h1>
-<p>Integer data type is actually a special case of numeric data. Integers are numeric data without decimals. It can be used if you are sure that the numbers you store will never contains decimals. For example, let’s say you are interested in the number of children in a sample of 10 families. This variable is a discrete variable (see a reminder on the <a href="/blog/variable-types-and-examples/">variable types</a> if you do not remember what is a discrete variable) and will never have decimals. Therefore, it can be stored as integer data thanks to the <code>as.integer()</code> command:</p>
-<pre class="r"><code>children</code></pre>
-<pre><code>##  [1] 1 3 2 2 4 4 1 1 1 4</code></pre>
-<pre class="r"><code>children &lt;- as.integer(children)
-class(children)</code></pre>
-<pre><code>## [1] &quot;integer&quot;</code></pre>
-<p>Note that if your variable does not have decimals, R will automatically set the type as integers instead of numeric.</p>
+<div id="mean" class="section level3">
+<h3>Mean</h3>
+<p>The mean is probably the most common statistics. It gives an idea on what is the average value that is used to derive the central tendency of the data. It is found by summing all values and dividing this sum by the number of observations (<span class="math inline">\(n\)</span>):</p>
+<p><span class="math display">\[mean = \bar{x} = \frac{\text{sum of all values}}{\text{number of values}} = \frac{1}{n}\sum^{n}_{i = 1} X_i\]</span>
+Given our sample of 6 heights presented above, the mean is:</p>
+<p><span class="math display">\[\frac{188.7 + 169.3 + 178.6 + 181.3 + 179 + 173.9}{6}\]</span></p>
 </div>
-<div id="character" class="section level1">
-<h1>Character</h1>
-<p>The data type character is used when storing text, known as strings in R. The simplest ways to store data under the character format is by using <code>&quot;&quot;</code> around the piece of text:</p>
-<pre class="r"><code>char &lt;- &quot;some text&quot;
-char</code></pre>
-<pre><code>## [1] &quot;some text&quot;</code></pre>
-<pre class="r"><code>class(char)</code></pre>
-<pre><code>## [1] &quot;character&quot;</code></pre>
-<p>If you want to force any kind of data to be stored as character, you can do it by using the command <code>as.character()</code>:</p>
-<pre class="r"><code>char2 &lt;- as.character(children)
-char2</code></pre>
-<pre><code>##  [1] &quot;1&quot; &quot;3&quot; &quot;2&quot; &quot;2&quot; &quot;4&quot; &quot;4&quot; &quot;1&quot; &quot;1&quot; &quot;1&quot; &quot;4&quot;</code></pre>
-<pre class="r"><code>class(char2)</code></pre>
-<pre><code>## [1] &quot;character&quot;</code></pre>
-<p>Note that everything inside <code>&quot;&quot;</code> will be considered as character, no matter if it looks like character or not. For example:</p>
-<pre class="r"><code>chars &lt;- c(&quot;7.42&quot;)
-chars</code></pre>
-<pre><code>## [1] &quot;7.42&quot;</code></pre>
-<pre class="r"><code>class(chars)</code></pre>
-<pre><code>## [1] &quot;character&quot;</code></pre>
-<p>Furthermore, as soon as there is at least one character value inside a variable or vector, the whole variable or vector will be considered as character:</p>
-<pre class="r"><code>char_num &lt;- c(&quot;text&quot;, 1, 3.72, 4)
-char_num</code></pre>
-<pre><code>## [1] &quot;text&quot; &quot;1&quot;    &quot;3.72&quot; &quot;4&quot;</code></pre>
-<pre class="r"><code>class(char_num)</code></pre>
-<pre><code>## [1] &quot;character&quot;</code></pre>
-<p>Last but not least, although space does not matter in numeric data, it does matter for character data:</p>
-<pre class="r"><code>num_space &lt;- c(1 )
-num_nospace &lt;- c(1)
-# is num_space equal to num_nospace?
-num_space == num_nospace</code></pre>
-<pre><code>## [1] TRUE</code></pre>
-<pre class="r"><code>char_space &lt;- &quot;text &quot;
-char_nospace &lt;- &quot;text&quot;
-# is char_space equal to char_nospace?
-char_space == char_nospace</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<p>As you can see from the results above, a space within character data (i.e., within <code>&quot;&quot;</code>) makes it a different string in R!</p>
 </div>
-<div id="logical" class="section level1">
-<h1>Logical</h1>
-<p>A logical variable is a variable with only two values; <code>TRUE</code> or <code>FALSE</code>:</p>
-<pre class="r"><code>value1 &lt;- 7
-value2 &lt;- 9
-
-# is value1 greater than value2?
-greater &lt;- value1 &gt; value2
-greater</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>class(greater)</code></pre>
-<pre><code>## [1] &quot;logical&quot;</code></pre>
-<pre class="r"><code># is value1 less than or equal to value2?
-less &lt;- value1 &lt;= value2
-less</code></pre>
-<pre><code>## [1] TRUE</code></pre>
-<pre class="r"><code>class(less)</code></pre>
-<pre><code>## [1] &quot;logical&quot;</code></pre>
-<p>It is also possible to transform logical data into numeric data. After the transformation from logical to numeric with the <code>as.numeric()</code> command, <code>FALSE</code> values equal to 0 and <code>TRUE</code> values equal to 1:</p>
-<pre class="r"><code>greater_num &lt;- as.numeric(greater)
-sum(greater)</code></pre>
-<pre><code>## [1] 0</code></pre>
-<pre class="r"><code>less_num &lt;- as.numeric(less)
-sum(less)</code></pre>
-<pre><code>## [1] 1</code></pre>
-<p>Conversely, numeric data can be converted to logical data, with <code>FALSE</code> for all values equal to 0 and <code>TRUE</code> for all other values.</p>
-<pre class="r"><code>x &lt;- 0
-as.logical(x)</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>y &lt;- 5
-as.logical(y)</code></pre>
-<pre><code>## [1] TRUE</code></pre>
-<p>Thanks for reading. I hope this article helped you to understand the basic data types in R and their particularities. If you would like to learn more about the different variable types from a statistical point of view, read “<a href="/blog/variable-types-and-examples/">Variable types and examples</a>”. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>. Get updates everytime a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
+<div id="dispersion" class="section level2">
+<h2>Dispersion</h2>
+<ul>
+<li>range</li>
+<li>standard deviation</li>
+<li>variance</li>
+</ul>
+<p>As for location measures, we now detail and compute (by hand) each of these statistics one by one.</p>
+<div id="range" class="section level3">
+<h3>Range</h3>
+<p>The range is the maximum value minus the minimum value:</p>
+<p><span class="math display">\[range = min - max\]</span></p>
+<p>It is often the first step in many statistical project in the sense that it</p>
+<p>Thanks for reading. I hope this article helped you to understand the different descriptive statistics. If you would like to learn how to compute these measures in R, read “<a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>”. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>. Get updates everytime a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
+</div>
+</div>
 </div>
 
 
@@ -296,15 +239,11 @@ as.logical(y)</code></pre>
                                 <div class="col-12 col-md-6">
                                     
                                         <div class="mx-0 mx-md-4 mt-4 text-left">
-                                            <a href="/blog/variable-types-and-examples/">« Variable types and examples</a>
+                                            <a href="/blog/data-types-in-r/">« Data types in R</a>
                                         </div>
                                     
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    
-                                        <div class="mx-0 mx-md-4 mt-4 text-right">
-                                            <a href="/blog/descriptive-statistics-by-hand/">Descriptive statistics by hand »</a>
-                                        </div>
                                     
                                 </div>
                             </div>
@@ -430,6 +369,9 @@ if (!doNotTrack) {
 
     
         
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
 
     
 </body>
