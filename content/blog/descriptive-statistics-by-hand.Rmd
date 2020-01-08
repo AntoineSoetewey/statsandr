@@ -11,6 +11,7 @@ meta_img: image/image.png
 output:
   blogdown::html_page:
     toc: true
+    toc_depth: 6
 draft: true
 ---
 
@@ -21,18 +22,19 @@ knitr::opts_chunk$set(
   message = FALSE,
   comment = NA
 )
+options(scipen = 999)
 ```
 
 # Introduction
 
-This article explains how to compute the main descriptive statistics by hand. To learn how to compute these measures in R, read "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)".
+This article explains how to compute the main descriptive statistics by hand. To learn how to compute these measures in R, read the article "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)".
 
 Descriptive statistics (in the broad sense of the term) is a branch of statistics aiming at summarizing and describing a series of values or a dataset. Long series of values without any preparation or without any summary measures are often not informative due to the difficulty of recognizing any pattern in the data. Below an example with the height (in cm) of a population of 100 adults:
 
 ```{r, echo = FALSE, message = FALSE}
 library(pander)
 set.seed(42)
-height <- round(rnorm(100, mean = 175, sd = 10), 2)
+height <- round(rnorm(100, mean = 175, sd = 10), 1)
 # range(height)
 pander(height)
 ```
@@ -41,7 +43,7 @@ Facing this series, it is hard (not to say impossible) for anyone to understand 
 
 # Location versus dispersion measures
 
-Several different measures (called statistics) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data. In the following sections, we detail both location and dispersion measures and illustrate them with the data presented in the introduction (the height of the 100 adults).
+Several different measures (called statistics) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data. In the following sections, we detail both location and dispersion measures and illustrate them with the data presented in the introduction (the height of 100 adults).
 
 ## Location
 
@@ -66,31 +68,33 @@ sub_height <- head(height)
 pander(sub_height)
 ```
 
-The minimum is `r min(sub_height)` and the maximum is `r max(sub_height)`. These two simple measures give a clear idea about the heights of the smallest and tallest persons.
+The minimum is `r round(min(sub_height), 1)` cm and the maximum is `r round(max(sub_height), 1)` cm. These two simple measures give a clear idea about the size of the smallest and tallest of these 6 adults.
 
 ### Mean
 
-The mean is probably the most common statistics. It gives an idea on what is the average value, that is, the central tendency of the data or the center of gravity. The mean is found by summing all values and dividing this sum by the number of observations (denoted $n$):
+The mean, also known as average, is probably the most common statistics. It gives an idea on what is the average value, that is, the central tendency of the data or the center of gravity. The mean is found by summing all values and dividing this sum by the number of observations (denoted $n$):
 
 $$mean = \overline{X} = \frac{\text{sum of all values}}{\text{number of values}} = \frac{1}{n}\sum^{n}_{i = 1} X_i$$
-Given our sample of 6 heights presented above, the mean is:
+Given our sample of 6 adults presented above, the mean is:
 
-$$\overline{x} = \frac{188.7 + 169.3 + 178.6 + 181.3 + 179 + 173.9}{6}$$
+$$\overline{x} = \frac{188.7 + 169.4 + 178.6 + 181.3 + 179 + 173.9}{6} = 178.4833$$
 
 (Note that a random variable is usually denoted with a capital letter and the particular values that our random variable can assume with a lowercase letter. That is the reason we used $\overline{X}$ and then $\overline{x}$.)
 
+In conclusion, the mean size, that is, the average size of our sample of 6 adults is `r round(mean(sub_height), 2)` cm (rounded to 2 decimals).
+
 ### Median
 
-The median is another measure of location so it also gives an idea about the central tendency of the data. The easiest way to compute it is by first sorting the data from lowest to highest (in ascending order) then take the middle value. Formally, after sorting, the median is:
+The median is another measure of location so it also gives an idea about the central tendency of the data. The interpretation of the median is that there are as many observations below as above the median. In other words, 50% of the observations lie below the median, and 50% of the observations lie above the median. The easiest way to compute the median is by first sorting the data from lowest to highest (i.e., in ascending order) then take the middle point as the median. From the sorted values, for an odd number of observations, the middle point is easy to find: it is the value with as many observations below as above. Still from the sorted values, for an even number of observations, the middle point is exactly between the two middle values. Formally, after sorting, the median is:
 
 * if $n$ (number of observations) is odd: $$med(X) = X_{\frac{n+1}{2}}$$
 * if $n$ is even: $$med(X) = \frac{1}{2}\big(X_{\frac{n}{2}} + X_{\frac{n}{2} + 1}\big)$$
 
-where the subscript of $X$ denotes the numbering of the sorted data. The formulas look harder than they really are, so let's see with two concrete ewamples.
+where the subscript of $X$ denotes the numbering of the sorted data. The formulas look harder than they really are, so let's see with two concrete examples.
 
 #### Odd number of observations
 
-Given a sample of 7 heights taken from the 100 heights presented in the introduction:
+Given the height of a sample of 7 adults taken from the 100 adults presented in the introduction:
 
 ```{r}
 pander(tail(height, 7))
@@ -106,11 +110,11 @@ Given that the number of observations $n$ is odd (since $n = 7$), the median is
 
 $$med(X) = X_\frac{7 + 1}{2} = X_4$$
 
-So we take the fourth value from the sorted values, which corresponds to `r round(median(tail(height, 7)), 1)`. In conclusion, the median of `r pander(tail(height, 7))` is `r round(median(tail(height, 7)), 1)`.
+So we take the fourth value from the sorted values, which corresponds to `r round(median(tail(height, 7)), 1)`. In conclusion, the median size of these 7 adults is `r round(median(tail(height, 7)), 1)` cm. As you can see, there are 3 observations below `r round(median(tail(height, 7)), 1)` and 3 observations above `r round(median(tail(height, 7)), 1)`.
 
 #### Even number of observations
 
-Now let's see when the number of observations is even, which is slighlty more complicated than when the number of observations is odd. Given a sample of 6 heights:
+Now let's see when the number of observations is even, which is slighlty more complicated than when the number of observations is odd. Given the height of a sample of 6 adults:
 
 ```{r}
 pander(sub_height)
@@ -130,11 +134,29 @@ So we sum the third and fourth values from the sorted values and divide this sum
 
 $$\frac{1}{2}(178.6 + 179) = 178.8$$
 
-In conclusion, the median of `r pander(sub_height)` is `r round(median(sub_height), 1)`.
+In conclusion, the median size of these 6 adults is `r round(median(sub_height), 1)` cm. Again, remark that there are as many observations below as above `r round(median(sub_height), 1)` cm.
 
 ### Mean vs. median
 
-The mean has the advantage that it gives a good picture of the data and it is usually understood by everyone. However, it has the disadvantage that the mean is sensible to outliers. To illustrate this, 
+```{r}
+salaries_3 <- c(1800, 2000, 2100)
+salaries_4 <- c(salaries_3, 1000000)
+```
+
+Although the mean and median are often relatively close to each other they should not be confused since they both have avantages and disadvantages in different contexts. Besides the fact that almost everyone knows (or have heard about) the mean, it has the advantage that it gives a unique picture for each different series of data. However, it has the disadvantage that the mean is sensible to outliers (i.e., extreme values). On the other hand, the advantage of the median is that it is not sensible to outliers and the inconvenient is that it may be the exact same value for very different series of data (so not unique to the data).
+
+To illustrate the "sensible to outlier" argument, consider 3 friends in a bar comparing their salaries. Their salaries are `r pander(salaries_3)`€, for an average (mean) salary of `r pander(mean(salaries_3))`€. A friend of them (who happens to be friend with Bill Gates as well) joins them in the bar. Their salaries are now `r pander(salaries_4)`€. The average salary of the 4 friends is now `r pander(mean(salaries_4))`€, compared to `r pander(mean(salaries_3))`€ without the rich friend. Although it is statistically correct to say that the average salary of the 4 friends is `r pander(mean(salaries_4))`€, you will concede that this measure does not represent a fair image of the salaries of the 4 friends, as 3 of them make much much less than the average salary. As we have just seen, the mean is sensible to outliers. On the other hand, if we report the medians, we see that the median salary of the 3 first friends is `r pander(median(salaries_3))`€, and the median salary of the 4 friends is `r pander(median(salaries_4))`€. As you can see with this example, the median is not sensible to outliers and for series with such extreme value(s), the median is more appropriate compared to the mean as it often gives a better representation of the data. (*Note:* this example also shows how a large majority of people earn less than the mean salary. This is however beyond the scope of the article.)
+
+Given the previous example, one may then choose to always use the median instead of the mean. However, the median has it own inconvenient which the mean does not have: the median is less unique and less specific to its underlying data than the mean. Consider the following data, representing the grades of 5 students taking a statistics and economics exam:
+
+```{r}
+dat <- data.frame(studentID = c(1:5), economics = c(10, 10, 10, 18, 20), statistics = c(5, 7, 10, 10, 11))
+pander(dat)
+```
+
+The median of the grades is the same in economics and statistics (median = `r pander(median(dat$statistics))`). Therefore, had we computed only the medians, we could have concluded that the students performed as well in economics than in statistics. However, although the medians are exactly the same for both classes, it is clear that students performed better in economics than in statistics. In fact, the mean of the grades in economics is `r pander(mean(dat$economics))` and the mean of the grades in statistics is `r pander(mean(dat$statistics))`. What we have just shown here is that the median is based only on one single value, the middle value, or on two middle values (if there are an even number of observations), while the mean is based on all values (and thus includes more information). The median is therefore not sensible to outliers, but it is also not unique (i.e., not specific) to different series of data, whereas the mean is much more likely to be different and unique for different series of data. This difference in terms of specificity and uniqueness between the two measures makes the mean more useful for data with no outlier.
+
+In conclusion, depending on the context and the data, it is often more interesting to report the mean or the median, or both. As a last remark regarding the comparison between the two most important location measures, note that when the mean and median are equal, the distribution of your data can be considered to follow a normal distribution (also referred as Gaussian distribution).
 
 ## Dispersion
 
@@ -147,9 +169,9 @@ As for location measures, we now detail and compute (by hand) each of these stat
 
 ### Range
 
-The range is the maximum value minus the minimum value:
+The range is the difference between the maximum and minimum:
 
-$$range = min - max$$
+$$range = max - min$$
 
 
 It is often the first step in many statistical project in the sense that it 

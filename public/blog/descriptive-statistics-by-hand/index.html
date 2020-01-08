@@ -134,7 +134,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            6 minute read
+                            9 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -166,7 +166,10 @@
 <li><a href="#location">Location</a><ul>
 <li><a href="#minimum-and-maximum">Minimum and maximum</a></li>
 <li><a href="#mean">Mean</a></li>
-<li><a href="#median">Median</a></li>
+<li><a href="#median">Median</a><ul>
+<li><a href="#odd-number-of-observations">Odd number of observations</a></li>
+<li><a href="#even-number-of-observations">Even number of observations</a></li>
+</ul></li>
 <li><a href="#mean-vs.median">Mean vs. median</a></li>
 </ul></li>
 <li><a href="#dispersion">Dispersion</a><ul>
@@ -178,14 +181,14 @@
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>This article explains how to compute the main descriptive statistics by hand. To learn how to compute these measures in R, read “<a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>”.</p>
+<p>This article explains how to compute the main descriptive statistics by hand. To learn how to compute these measures in R, read the article “<a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>”.</p>
 <p>Descriptive statistics (in the broad sense of the term) is a branch of statistics aiming at summarizing and describing a series of values or a dataset. Long series of values without any preparation or without any summary measures are often not informative due to the difficulty of recognizing any pattern in the data. Below an example with the height (in cm) of a population of 100 adults:</p>
-<p><em>188.7</em>, <em>169.3</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em>, <em>173.9</em>, <em>190.1</em>, <em>174.1</em>, <em>195.2</em>, <em>174.4</em>, <em>188.1</em>, <em>197.9</em>, <em>161.1</em>, <em>172.2</em>, <em>173.7</em>, <em>181.4</em>, <em>172.2</em>, <em>148.4</em>, <em>150.6</em>, <em>188.2</em>, <em>171.9</em>, <em>157.2</em>, <em>173.3</em>, <em>187.2</em>, <em>193.9</em>, <em>170.7</em>, <em>172.4</em>, <em>157.4</em>, <em>179.6</em>, <em>168.6</em>, <em>179.6</em>, <em>182.1</em>, <em>185.3</em>, <em>168.9</em>, <em>180.1</em>, <em>157.8</em>, <em>167.2</em>, <em>166.5</em>, <em>150.9</em>, <em>175.4</em>, <em>177.1</em>, <em>171.4</em>, <em>182.6</em>, <em>167.7</em>, <em>161.3</em>, <em>179.3</em>, <em>166.9</em>, <em>189.4</em>, <em>170.7</em>, <em>181.6</em>, <em>178.2</em>, <em>167.2</em>, <em>190.8</em>, <em>181.4</em>, <em>175.9</em>, <em>177.8</em>, <em>181.8</em>, <em>175.9</em>, <em>145.1</em>, <em>177.8</em>, <em>171.3</em>, <em>176.8</em>, <em>180.8</em>, <em>189</em>, <em>167.7</em>, <em>188</em>, <em>178.4</em>, <em>185.4</em>, <em>184.2</em>, <em>182.2</em>, <em>164.6</em>, <em>174.1</em>, <em>181.2</em>, <em>165.5</em>, <em>169.6</em>, <em>180.8</em>, <em>182.7</em>, <em>179.6</em>, <em>166.1</em>, <em>164</em>, <em>190.1</em>, <em>177.6</em>, <em>175.9</em>, <em>173.8</em>, <em>163.1</em>, <em>181.1</em>, <em>172.8</em>, <em>173.2</em>, <em>184.3</em>, <em>183.2</em>, <em>188.9</em>, <em>170.2</em>, <em>181.5</em>, <em>188.9</em>, <em>163.9</em>, <em>166.4</em>, <em>163.7</em>, <em>160.4</em>, <em>175.8</em> and <em>181.5</em></p>
+<p><em>188.7</em>, <em>169.4</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em>, <em>173.9</em>, <em>190.1</em>, <em>174.1</em>, <em>195.2</em>, <em>174.4</em>, <em>188</em>, <em>197.9</em>, <em>161.1</em>, <em>172.2</em>, <em>173.7</em>, <em>181.4</em>, <em>172.2</em>, <em>148.4</em>, <em>150.6</em>, <em>188.2</em>, <em>171.9</em>, <em>157.2</em>, <em>173.3</em>, <em>187.1</em>, <em>194</em>, <em>170.7</em>, <em>172.4</em>, <em>157.4</em>, <em>179.6</em>, <em>168.6</em>, <em>179.6</em>, <em>182</em>, <em>185.4</em>, <em>168.9</em>, <em>180</em>, <em>157.8</em>, <em>167.2</em>, <em>166.5</em>, <em>150.9</em>, <em>175.4</em>, <em>177.1</em>, <em>171.4</em>, <em>182.6</em>, <em>167.7</em>, <em>161.3</em>, <em>179.3</em>, <em>166.9</em>, <em>189.4</em>, <em>170.7</em>, <em>181.6</em>, <em>178.2</em>, <em>167.2</em>, <em>190.8</em>, <em>181.4</em>, <em>175.9</em>, <em>177.8</em>, <em>181.8</em>, <em>175.9</em>, <em>145.1</em>, <em>177.8</em>, <em>171.3</em>, <em>176.9</em>, <em>180.8</em>, <em>189</em>, <em>167.7</em>, <em>188</em>, <em>178.4</em>, <em>185.4</em>, <em>184.2</em>, <em>182.2</em>, <em>164.6</em>, <em>174.1</em>, <em>181.2</em>, <em>165.5</em>, <em>169.6</em>, <em>180.8</em>, <em>182.7</em>, <em>179.6</em>, <em>166.1</em>, <em>164</em>, <em>190.1</em>, <em>177.6</em>, <em>175.9</em>, <em>173.8</em>, <em>163.1</em>, <em>181.1</em>, <em>172.8</em>, <em>173.2</em>, <em>184.3</em>, <em>183.2</em>, <em>188.9</em>, <em>170.2</em>, <em>181.5</em>, <em>188.9</em>, <em>163.9</em>, <em>166.4</em>, <em>163.7</em>, <em>160.4</em>, <em>175.8</em> and <em>181.5</em></p>
 <p>Facing this series, it is hard (not to say impossible) for anyone to understand the data and have a clear view of the size of these adults (in a reasonable amount of time). Descriptive statistics allow to summarize, and thus have a better overview of the data. Of course, by summarizing data through one or several measures, some information will inevitably be lost. However, in many cases it is generally better to lose some information but in return gain an overview.</p>
 </div>
 <div id="location-versus-dispersion-measures" class="section level1">
 <h1>Location versus dispersion measures</h1>
-<p>Several different measures (called statistics) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data. In the following sections, we detail both location and dispersion measures and illustrate them with the data presented in the introduction (the height of the 100 adults).</p>
+<p>Several different measures (called statistics) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data. In the following sections, we detail both location and dispersion measures and illustrate them with the data presented in the introduction (the height of 100 adults).</p>
 <div id="location" class="section level2">
 <h2>Location</h2>
 <p>Location measures allow to see “where” the data are located, around which values. In other words, location measures give an understanding on what is the central tendency or the “position” of the data. It includes the following statistics (others exist but we focus on the most common ones):</p>
@@ -202,51 +205,97 @@
 <div id="minimum-and-maximum" class="section level3">
 <h3>Minimum and maximum</h3>
 <p>Minimum (<span class="math inline">\(min\)</span>) and maximum (<span class="math inline">\(max\)</span>) are simply the lowest and largest values, respectively. Given the height (in cm) of a sample of 6 adults:</p>
-<p><em>188.7</em>, <em>169.3</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em> and <em>173.9</em></p>
-<p>The minimum is 169.35 and the maximum is 188.71. These two simple measures give a clear idea about the heights of the smallest and tallest persons.</p>
+<p><em>188.7</em>, <em>169.4</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em> and <em>173.9</em></p>
+<p>The minimum is 169.4 cm and the maximum is 188.7 cm. These two simple measures give a clear idea about the size of the smallest and tallest of these 6 adults.</p>
 </div>
 <div id="mean" class="section level3">
 <h3>Mean</h3>
-<p>The mean is probably the most common statistics. It gives an idea on what is the average value, that is, the central tendency of the data or the center of gravity. The mean is found by summing all values and dividing this sum by the number of observations (denoted <span class="math inline">\(n\)</span>):</p>
+<p>The mean, also known as average, is probably the most common statistics. It gives an idea on what is the average value, that is, the central tendency of the data or the center of gravity. The mean is found by summing all values and dividing this sum by the number of observations (denoted <span class="math inline">\(n\)</span>):</p>
 <p><span class="math display">\[mean = \overline{X} = \frac{\text{sum of all values}}{\text{number of values}} = \frac{1}{n}\sum^{n}_{i = 1} X_i\]</span>
-Given our sample of 6 heights presented above, the mean is:</p>
-<p><span class="math display">\[\overline{x} = \frac{188.7 + 169.3 + 178.6 + 181.3 + 179 + 173.9}{6}\]</span></p>
+Given our sample of 6 adults presented above, the mean is:</p>
+<p><span class="math display">\[\overline{x} = \frac{188.7 + 169.4 + 178.6 + 181.3 + 179 + 173.9}{6} = 178.4833\]</span></p>
 <p>(Note that a random variable is usually denoted with a capital letter and the particular values that our random variable can assume with a lowercase letter. That is the reason we used <span class="math inline">\(\overline{X}\)</span> and then <span class="math inline">\(\overline{x}\)</span>.)</p>
+<p>In conclusion, the mean size, that is, the average size of our sample of 6 adults is 178.48 cm (rounded to 2 decimals).</p>
 </div>
 <div id="median" class="section level3">
 <h3>Median</h3>
-<p>The median is another measure of location so it also gives an idea about the central tendency of the data. The easiest way to compute it is by first sorting the data from lowest to highest (in ascending order) then take the middle value. Formally, after sorting, the median is:</p>
+<p>The median is another measure of location so it also gives an idea about the central tendency of the data. The interpretation of the median is that there are as many observations below as above the median. In other words, 50% of the observations lie below the median, and 50% of the observations lie above the median. The easiest way to compute the median is by first sorting the data from lowest to highest (i.e., in ascending order) then take the middle point as the median. From the sorted values, for an odd number of observations, the middle point is easy to find: it is the value with as many observations below as above. Still from the sorted values, for an even number of observations, the middle point is exactly between the two middle values. Formally, after sorting, the median is:</p>
 <ul>
 <li>if <span class="math inline">\(n\)</span> (number of observations) is odd: <span class="math display">\[med(X) = X_{\frac{n+1}{2}}\]</span></li>
 <li>if <span class="math inline">\(n\)</span> is even: <span class="math display">\[med(X) = \frac{1}{2}\big(X_{\frac{n}{2}} + X_{\frac{n}{2} + 1}\big)\]</span></li>
 </ul>
-<p>where the subscript of <span class="math inline">\(X\)</span> denotes the numbering of the sorted data. The formulas look harder than they really are, so let’s see with two concrete ewamples.</p>
+<p>where the subscript of <span class="math inline">\(X\)</span> denotes the numbering of the sorted data. The formulas look harder than they really are, so let’s see with two concrete examples.</p>
 <div id="odd-number-of-observations" class="section level4">
 <h4>Odd number of observations</h4>
-<p>Given a sample of 7 heights taken from the 100 heights presented in the introduction:</p>
+<p>Given the height of a sample of 7 adults taken from the 100 adults presented in the introduction:</p>
 <p><em>188.9</em>, <em>163.9</em>, <em>166.4</em>, <em>163.7</em>, <em>160.4</em>, <em>175.8</em> and <em>181.5</em></p>
 <p>We first sort the order from lowest to highest:</p>
 <p><em>160.4</em>, <em>163.7</em>, <em>163.9</em>, <em>166.4</em>, <em>175.8</em>, <em>181.5</em> and <em>188.9</em></p>
 <p>Given that the number of observations <span class="math inline">\(n\)</span> is odd (since <span class="math inline">\(n = 7\)</span>), the median is</p>
 <p><span class="math display">\[med(X) = X_\frac{7 + 1}{2} = X_4\]</span></p>
-<p>So we take the fourth value from the sorted values, which corresponds to 166.4. In conclusion, the median of <em>188.9</em>, <em>163.9</em>, <em>166.4</em>, <em>163.7</em>, <em>160.4</em>, <em>175.8</em> and <em>181.5</em> is 166.4.</p>
+<p>So we take the fourth value from the sorted values, which corresponds to 166.4. In conclusion, the median size of these 7 adults is 166.4 cm. As you can see, there are 3 observations below 166.4 and 3 observations above 166.4.</p>
 </div>
 <div id="even-number-of-observations" class="section level4">
 <h4>Even number of observations</h4>
-<p>Now let’s see when the number of observations is even, which is slighlty more complicated than when the number of observations is odd. Given a sample of 6 heights:</p>
-<p><em>188.7</em>, <em>169.3</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em> and <em>173.9</em></p>
+<p>Now let’s see when the number of observations is even, which is slighlty more complicated than when the number of observations is odd. Given the height of a sample of 6 adults:</p>
+<p><em>188.7</em>, <em>169.4</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em> and <em>173.9</em></p>
 <p>We sort the values in ascending order:</p>
-<p><em>169.3</em>, <em>173.9</em>, <em>178.6</em>, <em>179</em>, <em>181.3</em> and <em>188.7</em></p>
+<p><em>169.4</em>, <em>173.9</em>, <em>178.6</em>, <em>179</em>, <em>181.3</em> and <em>188.7</em></p>
 <p>Given that the number of observations <span class="math inline">\(n\)</span> is even (since <span class="math inline">\(n = 6\)</span>), the median is</p>
 <p><span class="math display">\[med(X) = \frac{1}{2}\big(X_{\frac{6}{2}} + X_{\frac{6}{2} + 1}\big) = \frac{1}{2}\big(X_{3} + X_{4}\big)\]</span></p>
 <p>So we sum the third and fourth values from the sorted values and divide this sum by 2 (which is equivalent than taking the mean of these two middle values):</p>
 <p><span class="math display">\[\frac{1}{2}(178.6 + 179) = 178.8\]</span></p>
-<p>In conclusion, the median of <em>188.7</em>, <em>169.3</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em> and <em>173.9</em> is 178.8.</p>
+<p>In conclusion, the median size of these 6 adults is 178.8 cm. Again, remark that there are as many observations below as above 178.8 cm.</p>
 </div>
 </div>
 <div id="mean-vs.median" class="section level3">
 <h3>Mean vs. median</h3>
-<p>The mean has the advantage that it gives a good picture of the data and it is usually understood by everyone. However, it has the disadvantage that the mean is sensible to outliers. To illustrate this,</p>
+<p>Although the mean and median are often relatively close to each other they should not be confused since they both have avantages and disadvantages in different contexts. Besides the fact that almost everyone knows (or have heard about) the mean, it has the advantage that it gives a unique picture for each different series of data. However, it has the disadvantage that the mean is sensible to outliers (i.e., extreme values). On the other hand, the advantage of the median is that it is not sensible to outliers and the inconvenient is that it may be the exact same value for very different series of data (so not unique to the data).</p>
+<p>To illustrate the “sensible to outlier” argument, consider 3 friends in a bar comparing their salaries. Their salaries are <em>1800</em>, <em>2000</em> and <em>2100</em>€, for an average (mean) salary of <em>1967</em>€. A friend of them (who happens to be friend with Bill Gates as well) joins them in the bar. Their salaries are now <em>1800</em>, <em>2000</em>, <em>2100</em> and <em>1000000</em>€. The average salary of the 4 friends is now <em>251475</em>€, compared to <em>1967</em>€ without the rich friend. Although it is statistically correct to say that the average salary of the 4 friends is <em>251475</em>€, you will concede that this measure does not represent a fair image of the salaries of the 4 friends, as 3 of them make much much less than the average salary. As we have just seen, the mean is sensible to outliers. On the other hand, if we report the medians, we see that the median salary of the 3 first friends is <em>2000</em>€, and the median salary of the 4 friends is <em>2050</em>€. As you can see with this example, the median is not sensible to outliers and for series with such extreme value(s), the median is more appropriate compared to the mean as it often gives a better representation of the data. (<em>Note:</em> this example also shows how a large majority of people earn less than the mean salary. This is however beyond the scope of the article.)</p>
+<p>Given the previous example, one may then choose to always use the median instead of the mean. However, the median has it own inconvenient which the mean does not have: the median is less unique and less specific to its underlying data than the mean. Consider the following data, representing the grades of 5 students taking a statistics and economics exam:</p>
+<table style="width:51%;">
+<colgroup>
+<col width="16%" />
+<col width="16%" />
+<col width="18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">studentID</th>
+<th align="center">economics</th>
+<th align="center">statistics</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">10</td>
+<td align="center">5</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">10</td>
+<td align="center">7</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">10</td>
+<td align="center">10</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">18</td>
+<td align="center">10</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">20</td>
+<td align="center">11</td>
+</tr>
+</tbody>
+</table>
+<p>The median of the grades is the same in economics and statistics (median = <em>10</em>). Therefore, had we computed only the medians, we could have concluded that the students performed as well in economics than in statistics. However, although the medians are exactly the same for both classes, it is clear that students performed better in economics than in statistics. In fact, the mean of the grades in economics is <em>13.6</em> and the mean of the grades in statistics is <em>8.6</em>. What we have just shown here is that the median is based only on one single value, the middle value, or on two middle values (if there are an even number of observations), while the mean is based on all values (and thus includes more information). The median is therefore not sensible to outliers, but it is also not unique (i.e., not specific) to different series of data, whereas the mean is much more likely to be different and unique for different series of data. This difference in terms of specificity and uniqueness between the two measures makes the mean more useful for data with no outlier.</p>
+<p>In conclusion, depending on the context and the data, it is often more interesting to report the mean or the median, or both. As a last remark regarding the comparison between the two most important location measures, note that when the mean and median are equal, the distribution of your data can be considered to follow a normal distribution (also referred as Gaussian distribution).</p>
 </div>
 </div>
 <div id="dispersion" class="section level2">
@@ -260,8 +309,8 @@ Given our sample of 6 heights presented above, the mean is:</p>
 <p>As for location measures, we now detail and compute (by hand) each of these statistics one by one.</p>
 <div id="range" class="section level3">
 <h3>Range</h3>
-<p>The range is the maximum value minus the minimum value:</p>
-<p><span class="math display">\[range = min - max\]</span></p>
+<p>The range is the difference between the maximum and minimum:</p>
+<p><span class="math display">\[range = max - min\]</span></p>
 <p>It is often the first step in many statistical project in the sense that it</p>
 <p>Thanks for reading. I hope this article helped you to understand the different descriptive statistics. If you would like to learn how to compute these measures in R, read “<a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>”. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>. Get updates everytime a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
 </div>
