@@ -1,7 +1,7 @@
 ---
 title: Descriptive statistics by hand
 author: Antoine Soetewey
-date: '2020-01-02'
+date: '2020-01-08'
 slug: descriptive-statistics-by-hand
 categories: []
 tags:
@@ -22,6 +22,8 @@ draft: true
 <li><a href="#location">Location</a><ul>
 <li><a href="#minimum-and-maximum">Minimum and maximum</a></li>
 <li><a href="#mean">Mean</a></li>
+<li><a href="#median">Median</a></li>
+<li><a href="#mean-vs.median">Mean vs. median</a></li>
 </ul></li>
 <li><a href="#dispersion">Dispersion</a><ul>
 <li><a href="#range">Range</a></li>
@@ -33,16 +35,16 @@ draft: true
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>This article explains how to compute the main descriptive statistics by hand. To learn how to compute these measures in R, read “<a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>”.</p>
-<p>Descriptive statistics (in the broad sense of the term) is a branch of statistics aiming at summarizing and describing a series of values or a dataset. Long series of values without any preparation or without any summary measures are often not informative due to the difficulty of recognizing any pattern in the data. Below an example with the height (in cm) of a sample of 100 adults:</p>
+<p>Descriptive statistics (in the broad sense of the term) is a branch of statistics aiming at summarizing and describing a series of values or a dataset. Long series of values without any preparation or without any summary measures are often not informative due to the difficulty of recognizing any pattern in the data. Below an example with the height (in cm) of a population of 100 adults:</p>
 <p><em>188.7</em>, <em>169.3</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em>, <em>173.9</em>, <em>190.1</em>, <em>174.1</em>, <em>195.2</em>, <em>174.4</em>, <em>188.1</em>, <em>197.9</em>, <em>161.1</em>, <em>172.2</em>, <em>173.7</em>, <em>181.4</em>, <em>172.2</em>, <em>148.4</em>, <em>150.6</em>, <em>188.2</em>, <em>171.9</em>, <em>157.2</em>, <em>173.3</em>, <em>187.2</em>, <em>193.9</em>, <em>170.7</em>, <em>172.4</em>, <em>157.4</em>, <em>179.6</em>, <em>168.6</em>, <em>179.6</em>, <em>182.1</em>, <em>185.3</em>, <em>168.9</em>, <em>180.1</em>, <em>157.8</em>, <em>167.2</em>, <em>166.5</em>, <em>150.9</em>, <em>175.4</em>, <em>177.1</em>, <em>171.4</em>, <em>182.6</em>, <em>167.7</em>, <em>161.3</em>, <em>179.3</em>, <em>166.9</em>, <em>189.4</em>, <em>170.7</em>, <em>181.6</em>, <em>178.2</em>, <em>167.2</em>, <em>190.8</em>, <em>181.4</em>, <em>175.9</em>, <em>177.8</em>, <em>181.8</em>, <em>175.9</em>, <em>145.1</em>, <em>177.8</em>, <em>171.3</em>, <em>176.8</em>, <em>180.8</em>, <em>189</em>, <em>167.7</em>, <em>188</em>, <em>178.4</em>, <em>185.4</em>, <em>184.2</em>, <em>182.2</em>, <em>164.6</em>, <em>174.1</em>, <em>181.2</em>, <em>165.5</em>, <em>169.6</em>, <em>180.8</em>, <em>182.7</em>, <em>179.6</em>, <em>166.1</em>, <em>164</em>, <em>190.1</em>, <em>177.6</em>, <em>175.9</em>, <em>173.8</em>, <em>163.1</em>, <em>181.1</em>, <em>172.8</em>, <em>173.2</em>, <em>184.3</em>, <em>183.2</em>, <em>188.9</em>, <em>170.2</em>, <em>181.5</em>, <em>188.9</em>, <em>163.9</em>, <em>166.4</em>, <em>163.7</em>, <em>160.4</em>, <em>175.8</em> and <em>181.5</em></p>
-<p>Facing this sample, it is hard (not to say impossible) for anyone to understand the data and have a clear view of the size of these adults (in a reasonable amount of time). Descriptive statistics allow to summarize, and thus have a better overview of the data. Of course, by summarizing data through one or several measures, some information will inevitably be lost. However, in many cases it is generally better to lose some information but in return gain an overview.</p>
+<p>Facing this series, it is hard (not to say impossible) for anyone to understand the data and have a clear view of the size of these adults (in a reasonable amount of time). Descriptive statistics allow to summarize, and thus have a better overview of the data. Of course, by summarizing data through one or several measures, some information will inevitably be lost. However, in many cases it is generally better to lose some information but in return gain an overview.</p>
 </div>
 <div id="location-versus-dispersion-measures" class="section level1">
 <h1>Location versus dispersion measures</h1>
-<p>Several different measures (called statistics) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data.</p>
+<p>Several different measures (called statistics) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data. In the following sections, we detail both location and dispersion measures and illustrate them with the data presented in the introduction (the height of the 100 adults).</p>
 <div id="location" class="section level2">
 <h2>Location</h2>
-<p>Location measures allow to see “where” the data are located, around which values. In other words, location measures give an understanding on what is the central tendency or the “position” of the data. It includes the following statistics:</p>
+<p>Location measures allow to see “where” the data are located, around which values. In other words, location measures give an understanding on what is the central tendency or the “position” of the data. It includes the following statistics (others exist but we focus on the most common ones):</p>
 <ul>
 <li>minimum</li>
 <li>maximum</li>
@@ -55,16 +57,52 @@ draft: true
 <p>We detail and compute (by hand) each of them in the following sections.</p>
 <div id="minimum-and-maximum" class="section level3">
 <h3>Minimum and maximum</h3>
-<p>Minimum (min) and maximum (max) are simply the lowest and largest values. Given the height (in cm) of a sample of 6 adults:</p>
+<p>Minimum (<span class="math inline">\(min\)</span>) and maximum (<span class="math inline">\(max\)</span>) are simply the lowest and largest values, respectively. Given the height (in cm) of a sample of 6 adults:</p>
 <p><em>188.7</em>, <em>169.3</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em> and <em>173.9</em></p>
 <p>The minimum is 169.35 and the maximum is 188.71. These two simple measures give a clear idea about the heights of the smallest and tallest persons.</p>
 </div>
 <div id="mean" class="section level3">
 <h3>Mean</h3>
-<p>The mean is probably the most common statistics. It gives an idea on what is the average value that is used to derive the central tendency of the data. It is found by summing all values and dividing this sum by the number of observations (<span class="math inline">\(n\)</span>):</p>
-<p><span class="math display">\[mean = \bar{x} = \frac{\text{sum of all values}}{\text{number of values}} = \frac{1}{n}\sum^{n}_{i = 1} X_i\]</span>
+<p>The mean is probably the most common statistics. It gives an idea on what is the average value, that is, the central tendency of the data or the center of gravity. The mean is found by summing all values and dividing this sum by the number of observations (denoted <span class="math inline">\(n\)</span>):</p>
+<p><span class="math display">\[mean = \overline{X} = \frac{\text{sum of all values}}{\text{number of values}} = \frac{1}{n}\sum^{n}_{i = 1} X_i\]</span>
 Given our sample of 6 heights presented above, the mean is:</p>
-<p><span class="math display">\[\frac{188.7 + 169.3 + 178.6 + 181.3 + 179 + 173.9}{6}\]</span></p>
+<p><span class="math display">\[\overline{x} = \frac{188.7 + 169.3 + 178.6 + 181.3 + 179 + 173.9}{6}\]</span></p>
+<p>(Note that a random variable is usually denoted with a capital letter and the particular values that our random variable can assume with a lowercase letter. That is the reason we used <span class="math inline">\(\overline{X}\)</span> and then <span class="math inline">\(\overline{x}\)</span>.)</p>
+</div>
+<div id="median" class="section level3">
+<h3>Median</h3>
+<p>The median is another measure of location so it also gives an idea about the central tendency of the data. The easiest way to compute it is by first sorting the data from lowest to highest (in ascending order) then take the middle value. Formally, after sorting, the median is:</p>
+<ul>
+<li>if <span class="math inline">\(n\)</span> (number of observations) is odd: <span class="math display">\[med(X) = X_{\frac{n+1}{2}}\]</span></li>
+<li>if <span class="math inline">\(n\)</span> is even: <span class="math display">\[med(X) = \frac{1}{2}\big(X_{\frac{n}{2}} + X_{\frac{n}{2} + 1}\big)\]</span></li>
+</ul>
+<p>where the subscript of <span class="math inline">\(X\)</span> denotes the numbering of the sorted data. The formulas look harder than they really are, so let’s see with two concrete ewamples.</p>
+<div id="odd-number-of-observations" class="section level4">
+<h4>Odd number of observations</h4>
+<p>Given a sample of 7 heights taken from the 100 heights presented in the introduction:</p>
+<p><em>188.9</em>, <em>163.9</em>, <em>166.4</em>, <em>163.7</em>, <em>160.4</em>, <em>175.8</em> and <em>181.5</em></p>
+<p>We first sort the order from lowest to highest:</p>
+<p><em>160.4</em>, <em>163.7</em>, <em>163.9</em>, <em>166.4</em>, <em>175.8</em>, <em>181.5</em> and <em>188.9</em></p>
+<p>Given that the number of observations <span class="math inline">\(n\)</span> is odd (since <span class="math inline">\(n = 7\)</span>), the median is</p>
+<p><span class="math display">\[med(X) = X_\frac{7 + 1}{2} = X_4\]</span></p>
+<p>So we take the fourth value from the sorted values, which corresponds to 166.4. In conclusion, the median of <em>188.9</em>, <em>163.9</em>, <em>166.4</em>, <em>163.7</em>, <em>160.4</em>, <em>175.8</em> and <em>181.5</em> is 166.4.</p>
+</div>
+<div id="even-number-of-observations" class="section level4">
+<h4>Even number of observations</h4>
+<p>Now let’s see when the number of observations is even, which is slighlty more complicated than when the number of observations is odd. Given a sample of 6 heights:</p>
+<p><em>188.7</em>, <em>169.3</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em> and <em>173.9</em></p>
+<p>We sort the values in ascending order:</p>
+<p><em>169.3</em>, <em>173.9</em>, <em>178.6</em>, <em>179</em>, <em>181.3</em> and <em>188.7</em></p>
+<p>Given that the number of observations <span class="math inline">\(n\)</span> is even (since <span class="math inline">\(n = 6\)</span>), the median is</p>
+<p><span class="math display">\[med(X) = \frac{1}{2}\big(X_{\frac{6}{2}} + X_{\frac{6}{2} + 1}\big) = \frac{1}{2}\big(X_{3} + X_{4}\big)\]</span></p>
+<p>So we sum the third and fourth values from the sorted values and divide this sum by 2 (which is equivalent than taking the mean of these two middle values):</p>
+<p><span class="math display">\[\frac{1}{2}(178.6 + 179) = 178.8\]</span></p>
+<p>In conclusion, the median of <em>188.7</em>, <em>169.3</em>, <em>178.6</em>, <em>181.3</em>, <em>179</em> and <em>173.9</em> is 178.8.</p>
+</div>
+</div>
+<div id="mean-vs.median" class="section level3">
+<h3>Mean vs. median</h3>
+<p>The mean has the advantage that it gives a good picture of the data and it is usually understood by everyone. However, it has the disadvantage that the mean is sensible to outliers. To illustrate this,</p>
 </div>
 </div>
 <div id="dispersion" class="section level2">
