@@ -41,9 +41,11 @@ pander(height)
 
 Facing this series, it is hard (not to say impossible) for anyone to understand the data and have a clear view of the size of these adults (in a reasonable amount of time). Descriptive statistics allow to summarize, and thus have a better overview of the data. Of course, by summarizing data through one or several measures, some information will inevitably be lost. However, in many cases it is generally better to lose some information but in return gain an overview.
 
+<!-- Descriptive statistics is often the first step in any statistical analyses. -->
+
 # Location versus dispersion measures
 
-Several different measures (called statistics) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data. In the following sections, we detail both location and dispersion measures and illustrate them with the data presented in the introduction (the height of 100 adults).
+Several different measures (called statistics) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data. In the following sections, we detail both location and dispersion measures and illustrate them with examples. In practice, both types of measures are often used together in order to summarize the data in the most concise but complete way.
 
 ## Location
 
@@ -167,9 +169,7 @@ The first and third quartiles are similar to the median in the sense that they a
 1. round up these two numbers to the next whole number
 1. these two number represent the rank of the first and third quartile (in the sorted series), respectively
 
-Here is an example with the following series, representing the number of exams 9 students have to take in the June session:
-
-xxx change with height of adults
+Here is an example with the following series, representing the number of exams for 9 university students during the next exam session:
 
 ```{r}
 x <- c(5, 11, 7, 4, 4, 6, 14, 2, 8)
@@ -184,7 +184,7 @@ pander(sort(x))
 
 There are 9 observations so $$0.25 \cdot 9 = 2.25$$ and $$0.75 \cdot 9 = 6.75$$
 
-Rounding up to the whole number gives 3 and 7, which represents the rank of the first and third quartiles. Therefore, the first quartile is 4 and the third quartile is 8.
+Rounding up to the whole number gives 3 and 7, which represents the rank of the first and third quartiles, respectively. Therefore, the first quartile is 4 and the third quartile is 8.
 
 In conclusion, 25% of students have to take less than 4 exams in June (and thus 75% of students have to take more than 4 exams), while 75% of students have to take less than 8 exams in June (and thus 25% of students have to take more than 8 exams).
 
@@ -192,22 +192,52 @@ In conclusion, 25% of students have to take less than 4 exams in June (and thus 
 
 Note that the first quartile is denoted $Q1$ and the third quartile is denoted $Q3$ (where $Q$ stands for quartile). As you can see, the median is actually the second quartile and for this reason it is also sometimes denoted $Q2$.
 
+### Mode
+
+The mode of a series is the value that appears most often. In other words, it is the value that has the highest number of occurrences. Given the number of exams for the 9 students presented above:
+
+```{r}
+pander(x)
+```
+
+The mode is 4 because it is the most common value with 2 occurences. All other values appear only once. In conclusion, most students have to take 4 exams in the next exam session. Note that it is possible that a series has no mode (e.g., `r pander(c(4,7,2,10))`) or more than one mode (e.g., `r pander(c(4, 2, 2, 8, 11, 11))`).
+
+Data with two modes are often called bimodal and data with more than two modes are often called multimodal, as opposed to series with one mode which are referred as unimodal.
+
+#### Mode for qualitative variables
+
+Unlike the previous descriptive statistics (i.e., min, max, mean, median, Q1 and Q3) that can only be computed for quantitative variables, the mode can be computed for quantitative **and** qualitative variables (see a recap of the different [types of variables](/blog/variable-types-and-examples/) if you do not remember the difference). Given the eye color of the 9 students presented above:
+
+```{r}
+set.seed(42)
+pander(sample(c("brown", "blue", "green"), size = 9, replace = TRUE))
+```
+
+The mode is brown, so most students have brown eyes.
+
 ## Dispersion
+
+All previous descriptive statistics helps to get a sense of the location and position of the data. We now present the most common dispersion measures, which help to get a sense of the dispersion and the variability of the data (to which extent a distribution is squeezed or stretched):
 
 * range
 * standard deviation
 * variance
 * interquartile range
 
-As for location measures, we now detail and compute (by hand) each of these statistics one by one.
+As for location measures, we detail and compute (by hand) each of these statistics one by one.
 
 ### Range
 
-The range is the difference between the maximum and minimum:
+The range is the difference between the maximum and the minimum value:
 
 $$range = max - min$$
 
+Given the height (in cm) of our sample of 6 adults:
 
-It is often the first step in many statistical project in the sense that it 
+```{r}
+pander(sub_height)
+```
+
+The range is `r max(sub_height)` $-$ `r min(sub_height)` $=$ `r max(sub_height) - min(sub_height)` cm. The advantage of the range is that it is extremely easy to compute it, but the disadvantage is that it relies on only the two most extreme values.
 
 Thanks for reading. I hope this article helped you to understand and compute the different descriptive statistics by hand. If you would like to learn how to compute these measures in R, read "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)". As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/). Get updates every time a new article is published by [subscribing to this blog](/subscribe/).
