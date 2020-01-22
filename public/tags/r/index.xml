@@ -6,10 +6,251 @@
     <description>Recent content in R on Stats and R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Tue, 21 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 22 Jan 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Descriptive statistics in R</title>
+      <link>/blog/descriptive-statistics-in-r/</link>
+      <pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/descriptive-statistics-in-r/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#minimum-and-maximum&#34;&gt;Minimum and maximum&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#mean&#34;&gt;Mean&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#median&#34;&gt;Median&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#first-and-third-quartile&#34;&gt;First and third quartile&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#other-quantiles&#34;&gt;Other quantiles&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#standard-deviation-and-variance&#34;&gt;Standard deviation and variance&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#interquartile-range&#34;&gt;Interquartile range&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#barplot&#34;&gt;Barplot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#histogram&#34;&gt;Histogram&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#boxplot&#34;&gt;Boxplot&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;This article explains how to compute the main descriptive statistics in R and how to present them graphically. To learn more about the reasoning behind each descriptive statistics and learn how to compute them by hand, read the article “&lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;Descriptive statistics by hand&lt;/a&gt;”.&lt;/p&gt;
+&lt;p&gt;To briefly recap what have been said in that article, descriptive statistics (in the broad sense of the term) is a branch of statistics aiming at summarizing, describing and presenting a series of values or a dataset. Descriptive statistics is often the first step and an important part in any statistical analysis. It allows to check the quality of the data and it helps to “understand” the data by having a clear overview of it. If well presented, descriptive statistics is already a good starting point for further analyses. There exists many measures to summarize a dataset. They are divided into two types: (i) location and (ii) dispersion measures. Location measures give an understanding about the central tendency of the data, whereas dispersion measures give an understanding about the spread of the data. In this article, we focus only on the implementation in R of the most common descriptive statistics and their visualizations (when deemed appropriate). See online or in the &lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;above mentioned article&lt;/a&gt; for more information about the purpose and usage of each measure.&lt;/p&gt;
+&lt;p&gt;We use the dataset &lt;code&gt;iris&lt;/code&gt; through the article. This dataset is imported by default in R, you only need to load it by running &lt;code&gt;iris&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat &amp;lt;- iris # load the iris dataset and renamed it dat&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Below a preview of this dataset and its structure:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(dat) # first 6 observations&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;str(dat) # structure of dataset&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## &amp;#39;data.frame&amp;#39;:    150 obs. of  5 variables:
+##  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+##  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+##  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+##  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+##  $ Species     : Factor w/ 3 levels &amp;quot;setosa&amp;quot;,&amp;quot;versicolor&amp;quot;,..: 1 1 1 1 1 1 1 1 1 1 ...&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The dataset contains 150 observations and 5 variables, representing the length and width of the sepal and petal and the species of 150 flowers. Length and width of the sepal and petal are numeric variables and the species is a factor with 3 levels (indicated by &lt;code&gt;num&lt;/code&gt; and &lt;code&gt;Factor w/ 3 levels&lt;/code&gt; after the name of the variables). See the &lt;a href=&#34;/blog/data-types-in-r&#34;&gt;different variables types in R&lt;/a&gt; if you need a refresh.&lt;/p&gt;
+&lt;p&gt;For plots, we use the default graphs and the graphs from the package &lt;code&gt;{ggplot2}&lt;/code&gt;. Graphs from &lt;code&gt;{ggplot2}&lt;/code&gt; have a better look but it requires more advanced code so if you need to publish or share your graphs, I suggest using &lt;code&gt;{ggplot2}&lt;/code&gt;, otherwise the default graphics will do the job.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;minimum-and-maximum&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Minimum and maximum&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;min(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 4.3&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;max(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 7.9&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Alternatively:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;range(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 4.3 7.9&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;gives you the minimum and maximum directly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;mean&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Mean&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 5.843333&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;Tips:&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;if there is at least one missing value in your dataset, use &lt;code&gt;mean(dat$Sepal.Length, na.rm = TRUE)&lt;/code&gt; to compute the mean without the NA. This argument can be used for many functions, not only the mean&lt;/li&gt;
+&lt;li&gt;for a truncated mean, use &lt;code&gt;mean(dat$Sepal.Length, trim = 0.10)&lt;/code&gt; and change the &lt;code&gt;trim&lt;/code&gt; argument to your needs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;median&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Median&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;median(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 5.8&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;or:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.5)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 50% 
+## 5.8&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;first-and-third-quartile&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;First and third quartile&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.25) # first quartile&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 25% 
+## 5.1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.75) # third quartile&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 75% 
+## 6.4&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;other-quantiles&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Other quantiles&lt;/h2&gt;
+&lt;p&gt;As you have guessed, any quantile can also be computed with the &lt;code&gt;quantile()&lt;/code&gt; function. For instance, the &lt;span class=&#34;math inline&#34;&gt;\(4^{th}\)&lt;/span&gt; decile or the &lt;span class=&#34;math inline&#34;&gt;\(98^{th}\)&lt;/span&gt; percentile:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.4) # 4th decile&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 40% 
+## 5.6&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.98) # 98th percentile&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 98% 
+## 7.7&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;standard-deviation-and-variance&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Standard deviation and variance&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sd(dat$Sepal.Length) # standard deviation&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.8280661&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;var(dat$Sepal.Length) # variance&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.6856935&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Remember from this &lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;article&lt;/a&gt; that the standard deviation and the variance are different whether we compute it for a sample or a population (see the difference between the two &lt;a href=&#34;/blog/what-is-the-difference-between-population-and-sample/&#34;&gt;here&lt;/a&gt;). In R, the standard deviation and the variance are computed as if the data represent a sample (so the denominator is &lt;span class=&#34;math inline&#34;&gt;\(n - 1\)&lt;/span&gt;, where &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; is the number of observations). To my knowledge, there is no function by default in R that computes the standard deviation and variance for a population.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Tip:&lt;/em&gt; to compute the standard deviation (or variance) of multiple variables at the same time, use:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lapply(dat[, 1:4], sd) # dat[, 1:4] selects the variables 1 to 4&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Sepal.Length
+## [1] 0.8280661
+## 
+## $Sepal.Width
+## [1] 0.4358663
+## 
+## $Petal.Length
+## [1] 1.765298
+## 
+## $Petal.Width
+## [1] 0.7622377&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;interquartile-range&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Interquartile range&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;IQR(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 1.3&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;IQR()&lt;/code&gt; actually computes:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.75) - quantile(dat$Sepal.Length, 0.25)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 75% 
+## 1.3&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;summary&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Summary&lt;/h1&gt;
+&lt;p&gt;You can compute the minimum, &lt;span class=&#34;math inline&#34;&gt;\(1^{st}\)&lt;/span&gt; quartile, median, mean, &lt;span class=&#34;math inline&#34;&gt;\(3^{rd}\)&lt;/span&gt; quartile and the maximum for all variables of the dataset at once using &lt;code&gt;summary()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(dat)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
+##  Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100  
+##  1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300  
+##  Median :5.800   Median :3.000   Median :4.350   Median :1.300  
+##  Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199  
+##  3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800  
+##  Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500  
+##        Species  
+##  setosa    :50  
+##  versicolor:50  
+##  virginica :50  
+##                 
+##                 
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;Tip:&lt;/em&gt; if you need these descriptive statistics by group:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;by(dat, dat$Species, summary)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## dat$Species: setosa
+##   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
+##  Min.   :4.300   Min.   :2.300   Min.   :1.000   Min.   :0.100  
+##  1st Qu.:4.800   1st Qu.:3.200   1st Qu.:1.400   1st Qu.:0.200  
+##  Median :5.000   Median :3.400   Median :1.500   Median :0.200  
+##  Mean   :5.006   Mean   :3.428   Mean   :1.462   Mean   :0.246  
+##  3rd Qu.:5.200   3rd Qu.:3.675   3rd Qu.:1.575   3rd Qu.:0.300  
+##  Max.   :5.800   Max.   :4.400   Max.   :1.900   Max.   :0.600  
+##        Species  
+##  setosa    :50  
+##  versicolor: 0  
+##  virginica : 0  
+##                 
+##                 
+##                 
+## ------------------------------------------------------------ 
+## dat$Species: versicolor
+##   Sepal.Length    Sepal.Width     Petal.Length   Petal.Width          Species  
+##  Min.   :4.900   Min.   :2.000   Min.   :3.00   Min.   :1.000   setosa    : 0  
+##  1st Qu.:5.600   1st Qu.:2.525   1st Qu.:4.00   1st Qu.:1.200   versicolor:50  
+##  Median :5.900   Median :2.800   Median :4.35   Median :1.300   virginica : 0  
+##  Mean   :5.936   Mean   :2.770   Mean   :4.26   Mean   :1.326                  
+##  3rd Qu.:6.300   3rd Qu.:3.000   3rd Qu.:4.60   3rd Qu.:1.500                  
+##  Max.   :7.000   Max.   :3.400   Max.   :5.10   Max.   :1.800                  
+## ------------------------------------------------------------ 
+## dat$Species: virginica
+##   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
+##  Min.   :4.900   Min.   :2.200   Min.   :4.500   Min.   :1.400  
+##  1st Qu.:6.225   1st Qu.:2.800   1st Qu.:5.100   1st Qu.:1.800  
+##  Median :6.500   Median :3.000   Median :5.550   Median :2.000  
+##  Mean   :6.588   Mean   :2.974   Mean   :5.552   Mean   :2.026  
+##  3rd Qu.:6.900   3rd Qu.:3.175   3rd Qu.:5.875   3rd Qu.:2.300  
+##  Max.   :7.900   Max.   :3.800   Max.   :6.900   Max.   :2.500  
+##        Species  
+##  setosa    : 0  
+##  versicolor: 0  
+##  virginica :50  
+##                 
+##                 
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;where the arguments are the name of the dataset, the grouping variable and the summary function (in this order).&lt;/p&gt;
+&lt;p&gt;If you need more descriptive statistics, use &lt;code&gt;stat.desc()&lt;/code&gt; from the package &lt;code&gt;{pastecs}&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(pastecs)
+stat.desc(dat, norm = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##              Sepal.Length  Sepal.Width  Petal.Length   Petal.Width Species
+## nbr.val      150.00000000 150.00000000  1.500000e+02  1.500000e+02      NA
+## nbr.null       0.00000000   0.00000000  0.000000e+00  0.000000e+00      NA
+## nbr.na         0.00000000   0.00000000  0.000000e+00  0.000000e+00      NA
+## min            4.30000000   2.00000000  1.000000e+00  1.000000e-01      NA
+## max            7.90000000   4.40000000  6.900000e+00  2.500000e+00      NA
+## range          3.60000000   2.40000000  5.900000e+00  2.400000e+00      NA
+## sum          876.50000000 458.60000000  5.637000e+02  1.799000e+02      NA
+## median         5.80000000   3.00000000  4.350000e+00  1.300000e+00      NA
+## mean           5.84333333   3.05733333  3.758000e+00  1.199333e+00      NA
+## SE.mean        0.06761132   0.03558833  1.441360e-01  6.223645e-02      NA
+## CI.mean.0.95   0.13360085   0.07032302  2.848146e-01  1.229800e-01      NA
+## var            0.68569351   0.18997942  3.116278e+00  5.810063e-01      NA
+## std.dev        0.82806613   0.43586628  1.765298e+00  7.622377e-01      NA
+## coef.var       0.14171126   0.14256420  4.697441e-01  6.355511e-01      NA
+## skewness       0.30864073   0.31261470 -2.694109e-01 -1.009166e-01      NA
+## skew.2SE       0.77924478   0.78927812 -6.801988e-01 -2.547904e-01      NA
+## kurtosis      -0.60581253   0.13870468 -1.416857e+00 -1.358179e+00      NA
+## kurt.2SE      -0.76961200   0.17620762 -1.799947e+00 -1.725403e+00      NA
+## normtest.W     0.97609027   0.98491787  8.762681e-01  9.018349e-01      NA
+## normtest.p     0.01018116   0.10115427  7.412263e-10  1.680465e-08      NA&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note that the variable &lt;code&gt;Species&lt;/code&gt; is not numeric, so descriptive statistics cannot be computed for this variable and NA are displayed.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;barplot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Barplot&lt;/h1&gt;
+&lt;p&gt;Barplots can only be done on qualitative variables (see the difference with a quantative variable &lt;a href=&#34;/blog/variable-types-and-examples/&#34;&gt;here&lt;/a&gt;). The only qualitative variable in the dataset is the variable &lt;code&gt;Species&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;barplot(table(dat$Species)) # table() is mandatory&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;All bars have the same height as there are 50 observations of each species.&lt;/p&gt;
+&lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+
+ggplot(dat) +
+ aes(x = Species) +
+ geom_bar()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Both plots can be customized. For instance, it is possible to edit the title, x and y-axis labels, color, etc. However, customizing plots is beyond the scope of this article so all plots in this article are presented without any customization. Interested readers will find numerous resources online.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;histogram&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Histogram&lt;/h1&gt;
+&lt;/div&gt;
+&lt;div id=&#34;boxplot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Boxplot&lt;/h1&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Tips and tricks in RStudio and R Markdown</title>
@@ -195,19 +436,6 @@ for (i in 1:10) {
 &lt;/ul&gt;
 &lt;p&gt;Thanks for reading. I hope you find these tips and tricks useful. If you are using others, feel free to share them in the comment section. See more &lt;a href=&#34;/tags/r/&#34;&gt;articles on R&lt;/a&gt;. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raise an issue on GitHub&lt;/a&gt; or &lt;a href=&#34;/contact/&#34;&gt;contact me&lt;/a&gt;. Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Descriptive statistics in R</title>
-      <link>/blog/descriptive-statistics-in-r/</link>
-      <pubDate>Fri, 17 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/blog/descriptive-statistics-in-r/</guid>
-      <description>
-
-
-&lt;p&gt;This article explains how to compute the main descriptive statistics in R. To learn how to compute these measures by hand, read the article “&lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;Descriptive statistics by hand&lt;/a&gt;”.&lt;/p&gt;
 </description>
     </item>
     
