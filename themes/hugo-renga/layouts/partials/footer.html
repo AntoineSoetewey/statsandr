@@ -9,12 +9,53 @@
                               <a href="{{ .Site.Params.subscribe }}">Subscribe</a>
                               <a href="{{ .Site.Params.support }}">Support</a>
                               <a href="{{ .Site.Params.sitemap }}">Sitemap</a>
+                              
+                              {{ if .File.Path }}
+
+{{ $Rmd := (print .File.BaseFileName ".Rmd") }}
+
+{{ if (where (readDir (print "content/" .File.Dir)) "Name" $Rmd) }}
+  {{ $.Scratch.Set "FilePath" (print .File.Dir $Rmd) }}
+{{ else }}
+  {{ $.Scratch.Set "FilePath" .File.Path }}
+{{ end }}
+
+{{ with .Site.Params.GithubEdit}}
+<a href='{{ . }}{{ $.Scratch.Get "FilePath" }}'>Edit this page</a>
+{{ end }}
+
+{{ end }}
+                              
                             </p>
                             <p>
                               <a href="{{ .Site.Params.copyrightUrl }}">&copy; <script>document.write(new Date().getFullYear())</script> {{ .Site.Params.copyright }}</a>
                             </p>
                         {{ else }}
-                            <a href="{{ .Site.BaseURL }}">&copy; <script>document.write(new Date().getFullYear())</script> {{ .Site.Params.copyright }}</a>
+                        
+                        <p>
+                              <a href="{{ .Site.Params.subscribe }}">Subscribe</a>
+                              <a href="{{ .Site.Params.support }}">Support</a>
+                              <a href="{{ .Site.Params.sitemap }}">Sitemap</a>
+                              
+                              {{ if .File.Path }}
+
+{{ $Rmd := (print .File.BaseFileName ".Rmd") }}
+
+{{ if (where (readDir (print "content/" .File.Dir)) "Name" $Rmd) }}
+  {{ $.Scratch.Set "FilePath" (print .File.Dir $Rmd) }}
+{{ else }}
+  {{ $.Scratch.Set "FilePath" .File.Path }}
+{{ end }}
+
+{{ with .Site.Params.GithubEdit}}
+<a href='{{ . }}{{ $.Scratch.Get "FilePath" }}'>Edit this page</a>
+{{ end }}
+
+{{ end }}
+                              
+                            </p>
+                        
+                            <p><a href="{{ .Site.BaseURL }}">&copy; <script>document.write(new Date().getFullYear())</script> {{ .Site.Params.copyright }}</a></p>
                         {{ end }}
                     </div>
                 {{ end }}
