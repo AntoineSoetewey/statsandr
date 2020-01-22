@@ -35,7 +35,7 @@ If you shop on Amazon, using my referral links below will make me earn a small c
 <a name="spread"></a>
 ## Spread the word
 
-If you have found any of this content useful please consider linking to [https://www.statsandr.com/](/) or subscribing by [email](/subscribe/) or via the [feed](/index.xml).
+If you have found any of the content on this blog useful please consider linking to [https://www.statsandr.com/](/) or subscribing by [email](/subscribe/) or via the [feed](/index.xml).
 
 <a name="recommendations"></a>
 ## Recommendations
