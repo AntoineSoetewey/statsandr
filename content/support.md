@@ -14,12 +14,12 @@ menu: main
 There are several ways you can support this blog.
 
 <a name="donation"></a>
-# Donation
+## Donation
 
 If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can send me a donation via [PayPal](https://www.paypal.me/AntoineSoetewey).
 
 <a name="amazon"></a>
-# Amazon
+## Amazon
 
 If you shop on Amazon, using my referral links below will make me earn a small commission and you will pay your product the exact same price:
 
@@ -33,12 +33,12 @@ If you shop on Amazon, using my referral links below will make me earn a small c
 * [Amazon.co.jp](https://www.amazon.co.jp/?&_encoding=UTF8&tag=antoinesoetew-22&linkCode=ur2&linkId=97cc79e839d8aeca287a93e57dbd4d02&camp=247&creative=1211)
 
 <a name="spread"></a>
-# Spread the word
+## Spread the word
 
 If you have found any of this content useful please consider linking to [https://www.statsandr.com/](/) or subscribing by [email](/subscribe/) or via the [feed](/index.xml).
 
 <a name="recommendations"></a>
-# Recommendations
+## Recommendations
 
 If you know someone who needs help for their statistical analyses, feel free to give my [contact details](/contact/) so the person can contact me.
 
