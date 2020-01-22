@@ -30,7 +30,7 @@ If you shop on Amazon, using my referral links below will make me earn a small c
 * [Amazon.de](https://www.amazon.de/?&_encoding=UTF8&tag=antoinesoet0a-21&linkCode=ur2&linkId=76b439299ff165ff310003ccac2185c2&camp=1638&creative=6742)
 * [Amazon.it](https://www.amazon.it/?&_encoding=UTF8&tag=antoinesoet0c-21&linkCode=ur2&linkId=011a566778c8c0c02ba0432517697e29&camp=3414&creative=21718)
 * [Amazon.es](https://www.amazon.es/?&_encoding=UTF8&tag=antoinesoet0f-21&linkCode=ur2&linkId=46ef6b4438a919d3b964d66f6587c26b&camp=3638&creative=24630)
-* [Amazon.co.jp](https://www.amazon.co.jp/?&_encoding=UTF8&tag=antoinesoetew-22&linkCode=ur2&linkId=97cc79e839d8aeca287a93e57dbd4d02&camp=247&creative=1211)
+* [Amazon.co.jp](https://www.amazon.co.jp/?&_encoding=UTF8&tag=antoinesoet03-22&linkCode=ur2&linkId=f0cbe2e2f517cf8ad99139cbed339a05&camp=247&creative=1211)
 
 <a name="spread"></a>
 ## Spread the word
