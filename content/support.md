@@ -16,7 +16,7 @@ There are several ways you can support this blog.
 <a name="donation"></a>
 # Donation
 
-If you would like to support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can send me a donation via [PayPal](https://www.paypal.me/AntoineSoetewey).
+If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can send me a donation via [PayPal](https://www.paypal.me/AntoineSoetewey).
 
 <a name="amazon"></a>
 # Amazon
