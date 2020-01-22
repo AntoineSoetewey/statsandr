@@ -3,7 +3,6 @@ title: 'Support this blog'
 date: "2020-01-21"
 draft: true
 # description: "Description for the page."
-menu: main
 ---
 
 1. [Donation](#donation)
