@@ -127,7 +127,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            15 minute read
+                            18 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -165,6 +165,8 @@
 </ul></li>
 <li><a href="#create-a-new-variable">Create a new variable</a><ul>
 <li><a href="#discretize-a-continuous-variable">Discretize a continuous variable</a></li>
+<li><a href="#sum-and-mean-in-rows">Sum and mean in rows</a></li>
+<li><a href="#sum-and-mean-in-column">Sum and mean in column</a></li>
 </ul></li>
 <li><a href="#categorical-variables-and-labels-management">Categorical variables and labels management</a><ul>
 <li><a href="#recode-categorical-variables">Recode categorical variables</a></li>
@@ -176,6 +178,7 @@
 <li><a href="#remove-nas">Remove NAs</a></li>
 <li><a href="#impute-nas">Impute NAs</a></li>
 </ul></li>
+<li><a href="#scale">Scale</a></li>
 </ul>
 </div>
 
@@ -288,10 +291,10 @@ dat # display the entire dataset</code></pre>
 <pre class="r"><code>library(dplyr)
 sample_n(dat, 4, replace = FALSE)</code></pre>
 <pre><code>##   speed dist
-## 1    13   34
-## 2    15   20
-## 3    18   56
-## 4    20   32</code></pre>
+## 1    17   32
+## 2     4    2
+## 3     8   16
+## 4    16   32</code></pre>
 </div>
 <div id="based-on-row-or-column-numbers" class="section level2">
 <h2>Based on row or column numbers</h2>
@@ -466,6 +469,30 @@ dat[c(1:2, 23:24, 49:50), ] # display some observations</code></pre>
 ## 49    24  120       2880 high speed     [19,26)
 ## 50    25   85       2125 high speed     [19,26)</code></pre>
 </div>
+<div id="sum-and-mean-in-rows" class="section level2">
+<h2>Sum and mean in rows</h2>
+<p>In survey with Likert scale (used in psychology, among others), it is often the case that we need to compute a score for each respondants based on multiple questions. The score is usually the mean or the sum of all the questions of interest. This can be done with <code>rowMeans()</code> and <code>rowSums()</code>. For instance, let’s compute the mean and the sum of the variables <code>speed</code>, <code>dist</code> and <code>speed_dist</code> (variables must be numeric of course as sum and mean cannot be computed on qualitative variables!) for each row and store them under the variables <code>mean_score</code> and <code>total_score</code>:</p>
+<pre class="r"><code>dat$mean_score &lt;- rowMeans(dat[, 1:3]) # variables speed, dist and speed_dist correspond to variables 1 to 3
+dat$total_score &lt;- rowSums(dat[, 1:3])
+head(dat)</code></pre>
+<pre><code>##   speed dist speed_dist  speed_cat speed_discr mean_score total_score
+## 1     4    2          8  low speed      [0,12)   4.666667          14
+## 2     4   10         40  low speed      [0,12)  18.000000          54
+## 3     7    4         28  low speed      [0,12)  13.000000          39
+## 4     7   22        154  low speed      [0,12)  61.000000         183
+## 5     8   16        128 high speed      [0,12)  50.666667         152
+## 6     9   10         90 high speed      [0,12)  36.333333         109</code></pre>
+</div>
+<div id="sum-and-mean-in-column" class="section level2">
+<h2>Sum and mean in column</h2>
+<p>It is also possible to compute the mean and sum by column with <code>colMeans()</code> and <code>colSums()</code>:</p>
+<pre class="r"><code>colMeans(dat[, 1:3])</code></pre>
+<pre><code>##      speed       dist speed_dist 
+##      15.40      42.98     769.64</code></pre>
+<pre class="r"><code>colSums(dat[, 1:3])</code></pre>
+<pre><code>##      speed       dist speed_dist 
+##        770       2149      38482</code></pre>
+</div>
 </div>
 <div id="categorical-variables-and-labels-management" class="section level1">
 <h1>Categorical variables and labels management</h1>
@@ -485,13 +512,20 @@ dat$dist_cat &lt;- factor(dat$dist_cat,
 )
 
 head(dat)</code></pre>
-<pre><code>##   speed dist speed_dist  speed_cat speed_discr       dist_cat
-## 1     4    2          8  low speed      [0,12) small distance
-## 2     4   10         40  low speed      [0,12) small distance
-## 3     7    4         28  low speed      [0,12) small distance
-## 4     7   22        154  low speed      [0,12)   big distance
-## 5     8   16        128 high speed      [0,12)   big distance
-## 6     9   10         90 high speed      [0,12) small distance</code></pre>
+<pre><code>##   speed dist speed_dist  speed_cat speed_discr mean_score total_score
+## 1     4    2          8  low speed      [0,12)   4.666667          14
+## 2     4   10         40  low speed      [0,12)  18.000000          54
+## 3     7    4         28  low speed      [0,12)  13.000000          39
+## 4     7   22        154  low speed      [0,12)  61.000000         183
+## 5     8   16        128 high speed      [0,12)  50.666667         152
+## 6     9   10         90 high speed      [0,12)  36.333333         109
+##         dist_cat
+## 1 small distance
+## 2 small distance
+## 3 small distance
+## 4   big distance
+## 5   big distance
+## 6 small distance</code></pre>
 <ul>
 <li>to check the format of a variable:</li>
 </ul>
@@ -512,20 +546,29 @@ str(dat$dist_cat)</code></pre>
   ))
 })
 head(dat)</code></pre>
-<pre><code>##   speed dist speed_dist  speed_cat speed_discr       dist_cat
-## 1     4    2          8  low speed      [0,12) small distance
-## 2     4   10         40  low speed      [0,12) small distance
-## 3     7    4         28  low speed      [0,12) small distance
-## 4     7   22        154  low speed      [0,12)   big distance
-## 5     8   16        128 high speed      [0,12)   big distance
-## 6     9   10         90 high speed      [0,12) small distance</code></pre>
+<pre><code>##   speed dist speed_dist  speed_cat speed_discr mean_score total_score
+## 1     4    2          8  low speed      [0,12)   4.666667          14
+## 2     4   10         40  low speed      [0,12)  18.000000          54
+## 3     7    4         28  low speed      [0,12)  13.000000          39
+## 4     7   22        154  low speed      [0,12)  61.000000         183
+## 5     8   16        128 high speed      [0,12)  50.666667         152
+## 6     9   10         90 high speed      [0,12)  36.333333         109
+##         dist_cat
+## 1 small distance
+## 2 small distance
+## 3 small distance
+## 4   big distance
+## 5   big distance
+## 6 small distance</code></pre>
 <pre class="r"><code>str(dat)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    50 obs. of  6 variables:
+<pre><code>## &#39;data.frame&#39;:    50 obs. of  8 variables:
 ##  $ speed      : num  4 4 7 7 8 9 10 10 10 11 ...
 ##  $ dist       : num  2 10 4 22 16 10 18 26 34 17 ...
 ##  $ speed_dist : num  8 40 28 154 128 90 180 260 340 187 ...
 ##  $ speed_cat  : Factor w/ 2 levels &quot;high speed&quot;,&quot;low speed&quot;: 2 2 2 2 1 1 1 1 1 1 ...
 ##  $ speed_discr: Factor w/ 4 levels &quot;[0,12)&quot;,&quot;[12,15)&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ mean_score : num  4.67 18 13 61 50.67 ...
+##  $ total_score: num  14 54 39 183 152 109 208 296 384 215 ...
 ##  $ dist_cat   : Factor w/ 2 levels &quot;small distance&quot;,..: 1 1 1 2 2 1 2 2 2 2 ...</code></pre>
 <div id="recode-categorical-variables" class="section level2">
 <h2>Recode categorical variables</h2>
@@ -539,13 +582,20 @@ head(dat)</code></pre>
   &quot;big distance&quot; = &quot;large distance&quot;
 )
 head(dat)</code></pre>
-<pre><code>##   speed dist speed_dist  speed_cat speed_discr       dist_cat
-## 1     4    2          8  low speed      [0,12) short distance
-## 2     4   10         40  low speed      [0,12) short distance
-## 3     7    4         28  low speed      [0,12) short distance
-## 4     7   22        154  low speed      [0,12) large distance
-## 5     8   16        128 high speed      [0,12) large distance
-## 6     9   10         90 high speed      [0,12) short distance</code></pre>
+<pre><code>##   speed dist speed_dist  speed_cat speed_discr mean_score total_score
+## 1     4    2          8  low speed      [0,12)   4.666667          14
+## 2     4   10         40  low speed      [0,12)  18.000000          54
+## 3     7    4         28  low speed      [0,12)  13.000000          39
+## 4     7   22        154  low speed      [0,12)  61.000000         183
+## 5     8   16        128 high speed      [0,12)  50.666667         152
+## 6     9   10         90 high speed      [0,12)  36.333333         109
+##         dist_cat
+## 1 short distance
+## 2 short distance
+## 3 short distance
+## 4 large distance
+## 5 large distance
+## 6 short distance</code></pre>
 <!-- This will be sufficient if you need to recode only one variable. However, if you need to recode more than one variables without having to recode them one by one, another piece of code is necessary: -->
 <!-- ```{r} -->
 <!-- dat2 <- select(dat, c(speed_cat, dist_cat)) -->
@@ -595,7 +645,7 @@ levels(dat$dist_cat)</code></pre>
 )
 names(dat) # display variable names</code></pre>
 <pre><code>## [1] &quot;speed&quot;          &quot;distance&quot;       &quot;speed_distance&quot; &quot;speed_cat&quot;     
-## [5] &quot;speed_discr&quot;    &quot;distance_cat&quot;</code></pre>
+## [5] &quot;speed_discr&quot;    &quot;mean_score&quot;     &quot;total_score&quot;    &quot;distance_cat&quot;</code></pre>
 </div>
 <div id="create-a-dataframe-manually" class="section level1">
 <h1>Create a dataframe manually</h1>
@@ -646,8 +696,28 @@ dat_imputed</code></pre>
 ## 3         6         9
 ## 4         3         1</code></pre>
 <p>When the median/mode method is used (the default), character vectors and factors are imputed with the mode. Numeric and integer vectors are imputed with the median. Again, use imputations carefully. Other packages offer more advanced imputation techniques. However, we keep it simple and straightforward for this article as advanced imputations is beyond the scope of introductory data manipulations in R.</p>
+</div>
+</div>
+<div id="scale" class="section level1">
+<h1>Scale</h1>
+<p>Scaling (i.e., standardize) a variable is often used before a Principal Component Analysis (PCA)<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> when variables of a dataset have different units. Remember that scaling a variable means that it will compute the mean and the standard deviation of that variable. Then each value (so each row) of that variable is “scaled” by substracting the mean and dividing by the standard deviation of that variable. Formally:</p>
+<p><span class="math display">\[z = \frac{x - \bar{x}}{s}\]</span></p>
+<p>where <span class="math inline">\(\bar{x}\)</span> and <span class="math inline">\(s\)</span> are the mean and the standard deviation of the variable, respectively.</p>
+<p>To scale one or more variables in R use <code>scale()</code>:</p>
+<pre class="r"><code>dat_scaled &lt;- scale(dat_imputed)
+head(dat_scaled)</code></pre>
+<pre><code>##       variable1  variable2
+## [1,] -0.1986799 -0.5477226
+## [2,]  1.3907590  0.5477226
+## [3,] -0.1986799  1.0954451
+## [4,] -0.9933993 -1.0954451</code></pre>
 <p>Thanks for reading. I hope this article helped you to manipulate your data in RStudio. See other articles related to R <a href="/tags/r/">here</a>. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>. Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
 </div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Principal Component Analysis (PCA) is a useful technique for exploratory data analysis, allowing a better visualization of the variation present in a dataset with a large number of variables. When there are many variables, the data cannot easily be illustrated in their raw format. To counter this, the PCA takes a dataset with many variables and simplifies it by transforming the original variables into a smaller number of “principal components”. The first dimension contains the most variance in the dataset and so on, and the dimensions are uncorrelated. Note that PCA is done on quantitative variables.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
 </div>
 
 

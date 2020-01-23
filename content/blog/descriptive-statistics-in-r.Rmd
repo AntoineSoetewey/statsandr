@@ -94,6 +94,18 @@ quantile(dat$Sepal.Length, 0.4) # 4th decile
 quantile(dat$Sepal.Length, 0.98) # 98th percentile
 ```
 
+# Interquartile range
+
+```{r}
+IQR(dat$Sepal.Length)
+```
+
+`IQR()` actually computes:
+
+```{r}
+quantile(dat$Sepal.Length, 0.75) - quantile(dat$Sepal.Length, 0.25)
+```
+
 # Standard deviation and variance
 
 ```{r}
@@ -107,18 +119,6 @@ Remember from this [article](/blog/descriptive-statistics-by-hand/) that the sta
 
 ```{r}
 lapply(dat[, 1:4], sd) # dat[, 1:4] selects the variables 1 to 4
-```
-
-# Interquartile range
-
-```{r}
-IQR(dat$Sepal.Length)
-```
-
-`IQR()` actually computes:
-
-```{r}
-quantile(dat$Sepal.Length, 0.75) - quantile(dat$Sepal.Length, 0.25)
 ```
 
 # Summary
@@ -199,9 +199,27 @@ Both plots can be customized. For instance, it is possible to edit the title, x 
 
 # Histogram
 
+Histograms are a bit similar to barplots, but histograms are used for quantitative variables whereas barplots are used for qualitative variables. To draw an histogram in R, use `hist()`:
 
+```{r}
+hist(dat$Sepal.Length)
+```
+
+Add the arguments `breaks =` inside the `hist()` function if you want to change the number of bins. A rule of thumb is that the number of bins should be the rounded value of the square root of the number of observations. The dataset includes 150 observations so in this case the number of bins can be set to `r round(sqrt(nrow(dat)))`.
+
+In `{ggplot2}`:
+
+```{r, message = FALSE, warning = FALSE}
+ggplot(dat) +
+ aes(x = Sepal.Length) +
+ geom_histogram()
+```
+
+By default, the number of bins is 30. You can change this value with `geom_histogram(bins = 12)` for instance.
 
 # Boxplot
+
+Boxplots are really useful in descriptive statistics and are often underused. It allows to 
 
 
 

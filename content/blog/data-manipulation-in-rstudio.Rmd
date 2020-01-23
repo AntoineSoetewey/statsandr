@@ -175,6 +175,25 @@ dat$speed_discr <- cut(dat$speed,
 dat[c(1:2, 23:24, 49:50), ] # display some observations
 ```
 
+## Sum and mean in rows
+
+In survey with Likert scale (used in psychology, among others), it is often the case that we need to compute a score for each respondants based on multiple questions. The score is usually the mean or the sum of all the questions of interest. This can be done with `rowMeans()` and `rowSums()`. For instance, let's compute the mean and the sum of the variables `speed`, `dist` and `speed_dist` (variables must be numeric of course as sum and mean cannot be computed on qualitative variables!) for each row and store them under the variables `mean_score` and `total_score`:
+
+```{r}
+dat$mean_score <- rowMeans(dat[, 1:3]) # variables speed, dist and speed_dist correspond to variables 1 to 3
+dat$total_score <- rowSums(dat[, 1:3])
+head(dat)
+```
+
+## Sum and mean in column
+
+It is also possible to compute the mean and sum by column with `colMeans()` and `colSums()`:
+
+```{r}
+colMeans(dat[, 1:3])
+colSums(dat[, 1:3])
+```
+
 # Categorical variables and labels management
 
 For categorical variables, it is a good practice to use the factor format and to name the different levels of the variables.
@@ -346,5 +365,20 @@ dat_imputed
 ```
 
 When the median/mode method is used (the default), character vectors and factors are imputed with the mode. Numeric and integer vectors are imputed with the median. Again, use imputations carefully. Other packages offer more advanced imputation techniques. However, we keep it simple and straightforward for this article as advanced imputations is beyond the scope of introductory data manipulations in R.
+
+# Scale
+
+Scaling (i.e., standardize) a variable is often used before a Principal Component Analysis (PCA)^[Principal Component Analysis (PCA) is a useful technique for exploratory data analysis, allowing a better visualization of the variation present in a dataset with a large number of variables. When there are many variables, the data cannot easily be illustrated in their raw format. To counter this, the PCA takes a dataset with many variables and simplifies it by transforming the original variables into a smaller number of "principal components". The first dimension contains the most variance in the dataset and so on, and the dimensions are uncorrelated. Note that PCA is done on quantitative variables.] when variables of a dataset have different units. Remember that scaling a variable means that it will compute the mean and the standard deviation of that variable. Then each value (so each row) of that variable is "scaled" by substracting the mean and dividing by the standard deviation of that variable. Formally:
+
+$$z = \frac{x - \bar{x}}{s}$$
+
+where $\bar{x}$ and $s$ are the mean and the standard deviation of the variable, respectively.
+
+To scale one or more variables in R use `scale()`:
+
+```{r}
+dat_scaled <- scale(dat_imputed)
+head(dat_scaled)
+```
 
 Thanks for reading. I hope this article helped you to manipulate your data in RStudio. See other articles related to R [here](/tags/r/). As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/). Get updates every time a new article is published by [subscribing to this blog](/subscribe/).
