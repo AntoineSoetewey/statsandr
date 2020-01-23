@@ -34,6 +34,7 @@ draft: true
 <li><a href="#barplot">Barplot</a></li>
 <li><a href="#histogram">Histogram</a></li>
 <li><a href="#boxplot">Boxplot</a></li>
+<li><a href="#scatterplot">Scatterplot</a></li>
 </ul>
 </div>
 
@@ -259,12 +260,12 @@ sort(tab, decreasing = TRUE) # sort highest to lowest</code></pre>
 </div>
 <div id="barplot" class="section level1">
 <h1>Barplot</h1>
-<p>Barplots can only be done on qualitative variables (see the difference with a quantative variable <a href="/blog/variable-types-and-examples/">here</a>). The only qualitative variable in the dataset is the variable <code>Species</code>:</p>
+<p>Barplots can only be done on qualitative variables (see the difference with a quantative variable <a href="/blog/variable-types-and-examples/">here</a>). A barplot is a tool to visualize the distribution of a qualitative variable. The only qualitative variable in the dataset is the variable <code>Species</code>:</p>
 <pre class="r"><code>barplot(table(dat$Species)) # table() is mandatory</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 <p>All bars have the same height as there are 50 observations of each species.</p>
 <p>In <code>{ggplot2}</code>:</p>
-<pre class="r"><code>library(ggplot2)
+<pre class="r"><code>library(ggplot2) # needed each time you open RStudio. The package must be installed first
 
 ggplot(dat) +
  aes(x = Species) +
@@ -274,7 +275,7 @@ ggplot(dat) +
 </div>
 <div id="histogram" class="section level1">
 <h1>Histogram</h1>
-<p>Histograms are a bit similar to barplots, but histograms are used for quantitative variables whereas barplots are used for qualitative variables. To draw an histogram in R, use <code>hist()</code>:</p>
+<p>A histogram gives an idea about the distribution of a quantitative variable. The idea is to break the range of values into intervals and count how many observations fall into each interval. Histograms are a bit similar to barplots, but histograms are used for quantitative variables whereas barplots are used for qualitative variables. To draw a histogram in R, use <code>hist()</code>:</p>
 <pre class="r"><code>hist(dat$Sepal.Length)</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
 <p>Add the arguments <code>breaks =</code> inside the <code>hist()</code> function if you want to change the number of bins. A rule of thumb is that the number of bins should be the rounded value of the square root of the number of observations. The dataset includes 150 observations so in this case the number of bins can be set to 12.</p>
@@ -287,5 +288,38 @@ ggplot(dat) +
 </div>
 <div id="boxplot" class="section level1">
 <h1>Boxplot</h1>
-<p>Boxplots are really useful in descriptive statistics and are often underused. It allows to</p>
+<p>Boxplots are really useful in descriptive statistics and are often underused (mostly because it is not well understood by the public). A boxplot graphically represents the distribution of a quantitative variable by visually displaying five common location summary (minimum, median, first and third quartiles and maximum) and any observation that was classified as a suspected outlier using the interquartile range (IQR) criterion. The IQR criterion means that all observations above <span class="math inline">\(q_{0.75} + 1.5 \cdot IQR\)</span> and below <span class="math inline">\(q_{0.25} - 1.5 \cdot IQR\)</span> (where <span class="math inline">\(q_{0.25}\)</span> and <span class="math inline">\(q_{0.75}\)</span> correspond to first and third quartile respectively) are considered as potential outliers by R. The minimum and maximum in the boxplot are represented without these suspected outliers. Seeing all these information on the same plot help to have a good first overview of the dispersion and the location of the data. Before drawing a boxplot of our data, see below a graph explaining the information present on a boxplot:</p>
+<div class="figure">
+<img src="/blog/descriptive-statistics-in-r_files/boxplot.png" alt="Detailed boxplot. Source: LFSAB1105 at UCLouvain" />
+<p class="caption">Detailed boxplot. Source: LFSAB1105 at UCLouvain</p>
+</div>
+<p>Now an example with our dataset:</p>
+<pre class="r"><code>boxplot(dat$Sepal.Length)</code></pre>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<p>Boxplots are even more informative when presented side-by-side for comparing and contrasting distributions from two or more groups. For instance, we compare the length of the sepal across the different species:</p>
+<pre class="r"><code>boxplot(dat$Sepal.Length ~ dat$Species)</code></pre>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<p>In <code>{ggplot2}</code>:</p>
+<pre class="r"><code>ggplot(dat) +
+ aes(x = Species, y = Sepal.Length) +
+ geom_boxplot()</code></pre>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+</div>
+<div id="scatterplot" class="section level1">
+<h1>Scatterplot</h1>
+<p>Scatterplots allow to check whether there is a potential link between two quantitative variables. For instance, when drawing a scatterplot of the length of the sepal and the length of the petal:</p>
+<pre class="r"><code>plot(dat$Sepal.Length, dat$Petal.Length)</code></pre>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p>We see a positive association between the two variables.</p>
+<p>In <code>{ggplot2}</code>:</p>
+<pre class="r"><code>ggplot(dat) +
+ aes(x = Sepal.Length, y = Petal.Length) +
+ geom_point()</code></pre>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p>As boxplots, scatterplots are even more informative when coloring the points according to a factor, in this case the species:</p>
+<pre class="r"><code>ggplot(dat) +
+ aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
+ geom_point() +
+ scale_color_hue()</code></pre>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
 </div>

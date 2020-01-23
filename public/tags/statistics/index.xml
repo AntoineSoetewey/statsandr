@@ -37,6 +37,7 @@
 &lt;li&gt;&lt;a href=&#34;#barplot&#34;&gt;Barplot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#histogram&#34;&gt;Histogram&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#boxplot&#34;&gt;Boxplot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#scatterplot&#34;&gt;Scatterplot&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -262,12 +263,12 @@ sort(tab, decreasing = TRUE) # sort highest to lowest&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;barplot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Barplot&lt;/h1&gt;
-&lt;p&gt;Barplots can only be done on qualitative variables (see the difference with a quantative variable &lt;a href=&#34;/blog/variable-types-and-examples/&#34;&gt;here&lt;/a&gt;). The only qualitative variable in the dataset is the variable &lt;code&gt;Species&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;Barplots can only be done on qualitative variables (see the difference with a quantative variable &lt;a href=&#34;/blog/variable-types-and-examples/&#34;&gt;here&lt;/a&gt;). A barplot is a tool to visualize the distribution of a qualitative variable. The only qualitative variable in the dataset is the variable &lt;code&gt;Species&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;barplot(table(dat$Species)) # table() is mandatory&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;All bars have the same height as there are 50 observations of each species.&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2) # needed each time you open RStudio. The package must be installed first
 
 ggplot(dat) +
  aes(x = Species) +
@@ -277,7 +278,7 @@ ggplot(dat) +
 &lt;/div&gt;
 &lt;div id=&#34;histogram&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Histogram&lt;/h1&gt;
-&lt;p&gt;Histograms are a bit similar to barplots, but histograms are used for quantitative variables whereas barplots are used for qualitative variables. To draw an histogram in R, use &lt;code&gt;hist()&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;A histogram gives an idea about the distribution of a quantitative variable. The idea is to break the range of values into intervals and count how many observations fall into each interval. Histograms are a bit similar to barplots, but histograms are used for quantitative variables whereas barplots are used for qualitative variables. To draw a histogram in R, use &lt;code&gt;hist()&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;hist(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Add the arguments &lt;code&gt;breaks =&lt;/code&gt; inside the &lt;code&gt;hist()&lt;/code&gt; function if you want to change the number of bins. A rule of thumb is that the number of bins should be the rounded value of the square root of the number of observations. The dataset includes 150 observations so in this case the number of bins can be set to 12.&lt;/p&gt;
@@ -290,7 +291,40 @@ ggplot(dat) +
 &lt;/div&gt;
 &lt;div id=&#34;boxplot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Boxplot&lt;/h1&gt;
-&lt;p&gt;Boxplots are really useful in descriptive statistics and are often underused. It allows to&lt;/p&gt;
+&lt;p&gt;Boxplots are really useful in descriptive statistics and are often underused (mostly because it is not well understood by the public). A boxplot graphically represents the distribution of a quantitative variable by visually displaying five common location summary (minimum, median, first and third quartiles and maximum) and any observation that was classified as a suspected outlier using the interquartile range (IQR) criterion. The IQR criterion means that all observations above &lt;span class=&#34;math inline&#34;&gt;\(q_{0.75} + 1.5 \cdot IQR\)&lt;/span&gt; and below &lt;span class=&#34;math inline&#34;&gt;\(q_{0.25} - 1.5 \cdot IQR\)&lt;/span&gt; (where &lt;span class=&#34;math inline&#34;&gt;\(q_{0.25}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(q_{0.75}\)&lt;/span&gt; correspond to first and third quartile respectively) are considered as potential outliers by R. The minimum and maximum in the boxplot are represented without these suspected outliers. Seeing all these information on the same plot help to have a good first overview of the dispersion and the location of the data. Before drawing a boxplot of our data, see below a graph explaining the information present on a boxplot:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/boxplot.png&#34; alt=&#34;Detailed boxplot. Source: LFSAB1105 at UCLouvain&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Detailed boxplot. Source: LFSAB1105 at UCLouvain&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Now an example with our dataset:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;boxplot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-25-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Boxplots are even more informative when presented side-by-side for comparing and contrasting distributions from two or more groups. For instance, we compare the length of the sepal across the different species:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;boxplot(dat$Sepal.Length ~ dat$Species)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+ aes(x = Species, y = Sepal.Length) +
+ geom_boxplot()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-27-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;scatterplot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Scatterplot&lt;/h1&gt;
+&lt;p&gt;Scatterplots allow to check whether there is a potential link between two quantitative variables. For instance, when drawing a scatterplot of the length of the sepal and the length of the petal:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(dat$Sepal.Length, dat$Petal.Length)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We see a positive association between the two variables.&lt;/p&gt;
+&lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+ aes(x = Sepal.Length, y = Petal.Length) +
+ geom_point()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;As boxplots, scatterplots are even more informative when coloring the points according to a factor, in this case the species:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+ aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
+ geom_point() +
+ scale_color_hue()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 </description>
     </item>
