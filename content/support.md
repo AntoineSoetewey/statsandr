@@ -10,7 +10,7 @@ draft: true
 1. [Spread the word](#spread)
 1. [Recommendations](#recommendations)
 
-There are several ways you can support this blog.
+Running and maintaining a blog is not free unfortunately ([Shiny app](/tags/shiny/) servers being the biggest expense). There are several ways you can contribute to this blog.
 
 <a name="donation"></a>
 ## Donation
