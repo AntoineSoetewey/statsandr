@@ -21,6 +21,8 @@ This article explains how to compute the main descriptive statistics in R and ho
 
 To briefly recap what have been said in that article, descriptive statistics (in the broad sense of the term) is a branch of statistics aiming at summarizing, describing and presenting a series of values or a dataset. Descriptive statistics is often the first step and an important part in any statistical analysis. It allows to check the quality of the data and it helps to "understand" the data by having a clear overview of it. If well presented, descriptive statistics is already a good starting point for further analyses. There exists many measures to summarize a dataset. They are divided into two types: (i) location and (ii) dispersion measures. Location measures give an understanding about the central tendency of the data, whereas dispersion measures give an understanding about the spread of the data. In this article, we focus only on the implementation in R of the most common descriptive statistics and their visualizations (when deemed appropriate). See online or in the [above mentioned article](/blog/descriptive-statistics-by-hand/) for more information about the purpose and usage of each measure.
 
+# Data
+
 We use the dataset `iris` through the article. This dataset is imported by default in R, you only need to load it by running `iris`:
 
 ```{r}
@@ -143,6 +145,35 @@ stat.desc(dat, norm = TRUE)
 ```
 
 Note that the variable `Species` is not numeric, so descriptive statistics cannot be computed for this variable and NA are displayed.
+
+# Coefficient of variation
+
+The coefficient of variation can be found with `stat.desc()` (see the line `coef.var` in the table above) or by computing manually (remember that the coefficient of variation is the standard deviation divided by the mean):
+
+```{r}
+sd(dat$Sepal.Length) / mean(dat$Sepal.Length)
+```
+
+# Mode
+
+To my knowledge there is no function to find the mode of a variable. However, we can easily find it thanks to the functions `table()` and `sort()`:
+
+```{r}
+tab <- table(dat$Sepal.Length) # number of occurences for each unique value
+sort(tab, decreasing = TRUE) # sort highest to lowest
+```
+
+`table()` gives the number of occurences for each unique value, then `sort()` with the argument `decreasing = TRUE` displays the number of occurences from highest to lowest. The mode of the variable `Sepal.Length` is thus 5. This code to find the mode can also be applied to qualitative variables such as `Species`:
+
+```{r}
+sort(table(dat$Species), decreasing = TRUE)
+```
+
+or:
+
+```{r}
+summary(dat$Species)
+```
 
 # Barplot
 

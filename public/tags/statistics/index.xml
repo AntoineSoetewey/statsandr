@@ -22,6 +22,7 @@
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#data&#34;&gt;Data&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#minimum-and-maximum&#34;&gt;Minimum and maximum&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#mean&#34;&gt;Mean&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#median&#34;&gt;Median&lt;/a&gt;&lt;/li&gt;
@@ -31,6 +32,8 @@
 &lt;li&gt;&lt;a href=&#34;#standard-deviation-and-variance&#34;&gt;Standard deviation and variance&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#interquartile-range&#34;&gt;Interquartile range&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#coefficient-of-variation&#34;&gt;Coefficient of variation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#mode&#34;&gt;Mode&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#barplot&#34;&gt;Barplot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#histogram&#34;&gt;Histogram&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#boxplot&#34;&gt;Boxplot&lt;/a&gt;&lt;/li&gt;
@@ -41,6 +44,9 @@
 &lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;This article explains how to compute the main descriptive statistics in R and how to present them graphically. To learn more about the reasoning behind each descriptive statistics and learn how to compute them by hand, read the article “&lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;Descriptive statistics by hand&lt;/a&gt;”.&lt;/p&gt;
 &lt;p&gt;To briefly recap what have been said in that article, descriptive statistics (in the broad sense of the term) is a branch of statistics aiming at summarizing, describing and presenting a series of values or a dataset. Descriptive statistics is often the first step and an important part in any statistical analysis. It allows to check the quality of the data and it helps to “understand” the data by having a clear overview of it. If well presented, descriptive statistics is already a good starting point for further analyses. There exists many measures to summarize a dataset. They are divided into two types: (i) location and (ii) dispersion measures. Location measures give an understanding about the central tendency of the data, whereas dispersion measures give an understanding about the spread of the data. In this article, we focus only on the implementation in R of the most common descriptive statistics and their visualizations (when deemed appropriate). See online or in the &lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;above mentioned article&lt;/a&gt; for more information about the purpose and usage of each measure.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Data&lt;/h1&gt;
 &lt;p&gt;We use the dataset &lt;code&gt;iris&lt;/code&gt; through the article. This dataset is imported by default in R, you only need to load it by running &lt;code&gt;iris&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat &amp;lt;- iris # load the iris dataset and renamed it dat&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Below a preview of this dataset and its structure:&lt;/p&gt;
@@ -228,11 +234,37 @@ stat.desc(dat, norm = TRUE)&lt;/code&gt;&lt;/pre&gt;
 ## normtest.p     0.01018116   0.10115427  7.412263e-10  1.680465e-08      NA&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that the variable &lt;code&gt;Species&lt;/code&gt; is not numeric, so descriptive statistics cannot be computed for this variable and NA are displayed.&lt;/p&gt;
 &lt;/div&gt;
+&lt;div id=&#34;coefficient-of-variation&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Coefficient of variation&lt;/h1&gt;
+&lt;p&gt;The coefficient of variation can be found with &lt;code&gt;stat.desc()&lt;/code&gt; (see the line &lt;code&gt;coef.var&lt;/code&gt; in the table above) or by computing manually (remember that the coefficient of variation is the standard deviation divided by the mean):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sd(dat$Sepal.Length) / mean(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.1417113&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;mode&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Mode&lt;/h1&gt;
+&lt;p&gt;To my knowledge there is no function to find the mode of a variable. However, we can easily find it thanks to the functions &lt;code&gt;table()&lt;/code&gt; and &lt;code&gt;sort()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tab &amp;lt;- table(dat$Sepal.Length) # number of occurences for each unique value
+sort(tab, decreasing = TRUE) # sort highest to lowest&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##   5 5.1 6.3 5.7 6.7 5.5 5.8 6.4 4.9 5.4 5.6   6 6.1 4.8 6.5 4.6 5.2 6.2 6.9 7.7 
+##  10   9   9   8   8   7   7   7   6   6   6   6   6   5   5   4   4   4   4   4 
+## 4.4 5.9 6.8 7.2 4.7 6.6 4.3 4.5 5.3   7 7.1 7.3 7.4 7.6 7.9 
+##   3   3   3   3   2   2   1   1   1   1   1   1   1   1   1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;table()&lt;/code&gt; gives the number of occurences for each unique value, then &lt;code&gt;sort()&lt;/code&gt; with the argument &lt;code&gt;decreasing = TRUE&lt;/code&gt; displays the number of occurences from highest to lowest. The mode of the variable &lt;code&gt;Sepal.Length&lt;/code&gt; is thus 5. This code to find the mode can also be applied to qualitative variables such as &lt;code&gt;Species&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sort(table(dat$Species), decreasing = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##     setosa versicolor  virginica 
+##         50         50         50&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;or:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(dat$Species)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##     setosa versicolor  virginica 
+##         50         50         50&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 &lt;div id=&#34;barplot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Barplot&lt;/h1&gt;
 &lt;p&gt;Barplots can only be done on qualitative variables (see the difference with a quantative variable &lt;a href=&#34;/blog/variable-types-and-examples/&#34;&gt;here&lt;/a&gt;). The only qualitative variable in the dataset is the variable &lt;code&gt;Species&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;barplot(table(dat$Species)) # table() is mandatory&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;All bars have the same height as there are 50 observations of each species.&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
@@ -240,7 +272,7 @@ stat.desc(dat, norm = TRUE)&lt;/code&gt;&lt;/pre&gt;
 ggplot(dat) +
  aes(x = Species) +
  geom_bar()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-22-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Both plots can be customized. For instance, it is possible to edit the title, x and y-axis labels, color, etc. However, customizing plots is beyond the scope of this article so all plots in this article are presented without any customization. Interested readers will find numerous resources online.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;histogram&#34; class=&#34;section level1&#34;&gt;
