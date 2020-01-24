@@ -39,6 +39,6 @@ If you have found any of the content on this blog useful please consider linking
 <a name="recommendations"></a>
 ## Recommendations
 
-If you know someone who needs help for their statistical analyses, feel free to give my [contact details](/contact/) so the person can contact me.
+If you know someone who needs help for their statistical analyses, feel free to give my [contact details](/contact/) so the person can reach out to me.
 
 Thanks in advance for your support!
