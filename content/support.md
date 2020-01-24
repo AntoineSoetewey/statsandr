@@ -7,7 +7,7 @@ draft: true
 
 1. [Donation](#donation)
 1. [Amazon](#amazon)
-1. [Spread the word](#spread)
+1. [Spread the word](#word)
 1. [Recommendations](#recommendations)
 
 Running and maintaining a blog is not free unfortunately ([Shiny app](/tags/shiny/) servers being the biggest expense). There are several ways you can contribute to this blog.
@@ -31,7 +31,7 @@ If you shop on Amazon, using my referral links below will make me earn a small c
 * [Amazon.es](https://www.amazon.es/?&_encoding=UTF8&tag=antoinesoet0f-21&linkCode=ur2&linkId=46ef6b4438a919d3b964d66f6587c26b&camp=3638&creative=24630)
 * [Amazon.co.jp](https://www.amazon.co.jp/?&_encoding=UTF8&tag=antoinesoet03-22&linkCode=ur2&linkId=f0cbe2e2f517cf8ad99139cbed339a05&camp=247&creative=1211)
 
-<a name="spread"></a>
+<a name="word"></a>
 ## Spread the word
 
 If you have found any of the content on this blog useful please consider linking to [https://www.statsandr.com/](/) or subscribing by [email](/subscribe/) or via the [feed](/index.xml).
