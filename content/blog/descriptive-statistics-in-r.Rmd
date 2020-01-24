@@ -12,31 +12,18 @@ meta_img: image/image.png
 output:
   blogdown::html_page:
     toc: true
-draft: true
+# draft: true
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE,
-  warning = FALSE,
-  message = FALSE,
-  comment = NA,
-  fig.align = "center"
-)
-# options(scipen = 999)
-
-styler::tidyverse_style()
-```
 
 # Introduction
 
-This article explains how to compute the main descriptive statistics in R and how to present them graphically. To learn more about the reasoning behind each descriptive statistics and learn how to compute them by hand, read the article "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)".
+This article explains how to compute the main descriptive statistics in R and how to present them graphically. To learn more about the reasoning behind each descriptive statistics, how to compute them by hand and how to interpret them, read the article "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)".
 
 To briefly recap what have been said in that article, descriptive statistics (in the broad sense of the term) is a branch of statistics aiming at summarizing, describing and presenting a series of values or a dataset. Descriptive statistics is often the first step and an important part in any statistical analysis. It allows to check the quality of the data and it helps to "understand" the data by having a clear overview of it. If well presented, descriptive statistics is already a good starting point for further analyses. There exists many measures to summarize a dataset. They are divided into two types: (i) location and (ii) dispersion measures. Location measures give an understanding about the central tendency of the data, whereas dispersion measures give an understanding about the spread of the data. In this article, we focus only on the implementation in R of the most common descriptive statistics and their visualizations (when deemed appropriate). See online or in the [above mentioned article](/blog/descriptive-statistics-by-hand/) for more information about the purpose and usage of each measure.
 
 # Data
 
-We use the dataset `iris` through the article. This dataset is imported by default in R, you only need to load it by running `iris`:
+We use the dataset `iris` throughout the article. This dataset is imported by default in R, you only need to load it by running `iris`:
 
 ```{r}
 dat <- iris # load the iris dataset and renamed it dat
@@ -51,24 +38,66 @@ str(dat) # structure of dataset
 
 The dataset contains 150 observations and 5 variables, representing the length and width of the sepal and petal and the species of 150 flowers. Length and width of the sepal and petal are numeric variables and the species is a factor with 3 levels (indicated by `num` and `Factor w/ 3 levels` after the name of the variables). See the [different variables types in R](/blog/data-types-in-r) if you need a refresh.
 
-For plots, we use the default graphs and the graphs from the package `{ggplot2}`. Graphs from `{ggplot2}` have a better look but it requires more advanced code so if you need to publish or share your graphs, I suggest using `{ggplot2}`, otherwise the default graphics will do the job.
+Regarding plots, we present the default graphs and the graphs from the well-known `{ggplot2}` package. Graphs from the `{ggplot2}` package usually have a better look but it requires more advanced coding skills. If you need to publish or share your graphs, I suggest using `{ggplot2}` if you can, otherwise the default graphics will do the job.
+<!-- **Tip: I recently discovered the ggplot2 builder from the esquisse addins. See how you can easily [draw graphs from the ggplot2 package](/blog/xxx/) without having to code it yourself.**  -->
+All plots displayed in this article can be customized. For instance, it is possible to edit the title, x and y-axis labels, color, etc. However, customizing plots is beyond the scope of this article so all plots are presented without any customization. Interested readers will find numerous resources online.
 
 # Minimum and maximum
+
+Minimum and maximum can be found thanks to the `min()` and `max()` functions:
 
 ```{r}
 min(dat$Sepal.Length)
 max(dat$Sepal.Length)
 ```
 
-Alternatively:
+Alternatively the `range()` function:
 
 ```{r}
-range(dat$Sepal.Length)
+rng <- range(dat$Sepal.Length)
+rng
 ```
 
-gives you the minimum and maximum directly.
+gives you the minimum and maximum directly. Note that the output of the `range()` function is actually an object containing the minimum and maximum (in that order). This means you can actually access the minimum with:
+
+```{r}
+rng[1] # rng = name of the object specified above
+```
+
+and the maximum with:
+
+```{r}
+rng[2]
+```
+
+This reminds us that, in R, there are often several ways to arrive at the same result. The method that uses the shortest piece of code is usually preferred as a shorter piece of code is less prone to coding errors and more readable.
+
+# Range
+
+The range can then be easily computed, as you have guessed, by substracting the minimum from the maximum:
+
+```{r}
+max(dat$Sepal.Length) - min(dat$Sepal.Length)
+```
+
+To my knowledge, there is no default function to compute the range. However, if you are familiar with writing functions in R
+<!-- (if not, see this article on [how to write a function in R](/blog/xxx/)) -->
+, you can create your own function to compute the range:
+
+```{r}
+range2 <- function(x) {
+  range <- max(x) - min(x)
+  return(range)
+}
+
+range2(dat$Sepal.Length)
+```
+
+which is equivalent than $max - min$ presented above.
 
 # Mean
+
+The mean can be computed with the `mean()` function:
 
 ```{r}
 mean(dat$Sepal.Length)
@@ -76,27 +105,35 @@ mean(dat$Sepal.Length)
 
 *Tips:*
 
-* if there is at least one missing value in your dataset, use `mean(dat$Sepal.Length, na.rm = TRUE)` to compute the mean without the NA. This argument can be used for many functions, not only the mean
+* if there is at least one missing value in your dataset, use `mean(dat$Sepal.Length, na.rm = TRUE)` to compute the mean with the NA excluded. This argument can be used for most functions presented in this article, not only the mean
 * for a truncated mean, use `mean(dat$Sepal.Length, trim = 0.10)` and change the `trim` argument to your needs
 
 # Median
+
+The median can be computed thanks to the `median()` function:
 
 ```{r}
 median(dat$Sepal.Length)
 ```
 
-or:
+or with the `quantile()` function:
 
 ```{r}
 quantile(dat$Sepal.Length, 0.5)
 ```
 
+since the quantile of order 0.5 ($q_{0.5}$) corresponds to the median.
+
 # First and third quartile
+
+As the median, the first and third quartiles can be computed thanks to the `quantile()` function and by setting the second argument to 0.25 or 0.75:
 
 ```{r}
 quantile(dat$Sepal.Length, 0.25) # first quartile
 quantile(dat$Sepal.Length, 0.75) # third quartile
 ```
+
+You may have seen that the results above are slightly different than the results you would have found if you compute the first and third quartiles [by hand](/blog/descriptive-statistics-by-hand/). It is normal, there are many methods to compute them (R actually has 7 methods to compute the quantiles!). However, the methods presented here and in the article "[descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)" are the easiest and most "standard" ones. Furthermore, results do not dramatically change between the two methods.
 
 ## Other quantiles
 
@@ -109,55 +146,63 @@ quantile(dat$Sepal.Length, 0.98) # 98th percentile
 
 # Interquartile range
 
+The interquartile range (i.e., the difference between the first and third quartile) can be computed with the `IQR()` function:
+
 ```{r}
 IQR(dat$Sepal.Length)
 ```
 
-`IQR()` actually computes:
+or alternativaly with the `quantile()` function again:
 
 ```{r}
 quantile(dat$Sepal.Length, 0.75) - quantile(dat$Sepal.Length, 0.25)
 ```
 
+As mentioned earlier, when possible it is usually recommended to use the shortest piece of code to arrive at the result. For this reason, the `IQR()` function is preferred to compute the interquartile range.
+
 # Standard deviation and variance
+
+The standard deviation and the variance is computed with the `sd()` and `var()` functions:
 
 ```{r}
 sd(dat$Sepal.Length) # standard deviation
 var(dat$Sepal.Length) # variance
 ```
 
-Remember from this [article](/blog/descriptive-statistics-by-hand/) that the standard deviation and the variance are different whether we compute it for a sample or a population (see the difference between the two [here](/blog/what-is-the-difference-between-population-and-sample/)). In R, the standard deviation and the variance are computed as if the data represent a sample (so the denominator is $n - 1$, where $n$ is the number of observations). To my knowledge, there is no function by default in R that computes the standard deviation and variance for a population.
+Remember from this [article](/blog/descriptive-statistics-by-hand/) that the standard deviation and the variance are different whether we compute it for a sample or a population (see the difference between the two [here](/blog/what-is-the-difference-between-population-and-sample/)). In R, the standard deviation and the variance are computed as if the data represent a sample (so the denominator is $n - 1$, where $n$ is the number of observations). To my knowledge, there is no function by default in R that computes the standard deviation or variance for a population.
 
-*Tip:* to compute the standard deviation (or variance) of multiple variables at the same time, use:
+*Tip:* to compute the standard deviation (or variance) of multiple variables at the same time, use `lapply()` with the appropriate statistics as second argument:
 
 ```{r}
-lapply(dat[, 1:4], sd) # dat[, 1:4] selects the variables 1 to 4
+lapply(dat[, 1:4], sd)
 ```
+
+The command `dat[, 1:4]` selects the variables 1 to 4 as the fifth variable is a qualitative variable and the standard deviation cannot be computed on such type of variable. See a recap of the different [data types in R](/blog/data-types-in-r/) if needed.
 
 # Summary
 
-You can compute the minimum, $1^{st}$ quartile, median, mean, $3^{rd}$ quartile and the maximum for all variables of the dataset at once using `summary()`:
+You can compute the minimum, $1^{st}$ quartile, median, mean, $3^{rd}$ quartile and the maximum for all numeric variables of a dataset at once using `summary()`:
 
 ```{r}
 summary(dat)
 ```
 
-*Tip:* if you need these descriptive statistics by group:
+*Tip:* if you need these descriptive statistics by group use the `by()` function:
 
 ```{r}
 by(dat, dat$Species, summary)
 ```
 
-where the arguments are the name of the dataset, the grouping variable and the summary function (in this order).
+where the arguments are the name of the dataset, the grouping variable and the summary function. Follow this order, or specify the name of the arguments if you do not follow this order.
 
 If you need more descriptive statistics, use `stat.desc()` from the package `{pastecs}`:
 
 ```{r}
 library(pastecs)
-stat.desc(dat, norm = TRUE)
+stat.desc(dat)
 ```
 
-Note that the variable `Species` is not numeric, so descriptive statistics cannot be computed for this variable and NA are displayed.
+You can have even more statistics (i.e., skewness, kurtosis and normality test) by adding the argument `norm = TRUE` in the previous function. Note that the variable `Species` is not numeric, so descriptive statistics cannot be computed for this variable and NA are displayed.
 
 # Coefficient of variation
 
@@ -188,27 +233,75 @@ or:
 summary(dat$Species)
 ```
 
-# Barplot
+# Contingency table
 
-Barplots can only be done on qualitative variables (see the difference with a quantative variable [here](/blog/variable-types-and-examples/)). A barplot is a tool to visualize the distribution of a qualitative variable. The only qualitative variable in the dataset is the variable `Species`:
+`table()` introduced above can also be used on two qualitative variables to create a contingency table. The dataset `iris` has only one qualitative variable so we create a new qualitative variable just for this example. We create the variable `size` which corresponds to `small` if the length of the petal is smaller than the median of all flowers, `big` otherwise: 
 
 ```{r}
-barplot(table(dat$Species)) # table() is mandatory
+dat$size <- ifelse(dat$Sepal.Length < median(dat$Sepal.Length), "small", "big")
 ```
 
-All bars have the same height as there are 50 observations of each species.
+Here is a recap of the occurences by size:
+
+```{r}
+table(dat$size)
+```
+
+We now create a contingency table of the two variables `Species` and `size` with the `table()` function:
+
+```{r}
+table(dat$Species, dat$size)
+```
+
+or with the `xtabs()` function:
+
+```{r}
+xtabs(~dat$Species + dat$size)
+```
+
+The contingency table gives the number of cases in each subgroup. For instance, there is only one big setosa flower, while there are 49 small setosa flowers in the dataset.
+<!-- To go further, we can see from the table that setosa flowers seem to be larger than virginica flowers. In order to check whether size is significantly associated with species, we could perform a test of independence. Read this [article](/blog/xxx/) for more information about this kind of statistical test. -->
+Note that `Species` are in rows and `size` in column because we specified `Species` and then `size` in `table()`. Change the order if you want to switch the two variables.
+
+Instead of having the frequencies (i.e.. the number of cases) you can also have the relative frequencies in each subgroup by adding the `table()` function inside the `prop.table()` function:
+
+```{r}
+prop.table(table(dat$Species, dat$size))
+```
+
+Note that you can also compute the percentages by row or by column by adding a second argument to the `prop.table()` function: `1` for row, or `2` for column:
+
+```{r}
+# percentages by row:
+round(prop.table(table(dat$Species, dat$size), 1), 2) # round to 2 digits with round()
+# percentages by column:
+round(prop.table(table(dat$Species, dat$size), 2), 2) # round to 2 digits with round()
+```
+
+# Barplot
+
+Barplots can only be done on qualitative variables (see the difference with a quantative variable [here](/blog/variable-types-and-examples/)). A barplot is a tool to visualize the distribution of a qualitative variable. We draw a barplot on the qualitative variable `size`:
+
+```{r}
+barplot(table(dat$size)) # table() is mandatory
+```
+
+You can also draw a barplot of the relative frequencies instead of the frequencies by adding `prop.table()` as we did earlier:
+
+```{r}
+barplot(prop.table(table(dat$size)))
+```
 
 In `{ggplot2}`:
 
 ```{r}
-library(ggplot2) # needed each time you open RStudio. The package must be installed first
+library(ggplot2) # needed each time you open RStudio
+# The package ggplot2 must be installed first
 
 ggplot(dat) +
-  aes(x = Species) +
+  aes(x = size) +
   geom_bar()
 ```
-
-Both plots can be customized. For instance, it is possible to edit the title, x and y-axis labels, color, etc. However, customizing plots is beyond the scope of this article so all plots in this article are presented without any customization. Interested readers will find numerous resources online.
 
 # Histogram
 
@@ -218,7 +311,7 @@ A histogram gives an idea about the distribution of a quantitative variable. The
 hist(dat$Sepal.Length)
 ```
 
-Add the arguments `breaks =` inside the `hist()` function if you want to change the number of bins. A rule of thumb is that the number of bins should be the rounded value of the square root of the number of observations. The dataset includes 150 observations so in this case the number of bins can be set to `r round(sqrt(nrow(dat)))`.
+Add the arguments `breaks =` inside the `hist()` function if you want to change the number of bins. A rule of thumb (known as Sturges' law) is that the number of bins should be the rounded value of the square root of the number of observations. The dataset includes 150 observations so in this case the number of bins can be set to `r round(sqrt(nrow(dat)))`.
 
 In `{ggplot2}`:
 
@@ -274,7 +367,7 @@ ggplot(dat) +
   geom_point()
 ```
 
-As boxplots, scatterplots are even more informative when coloring the points according to a factor, in this case the species: 
+As boxplots, scatterplots are even more informative when differentiating the points according to a factor, in this case the species: 
 
 ```{r}
 ggplot(dat) +
@@ -287,13 +380,66 @@ ggplot(dat) +
 
 ## For a single variable
 
-If we need to check the normality assumption of a variable:
+In order to check the normality assumption of a variable (normality means that the data follow a normal distribution, also known as a Gaussion distribution), we usually use histograms and/or QQ-plots.^[Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that sometimes a very limited number of observations may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified only based on histograms and QQ-plots.]
+<!-- See an article discussing about [normality and how to check it](/blog/xxx/) if needed. -->
+Histograms have been presented earlier, so here is how to draw a QQ-plot:
 
 ```{r}
 # Draw points on the qq-plot:
 qqnorm(dat$Sepal.Length)
 # Draw the reference line:
 qqline(dat$Sepal.Length)
-1+1
 ```
 
+Or a QQ-plot with confidence bands with the `qqPlot()` function from the `{car}` package:
+
+```{r, message = FALSE}
+library(car) # package must be installed first
+qqPlot(dat$Sepal.Length)
+```
+
+If points are close to the reference line (sometimes referred as Henry's line) and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The variable `Sepal.Length` does not seem to follow a normal distribution because several points lie outside the confidence bands. When facing a non-normal distribution, the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. Applying the logarithm transformation can be done with the `log()` function.
+
+In `{ggplot2}`:
+
+```{r}
+# method 1
+qplot(sample = Sepal.Length, data = dat)
+# method 2
+ggplot(dat, aes(sample=Sepal.Length))+stat_qq()
+```
+
+## By groups
+
+For some statistical tests, the normality assumption is required in all groups. One solution is to draw a QQ-plot for each group by manually splitting the dataset into different groups and then draw a QQ-plot for each subset of the data (with the methods shown above). Another (easier) solution is to draw a QQ-plot for each group automatically with the argument `groups =` in the function `qqPlot()` from the `{car}` package:
+
+```{r}
+qqPlot(dat$Sepal.Length, groups = dat$size)
+```
+
+In `{ggplot2}`:
+
+```{r}
+qplot(sample = Sepal.Length, data = dat,
+      col = size, shape = size)
+```
+
+It is also possible to differentiate groups by only shape or color. For this, remove one of the argument `col` or `shape` in the `qplot()` function above.
+
+# Density plot
+
+Density plot is a smoothed version of the histogram and is used in the same concept, that is, to represent the distribution of a numeric variable. The functions `plot()` and `density()` are used together to draw a density plot:
+
+```{r}
+plot(density(dat$Sepal.Length))
+```
+
+In `{ggplot2}`:
+
+```{r}
+ggplot(dat) +
+ aes(x = Sepal.Length) +
+ geom_density()
+```
+
+Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)". As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/). Get updates every time a new article is published by [subscribing to this blog](/subscribe/).
