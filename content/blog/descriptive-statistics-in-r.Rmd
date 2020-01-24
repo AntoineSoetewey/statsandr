@@ -15,6 +15,19 @@ output:
 draft: true
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = NA,
+  fig.align = "center"
+)
+# options(scipen = 999)
+
+styler::tidyverse_style()
+```
+
 # Introduction
 
 This article explains how to compute the main descriptive statistics in R and how to present them graphically. To learn more about the reasoning behind each descriptive statistics and learn how to compute them by hand, read the article "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)".
@@ -191,8 +204,8 @@ In `{ggplot2}`:
 library(ggplot2) # needed each time you open RStudio. The package must be installed first
 
 ggplot(dat) +
- aes(x = Species) +
- geom_bar()
+  aes(x = Species) +
+  geom_bar()
 ```
 
 Both plots can be customized. For instance, it is possible to edit the title, x and y-axis labels, color, etc. However, customizing plots is beyond the scope of this article so all plots in this article are presented without any customization. Interested readers will find numerous resources online.
@@ -211,8 +224,8 @@ In `{ggplot2}`:
 
 ```{r, message = FALSE, warning = FALSE}
 ggplot(dat) +
- aes(x = Sepal.Length) +
- geom_histogram()
+  aes(x = Sepal.Length) +
+  geom_histogram()
 ```
 
 By default, the number of bins is 30. You can change this value with `geom_histogram(bins = 12)` for instance.
@@ -239,8 +252,8 @@ In `{ggplot2}`:
 
 ```{r}
 ggplot(dat) +
- aes(x = Species, y = Sepal.Length) +
- geom_boxplot()
+  aes(x = Species, y = Sepal.Length) +
+  geom_boxplot()
 ```
 
 # Scatterplot
@@ -251,23 +264,36 @@ Scatterplots allow to check whether there is a potential link between two quanti
 plot(dat$Sepal.Length, dat$Petal.Length)
 ```
 
-We see a positive association between the two variables.
+There seems to be a positive association between the two variables.
 
 In `{ggplot2}`:
 
 ```{r}
 ggplot(dat) +
- aes(x = Sepal.Length, y = Petal.Length) +
- geom_point()
+  aes(x = Sepal.Length, y = Petal.Length) +
+  geom_point()
 ```
 
 As boxplots, scatterplots are even more informative when coloring the points according to a factor, in this case the species: 
 
 ```{r}
 ggplot(dat) +
- aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
- geom_point() +
- scale_color_hue()
+  aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
+  geom_point() +
+  scale_color_hue()
 ```
 
+# QQ-plot
+
+## For a single variable
+
+If we need to check the normality assumption of a variable:
+
+```{r}
+# Draw points on the qq-plot:
+qqnorm(dat$Sepal.Length)
+# Draw the reference line:
+qqline(dat$Sepal.Length)
+1+1
+```
 

@@ -20,9 +20,12 @@ knitr::opts_chunk$set(
   echo = FALSE,
   warning = FALSE,
   message = FALSE,
-  comment = NA
+  comment = NA,
+  fig.align = "center"
 )
 options(scipen = 999)
+
+styler::tidyverse_style()
 ```
 
 # Introduction
@@ -56,10 +59,10 @@ dr <- data.frame(
 )
 
 library(ggplot2)
-p <- ggplot(dr, aes(x=X,y=Y,na.rm=T)) +
+p <- ggplot(dr, aes(x = X, y = Y, na.rm = T)) +
   theme_minimal() +
-  geom_jitter(alpha=0.7,width=0.1,na.rm=T, color = "steelblue") +
-  stat_summary(fun.y = "mean", fun.ymin = "mean", fun.ymax= "mean", size=0.3,width=0.33, geom = "crossbar") +
+  geom_jitter(alpha = 0.7, width = 0.1, na.rm = T, color = "steelblue") +
+  stat_summary(fun.y = "mean", fun.ymin = "mean", fun.ymax = "mean", size = 0.3, width = 0.33, geom = "crossbar") +
   ylab("Height (in cm)") +
   xlab("")
 plot(p)
@@ -99,6 +102,10 @@ The minimum is `r round(min(sub_height), 1)` cm and the maximum is `r round(max(
 The mean, also known as average, is probably the most common statistics. It gives an idea on what is the average value, that is, the central value of the data or in other words the center of gravity. The mean is found by summing all values and dividing this sum by the number of observations (denoted $n$):
 
 $$mean = \bar{x} = \frac{\text{sum of all values}}{\text{number of values}} = \frac{1}{n}\sum^{n}_{i = 1} x_i$$
+Below a visual representation of the mean:
+
+![Mean. Source: LFSAB1105 at UCLouvain](/blog/descriptive-statistics-by-hand_files/mean.png)
+
 Given our sample of 6 adults presented above, the mean is:
 
 $$\bar{x} = \frac{188.7 + 169.4 + 178.6 + 181.3 + 179 + 173.9}{6} = 178.4833$$
@@ -107,7 +114,11 @@ In conclusion, the mean size, that is, the average size of our sample of 6 adult
 
 ## Median
 
-The median is another measure of location so it also gives an idea about the central tendency of the data. The interpretation of the median is that there are as many observations below as above the median. In other words, 50% of the observations lie below the median, and 50% of the observations lie above the median. The easiest way to compute the median is by first sorting the data from lowest to highest (i.e., in ascending order) then take the middle point as the median. From the sorted values, for an odd number of observations, the middle point is easy to find: it is the value with as many observations below as above. Still from the sorted values, for an even number of observations, the middle point is exactly between the two middle values. Formally, after sorting, the median is:
+The median is another measure of location so it also gives an idea about the central tendency of the data. The interpretation of the median is that there are as many observations below as above the median. In other words, 50% of the observations lie below the median, and 50% of the observations lie above the median. Below a visual representation of the median:
+
+![Median. Source: LFSAB1105 at UCLouvain](/blog/descriptive-statistics-by-hand_files/median.png)
+
+The easiest way to compute the median is by first sorting the data from lowest to highest (i.e., in ascending order) then take the middle point as the median. From the sorted values, for an odd number of observations, the middle point is easy to find: it is the value with as many observations below as above. Still from the sorted values, for an even number of observations, the middle point is exactly between the two middle values. Formally, after sorting, the median is:
 
 * if $n$ (number of observations) is odd: $$med(x) = x_{\frac{n+1}{2}}$$
 * if $n$ is even: $$med(x) = \frac{1}{2}\big(x_{\frac{n}{2}} + x_{\frac{n}{2} + 1}\big)$$
@@ -266,7 +277,9 @@ The range is `r max(sub_height)` $-$ `r min(sub_height)` $=$ `r max(sub_height) 
 
 ## Standard deviation
 
-The standard deviation is the most common dispersion measure in statistics. Like the mean for the location measures, if we have to present one statistics which summarizes the spread of the data, it is usually the standard deviation. As its name suggests, the standard deviation tells what is the "normal" deviation of the data. It actually computes the average deviation from the **mean**. The larger the standard deviation, the more scattered the data are. On the contrary, the smaller the standard deviation, the more the data are centred around the mean.
+The standard deviation is the most common dispersion measure in statistics. Like the mean for the location measures, if we have to present one statistics which summarizes the spread of the data, it is usually the standard deviation. As its name suggests, the standard deviation tells what is the "normal" deviation of the data. It actually computes the average deviation from the **mean**. The larger the standard deviation, the more scattered the data are. On the contrary, the smaller the standard deviation, the more the data are centred around the mean. Below a visual representation of the standard deviation:
+
+![Standard deviation. Source: LFSAB1105 at UCLouvain](/blog/descriptive-statistics-by-hand_files/standard-deviation.png)
 
 The standard deviation is a bit more complex than the previous statistics in the sense that there are two formulas depending on whether we face a sample or a population. A population includes all members from a specified group, all possible outcomes or measurements that are of interest. A sample consists of some observations drawn from the population, so a part or a subset of the population. For instance, the population may be "**all** people living in Belgium" and the sample may be "**some** people living in Belgium". Read this article on [the difference between population and sample](/blog/what-is-the-difference-between-population-and-sample/) if you want to learn more.
 
@@ -274,9 +287,9 @@ The standard deviation is a bit more complex than the previous statistics in the
 
 The standard deviation for a population, denoted $\sigma$, is:
 
-$$\sigma = \sqrt{\frac{1}{n}\sum^n_{i = 1}(x_i - \bar{x})^2}$$
+$$\sigma = \sqrt{\frac{1}{n}\sum^n_{i = 1}(x_i - \mu)^2}$$
 
-As you can see from the formula, the standard deviation is actually the average deviation of the data from their mean. Note the square for the difference between the observations and the mean to avoid that negative differences are compensated by positive differences.
+As you can see from the formula, the standard deviation is actually the average deviation of the data from their mean $\mu$. Note the square for the difference between the observations and the mean to avoid that negative differences are compensated by positive differences.
 
 For the sake of easiness, imagine a population of only 3 adults (the steps are the same with a large population, the computation is just longer). Below their heights (in cm):
 
@@ -318,7 +331,7 @@ The variance is simply the square of the standard deviation. Put it another way,
 
 The variance for a population, denoted $\sigma^2$, is:
 
-$$\sigma^2 = \frac{1}{n}\sum^n_{i = 1}(x_i - \bar{x})^2$$
+$$\sigma^2 = \frac{1}{n}\sum^n_{i = 1}(x_i - \mu)^2$$
 
 As you can see, the formula for variance is the same than for standard deviation, except that the square root is removed for the variance. Remember the heights of our population of 3 adults:
 
@@ -375,7 +388,7 @@ $$IQR = 181.5 - 163.9 = 17.6$$
 
 In conclusion, the interquartile range is 17.6 cm. The interquartile range is actually the range (since it is the difference between a higher and a lower value) of the middle data. The graph below may help to understand better the IQR and the quartiles:
 
-![IQR, first and third quartile](/blog/descriptive-statistics-by-hand_files/IQR-quartiles.png)
+![IQR, first and third quartile. Source: LFSAB1105 at UCLouvain](/blog/descriptive-statistics-by-hand_files/IQR-quartiles.png)
 
 ## Coefficient of variation
 

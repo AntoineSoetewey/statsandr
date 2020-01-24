@@ -38,6 +38,9 @@
 &lt;li&gt;&lt;a href=&#34;#histogram&#34;&gt;Histogram&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#boxplot&#34;&gt;Boxplot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#scatterplot&#34;&gt;Scatterplot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#qq-plot&#34;&gt;QQ-plot&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#for-a-single-variable&#34;&gt;For a single variable&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -52,38 +55,38 @@
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat &amp;lt;- iris # load the iris dataset and renamed it dat&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Below a preview of this dataset and its structure:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(dat) # first 6 observations&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-## 1          5.1         3.5          1.4         0.2  setosa
-## 2          4.9         3.0          1.4         0.2  setosa
-## 3          4.7         3.2          1.3         0.2  setosa
-## 4          4.6         3.1          1.5         0.2  setosa
-## 5          5.0         3.6          1.4         0.2  setosa
-## 6          5.4         3.9          1.7         0.4  setosa&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          5.1         3.5          1.4         0.2  setosa
+2          4.9         3.0          1.4         0.2  setosa
+3          4.7         3.2          1.3         0.2  setosa
+4          4.6         3.1          1.5         0.2  setosa
+5          5.0         3.6          1.4         0.2  setosa
+6          5.4         3.9          1.7         0.4  setosa&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;str(dat) # structure of dataset&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## &amp;#39;data.frame&amp;#39;:    150 obs. of  5 variables:
-##  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
-##  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
-##  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
-##  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
-##  $ Species     : Factor w/ 3 levels &amp;quot;setosa&amp;quot;,&amp;quot;versicolor&amp;quot;,..: 1 1 1 1 1 1 1 1 1 1 ...&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;&amp;#39;data.frame&amp;#39;:   150 obs. of  5 variables:
+ $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+ $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+ $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+ $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+ $ Species     : Factor w/ 3 levels &amp;quot;setosa&amp;quot;,&amp;quot;versicolor&amp;quot;,..: 1 1 1 1 1 1 1 1 1 1 ...&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The dataset contains 150 observations and 5 variables, representing the length and width of the sepal and petal and the species of 150 flowers. Length and width of the sepal and petal are numeric variables and the species is a factor with 3 levels (indicated by &lt;code&gt;num&lt;/code&gt; and &lt;code&gt;Factor w/ 3 levels&lt;/code&gt; after the name of the variables). See the &lt;a href=&#34;/blog/data-types-in-r&#34;&gt;different variables types in R&lt;/a&gt; if you need a refresh.&lt;/p&gt;
 &lt;p&gt;For plots, we use the default graphs and the graphs from the package &lt;code&gt;{ggplot2}&lt;/code&gt;. Graphs from &lt;code&gt;{ggplot2}&lt;/code&gt; have a better look but it requires more advanced code so if you need to publish or share your graphs, I suggest using &lt;code&gt;{ggplot2}&lt;/code&gt;, otherwise the default graphics will do the job.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;minimum-and-maximum&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Minimum and maximum&lt;/h1&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;min(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 4.3&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[1] 4.3&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;max(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 7.9&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[1] 7.9&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Alternatively:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;range(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 4.3 7.9&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[1] 4.3 7.9&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;gives you the minimum and maximum directly.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;mean&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Mean&lt;/h1&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 5.843333&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[1] 5.843333&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;em&gt;Tips:&lt;/em&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;if there is at least one missing value in your dataset, use &lt;code&gt;mean(dat$Sepal.Length, na.rm = TRUE)&lt;/code&gt; to compute the mean without the NA. This argument can be used for many functions, not only the mean&lt;/li&gt;
@@ -93,200 +96,200 @@
 &lt;div id=&#34;median&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Median&lt;/h1&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;median(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 5.8&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[1] 5.8&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;or:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.5)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 50% 
-## 5.8&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;50% 
+5.8 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;first-and-third-quartile&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;First and third quartile&lt;/h1&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.25) # first quartile&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 25% 
-## 5.1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;25% 
+5.1 &lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.75) # third quartile&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 75% 
-## 6.4&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;75% 
+6.4 &lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;other-quantiles&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Other quantiles&lt;/h2&gt;
 &lt;p&gt;As you have guessed, any quantile can also be computed with the &lt;code&gt;quantile()&lt;/code&gt; function. For instance, the &lt;span class=&#34;math inline&#34;&gt;\(4^{th}\)&lt;/span&gt; decile or the &lt;span class=&#34;math inline&#34;&gt;\(98^{th}\)&lt;/span&gt; percentile:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.4) # 4th decile&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 40% 
-## 5.6&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;40% 
+5.6 &lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.98) # 98th percentile&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 98% 
-## 7.7&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;98% 
+7.7 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;interquartile-range&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Interquartile range&lt;/h1&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;IQR(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 1.3&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[1] 1.3&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;code&gt;IQR()&lt;/code&gt; actually computes:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(dat$Sepal.Length, 0.75) - quantile(dat$Sepal.Length, 0.25)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 75% 
-## 1.3&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;75% 
+1.3 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;standard-deviation-and-variance&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Standard deviation and variance&lt;/h1&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sd(dat$Sepal.Length) # standard deviation&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 0.8280661&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[1] 0.8280661&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;var(dat$Sepal.Length) # variance&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 0.6856935&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[1] 0.6856935&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Remember from this &lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;article&lt;/a&gt; that the standard deviation and the variance are different whether we compute it for a sample or a population (see the difference between the two &lt;a href=&#34;/blog/what-is-the-difference-between-population-and-sample/&#34;&gt;here&lt;/a&gt;). In R, the standard deviation and the variance are computed as if the data represent a sample (so the denominator is &lt;span class=&#34;math inline&#34;&gt;\(n - 1\)&lt;/span&gt;, where &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; is the number of observations). To my knowledge, there is no function by default in R that computes the standard deviation and variance for a population.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Tip:&lt;/em&gt; to compute the standard deviation (or variance) of multiple variables at the same time, use:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lapply(dat[, 1:4], sd) # dat[, 1:4] selects the variables 1 to 4&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## $Sepal.Length
-## [1] 0.8280661
-## 
-## $Sepal.Width
-## [1] 0.4358663
-## 
-## $Petal.Length
-## [1] 1.765298
-## 
-## $Petal.Width
-## [1] 0.7622377&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;$Sepal.Length
+[1] 0.8280661
+
+$Sepal.Width
+[1] 0.4358663
+
+$Petal.Length
+[1] 1.765298
+
+$Petal.Width
+[1] 0.7622377&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;summary&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Summary&lt;/h1&gt;
 &lt;p&gt;You can compute the minimum, &lt;span class=&#34;math inline&#34;&gt;\(1^{st}\)&lt;/span&gt; quartile, median, mean, &lt;span class=&#34;math inline&#34;&gt;\(3^{rd}\)&lt;/span&gt; quartile and the maximum for all variables of the dataset at once using &lt;code&gt;summary()&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(dat)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
-##  Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100  
-##  1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300  
-##  Median :5.800   Median :3.000   Median :4.350   Median :1.300  
-##  Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199  
-##  3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800  
-##  Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500  
-##        Species  
-##  setosa    :50  
-##  versicolor:50  
-##  virginica :50  
-##                 
-##                 
-## &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;  Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
+ Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100  
+ 1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300  
+ Median :5.800   Median :3.000   Median :4.350   Median :1.300  
+ Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199  
+ 3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800  
+ Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500  
+       Species  
+ setosa    :50  
+ versicolor:50  
+ virginica :50  
+                
+                
+                &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;em&gt;Tip:&lt;/em&gt; if you need these descriptive statistics by group:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;by(dat, dat$Species, summary)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## dat$Species: setosa
-##   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
-##  Min.   :4.300   Min.   :2.300   Min.   :1.000   Min.   :0.100  
-##  1st Qu.:4.800   1st Qu.:3.200   1st Qu.:1.400   1st Qu.:0.200  
-##  Median :5.000   Median :3.400   Median :1.500   Median :0.200  
-##  Mean   :5.006   Mean   :3.428   Mean   :1.462   Mean   :0.246  
-##  3rd Qu.:5.200   3rd Qu.:3.675   3rd Qu.:1.575   3rd Qu.:0.300  
-##  Max.   :5.800   Max.   :4.400   Max.   :1.900   Max.   :0.600  
-##        Species  
-##  setosa    :50  
-##  versicolor: 0  
-##  virginica : 0  
-##                 
-##                 
-##                 
-## ------------------------------------------------------------ 
-## dat$Species: versicolor
-##   Sepal.Length    Sepal.Width     Petal.Length   Petal.Width          Species  
-##  Min.   :4.900   Min.   :2.000   Min.   :3.00   Min.   :1.000   setosa    : 0  
-##  1st Qu.:5.600   1st Qu.:2.525   1st Qu.:4.00   1st Qu.:1.200   versicolor:50  
-##  Median :5.900   Median :2.800   Median :4.35   Median :1.300   virginica : 0  
-##  Mean   :5.936   Mean   :2.770   Mean   :4.26   Mean   :1.326                  
-##  3rd Qu.:6.300   3rd Qu.:3.000   3rd Qu.:4.60   3rd Qu.:1.500                  
-##  Max.   :7.000   Max.   :3.400   Max.   :5.10   Max.   :1.800                  
-## ------------------------------------------------------------ 
-## dat$Species: virginica
-##   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
-##  Min.   :4.900   Min.   :2.200   Min.   :4.500   Min.   :1.400  
-##  1st Qu.:6.225   1st Qu.:2.800   1st Qu.:5.100   1st Qu.:1.800  
-##  Median :6.500   Median :3.000   Median :5.550   Median :2.000  
-##  Mean   :6.588   Mean   :2.974   Mean   :5.552   Mean   :2.026  
-##  3rd Qu.:6.900   3rd Qu.:3.175   3rd Qu.:5.875   3rd Qu.:2.300  
-##  Max.   :7.900   Max.   :3.800   Max.   :6.900   Max.   :2.500  
-##        Species  
-##  setosa    : 0  
-##  versicolor: 0  
-##  virginica :50  
-##                 
-##                 
-## &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;dat$Species: setosa
+  Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
+ Min.   :4.300   Min.   :2.300   Min.   :1.000   Min.   :0.100  
+ 1st Qu.:4.800   1st Qu.:3.200   1st Qu.:1.400   1st Qu.:0.200  
+ Median :5.000   Median :3.400   Median :1.500   Median :0.200  
+ Mean   :5.006   Mean   :3.428   Mean   :1.462   Mean   :0.246  
+ 3rd Qu.:5.200   3rd Qu.:3.675   3rd Qu.:1.575   3rd Qu.:0.300  
+ Max.   :5.800   Max.   :4.400   Max.   :1.900   Max.   :0.600  
+       Species  
+ setosa    :50  
+ versicolor: 0  
+ virginica : 0  
+                
+                
+                
+------------------------------------------------------------ 
+dat$Species: versicolor
+  Sepal.Length    Sepal.Width     Petal.Length   Petal.Width          Species  
+ Min.   :4.900   Min.   :2.000   Min.   :3.00   Min.   :1.000   setosa    : 0  
+ 1st Qu.:5.600   1st Qu.:2.525   1st Qu.:4.00   1st Qu.:1.200   versicolor:50  
+ Median :5.900   Median :2.800   Median :4.35   Median :1.300   virginica : 0  
+ Mean   :5.936   Mean   :2.770   Mean   :4.26   Mean   :1.326                  
+ 3rd Qu.:6.300   3rd Qu.:3.000   3rd Qu.:4.60   3rd Qu.:1.500                  
+ Max.   :7.000   Max.   :3.400   Max.   :5.10   Max.   :1.800                  
+------------------------------------------------------------ 
+dat$Species: virginica
+  Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
+ Min.   :4.900   Min.   :2.200   Min.   :4.500   Min.   :1.400  
+ 1st Qu.:6.225   1st Qu.:2.800   1st Qu.:5.100   1st Qu.:1.800  
+ Median :6.500   Median :3.000   Median :5.550   Median :2.000  
+ Mean   :6.588   Mean   :2.974   Mean   :5.552   Mean   :2.026  
+ 3rd Qu.:6.900   3rd Qu.:3.175   3rd Qu.:5.875   3rd Qu.:2.300  
+ Max.   :7.900   Max.   :3.800   Max.   :6.900   Max.   :2.500  
+       Species  
+ setosa    : 0  
+ versicolor: 0  
+ virginica :50  
+                
+                
+                &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;where the arguments are the name of the dataset, the grouping variable and the summary function (in this order).&lt;/p&gt;
 &lt;p&gt;If you need more descriptive statistics, use &lt;code&gt;stat.desc()&lt;/code&gt; from the package &lt;code&gt;{pastecs}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(pastecs)
 stat.desc(dat, norm = TRUE)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##              Sepal.Length  Sepal.Width  Petal.Length   Petal.Width Species
-## nbr.val      150.00000000 150.00000000  1.500000e+02  1.500000e+02      NA
-## nbr.null       0.00000000   0.00000000  0.000000e+00  0.000000e+00      NA
-## nbr.na         0.00000000   0.00000000  0.000000e+00  0.000000e+00      NA
-## min            4.30000000   2.00000000  1.000000e+00  1.000000e-01      NA
-## max            7.90000000   4.40000000  6.900000e+00  2.500000e+00      NA
-## range          3.60000000   2.40000000  5.900000e+00  2.400000e+00      NA
-## sum          876.50000000 458.60000000  5.637000e+02  1.799000e+02      NA
-## median         5.80000000   3.00000000  4.350000e+00  1.300000e+00      NA
-## mean           5.84333333   3.05733333  3.758000e+00  1.199333e+00      NA
-## SE.mean        0.06761132   0.03558833  1.441360e-01  6.223645e-02      NA
-## CI.mean.0.95   0.13360085   0.07032302  2.848146e-01  1.229800e-01      NA
-## var            0.68569351   0.18997942  3.116278e+00  5.810063e-01      NA
-## std.dev        0.82806613   0.43586628  1.765298e+00  7.622377e-01      NA
-## coef.var       0.14171126   0.14256420  4.697441e-01  6.355511e-01      NA
-## skewness       0.30864073   0.31261470 -2.694109e-01 -1.009166e-01      NA
-## skew.2SE       0.77924478   0.78927812 -6.801988e-01 -2.547904e-01      NA
-## kurtosis      -0.60581253   0.13870468 -1.416857e+00 -1.358179e+00      NA
-## kurt.2SE      -0.76961200   0.17620762 -1.799947e+00 -1.725403e+00      NA
-## normtest.W     0.97609027   0.98491787  8.762681e-01  9.018349e-01      NA
-## normtest.p     0.01018116   0.10115427  7.412263e-10  1.680465e-08      NA&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;             Sepal.Length  Sepal.Width  Petal.Length   Petal.Width Species
+nbr.val      150.00000000 150.00000000  1.500000e+02  1.500000e+02      NA
+nbr.null       0.00000000   0.00000000  0.000000e+00  0.000000e+00      NA
+nbr.na         0.00000000   0.00000000  0.000000e+00  0.000000e+00      NA
+min            4.30000000   2.00000000  1.000000e+00  1.000000e-01      NA
+max            7.90000000   4.40000000  6.900000e+00  2.500000e+00      NA
+range          3.60000000   2.40000000  5.900000e+00  2.400000e+00      NA
+sum          876.50000000 458.60000000  5.637000e+02  1.799000e+02      NA
+median         5.80000000   3.00000000  4.350000e+00  1.300000e+00      NA
+mean           5.84333333   3.05733333  3.758000e+00  1.199333e+00      NA
+SE.mean        0.06761132   0.03558833  1.441360e-01  6.223645e-02      NA
+CI.mean.0.95   0.13360085   0.07032302  2.848146e-01  1.229800e-01      NA
+var            0.68569351   0.18997942  3.116278e+00  5.810063e-01      NA
+std.dev        0.82806613   0.43586628  1.765298e+00  7.622377e-01      NA
+coef.var       0.14171126   0.14256420  4.697441e-01  6.355511e-01      NA
+skewness       0.30864073   0.31261470 -2.694109e-01 -1.009166e-01      NA
+skew.2SE       0.77924478   0.78927812 -6.801988e-01 -2.547904e-01      NA
+kurtosis      -0.60581253   0.13870468 -1.416857e+00 -1.358179e+00      NA
+kurt.2SE      -0.76961200   0.17620762 -1.799947e+00 -1.725403e+00      NA
+normtest.W     0.97609027   0.98491787  8.762681e-01  9.018349e-01      NA
+normtest.p     0.01018116   0.10115427  7.412263e-10  1.680465e-08      NA&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that the variable &lt;code&gt;Species&lt;/code&gt; is not numeric, so descriptive statistics cannot be computed for this variable and NA are displayed.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;coefficient-of-variation&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Coefficient of variation&lt;/h1&gt;
 &lt;p&gt;The coefficient of variation can be found with &lt;code&gt;stat.desc()&lt;/code&gt; (see the line &lt;code&gt;coef.var&lt;/code&gt; in the table above) or by computing manually (remember that the coefficient of variation is the standard deviation divided by the mean):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sd(dat$Sepal.Length) / mean(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 0.1417113&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[1] 0.1417113&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;mode&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Mode&lt;/h1&gt;
 &lt;p&gt;To my knowledge there is no function to find the mode of a variable. However, we can easily find it thanks to the functions &lt;code&gt;table()&lt;/code&gt; and &lt;code&gt;sort()&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tab &amp;lt;- table(dat$Sepal.Length) # number of occurences for each unique value
 sort(tab, decreasing = TRUE) # sort highest to lowest&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 
-##   5 5.1 6.3 5.7 6.7 5.5 5.8 6.4 4.9 5.4 5.6   6 6.1 4.8 6.5 4.6 5.2 6.2 6.9 7.7 
-##  10   9   9   8   8   7   7   7   6   6   6   6   6   5   5   4   4   4   4   4 
-## 4.4 5.9 6.8 7.2 4.7 6.6 4.3 4.5 5.3   7 7.1 7.3 7.4 7.6 7.9 
-##   3   3   3   3   2   2   1   1   1   1   1   1   1   1   1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;
+  5 5.1 6.3 5.7 6.7 5.5 5.8 6.4 4.9 5.4 5.6   6 6.1 4.8 6.5 4.6 5.2 6.2 6.9 7.7 
+ 10   9   9   8   8   7   7   7   6   6   6   6   6   5   5   4   4   4   4   4 
+4.4 5.9 6.8 7.2 4.7 6.6 4.3 4.5 5.3   7 7.1 7.3 7.4 7.6 7.9 
+  3   3   3   3   2   2   1   1   1   1   1   1   1   1   1 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;code&gt;table()&lt;/code&gt; gives the number of occurences for each unique value, then &lt;code&gt;sort()&lt;/code&gt; with the argument &lt;code&gt;decreasing = TRUE&lt;/code&gt; displays the number of occurences from highest to lowest. The mode of the variable &lt;code&gt;Sepal.Length&lt;/code&gt; is thus 5. This code to find the mode can also be applied to qualitative variables such as &lt;code&gt;Species&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sort(table(dat$Species), decreasing = TRUE)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 
-##     setosa versicolor  virginica 
-##         50         50         50&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;
+    setosa versicolor  virginica 
+        50         50         50 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;or:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(dat$Species)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##     setosa versicolor  virginica 
-##         50         50         50&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;    setosa versicolor  virginica 
+        50         50         50 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;barplot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Barplot&lt;/h1&gt;
 &lt;p&gt;Barplots can only be done on qualitative variables (see the difference with a quantative variable &lt;a href=&#34;/blog/variable-types-and-examples/&#34;&gt;here&lt;/a&gt;). A barplot is a tool to visualize the distribution of a qualitative variable. The only qualitative variable in the dataset is the variable &lt;code&gt;Species&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;barplot(table(dat$Species)) # table() is mandatory&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;All bars have the same height as there are 50 observations of each species.&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2) # needed each time you open RStudio. The package must be installed first
 
 ggplot(dat) +
- aes(x = Species) +
- geom_bar()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-22-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+  aes(x = Species) +
+  geom_bar()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-22-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Both plots can be customized. For instance, it is possible to edit the title, x and y-axis labels, color, etc. However, customizing plots is beyond the scope of this article so all plots in this article are presented without any customization. Interested readers will find numerous resources online.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;histogram&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Histogram&lt;/h1&gt;
 &lt;p&gt;A histogram gives an idea about the distribution of a quantitative variable. The idea is to break the range of values into intervals and count how many observations fall into each interval. Histograms are a bit similar to barplots, but histograms are used for quantitative variables whereas barplots are used for qualitative variables. To draw a histogram in R, use &lt;code&gt;hist()&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;hist(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Add the arguments &lt;code&gt;breaks =&lt;/code&gt; inside the &lt;code&gt;hist()&lt;/code&gt; function if you want to change the number of bins. A rule of thumb is that the number of bins should be the rounded value of the square root of the number of observations. The dataset includes 150 observations so in this case the number of bins can be set to 12.&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
- aes(x = Sepal.Length) +
- geom_histogram()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+  aes(x = Sepal.Length) +
+  geom_histogram()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;By default, the number of bins is 30. You can change this value with &lt;code&gt;geom_histogram(bins = 12)&lt;/code&gt; for instance.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;boxplot&#34; class=&#34;section level1&#34;&gt;
@@ -298,33 +301,45 @@ ggplot(dat) +
 &lt;/div&gt;
 &lt;p&gt;Now an example with our dataset:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;boxplot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-25-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-25-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Boxplots are even more informative when presented side-by-side for comparing and contrasting distributions from two or more groups. For instance, we compare the length of the sepal across the different species:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;boxplot(dat$Sepal.Length ~ dat$Species)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
- aes(x = Species, y = Sepal.Length) +
- geom_boxplot()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-27-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+  aes(x = Species, y = Sepal.Length) +
+  geom_boxplot()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-27-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;scatterplot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Scatterplot&lt;/h1&gt;
 &lt;p&gt;Scatterplots allow to check whether there is a potential link between two quantitative variables. For instance, when drawing a scatterplot of the length of the sepal and the length of the petal:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(dat$Sepal.Length, dat$Petal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;We see a positive association between the two variables.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;There seems to be a positive association between the two variables.&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
- aes(x = Sepal.Length, y = Petal.Length) +
- geom_point()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+  aes(x = Sepal.Length, y = Petal.Length) +
+  geom_point()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;As boxplots, scatterplots are even more informative when coloring the points according to a factor, in this case the species:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
- aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
- geom_point() +
- scale_color_hue()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+  aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
+  geom_point() +
+  scale_color_hue()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;qq-plot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;QQ-plot&lt;/h1&gt;
+&lt;div id=&#34;for-a-single-variable&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;For a single variable&lt;/h2&gt;
+&lt;p&gt;If we need to check the normality assumption of a variable:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Draw points on the qq-plot:
+qqnorm(dat$Sepal.Length)
+# Draw the reference line:
+qqline(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 </description>
     </item>
@@ -615,7 +630,7 @@ for (i in 1:10) {
 &lt;div id=&#34;location-versus-dispersion-measures&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Location versus dispersion measures&lt;/h1&gt;
 &lt;p&gt;Several different measures (called statistics if we are analyzing a sample) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data. In practice, both types of measures are often used together in order to summarize the data in the most concise but complete way. We illustrate this point with the graph below, representing the height (in cm) of 100 persons divided into two groups (50 persons in each group):&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-by-hand_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-by-hand_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;The black line corresponds to the mean. The mean height (in cm) is similar in both groups. However, it is clear that the dispersion of heights are very different in the two groups. For this reason, location or dispersion measures are often not enough if presented individually and it is a good practice to present several statistics from both types of measures.&lt;/p&gt;
 &lt;p&gt;In the following sections, we detail the most common location and dispersion measures and illustrate them with examples.&lt;/p&gt;
 &lt;/div&gt;
@@ -642,13 +657,23 @@ for (i in 1:10) {
 &lt;h2&gt;Mean&lt;/h2&gt;
 &lt;p&gt;The mean, also known as average, is probably the most common statistics. It gives an idea on what is the average value, that is, the central value of the data or in other words the center of gravity. The mean is found by summing all values and dividing this sum by the number of observations (denoted &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt;):&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[mean = \bar{x} = \frac{\text{sum of all values}}{\text{number of values}} = \frac{1}{n}\sum^{n}_{i = 1} x_i\]&lt;/span&gt;
-Given our sample of 6 adults presented above, the mean is:&lt;/p&gt;
+Below a visual representation of the mean:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/descriptive-statistics-by-hand_files/mean.png&#34; alt=&#34;Mean. Source: LFSAB1105 at UCLouvain&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Mean. Source: LFSAB1105 at UCLouvain&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Given our sample of 6 adults presented above, the mean is:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\bar{x} = \frac{188.7 + 169.4 + 178.6 + 181.3 + 179 + 173.9}{6} = 178.4833\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;In conclusion, the mean size, that is, the average size of our sample of 6 adults is 178.48 cm (rounded to 2 decimals).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;median&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Median&lt;/h2&gt;
-&lt;p&gt;The median is another measure of location so it also gives an idea about the central tendency of the data. The interpretation of the median is that there are as many observations below as above the median. In other words, 50% of the observations lie below the median, and 50% of the observations lie above the median. The easiest way to compute the median is by first sorting the data from lowest to highest (i.e., in ascending order) then take the middle point as the median. From the sorted values, for an odd number of observations, the middle point is easy to find: it is the value with as many observations below as above. Still from the sorted values, for an even number of observations, the middle point is exactly between the two middle values. Formally, after sorting, the median is:&lt;/p&gt;
+&lt;p&gt;The median is another measure of location so it also gives an idea about the central tendency of the data. The interpretation of the median is that there are as many observations below as above the median. In other words, 50% of the observations lie below the median, and 50% of the observations lie above the median. Below a visual representation of the median:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/descriptive-statistics-by-hand_files/median.png&#34; alt=&#34;Median. Source: LFSAB1105 at UCLouvain&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Median. Source: LFSAB1105 at UCLouvain&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;The easiest way to compute the median is by first sorting the data from lowest to highest (i.e., in ascending order) then take the middle point as the median. From the sorted values, for an odd number of observations, the middle point is easy to find: it is the value with as many observations below as above. Still from the sorted values, for an even number of observations, the middle point is exactly between the two middle values. Formally, after sorting, the median is:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;if &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; (number of observations) is odd: &lt;span class=&#34;math display&#34;&gt;\[med(x) = x_{\frac{n+1}{2}}\]&lt;/span&gt;&lt;/li&gt;
 &lt;li&gt;if &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; is even: &lt;span class=&#34;math display&#34;&gt;\[med(x) = \frac{1}{2}\big(x_{\frac{n}{2}} + x_{\frac{n}{2} + 1}\big)\]&lt;/span&gt;&lt;/li&gt;
@@ -785,13 +810,17 @@ Given our sample of 6 adults presented above, the mean is:&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;standard-deviation&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Standard deviation&lt;/h2&gt;
-&lt;p&gt;The standard deviation is the most common dispersion measure in statistics. Like the mean for the location measures, if we have to present one statistics which summarizes the spread of the data, it is usually the standard deviation. As its name suggests, the standard deviation tells what is the “normal” deviation of the data. It actually computes the average deviation from the &lt;strong&gt;mean&lt;/strong&gt;. The larger the standard deviation, the more scattered the data are. On the contrary, the smaller the standard deviation, the more the data are centred around the mean.&lt;/p&gt;
+&lt;p&gt;The standard deviation is the most common dispersion measure in statistics. Like the mean for the location measures, if we have to present one statistics which summarizes the spread of the data, it is usually the standard deviation. As its name suggests, the standard deviation tells what is the “normal” deviation of the data. It actually computes the average deviation from the &lt;strong&gt;mean&lt;/strong&gt;. The larger the standard deviation, the more scattered the data are. On the contrary, the smaller the standard deviation, the more the data are centred around the mean. Below a visual representation of the standard deviation:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/descriptive-statistics-by-hand_files/standard-deviation.png&#34; alt=&#34;Standard deviation. Source: LFSAB1105 at UCLouvain&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Standard deviation. Source: LFSAB1105 at UCLouvain&lt;/p&gt;
+&lt;/div&gt;
 &lt;p&gt;The standard deviation is a bit more complex than the previous statistics in the sense that there are two formulas depending on whether we face a sample or a population. A population includes all members from a specified group, all possible outcomes or measurements that are of interest. A sample consists of some observations drawn from the population, so a part or a subset of the population. For instance, the population may be “&lt;strong&gt;all&lt;/strong&gt; people living in Belgium” and the sample may be “&lt;strong&gt;some&lt;/strong&gt; people living in Belgium”. Read this article on &lt;a href=&#34;/blog/what-is-the-difference-between-population-and-sample/&#34;&gt;the difference between population and sample&lt;/a&gt; if you want to learn more.&lt;/p&gt;
 &lt;div id=&#34;standard-deviation-for-a-population&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Standard deviation for a population&lt;/h3&gt;
 &lt;p&gt;The standard deviation for a population, denoted &lt;span class=&#34;math inline&#34;&gt;\(\sigma\)&lt;/span&gt;, is:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\sigma = \sqrt{\frac{1}{n}\sum^n_{i = 1}(x_i - \bar{x})^2}\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;As you can see from the formula, the standard deviation is actually the average deviation of the data from their mean. Note the square for the difference between the observations and the mean to avoid that negative differences are compensated by positive differences.&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\sigma = \sqrt{\frac{1}{n}\sum^n_{i = 1}(x_i - \mu)^2}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;As you can see from the formula, the standard deviation is actually the average deviation of the data from their mean &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt;. Note the square for the difference between the observations and the mean to avoid that negative differences are compensated by positive differences.&lt;/p&gt;
 &lt;p&gt;For the sake of easiness, imagine a population of only 3 adults (the steps are the same with a large population, the computation is just longer). Below their heights (in cm):&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;160.4&lt;/em&gt;, &lt;em&gt;175.8&lt;/em&gt; and &lt;em&gt;181.5&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;The mean is 172.6 (rounded to 1 decimal). The standard deviation is thus:&lt;/p&gt;
@@ -817,7 +846,7 @@ Given our sample of 6 adults presented above, the mean is:&lt;/p&gt;
 &lt;div id=&#34;variance-for-a-population&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Variance for a population&lt;/h3&gt;
 &lt;p&gt;The variance for a population, denoted &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2\)&lt;/span&gt;, is:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\sigma^2 = \frac{1}{n}\sum^n_{i = 1}(x_i - \bar{x})^2\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\sigma^2 = \frac{1}{n}\sum^n_{i = 1}(x_i - \mu)^2\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;As you can see, the formula for variance is the same than for standard deviation, except that the square root is removed for the variance. Remember the heights of our population of 3 adults:&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;160.4&lt;/em&gt;, &lt;em&gt;175.8&lt;/em&gt; and &lt;em&gt;181.5&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;The standard deviation was 8.91, so the variance of the height of these adults is &lt;span class=&#34;math inline&#34;&gt;\(8.91^2 = 79.39\)&lt;/span&gt; &lt;span class=&#34;math inline&#34;&gt;\(cm^2\)&lt;/span&gt; (see below why the unit of a variance is &lt;span class=&#34;math inline&#34;&gt;\(unit^2\)&lt;/span&gt;).&lt;/p&gt;
@@ -872,8 +901,8 @@ Given our sample of 6 adults presented above, the mean is:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[IQR = 181.5 - 163.9 = 17.6\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;In conclusion, the interquartile range is 17.6 cm. The interquartile range is actually the range (since it is the difference between a higher and a lower value) of the middle data. The graph below may help to understand better the IQR and the quartiles:&lt;/p&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;/blog/descriptive-statistics-by-hand_files/IQR-quartiles.png&#34; alt=&#34;IQR, first and third quartile&#34; /&gt;
-&lt;p class=&#34;caption&#34;&gt;IQR, first and third quartile&lt;/p&gt;
+&lt;img src=&#34;/blog/descriptive-statistics-by-hand_files/IQR-quartiles.png&#34; alt=&#34;IQR, first and third quartile. Source: LFSAB1105 at UCLouvain&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;IQR, first and third quartile. Source: LFSAB1105 at UCLouvain&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;coefficient-of-variation&#34; class=&#34;section level2&#34;&gt;
@@ -1028,11 +1057,11 @@ to learn more about this branch of statistics.&lt;/p&gt;
     </item>
     
     <item>
-      <title>How to construct a timeline of your CV in R</title>
-      <link>/blog/how-to-construct-a-timeline-of-your-cv-in-r/</link>
+      <title>How to create a timeline of your CV in R</title>
+      <link>/blog/how-to-create-a-timeline-of-your-cv-in-r/</link>
       <pubDate>Wed, 15 Jan 2020 00:00:00 +0000</pubDate>
       
-      <guid>/blog/how-to-construct-a-timeline-of-your-cv-in-r/</guid>
+      <guid>/blog/how-to-create-a-timeline-of-your-cv-in-r/</guid>
       <description>
 
 
@@ -1512,7 +1541,7 @@ char_num&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;class(char_num)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] &amp;quot;character&amp;quot;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Last but not least, although space does not matter in numeric data, it does matter for character data:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;num_space &amp;lt;- c(1 )
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;num_space &amp;lt;- c(1)
 num_nospace &amp;lt;- c(1)
 # is num_space equal to num_nospace?
 num_space == num_nospace&lt;/code&gt;&lt;/pre&gt;
@@ -1845,7 +1874,7 @@ link &amp;lt;- paste0(
   &amp;#39;&amp;lt;a target=&amp;quot;_blank&amp;quot; href=&amp;quot;https://www.amazon.com/gp/search?ie=UTF8&amp;amp;tag=antoinesoetew-20&amp;amp;linkCode=ur2&amp;amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;index=books&amp;amp;keywords=&amp;#39;, # affiliate link
   dat$Title, &amp;quot; + &amp;quot;, dat$Author, # book title and author
   &amp;#39;&amp;quot;&amp;gt;Amazon&amp;lt;/a&amp;gt;&amp;#39; # closing HTML tag
-) &lt;/code&gt;&lt;/pre&gt;
+)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Your links should look something like this, with same affiliate links and closing tags for all books but with different keywords, corresponding to book titles and authors:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(link)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] &amp;quot;&amp;lt;a target=\&amp;quot;_blank\&amp;quot; href=\&amp;quot;https://www.amazon.com/gp/search?ie=UTF8&amp;amp;tag=antoinesoetew-20&amp;amp;linkCode=ur2&amp;amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;index=books&amp;amp;keywords=A Random Walk Down Wall Street + Burton G. Malkiel\&amp;quot;&amp;gt;Amazon&amp;lt;/a&amp;gt;&amp;quot;   
