@@ -12,6 +12,148 @@
     
     
     <item>
+      <title>How to create a timeline of your CV in R</title>
+      <link>/blog/how-to-create-a-timeline-of-your-cv-in-r/</link>
+      <pubDate>Sun, 26 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/how-to-create-a-timeline-of-your-cv-in-r/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#minimal-reproducible-example&#34;&gt;Minimal reproducible example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#how-to-personalize-it&#34;&gt;How to personalize it&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;In this article, I show how to create a timeline of your CV in R. A CV timeline illustrates key information about your education, work experiences and extra activities. The main advantage of CV timelines compared to regular CV is that they make you stand out immediately by being visually appealing and easier to scan. It also allows you to better present your “story” by showing the chronology of your jobs and activities and thus explain how you got to where you are today.&lt;/p&gt;
+&lt;p&gt;We show below how to create such CV in R with a minimal reproducible example. Feel free to use the code and adapt it to you. For a more complete example (together with the code) you can check my own CV timeline &lt;a href=&#34;https://www.antoinesoetewey.com/files/CV_timeline_antoinesoetewey.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;minimal-reproducible-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Minimal reproducible example&lt;/h1&gt;
+&lt;p&gt;Here is the code and the result of a minimal reproducible example:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# All packages used below must be installed first
+library(devtools)
+# devtools::install_github(&amp;quot;laresbernardo/lares&amp;quot;)
+library(lares)
+library(ggplot2)
+
+plot_timeline2 &amp;lt;- function(event, start, end = start + 1, label = NA, group = NA,
+                           title = &amp;quot;Curriculum Vitae Timeline&amp;quot;, subtitle = &amp;quot;Antoine Soetewey&amp;quot;,
+                           size = 7, colour = &amp;quot;orange&amp;quot;, save = FALSE, subdir = NA) {
+  df &amp;lt;- data.frame(
+    Role = as.character(event), Place = as.character(label),
+    Start = lubridate::date(start), End = lubridate::date(end),
+    Type = group
+  )
+  cvlong &amp;lt;- data.frame(pos = rep(
+    as.numeric(rownames(df)),
+    2
+  ), name = rep(as.character(df$Role), 2), type = rep(factor(df$Type,
+    ordered = TRUE
+  ), 2), where = rep(
+    as.character(df$Place),
+    2
+  ), value = c(df$Start, df$End), label_pos = rep(df$Start +
+    floor((df$End - df$Start) / 2), 2))
+  maxdate &amp;lt;- max(df$End)
+  p &amp;lt;- ggplot(cvlong, aes(
+    x = value, y = reorder(name, -pos),
+    label = where, group = pos
+  )) + geom_vline(
+    xintercept = maxdate,
+    alpha = 0.8, linetype = &amp;quot;dotted&amp;quot;
+  ) + labs(
+    title = title,
+    subtitle = subtitle, x = NULL, y = NULL, colour = NULL
+  ) +
+    theme_lares2() + theme(panel.background = element_rect(
+      fill = &amp;quot;white&amp;quot;,
+      colour = NA
+    ), axis.ticks = element_blank(), panel.grid.major.x = element_line(
+      size = 0.25,
+      colour = &amp;quot;grey80&amp;quot;
+    ))
+  if (!is.na(cvlong$type)[1] | length(unique(cvlong$type)) &amp;gt;
+    1) {
+    p &amp;lt;- p + geom_line(aes(color = type), size = size) +
+      facet_grid(type ~ ., scales = &amp;quot;free&amp;quot;, space = &amp;quot;free&amp;quot;) +
+      guides(colour = FALSE) +
+      scale_colour_hue()
+  }
+  else {
+    p &amp;lt;- p + geom_line(size = size, colour = colour)
+  }
+  p &amp;lt;- p + geom_label(aes(x = label_pos),
+    colour = &amp;quot;black&amp;quot;,
+    size = 2, alpha = 0.7
+  )
+  if (save) {
+    file_name &amp;lt;- &amp;quot;cv_timeline.png&amp;quot;
+    if (!is.na(subdir)) {
+      dir.create(file.path(getwd(), subdir), recursive = T)
+      file_name &amp;lt;- paste(subdir, file_name, sep = &amp;quot;/&amp;quot;)
+    }
+    p &amp;lt;- p + ggsave(file_name, width = 8, height = 6)
+    message(paste(&amp;quot;Saved plot as&amp;quot;, file_name))
+  }
+  return(p)
+}
+
+order &amp;lt;- c(&amp;quot;Role&amp;quot;, &amp;quot;Place&amp;quot;, &amp;quot;Type&amp;quot;, &amp;quot;Start&amp;quot;, &amp;quot;End&amp;quot;)
+today &amp;lt;- as.character(Sys.Date())
+
+
+### Edit from here ###
+cv &amp;lt;- data.frame(rbind(
+  c(&amp;quot;PhD in Statistics&amp;quot;, &amp;quot;University3&amp;quot;, &amp;quot;Academic&amp;quot;, &amp;quot;2017-09-01&amp;quot;, today),
+  c(&amp;quot;MSc in Econometrics&amp;quot;, &amp;quot;University2&amp;quot;, &amp;quot;Academic&amp;quot;, &amp;quot;2015-09-01&amp;quot;, &amp;quot;2017-08-31&amp;quot;),
+  c(&amp;quot;BSc in Economics&amp;quot;, &amp;quot;University1&amp;quot;, &amp;quot;Academic&amp;quot;, &amp;quot;2010-09-01&amp;quot;, &amp;quot;2013-08-31&amp;quot;),
+  c(&amp;quot;Job title2&amp;quot;, &amp;quot;Company2&amp;quot;, &amp;quot;Work Experience&amp;quot;, &amp;quot;2016-09-01&amp;quot;, today),
+  c(&amp;quot;Job title1&amp;quot;, &amp;quot;Company1&amp;quot;, &amp;quot;Work Experience&amp;quot;, &amp;quot;2013-08-31&amp;quot;, &amp;quot;2015-08-31&amp;quot;),
+  c(&amp;quot;Extra1&amp;quot;, &amp;quot;Place1&amp;quot;, &amp;quot;Extra&amp;quot;, &amp;quot;2015-05-01&amp;quot;, today),
+  c(&amp;quot;Extra2&amp;quot;, &amp;quot;Place2&amp;quot;, &amp;quot;Extra&amp;quot;, &amp;quot;2019-01-01&amp;quot;, today),
+  c(&amp;quot;Extra3&amp;quot;, NA, &amp;quot;Extra&amp;quot;, &amp;quot;2019-12-01&amp;quot;, today)
+))
+### Edit until here ###
+
+
+colnames(cv) &amp;lt;- order
+colour &amp;lt;- c(&amp;quot;red&amp;quot;, &amp;quot;blue&amp;quot;, &amp;quot;green&amp;quot;)
+
+plot_timeline2(
+  event = cv$Role,
+  start = cv$Start,
+  end = cv$End,
+  label = cv$Place,
+  group = cv$Type,
+  save = FALSE,
+  subtitle = &amp;quot;Antoine Soetewey&amp;quot; # replace with your name
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/how-to-construct-a-timeline-of-your-cv-in-r_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;how-to-personalize-it&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;How to personalize it&lt;/h1&gt;
+&lt;p&gt;If you want to edit the example with your own academic, extra and work experiences you basically just have to edit the dataframe called &lt;code&gt;cv&lt;/code&gt; in the code above. Each row of the dataset &lt;code&gt;cv&lt;/code&gt; is a different academic program, job or activity. Rows should include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the name of the academic program, job title or activity&lt;/li&gt;
+&lt;li&gt;the name of the university, school, company or workplace&lt;/li&gt;
+&lt;li&gt;the category: academic, work experience or extra&lt;/li&gt;
+&lt;li&gt;the starting date (dates must be in format &lt;code&gt;yyyy-mm-dd&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;the ending date. If the role has not yet ended, type &lt;code&gt;today&lt;/code&gt; instead of the date. By using &lt;code&gt;today&lt;/code&gt; your CV timeline will automatically adapt to today’s date&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Add or remove a row in the dataframe if you want to add or remove a role. Indicate &lt;code&gt;NA&lt;/code&gt; if you do not want to specify any workplace (as it has been done for &lt;code&gt;Extra3&lt;/code&gt;). Last, do not forget to replace my name with yours for the subtitle of the timeline at the end of the code.&lt;/p&gt;
+&lt;p&gt;Experienced R users may wish to edit the &lt;code&gt;plot_timeline2&lt;/code&gt; function to their needs. However, if you are happy with the template and design of the example, you only have to change things mentioned above.&lt;/p&gt;
+&lt;p&gt;Thanks for reading. I hope this article helped you to create a timeline of your CV in R. If you would like to see a more complete and live example, see &lt;a href=&#34;https://www.antoinesoetewey.com/files/CV_timeline_antoinesoetewey.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;my timeline CV&lt;/a&gt;. See other articles related to R &lt;a href=&#34;/tags/r/&#34;&gt;here&lt;/a&gt;. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raise an issue on GitHub&lt;/a&gt; or &lt;a href=&#34;/contact/&#34;&gt;contact me&lt;/a&gt;. Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;A special thanks to Bernardo Lares for providing the first version of the code.&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Descriptive statistics in R</title>
       <link>/blog/descriptive-statistics-in-r/</link>
       <pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
@@ -1183,19 +1325,6 @@ to learn more about this branch of statistics.&lt;/p&gt;
 &lt;p&gt;All formulas, steps and computations to arrive at the final results are also provided. Note that it is your responsibility to check the validity of your linear model. This app only serves you to compute the results of the linear model given the data but it does not check whether the assumptions are met. Last but not least, you can download a report of the results by clicking on the Download button. You can choose the format of the report (i.e., HTML, PDF or Word) and whether you want to include the R code or not.&lt;/p&gt;
 &lt;p&gt;I hope you will find this app useful to do simple linear regression by hand and in R. See all other articles related to Shiny &lt;a href=&#34;/tags/shiny/&#34;&gt;here&lt;/a&gt;. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raise an issue on GitHub&lt;/a&gt; or &lt;a href=&#34;/contact/&#34;&gt;contact me&lt;/a&gt;. Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>How to create a timeline of your CV in R</title>
-      <link>/blog/how-to-create-a-timeline-of-your-cv-in-r/</link>
-      <pubDate>Wed, 15 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/blog/how-to-create-a-timeline-of-your-cv-in-r/</guid>
-      <description>
-
-
-&lt;p&gt;Thanks for reading. I hope this article helped you to construct a timeline of your CV in R. If you would like to see a live example, see &lt;a href=&#34;https://www.antoinesoetewey.com/files/CV_timeline_antoinesoetewey.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;my timeline CV&lt;/a&gt;. See other articles related to R &lt;a href=&#34;/tags/r/&#34;&gt;here&lt;/a&gt;. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raise an issue on GitHub&lt;/a&gt; or &lt;a href=&#34;/contact/&#34;&gt;contact me&lt;/a&gt;. Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     
