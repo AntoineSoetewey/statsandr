@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title> How to create a timeline of your CV in R - Stats and R </title>
+    <title> Best addins in RStudio, or how to make your coding life easier - Stats and R </title>
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <meta name="referrer" content="no-referrer">
@@ -12,18 +12,18 @@
     <meta property="og:site_name" content="Stats and R" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="/blog/how-to-create-a-timeline-of-your-cv-in-r/" />
-    <meta property="og:title" content="How to create a timeline of your CV in R" />
+    <meta property="og:url" content="/blog/best-addins-in-rstudio-or-how-to-make-your-coding-life-easier/" />
+    <meta property="og:title" content="Best addins in RStudio, or how to make your coding life easier" />
     <meta property="og:image" content="/image/image.png" />
     <meta property="og:description" content="A blog about statistics and its applications in R." />
 
     <meta name="twitter:card" content="summary_large_image" />
     
-    <meta name="twitter:title" content="How to create a timeline of your CV in R" />
+    <meta name="twitter:title" content="Best addins in RStudio, or how to make your coding life easier" />
     <meta name="twitter:description" content="A blog about statistics and its applications in R." />
     <meta name="twitter:image" content="/image/image.png" />
 
-    <link rel="canonical" href="/blog/how-to-create-a-timeline-of-your-cv-in-r/">
+    <link rel="canonical" href="/blog/best-addins-in-rstudio-or-how-to-make-your-coding-life-easier/">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
 
@@ -111,7 +111,7 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-sm-12 col-md-10">
-                    <h1 class="mx-0 mx-md-4 blog-post-title">How to create a timeline of your CV in R</h1>
+                    <h1 class="mx-0 mx-md-4 blog-post-title">Best addins in RStudio, or how to make your coding life easier</h1>
 
                     <div class="mb-md-4 meta">
                         
@@ -127,7 +127,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            5 minute read
+                            4 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -155,133 +155,80 @@
 <div id="TOC">
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#minimal-reproducible-example">Minimal reproducible example</a></li>
-<li><a href="#how-to-personalize-it">How to personalize it</a></li>
+<li><a href="#addins">Addins</a><ul>
+<li><a href="#esquisse">Esquisse</a></li>
+</ul></li>
 </ul>
 </div>
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>In this article, I show how to create a timeline of your CV in R. A CV timeline illustrates key information about your education, work experiences and extra activities. The main advantage of CV timelines compared to regular CV is that they make you stand out immediately by being visually appealing and easier to scan. It also allows you to better present your “story” by showing the chronology of your jobs and activities and thus explain how you got to where you are today.</p>
-<p>We show below how to create such CV in R with a minimal reproducible example. Feel free to use the code and adapt it to you. For a more complete example (together with the code) you can check my own CV timeline <a href="https://www.antoinesoetewey.com/files/CV_timeline_antoinesoetewey.html" target="_blank" rel="noopener">here</a>.</p>
-</div>
-<div id="minimal-reproducible-example" class="section level1">
-<h1>Minimal reproducible example</h1>
-<p>Here is the code and the result of a minimal reproducible example:</p>
-<pre class="r"><code># All packages used below must be installed first
-library(devtools)
-# devtools::install_github(&quot;laresbernardo/lares&quot;)
-library(lares)
-library(ggplot2)
-
-plot_timeline2 &lt;- function(event, start, end = start + 1, label = NA, group = NA,
-                           title = &quot;Curriculum Vitae Timeline&quot;, subtitle = &quot;Antoine Soetewey&quot;,
-                           size = 7, colour = &quot;orange&quot;, save = FALSE, subdir = NA) {
-  df &lt;- data.frame(
-    Role = as.character(event), Place = as.character(label),
-    Start = lubridate::date(start), End = lubridate::date(end),
-    Type = group
-  )
-  cvlong &lt;- data.frame(pos = rep(
-    as.numeric(rownames(df)),
-    2
-  ), name = rep(as.character(df$Role), 2), type = rep(factor(df$Type,
-    ordered = TRUE
-  ), 2), where = rep(
-    as.character(df$Place),
-    2
-  ), value = c(df$Start, df$End), label_pos = rep(df$Start +
-    floor((df$End - df$Start) / 2), 2))
-  maxdate &lt;- max(df$End)
-  p &lt;- ggplot(cvlong, aes(
-    x = value, y = reorder(name, -pos),
-    label = where, group = pos
-  )) + geom_vline(
-    xintercept = maxdate,
-    alpha = 0.8, linetype = &quot;dotted&quot;
-  ) + labs(
-    title = title,
-    subtitle = subtitle, x = NULL, y = NULL, colour = NULL
-  ) +
-    theme_lares2() + theme(panel.background = element_rect(
-      fill = &quot;white&quot;,
-      colour = NA
-    ), axis.ticks = element_blank(), panel.grid.major.x = element_line(
-      size = 0.25,
-      colour = &quot;grey80&quot;
-    ))
-  if (!is.na(cvlong$type)[1] | length(unique(cvlong$type)) &gt;
-    1) {
-    p &lt;- p + geom_line(aes(color = type), size = size) +
-      facet_grid(type ~ ., scales = &quot;free&quot;, space = &quot;free&quot;) +
-      guides(colour = FALSE) +
-      scale_colour_hue()
-  }
-  else {
-    p &lt;- p + geom_line(size = size, colour = colour)
-  }
-  p &lt;- p + geom_label(aes(x = label_pos),
-    colour = &quot;black&quot;,
-    size = 2, alpha = 0.7
-  )
-  if (save) {
-    file_name &lt;- &quot;cv_timeline.png&quot;
-    if (!is.na(subdir)) {
-      dir.create(file.path(getwd(), subdir), recursive = T)
-      file_name &lt;- paste(subdir, file_name, sep = &quot;/&quot;)
-    }
-    p &lt;- p + ggsave(file_name, width = 8, height = 6)
-    message(paste(&quot;Saved plot as&quot;, file_name))
-  }
-  return(p)
-}
-
-order &lt;- c(&quot;Role&quot;, &quot;Place&quot;, &quot;Type&quot;, &quot;Start&quot;, &quot;End&quot;)
-today &lt;- as.character(Sys.Date())
-
-
-### Edit from here ###
-cv &lt;- data.frame(rbind(
-  c(&quot;PhD in Statistics&quot;, &quot;University3&quot;, &quot;Academic&quot;, &quot;2017-09-01&quot;, today),
-  c(&quot;MSc in Econometrics&quot;, &quot;University2&quot;, &quot;Academic&quot;, &quot;2015-09-01&quot;, &quot;2017-08-31&quot;),
-  c(&quot;BSc in Economics&quot;, &quot;University1&quot;, &quot;Academic&quot;, &quot;2010-09-01&quot;, &quot;2013-08-31&quot;),
-  c(&quot;Job title2&quot;, &quot;Company2&quot;, &quot;Work Experience&quot;, &quot;2016-09-01&quot;, today),
-  c(&quot;Job title1&quot;, &quot;Company1&quot;, &quot;Work Experience&quot;, &quot;2013-08-31&quot;, &quot;2015-08-31&quot;),
-  c(&quot;Extra1&quot;, &quot;Place1&quot;, &quot;Extra&quot;, &quot;2015-05-01&quot;, today),
-  c(&quot;Extra2&quot;, &quot;Place2&quot;, &quot;Extra&quot;, &quot;2019-01-01&quot;, today),
-  c(&quot;Extra3&quot;, NA, &quot;Extra&quot;, &quot;2019-12-01&quot;, today)
-))
-### Edit until here ###
-
-
-colnames(cv) &lt;- order
-colour &lt;- c(&quot;red&quot;, &quot;blue&quot;, &quot;green&quot;)
-
-plot_timeline2(
-  event = cv$Role,
-  start = cv$Start,
-  end = cv$End,
-  label = cv$Place,
-  group = cv$Type,
-  save = FALSE,
-  subtitle = &quot;Antoine Soetewey&quot; # replace with your name
-)</code></pre>
-<p><img src="/blog/how-to-construct-a-timeline-of-your-cv-in-r_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-</div>
-<div id="how-to-personalize-it" class="section level1">
-<h1>How to personalize it</h1>
-<p>If you want to edit the example with your own academic, extra and work experiences you basically just have to edit the dataframe called <code>cv</code> in the code above. Each row of the dataset <code>cv</code> is a different academic program, job or activity. Rows should include:</p>
+<p>Although I have been using RStudio for several years, I only recently discovered RStudio addins. Since then, I am using these addins almost every time I open RStudio.</p>
+<p>What are RStudio addins? RStudio addins are extensions which provide a simple mechanism for executing advanced R functions from within RStudio. In simpler words, when executing an addin (by clicking a button in the Addins menu), the corresponding code is directly sent to the console and executed without you having to write the code. If it is still not clear, remember that for importing a dataset in RStudio, you have two options:</p>
 <ul>
-<li>the name of the academic program, job title or activity</li>
-<li>the name of the university, school, company or workplace</li>
-<li>the category: academic, work experience or extra</li>
-<li>the starting date (dates must be in format <code>yyyy-mm-dd</code>)</li>
-<li>the ending date. If the role has not yet ended, type <code>today</code> instead of the date. By using <code>today</code> your CV timeline will automatically adapt to today’s date</li>
+<li>import it by writing code (thanks to the <code>read.csv()</code> function for instance)</li>
+<li>or you can import it by clicking on the “Import Dataset” button in the Environment pane and follow the steps until your dataset is executed in the console and thus your dataset imported</li>
 </ul>
-<p>Add or remove a row in the dataframe if you want to add or remove a role. Indicate <code>NA</code> if you do not want to specify any workplace (as it has been done for <code>Extra3</code>). Last, do not forget to replace my name with yours for the subtitle of the timeline at the end of the code.</p>
-<p>Experienced R users may wish to edit the <code>plot_timeline2</code> function to their needs. However, if you are happy with the template and design of the example, you only have to change things mentioned above.</p>
-<p>Thanks for reading. I hope this article helped you to create a timeline of your CV in R. If you would like to see a more complete and live example, see <a href="https://www.antoinesoetewey.com/files/CV_timeline_antoinesoetewey.html" target="_blank" rel="noopener">my timeline CV</a>. See other articles related to R <a href="/tags/r/">here</a>. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>. Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
-<p><em>A special thanks to Bernardo Lares for providing the first version of the code.</em></p>
+<p>A RStudio addin is exactly like the Import Dataset button but for other common functionalities. So you could write code as you can import a dataset by writing code, but thanks to RStudio addins you can execute code without actually writing the necessary code. By using the RStudio addins, RStudio will run the required code for you. RStudio addins can be as simple as a function that inserts a commonly used snippet of code, and as complex as a Shiny application that accepts input from the user to draw a plot. RStudio addins have the advantage that they allow you to execute complex and advanced code much more easily than if you would have to write it yourself.</p>
+</div>
+<div id="addins" class="section level1">
+<h1>Addins</h1>
+<p>If you are still not convinced, see below a list of the addins I find most useful together with concrete examples. I believe addins are worth trying for all R users. Beginners will have the possibility to use functions that they would not have used otherwise because the code is too complex, whereas advanced users may find them useful to speed up the writing of their code in some circumstances. For other tips in R, see the article “<a href="/blog/tips-and-tricks-in-rstudio-and-r-markdown/">Tips and tricks in RStudio and R Markdown</a>”. Note that the list below is not exhaustive and you are likely to find others useful too depending on what type of analyses you do on RStudio. Feel free to comment at the end of the article to let me know (and other readers) other addins you found worth using.</p>
+<ul>
+<li>Esquisse</li>
+<li>Blogdown</li>
+<li>Questionr</li>
+<li>Remedy</li>
+<li>Snakecaser</li>
+<li>Styler</li>
+</ul>
+<div id="esquisse" class="section level2">
+<h2>Esquisse</h2>
+<p>Esquisse is an addin developed by a French company called dreamRs. Here is how they define it:</p>
+<blockquote>
+<p>This addin allows you to interactively explore your data by visualizing it with the ggplot2 package. It allows you to draw bar plots, curves, scatter plots, histograms, boxplot and sf objects, then export the graph or retrieve the code to reproduce the graph.</p>
+</blockquote>
+<p>With this addin you can easily create beautiful graphs from the <code>{ggplot2}</code> package and the best part according to me is that you can retrieve the code to reproduce the graph. Compared to the default <code>{graphics}</code> package, it is true that graphs from the <code>{ggplot2}</code> package look usually better but the code is also longer and more complex. With this addin, you can draw graphs from the <code>{ggplot2}</code> package by dragging and dropping variables of interest in an user-friendly and interactive window, and then use the generated code in your script.</p>
+<p>For the sake of illustration, let’s say wee want to create a scatter plot of the variables <code>Sepal.Length</code> and <code>Petal.Length</code> of the dataset <code>iris</code> and color the points by the variable <code>Species</code>. For this, follow these steps:</p>
+<ol style="list-style-type: decimal">
+<li>load the dataset:</li>
+</ol>
+<pre class="r"><code>dat &lt;- iris</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>install the package <code>{esquisse}</code>. This must be done only once</li>
+</ol>
+<pre class="r"><code>install.packages(&quot;esquisse&quot;)</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>open the ‘ggplot2’ builder from the RStudio Addins menu:</li>
+</ol>
+<div class="figure">
+<img src="/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier_files/esquisse-RStudio-addin.png" alt="Open ‘ggplot2’ builder from the RStudio addins menu" />
+<p class="caption">Open ‘ggplot2’ builder from the RStudio addins menu</p>
+</div>
+<ol start="4" style="list-style-type: decimal">
+<li>:</li>
+</ol>
+<div class="figure">
+<img src="/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier_files/esquisse-rstudio-addin2.png" alt="Step 4: Select dataset and valide imported data" />
+<p class="caption">Step 4: Select dataset and valide imported data</p>
+</div>
+<ol start="5" style="list-style-type: decimal">
+<li>:</li>
+</ol>
+<div class="figure">
+<img src="/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier_files/esquisse-rstudio-addin3.png" alt="Step 5: Drag and drop the variables in the corresponding areas" />
+<p class="caption">Step 5: Drag and drop the variables in the corresponding areas</p>
+</div>
+<ol start="6" style="list-style-type: decimal">
+<li>:</li>
+</ol>
+<div class="figure">
+<img src="/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier_files/esquisse-rstudio-addin4.png" alt="Step 6:" />
+<p class="caption">Step 6:</p>
+</div>
+<p>RStudio Addins are distributed as R packages. Once you’ve installed an R package that contains addins, they’ll be immediately become available within RStudio.</p>
+<p>Thanks for reading. I hope that you will find these addins useful for your future R-related projects. See other articles related to R <a href="/tags/r/">here</a>. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>. Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
+</div>
 </div>
 
 
@@ -294,15 +241,11 @@ plot_timeline2(
                                 <div class="col-12 col-md-6">
                                     
                                         <div class="mx-0 mx-md-4 mt-4 text-left">
-                                            <a href="/blog/descriptive-statistics-in-r/">« Descriptive statistics in R</a>
+                                            <a href="/blog/how-to-create-a-timeline-of-your-cv-in-r/">« How to create a timeline of your CV in R</a>
                                         </div>
                                     
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    
-                                        <div class="mx-0 mx-md-4 mt-4 text-right">
-                                            <a href="/blog/best-addins-in-rstudio-or-how-to-make-your-coding-life-easier/">Best addins in RStudio, or how to make your coding life easier »</a>
-                                        </div>
                                     
                                 </div>
                             </div>
@@ -366,7 +309,7 @@ plot_timeline2(
 
 
 
-<a href='https://github.com/AntoineSoetewey/statsandr/edit/master/content/blog/how-to-construct-a-timeline-of-your-cv-in-r.Rmd' target="_blank">Edit this page</a>
+<a href='https://github.com/AntoineSoetewey/statsandr/edit/master/content/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier.Rmd' target="_blank">Edit this page</a>
 
 
 
@@ -456,9 +399,6 @@ if (!doNotTrack) {
 
     
         
-<script src="/js/math-code.js"></script>
-<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-
 
     
 </body>
