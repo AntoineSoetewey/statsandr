@@ -17,7 +17,7 @@ If you are new to this blog and to R, I invite you to start with the following a
 
 You can also:
 
-* See [all articles](/blog/) or [articles by categories](/tags/)
+* See [all articles](/blog/) or [articles by categories](/tags/) for more advanced articles
 * Learn more [about me](/about/)
 * [Subscribe to this blog](/subscribe/) to receive updates everytime a new article is published
 

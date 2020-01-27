@@ -6,13 +6,13 @@ The goal of this website is to make statistics easy to understand by illustratin
 
 If you are new to this blog and to R, I invite you to start with the following articles:
 
-* [How to install R and RStudio](/blog/how-to-install-r-and-rstudio/)
-* [How to import an Excel file in RStudio](/blog/how-to-import-an-excel-file-in-rstudio/)
-* [Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/) or [in R](/blog/descriptive-statistics-in-r/)
+* [How to install R and RStudio](https://www.statsandr.com/blog/how-to-install-r-and-rstudio/)
+* [How to import an Excel file in RStudio](https://www.statsandr.com/blog/how-to-import-an-excel-file-in-rstudio/)
+* [Descriptive statistics by hand](https://www.statsandr.com/blog/descriptive-statistics-by-hand/) or [in R](https://www.statsandr.com/blog/descriptive-statistics-in-r/)
 
 You can also:
 
-* See [all articles](https://www.statsandr.com/blog/) or [articles by categories](https://www.statsandr.com/tags/)
+* See [all articles](https://www.statsandr.com/blog/) or [articles by categories](https://www.statsandr.com/tags/) for more advanced articles
 * Learn more [about me](https://www.statsandr.com/about/)
 * [Subscribe to this blog](https://www.statsandr.com/subscribe/) to receive updates everytime a new article is published
 
