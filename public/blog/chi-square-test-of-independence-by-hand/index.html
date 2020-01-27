@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title> Statistics - Stats and R </title>
+    <title> Chi-square test of independence by hand - Stats and R </title>
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <meta name="referrer" content="no-referrer">
@@ -12,18 +12,18 @@
     <meta property="og:site_name" content="Stats and R" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="/tags/statistics/" />
-    <meta property="og:title" content="Statistics" />
-    <meta property="og:image" content="/image/avatar.png" />
+    <meta property="og:url" content="/blog/chi-square-test-of-independence-by-hand/" />
+    <meta property="og:title" content="Chi-square test of independence by hand" />
+    <meta property="og:image" content="/image/image.png" />
     <meta property="og:description" content="A blog about statistics and its applications in R." />
 
     <meta name="twitter:card" content="summary_large_image" />
     
-    <meta name="twitter:title" content="Statistics" />
+    <meta name="twitter:title" content="Chi-square test of independence by hand" />
     <meta name="twitter:description" content="A blog about statistics and its applications in R." />
-    <meta name="twitter:image" content="/image/avatar.png" />
+    <meta name="twitter:image" content="/image/image.png" />
 
-    <link rel="canonical" href="/tags/statistics/">
+    <link rel="canonical" href="/blog/chi-square-test-of-independence-by-hand/">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
 
@@ -45,7 +45,7 @@
 
 <body>
     
-<div class="my-4 my-md-5 header">
+    <div class="my-4 my-md-5 header">
     <div class="container">
         <div class="row">
             <div class="col-auto offset-md-1 d-none d-md-block">
@@ -107,95 +107,120 @@
 </div>
 
 
-<div class="content">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-sm-12 col-md-10">
-                <div class="mx-0 mx-md-4">
-                    <h1>Posts about Statistics</h1>
-                    <hr>
-                    <ul>
-                        
-                        <li class="post-item">
-    <span class="meta">
-    2019-12-30
-    »
-    <a href="/blog/variable-types-and-examples/">Variable types and examples</a>
-    </span>
-</li>
+    <div class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-12 col-md-10">
+                    <h1 class="mx-0 mx-md-4 blog-post-title">Chi-square test of independence by hand</h1>
 
+                    <div class="mb-md-4 meta">
                         
-                        <li class="post-item">
-    <span class="meta">
-    2020-01-06
-    »
-    <a href="/blog/a-guide-on-how-to-read-statistical-tables/">A guide on how to read statistical tables</a>
-    </span>
-</li>
+                            
+                                <span class="author" title="Antoine Soetewey">
+                                    Antoine Soetewey
+                                </span>
+                            
+                        
 
-                        
-                        <li class="post-item">
-    <span class="meta">
-    2020-01-15
-    »
-    <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand/">A Shiny app for inferential statistics by hand</a>
-    </span>
-</li>
+                        <span class="date middot" title='Mon Jan 27 2020 00:00:00 UTC'>
+                            2020-01-27
+                        </span>
 
-                        
-                        <li class="post-item">
-    <span class="meta">
-    2020-01-15
-    »
-    <a href="/blog/a-shiny-app-for-simple-linear-regression-by-hand-and-in-r/">A Shiny app for simple linear regression by hand and in R</a>
-    </span>
-</li>
+                        <span class="reading-time middot">
+                            1 minute read
+                        </span>
 
-                        
-                        <li class="post-item">
-    <span class="meta">
-    2020-01-18
-    »
-    <a href="/blog/descriptive-statistics-by-hand/">Descriptive statistics by hand</a>
-    </span>
-</li>
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/statistics">Statistics</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
 
-                        
-                        <li class="post-item">
-    <span class="meta">
-    2020-01-18
-    »
-    <a href="/blog/what-is-the-difference-between-population-and-sample/">What is the difference between population and sample?</a>
-    </span>
-</li>
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                
+                            </ul>
+                        </div>
+                    </div>
 
+                    <div class="markdown">
                         
-                        <li class="post-item">
-    <span class="meta">
-    2020-01-22
-    »
-    <a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>
-    </span>
-</li>
+    
 
-                        
-                        <li class="post-item">
-    <span class="meta">
-    2020-01-27
-    »
-    <a href="/blog/chi-square-test-of-independence-by-hand/">Chi-square test of independence by hand</a>
-    </span>
-</li>
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+</ul>
+</div>
 
-                        
-                    </ul>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This article explains when and how to perform a chi-square test of independence by hand and how to interpret the results. To learn how to do this test in R, read the article “<a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence in R</a>”.</p>
+</div>
+
+
+
+                    </div>
+
+                    
+                        <div class="navigation">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    
+                                        <div class="mx-0 mx-md-4 mt-4 text-left">
+                                            <a href="/blog/chi-square-test-of-independence-in-r/">« Chi-square test of independence in R</a>
+                                        </div>
+                                    
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="my-4 footer">
+    <section id="comments">
+
+      <div class="py-3 content">
+            <div class="container">
+                  <div class="row justify-content-center">
+                        <div class="col-sm-12 col-md-10">
+                              <div class="comments">
+                                    <div id="disqus_thread"></div>
+                              </div>
+                        </div>
+                  </div>
+            </div>
+      </div>
+
+      <script type="text/javascript">
+            (function () {
+                  
+                  
+                  if (window.location.hostname == "localhost")
+                        return;
+
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'statsandr';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+      </script>
+      <noscript>
+            Please enable JavaScript to view the
+            <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+</section>
+    <div class="my-4 footer">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-sm-12 col-md-5">
@@ -208,6 +233,18 @@
                               <a href="/sitemap/">Sitemap</a>
                               
                               
+
+
+
+
+  
+
+
+
+<a href='https://github.com/AntoineSoetewey/statsandr/edit/master/content/blog/chi-square-test-of-independence-by-hand.Rmd' target="_blank">Edit this page</a>
+
+
+
                               
                             </p>
                             <p>
