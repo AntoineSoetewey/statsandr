@@ -21,6 +21,7 @@ output:
 <li><a href="#numeric">Numeric</a></li>
 <li><a href="#integer">Integer</a></li>
 <li><a href="#character">Character</a></li>
+<li><a href="#factor">Factor</a></li>
 <li><a href="#logical">Logical</a></li>
 </ul>
 </div>
@@ -28,15 +29,16 @@ output:
 <p>This article presents the different data types in R. To learn about the different variable types from a statistical point of view, read “<a href="/blog/variable-types-and-examples/">Variable types and examples</a>”.</p>
 <div id="what-data-types-exist-in-r" class="section level1">
 <h1>What data types exist in R?</h1>
-<p>There are five data types in R:</p>
+<p>There are the 6 most common data types in R:</p>
 <ol style="list-style-type: decimal">
 <li>Numeric</li>
 <li>Integer</li>
 <li>Complex</li>
 <li>Character</li>
+<li>Factor</li>
 <li>Logical</li>
 </ol>
-<p>Datasets in R are often a combination of these 5 different data types. Below we explore in more details each data types one by one, except the data type “complex” as we focus on the main ones and this data type is rarely used in practice.</p>
+<p>Datasets in R are often a combination of these 6 different data types. Below we explore in more details each data types one by one, except the data type “complex” as we focus on the main ones and this data type is rarely used in practice.</p>
 </div>
 <div id="numeric" class="section level1">
 <h1>Numeric</h1>
@@ -106,6 +108,29 @@ char_nospace &lt;- &quot;text&quot;
 char_space == char_nospace</code></pre>
 <pre><code>## [1] FALSE</code></pre>
 <p>As you can see from the results above, a space within character data (i.e., within <code>&quot;&quot;</code>) makes it a different string in R!</p>
+</div>
+<div id="factor" class="section level1">
+<h1>Factor</h1>
+<p>Factor variables are a special case of character variables in the sense that it also contains text. However, factor variables are used when there are a limited number of unique character strings. It often represents a <a href="/blog/variable-types-and-examples/">categorical variable</a>. For instance, the gender will usually take on only two values, “female” or “male” (and will be considered as a factor variable) whereas the name will generally have lots of possibilities (and thus will be considered as a character variable). To create a factor variable use the <code>factor()</code> function:</p>
+<pre class="r"><code>gender &lt;- factor(c(&quot;female&quot;, &quot;female&quot;, &quot;male&quot;, &quot;female&quot;, &quot;male&quot;))
+gender</code></pre>
+<pre><code>## [1] female female male   female male  
+## Levels: female male</code></pre>
+<p>To know the different levels of a factor variable, use <code>levels()</code>:</p>
+<pre class="r"><code>levels(gender)</code></pre>
+<pre><code>## [1] &quot;female&quot; &quot;male&quot;</code></pre>
+<p>By default, the levels are sorted alphabetically. You can reorder the levels with the argument <code>levels</code> in the <code>factor()</code> function:</p>
+<pre class="r"><code>gender &lt;- factor(gender, levels = c(&quot;male&quot;, &quot;female&quot;))
+levels(gender)</code></pre>
+<pre><code>## [1] &quot;male&quot;   &quot;female&quot;</code></pre>
+<p>Character strings can be converted to factors with <code>as.factor()</code>:</p>
+<pre class="r"><code>text &lt;- c(&quot;test1&quot;, &quot;test2&quot;, &quot;test1&quot;, &quot;test1&quot;) # create a character vector
+class(text) # to know the class</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>text_factor &lt;- as.factor(text) # transform to factor
+class(text_factor) # recheck the class</code></pre>
+<pre><code>## [1] &quot;factor&quot;</code></pre>
+<p>The character strings have been transformed to factors, as shown by its class of the type <code>factor</code>.</p>
 </div>
 <div id="logical" class="section level1">
 <h1>Logical</h1>

@@ -18,15 +18,16 @@ This article presents the different data types in R. To learn about the differen
 
 # What data types exist in R?
 
-There are five data types in R:
+There are the 6 most common data types in R:
 
 1. Numeric
 1. Integer
 1. Complex
 1. Character
+1. Factor
 1. Logical
 
-Datasets in R are often a combination of these 5 different data types. Below we explore in more details each data types one by one, except the data type "complex" as we focus on the main ones and this data type is rarely used in practice.
+Datasets in R are often a combination of these 6 different data types. Below we explore in more details each data types one by one, except the data type "complex" as we focus on the main ones and this data type is rarely used in practice.
 
 # Numeric
 
@@ -115,6 +116,39 @@ char_space == char_nospace
 ```
 
 As you can see from the results above, a space within character data (i.e., within `""`) makes it a different string in R!
+
+# Factor
+
+Factor variables are a special case of character variables in the sense that it also contains text. However, factor variables are used when there are a limited number of unique character strings. It often represents a [categorical variable](/blog/variable-types-and-examples/). For instance, the gender will usually take on only two values, "female" or "male" (and will be considered as a factor variable) whereas the name will generally have lots of possibilities (and thus will be considered as a character variable). To create a factor variable use the `factor()` function:
+
+```{r}
+gender <- factor(c("female", "female", "male", "female", "male"))
+gender
+```
+
+To know the different levels of a factor variable, use `levels()`:
+
+```{r}
+levels(gender)
+```
+
+By default, the levels are sorted alphabetically. You can reorder the levels with the argument `levels` in the `factor()` function:
+
+```{r}
+gender <- factor(gender, levels = c("male", "female"))
+levels(gender)
+```
+
+Character strings can be converted to factors with `as.factor()`:
+
+```{r}
+text <- c("test1", "test2", "test1", "test1") # create a character vector
+class(text) # to know the class
+text_factor <- as.factor(text) # transform to factor
+class(text_factor) # recheck the class
+```
+
+The character strings have been transformed to factors, as shown by its class of the type `factor`.
 
 # Logical
 

@@ -2123,6 +2123,7 @@ Thanks in advance for reading!</description>
 &lt;li&gt;&lt;a href=&#34;#numeric&#34;&gt;Numeric&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#integer&#34;&gt;Integer&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#character&#34;&gt;Character&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#factor&#34;&gt;Factor&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#logical&#34;&gt;Logical&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
@@ -2130,15 +2131,16 @@ Thanks in advance for reading!</description>
 &lt;p&gt;This article presents the different data types in R. To learn about the different variable types from a statistical point of view, read “&lt;a href=&#34;/blog/variable-types-and-examples/&#34;&gt;Variable types and examples&lt;/a&gt;”.&lt;/p&gt;
 &lt;div id=&#34;what-data-types-exist-in-r&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;What data types exist in R?&lt;/h1&gt;
-&lt;p&gt;There are five data types in R:&lt;/p&gt;
+&lt;p&gt;There are the 6 most common data types in R:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
 &lt;li&gt;Numeric&lt;/li&gt;
 &lt;li&gt;Integer&lt;/li&gt;
 &lt;li&gt;Complex&lt;/li&gt;
 &lt;li&gt;Character&lt;/li&gt;
+&lt;li&gt;Factor&lt;/li&gt;
 &lt;li&gt;Logical&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;Datasets in R are often a combination of these 5 different data types. Below we explore in more details each data types one by one, except the data type “complex” as we focus on the main ones and this data type is rarely used in practice.&lt;/p&gt;
+&lt;p&gt;Datasets in R are often a combination of these 6 different data types. Below we explore in more details each data types one by one, except the data type “complex” as we focus on the main ones and this data type is rarely used in practice.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;numeric&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Numeric&lt;/h1&gt;
@@ -2208,6 +2210,29 @@ char_nospace &amp;lt;- &amp;quot;text&amp;quot;
 char_space == char_nospace&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] FALSE&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;As you can see from the results above, a space within character data (i.e., within &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt;) makes it a different string in R!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;factor&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Factor&lt;/h1&gt;
+&lt;p&gt;Factor variables are a special case of character variables in the sense that it also contains text. However, factor variables are used when there are a limited number of unique character strings. It often represents a &lt;a href=&#34;/blog/variable-types-and-examples/&#34;&gt;categorical variable&lt;/a&gt;. For instance, the gender will usually take on only two values, “female” or “male” (and will be considered as a factor variable) whereas the name will generally have lots of possibilities (and thus will be considered as a character variable). To create a factor variable use the &lt;code&gt;factor()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gender &amp;lt;- factor(c(&amp;quot;female&amp;quot;, &amp;quot;female&amp;quot;, &amp;quot;male&amp;quot;, &amp;quot;female&amp;quot;, &amp;quot;male&amp;quot;))
+gender&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] female female male   female male  
+## Levels: female male&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To know the different levels of a factor variable, use &lt;code&gt;levels()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;levels(gender)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;female&amp;quot; &amp;quot;male&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;By default, the levels are sorted alphabetically. You can reorder the levels with the argument &lt;code&gt;levels&lt;/code&gt; in the &lt;code&gt;factor()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gender &amp;lt;- factor(gender, levels = c(&amp;quot;male&amp;quot;, &amp;quot;female&amp;quot;))
+levels(gender)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;male&amp;quot;   &amp;quot;female&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Character strings can be converted to factors with &lt;code&gt;as.factor()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;text &amp;lt;- c(&amp;quot;test1&amp;quot;, &amp;quot;test2&amp;quot;, &amp;quot;test1&amp;quot;, &amp;quot;test1&amp;quot;) # create a character vector
+class(text) # to know the class&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;character&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;text_factor &amp;lt;- as.factor(text) # transform to factor
+class(text_factor) # recheck the class&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;factor&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The character strings have been transformed to factors, as shown by its class of the type &lt;code&gt;factor&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;logical&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Logical&lt;/h1&gt;
