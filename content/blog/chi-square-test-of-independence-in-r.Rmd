@@ -13,3 +13,60 @@ output:
     toc_depth: 6
 draft: true
 ---
+
+# Introduction
+
+This article explains how to perform the Chi-square test of independence in R and how to interpret its results. To learn more about how the test works and how to do it by hand, I invite you to read the article "[Chi-square test of independence by hand](/blog/chi-square-test-of-independence-by-hand/)".
+
+To briefly recap what have been said in that article, the Chi-square test of independence tests whether there is a relationship between two categorical variables. The null and alternative hypotheses are:
+
+* $H_0$ : the variables are independent, there is **no** relationship between the two categorical variables. Knowing the value of one variable does not help to predict the value of the other variable
+* $H_1$ : the variables are dependent, there is a relationship between the two categorical variables. Knowing the value of one variable helps to predict the value of the other variable
+
+The Chi-square test of independence works by comparing the observed frequencies (so the frequencies observed in your sample) to the expected frequencies if there was no relationship between the two categorical variables (so the expected frequencies if the null hypothesis was true).
+
+# Example
+
+## Data
+
+For our example, let's reuse the dataset introduced in the article "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)". This dataset is the well-known `iris` dataset slightly enhanced (since there is only categorical variable and the Chi-square test requires two categorical variables). We added the variable `size` which corresponds to `small` if the length of the petal is smaller than the median of all flowers, `big` otherwise:
+
+```{r}
+dat <- iris
+dat$size <- ifelse(dat$Sepal.Length < median(dat$Sepal.Length),
+  "small", "big"
+)
+```
+
+We now create a contingency table of the two variables `Species` and `size` with the `table()` function:
+
+```{r}
+table(dat$Species, dat$size)
+```
+
+The contingency table gives the observed number of cases in each subgroup. For instance, there is only one big setosa flower, while there are 49 small setosa flowers in the dataset.
+
+## Chi-square test of independence
+
+For this example, we are going to test in R if there is a relationship between the variables `Species` and `size`. For this, the `chisq.test()` function is used:
+
+```{r}
+test <- chisq.test(table(dat$Species, dat$size))
+test
+```
+
+Everyting you need appears in this table: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the $p$-value of the test.^[If a warning such as "Chi-squared approximation may be incorrect." appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher's exact test with the function `fisher.test()`. This test is similar to the Chi-square test in terms of hypothesis and interpretation.] You can also retrieve the $\chi^2$ test statistic and the $p$-value with:^[If you need to find the expected frequencies, use `test$expected`.]
+
+```{r}
+test$statistic # test statistic
+test$p.value # p-value
+```
+
+## Conclusion and interpretation
+
+From the table or from `test$p.value` we see that the $p$-value is `r signif(test$p.value, 3)`, which is less than the significance level of 5%. Like any other statistical test, if the $p$-value is less than the significance level, we can reject the null hypothesis.
+<!-- If you are not familiar with $p$-values, I invite you to read this [article](/blog/xxx/).  -->
+
+$\Rightarrow$ Rejecting the null hypothesis for the Chi-square test of independence means that there is a significant relationship between the species and the size. Therefore, knowing the value of one variable helps to predict the value of the other variable
+
+Thanks for reading. I hope the article helped you to perform the Chi-square test of independence in R and interpret its results. If you would like to learn how to do this test by hand, read "[Chi-square test of independence by hand](/blog/chi-square-test-of-independence-by-hand/)". As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/). Get updates every time a new article is published by [subscribing to this blog](/subscribe/).
