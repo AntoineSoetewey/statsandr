@@ -6,148 +6,10 @@
     <description>Recent content in Statistics on Stats and R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Tue, 28 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 27 Jan 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/statistics/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Fisher&#39;s exact test in R: independence test for a small sample</title>
-      <link>/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/</link>
-      <pubDate>Tue, 28 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/</guid>
-      <description>
-
-&lt;div id=&#34;TOC&#34;&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#hypotheses&#34;&gt;Hypotheses&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#example&#34;&gt;Example&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#data&#34;&gt;Data&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#observed-frequencies&#34;&gt;Observed frequencies&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#expected-frequencies&#34;&gt;Expected frequencies&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#fishers-exact-test-in-r&#34;&gt;Fisher’s exact test in R&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#conclusion-and-interpretation&#34;&gt;Conclusion and interpretation&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#references&#34;&gt;References&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-
-&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Introduction&lt;/h1&gt;
-&lt;p&gt;After presenting the &lt;a href=&#34;/blog/chi-square-test-of-independence-by-hand/&#34;&gt;Chi-square test of independence by hand&lt;/a&gt; and &lt;a href=&#34;/blog/chi-square-test-of-independence-in-r/&#34;&gt;in R&lt;/a&gt;, this article focuses on the Fisher’s exact test.&lt;/p&gt;
-&lt;p&gt;Independence tests are used to determine if there is a significant relationship between two categorical variables. There exists two different types of independence test:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;the Chi-square test (the most common)&lt;/li&gt;
-&lt;li&gt;the Fisher’s exact test&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;On the one hand, the Chi-square test is used when the sample is large enough (in this case the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value is an approximation that becomes exact when the sample becomes infinite, which is the case for many statistical tests). On the other hand, the Fisher’s exact test is used when the sample is small (and in this case the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value is exact and is not an approximation).&lt;/p&gt;
-&lt;p&gt;The literature indicates that the usual rule for deciding whether the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; approximation is good enough is that the Chi-square test is not appropriate when the &lt;strong&gt;expected&lt;/strong&gt; values in one of the cells of a contingency table is less than 5, and in this case the Fisher exact test is preferred &lt;span class=&#34;citation&#34;&gt;(McCrum-Gardner 2008; Bower 2003)&lt;/span&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;hypotheses&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Hypotheses&lt;/h1&gt;
-&lt;p&gt;The hypotheses of the Fisher’s exact test are the same than for the Chi-square test, that is:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt; : the variables are independent, there is &lt;strong&gt;no&lt;/strong&gt; relationship between the two categorical variables. Knowing the value of one variable does not help to predict the value of the other variable&lt;/li&gt;
-&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt; : the variables are dependent, there is a relationship between the two categorical variables. Knowing the value of one variable helps to predict the value of the other variable&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div id=&#34;example&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Example&lt;/h1&gt;
-&lt;div id=&#34;data&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Data&lt;/h2&gt;
-&lt;p&gt;For our example, we want to determine whether there is a statistically significant association between smoking and being a professional athlete. Smoking can only be “yes” or “no” and being a professional athlete can only be “yes” or “no”. The two variables of interest are qualitative variables.&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;observed-frequencies&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Observed frequencies&lt;/h2&gt;
-&lt;p&gt;For our example, let’s say that we asked 14 persons their smoking habits and whether they were professional athletes. The answers are summarized in the contingency table below reporting the number of people in each subgroup, totals by row, by column and the grand total:&lt;/p&gt;
-&lt;table style=&#34;width:56%;&#34;&gt;
-&lt;colgroup&gt;
-&lt;col width=&#34;25%&#34; /&gt;
-&lt;col width=&#34;18%&#34; /&gt;
-&lt;col width=&#34;12%&#34; /&gt;
-&lt;/colgroup&gt;
-&lt;thead&gt;
-&lt;tr class=&#34;header&#34;&gt;
-&lt;th align=&#34;center&#34;&gt; &lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;Non-smoker&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;Smoker&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr class=&#34;odd&#34;&gt;
-&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;Athlete&lt;/strong&gt;&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;7&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr class=&#34;even&#34;&gt;
-&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;Non-athlete&lt;/strong&gt;&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;0&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;5&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;div id=&#34;expected-frequencies&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Expected frequencies&lt;/h2&gt;
-&lt;p&gt;Remember that the Fisher’s exact test is used when there is at least one cell in the contingency table of the expected frequencies below 5. To retrieve the expected frequencies, use the &lt;code&gt;chisq.test()&lt;/code&gt; function together with &lt;code&gt;$expected&lt;/code&gt;:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;chisq.test(dat)$expected&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## Warning in chisq.test(dat): Chi-squared approximation may be incorrect&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##             Non-smoker Smoker
-## Athlete            4.5    4.5
-## Non-athlete        2.5    2.5&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The contingency table above confirms that we should use the Fisher’s exact test instead of the Chi-square test because there is at least one cell below 5.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Tip&lt;/em&gt;: although it is a good practice to check the expected frequencies &lt;strong&gt;before&lt;/strong&gt; deciding between the Chi-square and the Fisher test, it is not a big issue if you forget. Indeed, when doing the Chi-square test in R (with &lt;code&gt;chisq.test()&lt;/code&gt;), a warning such as “Chi-squared approximation may be incorrect.” will appear. This warning means that the smallest expected frequencies is lower than 5. Therfore, if you forgot to check the expected frequencies before applying the test to your data, R will warn you that you should use the Fisher’s exact test instead of the Chi-square test.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;fishers-exact-test-in-r&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Fisher’s exact test in R&lt;/h2&gt;
-&lt;p&gt;To perform the Fisher’s exact test in R, use the &lt;code&gt;fisher.test()&lt;/code&gt; function as you would do for the Chi-square test:&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- fisher.test(dat)
-test&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 
-##  Fisher&amp;#39;s Exact Test for Count Data
-## 
-## data:  dat
-## p-value = 0.02098
-## alternative hypothesis: true odds ratio is not equal to 1
-## 95 percent confidence interval:
-##  1.449481      Inf
-## sample estimates:
-## odds ratio 
-##        Inf&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The most important in the output is the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value. You can also retrieve the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value with:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$p.value&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 0.02097902&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;div id=&#34;conclusion-and-interpretation&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Conclusion and interpretation&lt;/h2&gt;
-&lt;p&gt;From the output and from &lt;code&gt;test$p.value&lt;/code&gt; we see that the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value is less than the significance level of 5%. Like any other statistical test, if the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value is less than the significance level, we can reject the null hypothesis.
-&lt;!-- If you are not familiar with $p$-values, I invite you to read this [article](/blog/xxx/).  --&gt;&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math inline&#34;&gt;\(\Rightarrow\)&lt;/span&gt; In our context, rejecting the null hypothesis for the Fisher’s exact test of independence means that there is a significant relationship between the two categorical variables (smoking habits and being an athlete or not). Therefore, knowing the value of one variable helps to predict the value of the other variable.&lt;/p&gt;
-&lt;p&gt;Thanks for reading. I hope the article helped you to perform the Chi-square test of independence in R and interpret its results. If you would like to learn how to do this test by hand, read “&lt;a href=&#34;/blog/chi-square-test-of-independence-by-hand/&#34;&gt;Chi-square test of independence by hand&lt;/a&gt;”. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raise an issue on GitHub&lt;/a&gt; or &lt;a href=&#34;/contact/&#34;&gt;contact me&lt;/a&gt;. Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div id=&#34;references&#34; class=&#34;section level1 unnumbered&#34;&gt;
-&lt;h1&gt;References&lt;/h1&gt;
-&lt;div id=&#34;refs&#34; class=&#34;references&#34;&gt;
-&lt;div id=&#34;ref-bower2003use&#34;&gt;
-&lt;p&gt;Bower, Keith M. 2003. “When to Use Fisher?S Exact Test.” In &lt;em&gt;American Society for Quality, Six Sigma Forum Magazine&lt;/em&gt;, 2:35–37. 4.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;ref-mccrum2008correct&#34;&gt;
-&lt;p&gt;McCrum-Gardner, Evie. 2008. “Which Is the Correct Statistical Test to Use?” &lt;em&gt;British Journal of Oral and Maxillofacial Surgery&lt;/em&gt; 46 (1). Elsevier: 38–41.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&#34;footnotes&#34;&gt;
-&lt;hr /&gt;
-&lt;ol&gt;
-&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;The data are the same than for the article covering the &lt;a href=&#34;/blog/chi-square-test-of-independence-by-hand/&#34;&gt;Chi-square test by hand&lt;/a&gt;, except that some observations have been removed to decrease the sample size.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Use &lt;code&gt;fisher.test(table(dat$variable1, dat$variable2))&lt;/code&gt; if &lt;code&gt;dat&lt;/code&gt; represents the raw data and is not already presented as a contingency table.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/div&gt;
-</description>
-    </item>
     
     <item>
       <title>Chi-square test of independence by hand</title>
@@ -194,11 +56,11 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;example&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Example&lt;/h1&gt;
-&lt;p&gt;For our example, we want to determine whether there is a statistically significant association between smoking and being a professional athlete. Smoking can only be “yes” or “no” and being a professional athlete can only be “yes” or “no”. The two variables of interest are qualitative variables so we need to use a Chi-square test of independence.&lt;/p&gt;
+&lt;p&gt;For our example, we want to determine whether there is a statistically significant association between smoking and being a professional athlete. Smoking can only be “yes” or “no” and being a professional athlete can only be “yes” or “no”. The two variables of interest are qualitative variables so we need to use a Chi-square test of independence, and the data have been collected on 28 persons.&lt;/p&gt;
 &lt;p&gt;Note that we chose binary variables (binary variables = qualitative variables with two levels) for the sake of easiness, but the Chi-square test of independence can also be performed on qualitative variables with more than two levels. For instance, if the variable smoking had three levels: (i) non-smokers, (ii) moderate smokers and (iii) heavy smokers, the steps and the interpretation of the results of the test are similar than with two levels.&lt;/p&gt;
 &lt;div id=&#34;observed-frequencies&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Observed frequencies&lt;/h2&gt;
-&lt;p&gt;For our example, let’s say that we asked 28 persons their smoking habits and whether they were professional athletes. The answers are summarized in the contingency table below reporting the number of people in each subgroup, totals by row, by column and the grand total:&lt;/p&gt;
+&lt;p&gt;Our data are summarized in the contingency table below reporting the number of people in each subgroup, totals by row, by column and the grand total:&lt;/p&gt;
 &lt;table style=&#34;width:68%;&#34;&gt;
 &lt;colgroup&gt;
 &lt;col width=&#34;25%&#34; /&gt;
