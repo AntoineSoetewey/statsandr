@@ -97,10 +97,11 @@
 ## Athlete            4.5    4.5
 ## Non-athlete        2.5    2.5&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The contingency table above confirms that we should use the Fisher’s exact test instead of the Chi-square test because there is at least one cell below 5.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Tip&lt;/em&gt;: although it is a good practice to check the expected frequencies &lt;strong&gt;before&lt;/strong&gt; deciding between the Chi-square and the Fisher test, it is not a big issue if you forget. Indeed, when doing the Chi-square test in R (with &lt;code&gt;chisq.test()&lt;/code&gt;), a warning such as “Chi-squared approximation may be incorrect.” will appear. This warning means that the smallest expected frequencies is lower than 5. Therfore, if you forgot to check the expected frequencies before applying the test to your data, R will warn you that you should use the Fisher’s exact test instead of the Chi-square test.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fishers-exact-test-in-r&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Fisher’s exact test in R&lt;/h2&gt;
-&lt;p&gt;To perform the Fisher’s exact test in R, use the &lt;code&gt;fisher.test()&lt;/code&gt; function:&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;To perform the Fisher’s exact test in R, use the &lt;code&gt;fisher.test()&lt;/code&gt; function as you would do for the Chi-square test:&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- fisher.test(dat)
 test&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
@@ -114,7 +115,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 ## sample estimates:
 ## odds ratio 
 ##        Inf&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Everything you need appears in this output: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value of the test.&lt;a href=&#34;#fn3&#34; class=&#34;footnote-ref&#34; id=&#34;fnref3&#34;&gt;&lt;sup&gt;3&lt;/sup&gt;&lt;/a&gt; You can also retrieve the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; test statistic and the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value with:&lt;/p&gt;
+&lt;p&gt;The most important in the output is the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value. You can also retrieve the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; test statistic and the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value with:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$statistic # test statistic&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## NULL&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$p.value # p-value&lt;/code&gt;&lt;/pre&gt;
@@ -137,7 +138,6 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;ol&gt;
 &lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;The data are the same than for the article covering the &lt;a href=&#34;/blog/chi-square-test-of-independence-by-hand/&#34;&gt;Chi-square test by hand&lt;/a&gt;, except that some observations have been removed to decrease the sample size.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Use &lt;code&gt;fisher.test(table(dat$variable1, dat$variable2))&lt;/code&gt; if &lt;code&gt;dat&lt;/code&gt; represent the raw data and is not already presented as a contingency table.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;If a warning such as “Chi-squared approximation may be incorrect.” appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher’s exact test (which do not have this assumption) with the function &lt;code&gt;fisher.test()&lt;/code&gt;. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
 </description>

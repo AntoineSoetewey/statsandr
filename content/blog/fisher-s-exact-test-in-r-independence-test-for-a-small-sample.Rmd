@@ -69,16 +69,18 @@ chisq.test(dat)$expected
 
 The contingency table above confirms that we should use the Fisher's exact test instead of the Chi-square test because there is at least one cell below 5.
 
+*Tip*: although it is a good practice to check the expected frequencies **before** deciding between the Chi-square and the Fisher test, it is not a big issue if you forget. Indeed, when doing the Chi-square test in R (with `chisq.test()`), a warning such as "Chi-squared approximation may be incorrect." will appear. This warning means that the smallest expected frequencies is lower than 5. Therfore, if you forgot to check the expected frequencies before applying the test to your data, R will warn you that you should use the Fisher's exact test instead of the Chi-square test.
+
 ## Fisher's exact test in R
 
-To perform the Fisher's exact test in R, use the `fisher.test()` function:^[Use `fisher.test(table(dat$variable1, dat$variable2))` if `dat` represent the raw data and is not already presented as a contingency table.] 
+To perform the Fisher's exact test in R, use the `fisher.test()` function as you would do for the Chi-square test:^[Use `fisher.test(table(dat$variable1, dat$variable2))` if `dat` represent the raw data and is not already presented as a contingency table.] 
 
 ```{r}
 test <- fisher.test(dat)
 test
 ```
 
-Everything you need appears in this output: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the $p$-value of the test.^[If a warning such as "Chi-squared approximation may be incorrect." appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher's exact test (which do not have this assumption) with the function `fisher.test()`. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results.] You can also retrieve the $\chi^2$ test statistic and the $p$-value with:
+The most important in the output is the $p$-value. You can also retrieve the $\chi^2$ test statistic and the $p$-value with:
 
 ```{r}
 test$statistic # test statistic

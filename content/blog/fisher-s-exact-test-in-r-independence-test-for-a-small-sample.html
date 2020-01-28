@@ -96,10 +96,11 @@ bibliography: bibliography.bib
 ## Athlete            4.5    4.5
 ## Non-athlete        2.5    2.5</code></pre>
 <p>The contingency table above confirms that we should use the Fisher’s exact test instead of the Chi-square test because there is at least one cell below 5.</p>
+<p><em>Tip</em>: although it is a good practice to check the expected frequencies <strong>before</strong> deciding between the Chi-square and the Fisher test, it is not a big issue if you forget. Indeed, when doing the Chi-square test in R (with <code>chisq.test()</code>), a warning such as “Chi-squared approximation may be incorrect.” will appear. This warning means that the smallest expected frequencies is lower than 5. Therfore, if you forgot to check the expected frequencies before applying the test to your data, R will warn you that you should use the Fisher’s exact test instead of the Chi-square test.</p>
 </div>
 <div id="fishers-exact-test-in-r" class="section level2">
 <h2>Fisher’s exact test in R</h2>
-<p>To perform the Fisher’s exact test in R, use the <code>fisher.test()</code> function:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>To perform the Fisher’s exact test in R, use the <code>fisher.test()</code> function as you would do for the Chi-square test:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
 <pre class="r"><code>test &lt;- fisher.test(dat)
 test</code></pre>
 <pre><code>## 
@@ -113,7 +114,7 @@ test</code></pre>
 ## sample estimates:
 ## odds ratio 
 ##        Inf</code></pre>
-<p>Everything you need appears in this output: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the <span class="math inline">\(p\)</span>-value of the test.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> You can also retrieve the <span class="math inline">\(\chi^2\)</span> test statistic and the <span class="math inline">\(p\)</span>-value with:</p>
+<p>The most important in the output is the <span class="math inline">\(p\)</span>-value. You can also retrieve the <span class="math inline">\(\chi^2\)</span> test statistic and the <span class="math inline">\(p\)</span>-value with:</p>
 <pre class="r"><code>test$statistic # test statistic</code></pre>
 <pre><code>## NULL</code></pre>
 <pre class="r"><code>test$p.value # p-value</code></pre>
@@ -136,6 +137,5 @@ test</code></pre>
 <ol>
 <li id="fn1"><p>The data are the same than for the article covering the <a href="/blog/chi-square-test-of-independence-by-hand/">Chi-square test by hand</a>, except that some observations have been removed to decrease the sample size.<a href="#fnref1" class="footnote-back">↩</a></p></li>
 <li id="fn2"><p>Use <code>fisher.test(table(dat$variable1, dat$variable2))</code> if <code>dat</code> represent the raw data and is not already presented as a contingency table.<a href="#fnref2" class="footnote-back">↩</a></p></li>
-<li id="fn3"><p>If a warning such as “Chi-squared approximation may be incorrect.” appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher’s exact test (which do not have this assumption) with the function <code>fisher.test()</code>. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results.<a href="#fnref3" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
