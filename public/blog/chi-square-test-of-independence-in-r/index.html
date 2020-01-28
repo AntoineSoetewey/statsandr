@@ -173,7 +173,7 @@
 <h1>Example</h1>
 <div id="data" class="section level2">
 <h2>Data</h2>
-<p>For our example, let’s reuse the dataset introduced in the article “<a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>”. This dataset is the well-known <code>iris</code> dataset slightly enhanced (since there is only categorical variable and the Chi-square test requires two categorical variables). We added the variable <code>size</code> which corresponds to <code>small</code> if the length of the petal is smaller than the median of all flowers, <code>big</code> otherwise:</p>
+<p>For our example, let’s reuse the dataset introduced in the article “<a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>”. This dataset is the well-known <code>iris</code> dataset slightly enhanced. Since there is only one categorical variable and the Chi-square test requires two categorical variables, we added the variable <code>size</code> which corresponds to <code>small</code> if the length of the petal is smaller than the median of all flowers, <code>big</code> otherwise:</p>
 <pre class="r"><code>dat &lt;- iris
 dat$size &lt;- ifelse(dat$Sepal.Length &lt; median(dat$Sepal.Length),
   &quot;small&quot;, &quot;big&quot;
@@ -206,26 +206,26 @@ test</code></pre>
 ## 
 ## data:  table(dat$Species, dat$size)
 ## X-squared = 86.035, df = 2, p-value &lt; 2.2e-16</code></pre>
-<p>Everyting you need appears in this table: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the <span class="math inline">\(p\)</span>-value of the test.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> You can also retrieve the <span class="math inline">\(\chi^2\)</span> test statistic and the <span class="math inline">\(p\)</span>-value with:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>Everyting you need appears in this output: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the <span class="math inline">\(p\)</span>-value of the test.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> You can also retrieve the <span class="math inline">\(\chi^2\)</span> test statistic and the <span class="math inline">\(p\)</span>-value with:</p>
 <pre class="r"><code>test$statistic # test statistic</code></pre>
 <pre><code>## X-squared 
 ##  86.03451</code></pre>
 <pre class="r"><code>test$p.value # p-value</code></pre>
 <pre><code>## [1] 2.078944e-19</code></pre>
+<p>If you need to find the expected frequencies, use <code>test$expected</code>.</p>
 </div>
 <div id="conclusion-and-interpretation" class="section level2">
 <h2>Conclusion and interpretation</h2>
-<p>From the table or from <code>test$p.value</code> we see that the <span class="math inline">\(p\)</span>-value is 2.0810^{-19}, which is less than the significance level of 5%. Like any other statistical test, if the <span class="math inline">\(p\)</span>-value is less than the significance level, we can reject the null hypothesis.
+<p>From the table and from <code>test$p.value</code> we see that the <span class="math inline">\(p\)</span>-value is less than the significance level of 5%. Like any other statistical test, if the <span class="math inline">\(p\)</span>-value is less than the significance level, we can reject the null hypothesis.
 <!-- If you are not familiar with $p$-values, I invite you to read this [article](/blog/xxx/).  --></p>
-<p><span class="math inline">\(\Rightarrow\)</span> Rejecting the null hypothesis for the Chi-square test of independence means that there is a significant relationship between the species and the size. Therefore, knowing the value of one variable helps to predict the value of the other variable</p>
+<p><span class="math inline">\(\Rightarrow\)</span> In our context, rejecting the null hypothesis for the Chi-square test of independence means that there is a significant relationship between the species and the size. Therefore, knowing the value of one variable helps to predict the value of the other variable</p>
 <p>Thanks for reading. I hope the article helped you to perform the Chi-square test of independence in R and interpret its results. If you would like to learn how to do this test by hand, read “<a href="/blog/chi-square-test-of-independence-by-hand/">Chi-square test of independence by hand</a>”. As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or <a href="/contact/">contact me</a>. Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
 </div>
 </div>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>If a warning such as “Chi-squared approximation may be incorrect.” appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher’s exact test with the function <code>fisher.test()</code>. This test is similar to the Chi-square test in terms of hypothesis and interpretation.<a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p>If you need to find the expected frequencies, use <code>test$expected</code>.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>If a warning such as “Chi-squared approximation may be incorrect.” appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher’s exact test (which do not have this assumption) with the function <code>fisher.test()</code>. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results.<a href="#fnref1" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 

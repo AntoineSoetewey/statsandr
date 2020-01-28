@@ -11,7 +11,7 @@ output:
   blogdown::html_page:
     toc: true
     toc_depth: 6
-draft: true
+# draft: true
 ---
 
 # Introduction
@@ -29,7 +29,7 @@ The Chi-square test of independence works by comparing the observed frequencies 
 
 ## Data
 
-For our example, let's reuse the dataset introduced in the article "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)". This dataset is the well-known `iris` dataset slightly enhanced (since there is only categorical variable and the Chi-square test requires two categorical variables). We added the variable `size` which corresponds to `small` if the length of the petal is smaller than the median of all flowers, `big` otherwise:
+For our example, let's reuse the dataset introduced in the article "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)". This dataset is the well-known `iris` dataset slightly enhanced. Since there is only one categorical variable and the Chi-square test requires two categorical variables, we added the variable `size` which corresponds to `small` if the length of the petal is smaller than the median of all flowers, `big` otherwise:
 
 ```{r}
 dat <- iris
@@ -68,18 +68,20 @@ test <- chisq.test(table(dat$Species, dat$size))
 test
 ```
 
-Everyting you need appears in this table: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the $p$-value of the test.^[If a warning such as "Chi-squared approximation may be incorrect." appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher's exact test with the function `fisher.test()`. This test is similar to the Chi-square test in terms of hypothesis and interpretation.] You can also retrieve the $\chi^2$ test statistic and the $p$-value with:^[If you need to find the expected frequencies, use `test$expected`.]
+Everyting you need appears in this output: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the $p$-value of the test.^[If a warning such as "Chi-squared approximation may be incorrect." appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher's exact test (which do not have this assumption) with the function `fisher.test()`. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results.] You can also retrieve the $\chi^2$ test statistic and the $p$-value with:
 
 ```{r}
 test$statistic # test statistic
 test$p.value # p-value
 ```
 
+If you need to find the expected frequencies, use `test$expected`.
+
 ## Conclusion and interpretation
 
-From the table or from `test$p.value` we see that the $p$-value is `r signif(test$p.value, 3)`, which is less than the significance level of 5%. Like any other statistical test, if the $p$-value is less than the significance level, we can reject the null hypothesis.
+From the table and from `test$p.value` we see that the $p$-value is less than the significance level of 5%. Like any other statistical test, if the $p$-value is less than the significance level, we can reject the null hypothesis.
 <!-- If you are not familiar with $p$-values, I invite you to read this [article](/blog/xxx/).  -->
 
-$\Rightarrow$ Rejecting the null hypothesis for the Chi-square test of independence means that there is a significant relationship between the species and the size. Therefore, knowing the value of one variable helps to predict the value of the other variable
+$\Rightarrow$ In our context, rejecting the null hypothesis for the Chi-square test of independence means that there is a significant relationship between the species and the size. Therefore, knowing the value of one variable helps to predict the value of the other variable
 
 Thanks for reading. I hope the article helped you to perform the Chi-square test of independence in R and interpret its results. If you would like to learn how to do this test by hand, read "[Chi-square test of independence by hand](/blog/chi-square-test-of-independence-by-hand/)". As always, if you find a mistake/bug or if you have any questions do not hesitate to let me know in the comment section below, <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raise an issue on GitHub</a> or [contact me](/contact/). Get updates every time a new article is published by [subscribing to this blog](/subscribe/).
