@@ -6,6 +6,7 @@ slug: fisher-s-exact-test-in-r-independence-test-for-a-small-sample
 categories: []
 tags:
   - R
+  - Statistics
 meta_img: image/image.png
 # description: Description for the page.
 output:
@@ -27,8 +28,62 @@ Independence tests are used to determine if there is a significant relationship 
 
 On the one hand, the Chi-square test is used when the sample is large enough (in this case the $p$-value is an approximation that becomes exact when the sample becomes infinite, which is the case for many statistical tests). On the other hand, the Fisher's exact test is used when the sample is small (and in this case the $p$-value is exact and is not an approximation).
 
-The literature indicates that the usual rule for deciding whether the $\chi^2$ approximation is good enough is that the Chi-square test is not appropriate when the **expected** values in one of the cells of a contingency table is less than 5, and in this case the Fisher exact test is preferred [@mccrum2008correct; @bower2003use]. Here we use an exact Fisher's test because at least one of the **expected** values in the contingency table is less than 5. The Fisher exact test has the same null and alternative assumptions as the $\chi^2$ independence test, i.e. :
+The literature indicates that the usual rule for deciding whether the $\chi^2$ approximation is good enough is that the Chi-square test is not appropriate when the **expected** values in one of the cells of a contingency table is less than 5, and in this case the Fisher exact test is preferred [@mccrum2008correct; @bower2003use].
+
+# Hypotheses
+
+The hypotheses of the Fisher's exact test are the same than for the Chi-square test, that is:
+
+* $H_0$ : the variables are independent, there is **no** relationship between the two categorical variables. Knowing the value of one variable does not help to predict the value of the other variable
+* $H_1$ : the variables are dependent, there is a relationship between the two categorical variables. Knowing the value of one variable helps to predict the value of the other variable
+
+# Example
+
+## Data
+
+For our example, we want to determine whether there is a statistically significant association between smoking and being a professional athlete. Smoking can only be "yes" or "no" and being a professional athlete can only be "yes" or "no". The two variables of interest are qualitative variables.^[The data are the same than for the article covering the [Chi-square test by hand](/blog/chi-square-test-of-independence-by-hand/), except that some observations have been removed to decrease the sample size.]
+
+## Observed frequencies
+
+For our example, let's say that we asked 14 persons their smoking habits and whether they were professional athletes. The answers are summarized in the contingency table below reporting the number of people in each subgroup, totals by row, by column and the grand total:
+
+```{r, echo = FALSE}
+dat <- data.frame(
+  "smoke_no" = c(14/2, 0/2),
+  "smoke_yes" = c(4/2, 10/2),
+  row.names = c("Athlete", "Non-athlete"),
+  stringsAsFactors = FALSE
+)
+colnames(dat) <- c("Non-smoker", "Smoker")
+library(pander)
+pander(dat)
+```
+
+## Expected frequencies
+
+Remember that the Fisher's exact test is used when there is at least one cell in the contingency table of the expected frequencies below 5. To retrieve the expected frequencies, use the `chisq.test()` function together with `$expected`:
+
+```{r}
+chisq.test(dat)$expected
+```
+
+The contingency table above confirms that we should use the Fisher's exact test instead of the Chi-square test because there is at least one cell below 5.
+
+## Fisher's exact test in R
+
+To perform the Fisher's exact test in R, use the `fisher.test()` function:^[Use `fisher.test(table(dat$variable1, dat$variable2))` if `dat` represent the raw data and is not already presented as a contingency table.] 
+
+```{r}
+test <- fisher.test(dat)
+test
+```
+
+Everything you need appears in this output: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the $p$-value of the test.^[If a warning such as "Chi-squared approximation may be incorrect." appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher's exact test (which do not have this assumption) with the function `fisher.test()`. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results.] You can also retrieve the $\chi^2$ test statistic and the $p$-value with:
+
+```{r}
+test$statistic # test statistic
+test$p.value # p-value
+```
 
 
-Remember that one assumption of the Chi-square test of independence is that the **expected** frequencies in all groups are equal to or greater than 5. 
-
+# References

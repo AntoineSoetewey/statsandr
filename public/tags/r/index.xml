@@ -22,6 +22,14 @@
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#hypotheses&#34;&gt;Hypotheses&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#example&#34;&gt;Example&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#data&#34;&gt;Data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#observed-frequencies&#34;&gt;Observed frequencies&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#expected-frequencies&#34;&gt;Expected frequencies&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#fishers-exact-test-in-r&#34;&gt;Fisher’s exact test in R&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#references&#34;&gt;References&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -34,8 +42,87 @@
 &lt;li&gt;the Fisher’s exact test&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;On the one hand, the Chi-square test is used when the sample is large enough (in this case the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value is an approximation that becomes exact when the sample becomes infinite, which is the case for many statistical tests). On the other hand, the Fisher’s exact test is used when the sample is small (and in this case the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value is exact and is not an approximation).&lt;/p&gt;
-&lt;p&gt;The literature indicates that the usual rule for deciding whether the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; approximation is good enough is that the Chi-square test is not appropriate when the &lt;strong&gt;expected&lt;/strong&gt; values in one of the cells of a contingency table is less than 5, and in this case the Fisher exact test is preferred &lt;span class=&#34;citation&#34;&gt;(McCrum-Gardner 2008; Bower 2003)&lt;/span&gt;. Here we use an exact Fisher’s test because at least one of the &lt;strong&gt;expected&lt;/strong&gt; values in the contingency table is less than 5. The Fisher exact test has the same null and alternative assumptions as the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; independence test, i.e. :&lt;/p&gt;
-&lt;p&gt;Remember that one assumption of the Chi-square test of independence is that the &lt;strong&gt;expected&lt;/strong&gt; frequencies in all groups are equal to or greater than 5.&lt;/p&gt;
+&lt;p&gt;The literature indicates that the usual rule for deciding whether the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; approximation is good enough is that the Chi-square test is not appropriate when the &lt;strong&gt;expected&lt;/strong&gt; values in one of the cells of a contingency table is less than 5, and in this case the Fisher exact test is preferred &lt;span class=&#34;citation&#34;&gt;(McCrum-Gardner 2008; Bower 2003)&lt;/span&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;hypotheses&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Hypotheses&lt;/h1&gt;
+&lt;p&gt;The hypotheses of the Fisher’s exact test are the same than for the Chi-square test, that is:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt; : the variables are independent, there is &lt;strong&gt;no&lt;/strong&gt; relationship between the two categorical variables. Knowing the value of one variable does not help to predict the value of the other variable&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt; : the variables are dependent, there is a relationship between the two categorical variables. Knowing the value of one variable helps to predict the value of the other variable&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Example&lt;/h1&gt;
+&lt;div id=&#34;data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Data&lt;/h2&gt;
+&lt;p&gt;For our example, we want to determine whether there is a statistically significant association between smoking and being a professional athlete. Smoking can only be “yes” or “no” and being a professional athlete can only be “yes” or “no”. The two variables of interest are qualitative variables.&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;observed-frequencies&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Observed frequencies&lt;/h2&gt;
+&lt;p&gt;For our example, let’s say that we asked 14 persons their smoking habits and whether they were professional athletes. The answers are summarized in the contingency table below reporting the number of people in each subgroup, totals by row, by column and the grand total:&lt;/p&gt;
+&lt;table style=&#34;width:56%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;25%&#34; /&gt;
+&lt;col width=&#34;18%&#34; /&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt; &lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Non-smoker&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Smoker&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;Athlete&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;7&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;Non-athlete&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;5&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div id=&#34;expected-frequencies&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Expected frequencies&lt;/h2&gt;
+&lt;p&gt;Remember that the Fisher’s exact test is used when there is at least one cell in the contingency table of the expected frequencies below 5. To retrieve the expected frequencies, use the &lt;code&gt;chisq.test()&lt;/code&gt; function together with &lt;code&gt;$expected&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;chisq.test(dat)$expected&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in chisq.test(dat): Chi-squared approximation may be incorrect&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##             Non-smoker Smoker
+## Athlete            4.5    4.5
+## Non-athlete        2.5    2.5&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The contingency table above confirms that we should use the Fisher’s exact test instead of the Chi-square test because there is at least one cell below 5.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fishers-exact-test-in-r&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fisher’s exact test in R&lt;/h2&gt;
+&lt;p&gt;To perform the Fisher’s exact test in R, use the &lt;code&gt;fisher.test()&lt;/code&gt; function:&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- fisher.test(dat)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Fisher&amp;#39;s Exact Test for Count Data
+## 
+## data:  dat
+## p-value = 0.02098
+## alternative hypothesis: true odds ratio is not equal to 1
+## 95 percent confidence interval:
+##  1.449481      Inf
+## sample estimates:
+## odds ratio 
+##        Inf&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Everything you need appears in this output: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value of the test.&lt;a href=&#34;#fn3&#34; class=&#34;footnote-ref&#34; id=&#34;fnref3&#34;&gt;&lt;sup&gt;3&lt;/sup&gt;&lt;/a&gt; You can also retrieve the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; test statistic and the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value with:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$statistic # test statistic&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## NULL&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$p.value # p-value&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.02097902&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1 unnumbered&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
 &lt;div id=&#34;refs&#34; class=&#34;references&#34;&gt;
 &lt;div id=&#34;ref-bower2003use&#34;&gt;
 &lt;p&gt;Bower, Keith M. 2003. “When to Use Fisher?S Exact Test.” In &lt;em&gt;American Society for Quality, Six Sigma Forum Magazine&lt;/em&gt;, 2:35–37. 4.&lt;/p&gt;
@@ -44,6 +131,14 @@
 &lt;p&gt;McCrum-Gardner, Evie. 2008. “Which Is the Correct Statistical Test to Use?” &lt;em&gt;British Journal of Oral and Maxillofacial Surgery&lt;/em&gt; 46 (1). Elsevier: 38–41.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;The data are the same than for the article covering the &lt;a href=&#34;/blog/chi-square-test-of-independence-by-hand/&#34;&gt;Chi-square test by hand&lt;/a&gt;, except that some observations have been removed to decrease the sample size.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Use &lt;code&gt;fisher.test(table(dat$variable1, dat$variable2))&lt;/code&gt; if &lt;code&gt;dat&lt;/code&gt; represent the raw data and is not already presented as a contingency table.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;If a warning such as “Chi-squared approximation may be incorrect.” appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher’s exact test (which do not have this assumption) with the function &lt;code&gt;fisher.test()&lt;/code&gt;. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
 &lt;/div&gt;
 </description>
     </item>
@@ -61,7 +156,7 @@
 &lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#example&#34;&gt;Example&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#data&#34;&gt;Data&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#chi-square-test-of-independence&#34;&gt;Chi-square test of independence&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#chi-square-test-of-independence-in-r&#34;&gt;Chi-square test of independence in R&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#conclusion-and-interpretation&#34;&gt;Conclusion and interpretation&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -104,8 +199,8 @@ ggplot(dat) +
  theme_minimal()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/chi-square-test-of-independence-in-r_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
-&lt;div id=&#34;chi-square-test-of-independence&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Chi-square test of independence&lt;/h2&gt;
+&lt;div id=&#34;chi-square-test-of-independence-in-r&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Chi-square test of independence in R&lt;/h2&gt;
 &lt;p&gt;For this example, we are going to test in R if there is a relationship between the variables &lt;code&gt;Species&lt;/code&gt; and &lt;code&gt;size&lt;/code&gt;. For this, the &lt;code&gt;chisq.test()&lt;/code&gt; function is used:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- chisq.test(table(dat$Species, dat$size))
 test&lt;/code&gt;&lt;/pre&gt;
@@ -114,7 +209,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 ## 
 ## data:  table(dat$Species, dat$size)
 ## X-squared = 86.035, df = 2, p-value &amp;lt; 2.2e-16&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Everyting you need appears in this output: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value of the test.&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt; You can also retrieve the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; test statistic and the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value with:&lt;/p&gt;
+&lt;p&gt;Everything you need appears in this output: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value of the test.&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt; You can also retrieve the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; test statistic and the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value with:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$statistic # test statistic&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## X-squared 
 ##  86.03451&lt;/code&gt;&lt;/pre&gt;

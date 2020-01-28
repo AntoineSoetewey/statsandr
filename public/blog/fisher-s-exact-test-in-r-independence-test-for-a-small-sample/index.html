@@ -127,7 +127,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            2 minute read
+                            4 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -135,6 +135,10 @@
                                 
                                     <li class="d-inline middot">
                                         <a href="/tags/r">R</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/statistics">Statistics</a>
                                     </li>
                                 
                             </ul>
@@ -155,6 +159,14 @@
 <div id="TOC">
 <ul>
 <li><a href="#introduction">Introduction</a></li>
+<li><a href="#hypotheses">Hypotheses</a></li>
+<li><a href="#example">Example</a><ul>
+<li><a href="#data">Data</a></li>
+<li><a href="#observed-frequencies">Observed frequencies</a></li>
+<li><a href="#expected-frequencies">Expected frequencies</a></li>
+<li><a href="#fishers-exact-test-in-r">Fisher’s exact test in R</a></li>
+</ul></li>
+<li><a href="#references">References</a></li>
 </ul>
 </div>
 
@@ -167,8 +179,87 @@
 <li>the Fisher’s exact test</li>
 </ul>
 <p>On the one hand, the Chi-square test is used when the sample is large enough (in this case the <span class="math inline">\(p\)</span>-value is an approximation that becomes exact when the sample becomes infinite, which is the case for many statistical tests). On the other hand, the Fisher’s exact test is used when the sample is small (and in this case the <span class="math inline">\(p\)</span>-value is exact and is not an approximation).</p>
-<p>The literature indicates that the usual rule for deciding whether the <span class="math inline">\(\chi^2\)</span> approximation is good enough is that the Chi-square test is not appropriate when the <strong>expected</strong> values in one of the cells of a contingency table is less than 5, and in this case the Fisher exact test is preferred <span class="citation">(McCrum-Gardner 2008; Bower 2003)</span>. Here we use an exact Fisher’s test because at least one of the <strong>expected</strong> values in the contingency table is less than 5. The Fisher exact test has the same null and alternative assumptions as the <span class="math inline">\(\chi^2\)</span> independence test, i.e. :</p>
-<p>Remember that one assumption of the Chi-square test of independence is that the <strong>expected</strong> frequencies in all groups are equal to or greater than 5.</p>
+<p>The literature indicates that the usual rule for deciding whether the <span class="math inline">\(\chi^2\)</span> approximation is good enough is that the Chi-square test is not appropriate when the <strong>expected</strong> values in one of the cells of a contingency table is less than 5, and in this case the Fisher exact test is preferred <span class="citation">(McCrum-Gardner 2008; Bower 2003)</span>.</p>
+</div>
+<div id="hypotheses" class="section level1">
+<h1>Hypotheses</h1>
+<p>The hypotheses of the Fisher’s exact test are the same than for the Chi-square test, that is:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span> : the variables are independent, there is <strong>no</strong> relationship between the two categorical variables. Knowing the value of one variable does not help to predict the value of the other variable</li>
+<li><span class="math inline">\(H_1\)</span> : the variables are dependent, there is a relationship between the two categorical variables. Knowing the value of one variable helps to predict the value of the other variable</li>
+</ul>
+</div>
+<div id="example" class="section level1">
+<h1>Example</h1>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>For our example, we want to determine whether there is a statistically significant association between smoking and being a professional athlete. Smoking can only be “yes” or “no” and being a professional athlete can only be “yes” or “no”. The two variables of interest are qualitative variables.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+</div>
+<div id="observed-frequencies" class="section level2">
+<h2>Observed frequencies</h2>
+<p>For our example, let’s say that we asked 14 persons their smoking habits and whether they were professional athletes. The answers are summarized in the contingency table below reporting the number of people in each subgroup, totals by row, by column and the grand total:</p>
+<table style="width:56%;">
+<colgroup>
+<col width="25%" />
+<col width="18%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Non-smoker</th>
+<th align="center">Smoker</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Athlete</strong></td>
+<td align="center">7</td>
+<td align="center">2</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Non-athlete</strong></td>
+<td align="center">0</td>
+<td align="center">5</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="expected-frequencies" class="section level2">
+<h2>Expected frequencies</h2>
+<p>Remember that the Fisher’s exact test is used when there is at least one cell in the contingency table of the expected frequencies below 5. To retrieve the expected frequencies, use the <code>chisq.test()</code> function together with <code>$expected</code>:</p>
+<pre class="r"><code>chisq.test(dat)$expected</code></pre>
+<pre><code>## Warning in chisq.test(dat): Chi-squared approximation may be incorrect</code></pre>
+<pre><code>##             Non-smoker Smoker
+## Athlete            4.5    4.5
+## Non-athlete        2.5    2.5</code></pre>
+<p>The contingency table above confirms that we should use the Fisher’s exact test instead of the Chi-square test because there is at least one cell below 5.</p>
+</div>
+<div id="fishers-exact-test-in-r" class="section level2">
+<h2>Fisher’s exact test in R</h2>
+<p>To perform the Fisher’s exact test in R, use the <code>fisher.test()</code> function:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<pre class="r"><code>test &lt;- fisher.test(dat)
+test</code></pre>
+<pre><code>## 
+##  Fisher&#39;s Exact Test for Count Data
+## 
+## data:  dat
+## p-value = 0.02098
+## alternative hypothesis: true odds ratio is not equal to 1
+## 95 percent confidence interval:
+##  1.449481      Inf
+## sample estimates:
+## odds ratio 
+##        Inf</code></pre>
+<p>Everything you need appears in this output: the title of the test, what variables have been used, the test statistic, the degrees of freedom and the <span class="math inline">\(p\)</span>-value of the test.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> You can also retrieve the <span class="math inline">\(\chi^2\)</span> test statistic and the <span class="math inline">\(p\)</span>-value with:</p>
+<pre class="r"><code>test$statistic # test statistic</code></pre>
+<pre><code>## NULL</code></pre>
+<pre class="r"><code>test$p.value # p-value</code></pre>
+<pre><code>## [1] 0.02097902</code></pre>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
 <div id="refs" class="references">
 <div id="ref-bower2003use">
 <p>Bower, Keith M. 2003. “When to Use Fisher?S Exact Test.” In <em>American Society for Quality, Six Sigma Forum Magazine</em>, 2:35–37. 4.</p>
@@ -177,6 +268,14 @@
 <p>McCrum-Gardner, Evie. 2008. “Which Is the Correct Statistical Test to Use?” <em>British Journal of Oral and Maxillofacial Surgery</em> 46 (1). Elsevier: 38–41.</p>
 </div>
 </div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>The data are the same than for the article covering the <a href="/blog/chi-square-test-of-independence-by-hand/">Chi-square test by hand</a>, except that some observations have been removed to decrease the sample size.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>Use <code>fisher.test(table(dat$variable1, dat$variable2))</code> if <code>dat</code> represent the raw data and is not already presented as a contingency table.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>If a warning such as “Chi-squared approximation may be incorrect.” appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either: (i) gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or (ii) use the Fisher’s exact test (which do not have this assumption) with the function <code>fisher.test()</code>. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+</ol>
 </div>
 
 
