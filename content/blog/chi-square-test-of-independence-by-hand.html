@@ -33,7 +33,7 @@ draft: true
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Chi-square tests of independence test whether two <a href="/blog/variable-types-and-examples/#qualitative">qualitative variables</a> are independent, that is, whether there exists a relationship between the two variables of interest. In other words, this test is used to determine whether the values of one of the qualitative variables depend on the values of the other qualitative variable.</p>
+<p>Chi-square tests of independence test whether two <a href="/blog/variable-types-and-examples/#qualitative">qualitative variables</a> are independent, that is, whether there exists a relationship between two categorical variables. In other words, this test is used to determine whether the values of one of the 2 qualitative variables depend on the values of the other qualitative variable.</p>
 <p>If the test shows no association between the two variables (i.e., the variables are independent), it means that knowing the value of one variable gives no information about the value of the other variable. On the contrary, if the test shows a relationship between the variables (i.e., the variables are dependent), it means that knowing the value of one variable provides information about the value of the other variable.</p>
 <p>This article focuses on how to perform a Chi-square test of independence by hand and how to interpret the results with a concrete example. To learn how to do this test in R, read the article “<a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence in R</a>”.</p>
 </div>
@@ -47,9 +47,9 @@ draft: true
 </div>
 <div id="how-the-test-works" class="section level1">
 <h1>How the test works?</h1>
-<p>The Chi-square test of independence works by comparing the observed frequencies (so the frequencies observed in your sample) to the frequencies expected if there was no relationship between the two categorical variables (so the expected frequencies if the null hypothesis was true).</p>
+<p>The Chi-square test of independence works by comparing the observed frequencies (so the frequencies observed in your sample) to the expected frequencies if there was no relationship between the two categorical variables (so the expected frequencies if the null hypothesis was true).</p>
 <p>If the difference between the observed frequencies and the expected frequencies is <strong>small</strong>, we cannot reject the null hypothesis of independence and thus we cannot reject the fact that the two <strong>variables are not related</strong>. On the other hand, if the difference between the observed frequencies and the expected frequencies is <strong>large</strong>, we can reject the null hypothesis of independence and thus we can conclude that the two <strong>variables are related</strong>.</p>
-<p>The threshold between a small and large difference is a value that comes from the Chi-square distribution (hence the name of the test). This value, often referred as the critical value, depends on the significance level <span class="math inline">\(\alpha\)</span> (usually set equal to 5%) and on the degrees of freedom. This critical value can be found in the statistical table of the Chi-square distribution. More on this critical value and the degrees of freedom later in the article.</p>
+<p>The threshold between a small and large difference is a value that comes from the Chi-square distribution (hence the name of the test). This value, referred as the critical value, depends on the significance level <span class="math inline">\(\alpha\)</span> (usually set equal to 5%) and on the degrees of freedom. This critical value can be found in the statistical table of the Chi-square distribution. More on this critical value and the degrees of freedom later in the article.</p>
 </div>
 <div id="example" class="section level1">
 <h1>Example</h1>
@@ -97,9 +97,9 @@ draft: true
 </div>
 <div id="expected-frequencies" class="section level2">
 <h2>Expected frequencies</h2>
-<p>Remember that for the Chi-square test of independence we need to determine whether the observed counts of athletes by smoking habits is significantly different from the counts that we would expect if there was no association between the two variables. We have the observed counts, so we now need to compute the expected counts in the case the variables were independent. These expected frequencies are computed for each subgroup one by one with the following formula:</p>
+<p>Remember that for the Chi-square test of independence we need to determine whether the observed counts are significantly different from the counts that we would expect if there was no association between the two variables. We have the observed counts (see the table above), so we now need to compute the expected counts in the case the variables were independent. These expected frequencies are computed for each subgroup one by one with the following formula:</p>
 <p><span class="math display">\[\text{expected frequencies} = \frac{\text{total # of obs. for the row} \cdot \text{total # of obs. for the column}}{\text{total number of observations}}\]</span></p>
-<p>Given our table of observed frequencies above, below is the table of the expected frequencies computed for each subgroup:</p>
+<p>where obs. correspond to observations. Given our table of observed frequencies above, below is the table of the expected frequencies computed for each subgroup:</p>
 <table style="width:94%;">
 <colgroup>
 <col width="25%" />
@@ -136,10 +136,12 @@ draft: true
 </tr>
 </tbody>
 </table>
+<p>Note that the Chi-square test of independence should only be done when the expected frequencies in all groups are equal to or greater than 5. This assumption is met for our example as the minimum number of expected frequencies is 5.
+<!-- If the condition is not met, the [Fisher's exact test](/blog/xxx/) is preferred. --></p>
 </div>
 <div id="test-statistic" class="section level2">
 <h2>Test statistic</h2>
-<p>We have the observed and expected frequencies. We now need to compare these frequencies to determine whether they significantly differ. The difference between the frequencies, referred as the test statistic (or t-stat) and denoted <span class="math inline">\(\chi^2\)</span>, is computed as follows:</p>
+<p>We have the observed and expected frequencies. We now need to compare these frequencies to determine if they differ significantly. The difference between the observed and expected frequencies, referred as the test statistic (or t-stat) and denoted <span class="math inline">\(\chi^2\)</span>, is computed as follows:</p>
 <p><span class="math display">\[\chi^2 = \sum_{i, j} \frac{\big(O_{ij} - E_{ij}\big)^2}{E_{ij}}\]</span></p>
 <p>where <span class="math inline">\(O\)</span> represents the observed frequencies and <span class="math inline">\(E\)</span> the expected frequencies. We use the square of the differences between the observed and expected frequencies to make sure that negative differences are not compensated by positive differencies. The formula looks more complex than what it really is, so let’s compute this test statistic for our example. We first compute the difference in each subgroug one by one according to the formula:</p>
 <ul>

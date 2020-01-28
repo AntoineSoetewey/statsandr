@@ -36,7 +36,7 @@
 
 &lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Introduction&lt;/h1&gt;
-&lt;p&gt;Chi-square tests of independence test whether two &lt;a href=&#34;/blog/variable-types-and-examples/#qualitative&#34;&gt;qualitative variables&lt;/a&gt; are independent, that is, whether there exists a relationship between the two variables of interest. In other words, this test is used to determine whether the values of one of the qualitative variables depend on the values of the other qualitative variable.&lt;/p&gt;
+&lt;p&gt;Chi-square tests of independence test whether two &lt;a href=&#34;/blog/variable-types-and-examples/#qualitative&#34;&gt;qualitative variables&lt;/a&gt; are independent, that is, whether there exists a relationship between two categorical variables. In other words, this test is used to determine whether the values of one of the 2 qualitative variables depend on the values of the other qualitative variable.&lt;/p&gt;
 &lt;p&gt;If the test shows no association between the two variables (i.e., the variables are independent), it means that knowing the value of one variable gives no information about the value of the other variable. On the contrary, if the test shows a relationship between the variables (i.e., the variables are dependent), it means that knowing the value of one variable provides information about the value of the other variable.&lt;/p&gt;
 &lt;p&gt;This article focuses on how to perform a Chi-square test of independence by hand and how to interpret the results with a concrete example. To learn how to do this test in R, read the article “&lt;a href=&#34;/blog/chi-square-test-of-independence-in-r/&#34;&gt;Chi-square test of independence in R&lt;/a&gt;”.&lt;/p&gt;
 &lt;/div&gt;
@@ -50,9 +50,9 @@
 &lt;/div&gt;
 &lt;div id=&#34;how-the-test-works&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;How the test works?&lt;/h1&gt;
-&lt;p&gt;The Chi-square test of independence works by comparing the observed frequencies (so the frequencies observed in your sample) to the frequencies expected if there was no relationship between the two categorical variables (so the expected frequencies if the null hypothesis was true).&lt;/p&gt;
+&lt;p&gt;The Chi-square test of independence works by comparing the observed frequencies (so the frequencies observed in your sample) to the expected frequencies if there was no relationship between the two categorical variables (so the expected frequencies if the null hypothesis was true).&lt;/p&gt;
 &lt;p&gt;If the difference between the observed frequencies and the expected frequencies is &lt;strong&gt;small&lt;/strong&gt;, we cannot reject the null hypothesis of independence and thus we cannot reject the fact that the two &lt;strong&gt;variables are not related&lt;/strong&gt;. On the other hand, if the difference between the observed frequencies and the expected frequencies is &lt;strong&gt;large&lt;/strong&gt;, we can reject the null hypothesis of independence and thus we can conclude that the two &lt;strong&gt;variables are related&lt;/strong&gt;.&lt;/p&gt;
-&lt;p&gt;The threshold between a small and large difference is a value that comes from the Chi-square distribution (hence the name of the test). This value, often referred as the critical value, depends on the significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; (usually set equal to 5%) and on the degrees of freedom. This critical value can be found in the statistical table of the Chi-square distribution. More on this critical value and the degrees of freedom later in the article.&lt;/p&gt;
+&lt;p&gt;The threshold between a small and large difference is a value that comes from the Chi-square distribution (hence the name of the test). This value, referred as the critical value, depends on the significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; (usually set equal to 5%) and on the degrees of freedom. This critical value can be found in the statistical table of the Chi-square distribution. More on this critical value and the degrees of freedom later in the article.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;example&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Example&lt;/h1&gt;
@@ -100,9 +100,9 @@
 &lt;/div&gt;
 &lt;div id=&#34;expected-frequencies&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Expected frequencies&lt;/h2&gt;
-&lt;p&gt;Remember that for the Chi-square test of independence we need to determine whether the observed counts of athletes by smoking habits is significantly different from the counts that we would expect if there was no association between the two variables. We have the observed counts, so we now need to compute the expected counts in the case the variables were independent. These expected frequencies are computed for each subgroup one by one with the following formula:&lt;/p&gt;
+&lt;p&gt;Remember that for the Chi-square test of independence we need to determine whether the observed counts are significantly different from the counts that we would expect if there was no association between the two variables. We have the observed counts (see the table above), so we now need to compute the expected counts in the case the variables were independent. These expected frequencies are computed for each subgroup one by one with the following formula:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\text{expected frequencies} = \frac{\text{total # of obs. for the row} \cdot \text{total # of obs. for the column}}{\text{total number of observations}}\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Given our table of observed frequencies above, below is the table of the expected frequencies computed for each subgroup:&lt;/p&gt;
+&lt;p&gt;where obs. correspond to observations. Given our table of observed frequencies above, below is the table of the expected frequencies computed for each subgroup:&lt;/p&gt;
 &lt;table style=&#34;width:94%;&#34;&gt;
 &lt;colgroup&gt;
 &lt;col width=&#34;25%&#34; /&gt;
@@ -139,10 +139,12 @@
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
+&lt;p&gt;Note that the Chi-square test of independence should only be done when the expected frequencies in all groups are equal to or greater than 5. This assumption is met for our example as the minimum number of expected frequencies is 5.
+&lt;!-- If the condition is not met, the [Fisher&#39;s exact test](/blog/xxx/) is preferred. --&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;test-statistic&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Test statistic&lt;/h2&gt;
-&lt;p&gt;We have the observed and expected frequencies. We now need to compare these frequencies to determine whether they significantly differ. The difference between the frequencies, referred as the test statistic (or t-stat) and denoted &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt;, is computed as follows:&lt;/p&gt;
+&lt;p&gt;We have the observed and expected frequencies. We now need to compare these frequencies to determine if they differ significantly. The difference between the observed and expected frequencies, referred as the test statistic (or t-stat) and denoted &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt;, is computed as follows:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\chi^2 = \sum_{i, j} \frac{\big(O_{ij} - E_{ij}\big)^2}{E_{ij}}\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(O\)&lt;/span&gt; represents the observed frequencies and &lt;span class=&#34;math inline&#34;&gt;\(E\)&lt;/span&gt; the expected frequencies. We use the square of the differences between the observed and expected frequencies to make sure that negative differences are not compensated by positive differencies. The formula looks more complex than what it really is, so let’s compute this test statistic for our example. We first compute the difference in each subgroug one by one according to the formula:&lt;/p&gt;
 &lt;ul&gt;
@@ -499,7 +501,7 @@ sort(tab, decreasing = TRUE) # sort highest to lowest&lt;/code&gt;&lt;/pre&gt;
 ##   versicolor  29    21
 ##   virginica   47     3&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The contingency table gives the number of cases in each subgroup. For instance, there is only one big setosa flower, while there are 49 small setosa flowers in the dataset.
-&lt;!-- To go further, we can see from the table that setosa flowers seem to be larger than virginica flowers. In order to check whether size is significantly associated with species, we could perform a test of independence. Read this [article](/blog/xxx/) for more information about this kind of statistical test. --&gt;
+&lt;!-- To go further, we can see from the table that setosa flowers seem to be larger than virginica flowers. In order to check whether size is significantly associated with species, we could perform a Chi-square test of independence since both variables are categorical variables. See how to do this test [by hand](/blog/chi-square-test-of-independence-by-hand/) and [in R](/blog/chi-square-test-of-independence-in-r/) --&gt;
 Note that &lt;code&gt;Species&lt;/code&gt; are in rows and &lt;code&gt;size&lt;/code&gt; in column because we specified &lt;code&gt;Species&lt;/code&gt; and then &lt;code&gt;size&lt;/code&gt; in &lt;code&gt;table()&lt;/code&gt;. Change the order if you want to switch the two variables.&lt;/p&gt;
 &lt;p&gt;Instead of having the frequencies (i.e.. the number of cases) you can also have the relative frequencies in each subgroup by adding the &lt;code&gt;table()&lt;/code&gt; function inside the &lt;code&gt;prop.table()&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;prop.table(table(dat$Species, dat$size))&lt;/code&gt;&lt;/pre&gt;
