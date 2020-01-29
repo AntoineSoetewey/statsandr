@@ -19,10 +19,63 @@
       <guid>/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/</guid>
       <description>
 
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#empirical-rule&#34;&gt;Empirical rule&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#parameters&#34;&gt;Parameters&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#characteristics&#34;&gt;Characteristics&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#probabilities-and-quantiles&#34;&gt;Probabilities and quantiles&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#references&#34;&gt;References&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
 
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Many natural phenomena in real life can be approximated by a bell-shaped frequency distribution known as a normal distribution or the Gaussian distribution.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;empirical-rule&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Empirical rule&lt;/h1&gt;
+&lt;p&gt;Data possessing an approximately normal distribution have a definite variation, as expressed by the following empirical rule:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\mu \pm \sigma\)&lt;/span&gt; includes approximately 68% of the observations&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\mu \pm 2 \cdot \sigma\)&lt;/span&gt; includes approximately 95% of the observations&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\mu \pm 3 \cdot \sigma\)&lt;/span&gt; includes almost all of the observations (99.7% to be more precise)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;embed src=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Empirical_Rule-normal-distribution.webp&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Normal distribution: empirical rule. Source: Wikipedia&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\sigma\)&lt;/span&gt; correspond to the population mean and population standard deviation, respectively.&lt;/p&gt;
+&lt;p&gt;The empirical rule is illustred by the following 2 examples. Suppose that the scores of an exam in statistics given to all students in a Belgian university are known to have, approximately, a normal distribution with mean &lt;span class=&#34;math inline&#34;&gt;\(\mu = 67\)&lt;/span&gt; and standard deviation &lt;span class=&#34;math inline&#34;&gt;\(\sigma = 9\)&lt;/span&gt;. It can then be deduced that approximately 68% of the scores are between 58 and 76, that approximately 95% of the scores are between 49 and 85, and that almost all of the scores (99.7%) are between 40 and 94. Thus, knowing the mean and the standard deviation gives us a fairly good picture of the distribution of scores. Now suppose that a single university student is randomly selected from those who took the exam. What is the probability that her score will be between 49 and 85? Based on the empirical rule, we find that 0.95 is a reasonable answer to this probability question.&lt;/p&gt;
+&lt;p&gt;The utility and value of the empirical rule are due to the common occurrence of approximately normal distributions of measurements in nature. For example, IQ, shoe size, height, birth weight, etc. are approximately normally-distributed. You will find that approximately 95% of these measurements will be within &lt;span class=&#34;math inline&#34;&gt;\(2\sigma\)&lt;/span&gt; of their mean &lt;span class=&#34;citation&#34;&gt;(Wackerly, Mendenhall, and Scheaffer 2014)&lt;/span&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;parameters&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Parameters&lt;/h1&gt;
+&lt;p&gt;The normal distribution has two parameters: (i) the mean &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt; and (ii) the variance &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2\)&lt;/span&gt; (the square of the standard deviation &lt;span class=&#34;math inline&#34;&gt;\(\sigma\)&lt;/span&gt;). The mean &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt; locates the center of the distribution and the variance &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2\)&lt;/span&gt; measures its spread.&lt;/p&gt;
+&lt;p&gt;The mean &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt; can take on any finite value, whereas the variance &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2\)&lt;/span&gt; can assume any positive finite value (i.e., &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2 &amp;gt; 0\)&lt;/span&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;characteristics&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Characteristics&lt;/h1&gt;
+&lt;p&gt;A normal distribution is mount-shaped, unimodal and symmetric around the mean.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;probabilities-and-quantiles&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Probabilities and quantiles&lt;/h1&gt;
+&lt;p&gt;Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions &lt;code&gt;pnorm()&lt;/code&gt; and &lt;code&gt;qnorm()&lt;/code&gt;. Probabilities associated with a normal distribution can also be found using this &lt;a href=&#34;https://antoinesoetewey.shinyapps.io/statistics-101/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Shiny app&lt;/a&gt; (select the normal distribution).&lt;/p&gt;
+&lt;p&gt;Although there are infinitely many normal distributions (since there is a normal distribution for every mean and variance), we need only one table: the &lt;strong&gt;standard normal distribution&lt;/strong&gt;. A normal random variable &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; can always be transformed to a standard normal random variable &lt;span class=&#34;math inline&#34;&gt;\(Z\)&lt;/span&gt; by using the formula:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Z = \frac{X - \mu}{\sigma}\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;Thanks for reading. I hope the article helped you to learn more about the normal distribution and how to test for normality in R. See other articles in &lt;a href=&#34;/tag/statistics&#34;&gt;statistics&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;As always, if you have a statistical question related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1 unnumbered&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;div id=&#34;refs&#34; class=&#34;references&#34;&gt;
+&lt;div id=&#34;ref-wackerly2014mathematical&#34;&gt;
+&lt;p&gt;Wackerly, Dennis, William Mendenhall, and Richard L Scheaffer. 2014. &lt;em&gt;Mathematical Statistics with Applications&lt;/em&gt;. Cengage Learning.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 </description>
     </item>
     
@@ -149,7 +202,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;h1&gt;References&lt;/h1&gt;
 &lt;div id=&#34;refs&#34; class=&#34;references&#34;&gt;
 &lt;div id=&#34;ref-bower2003use&#34;&gt;
-&lt;p&gt;Bower, Keith M. 2003. “When to Use Fisher?S Exact Test.” In &lt;em&gt;American Society for Quality, Six Sigma Forum Magazine&lt;/em&gt;, 2:35–37. 4.&lt;/p&gt;
+&lt;p&gt;Bower, Keith M. 2003. “When to Use Fisher’s Exact Test.” In &lt;em&gt;American Society for Quality, Six Sigma Forum Magazine&lt;/em&gt;, 2:35–37. 4.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;ref-mccrum2008correct&#34;&gt;
 &lt;p&gt;McCrum-Gardner, Evie. 2008. “Which Is the Correct Statistical Test to Use?” &lt;em&gt;British Journal of Oral and Maxillofacial Surgery&lt;/em&gt; 46 (1). Elsevier: 38–41.&lt;/p&gt;
@@ -3754,9 +3807,9 @@ dat &amp;lt;- read.spss(
 Thanks in advance for contacting me. In order for me to answer you as soon as possible, here are the best communication methods:
 
 &lt;ul&gt;
-  &lt;li&gt;If you have a statistical question related to an article, please add it as a comment so other readers can benefit from the discussion.&lt;/li&gt;
-  &lt;li&gt;For mistakes or bugs, please inform me about it by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. Note that the code for all articles of this blog can be found on &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub&lt;/a&gt;.&lt;/li&gt;
-  &lt;li&gt;For all other requests, please use the contact form below.&lt;/li&gt;
+  &lt;li&gt;If you have a statistical question related to an article, please add it as a comment so other readers can benefit from the discussion&lt;/li&gt;
+  &lt;li&gt;For mistakes or bugs, please inform me about it by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. Note that the code for all articles of this blog can be found on &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;For all other requests, please use the contact form below&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;form action=&#34;https://formspree.io/xeqeqgzb&#34; method=&#34;POST&#34;&gt;
