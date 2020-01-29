@@ -10,7 +10,7 @@ draft: true
 1. [Spread the word](#word)
 1. [Recommendations](#recommendations)
 
-Running and maintaining a blog is not free unfortunately ([Shiny app](/tags/shiny/) servers being the biggest expense). There are several ways you can contribute to this blog.
+Running and maintaining a blog is not free unfortunately ([Shiny app](/tags/shiny/) servers being the biggest expense). There are several ways you can contribute to this blog. Any help will be greatly appreciated!
 
 <a name="donation"></a>
 ## Donation
