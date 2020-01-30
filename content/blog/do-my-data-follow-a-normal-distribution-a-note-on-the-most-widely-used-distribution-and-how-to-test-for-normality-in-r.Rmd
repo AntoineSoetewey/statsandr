@@ -18,6 +18,12 @@ draft: true
 bibliography: bibliography.bib
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center"
+)
+```
+
 # What is a normal distribution?
 
 The normal distribution is a function that defines how a set of measurements is distributed around the center of these measurements (i.e., the mean). Many natural phenomena in real life can be approximated by a bell-shaped frequency distribution known as a normal distribution or the Gaussian distribution.
@@ -50,7 +56,7 @@ The mean $\mu$ can take on any finite value, whereas the variance $\sigma^2$ can
 
 For instance, see how the shapes of the normal distributions vary when the two parameters change:
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
 library(ggplot2)
 library(reshape2)
 
@@ -71,13 +77,13 @@ ggplot(dat) +
  labs(title = "Normal distributions with different means", fill = "Distributions", subtitle = "Variance = 16") +
  theme_minimal()
 
-dat <- data.frame(Normal_dist1 = rnorm(1000000, mean = 100, sd = 4),
-                  Normal_dist2 = rnorm(1000000, mean = 100, sd = 5),
-                  Normal_dist3 = rnorm(1000000, mean = 100, sd = 6))
+dat <- data.frame(Normal_dist1 = rnorm(1000000, mean = 100, sd = 3),
+                  Normal_dist2 = rnorm(1000000, mean = 100, sd = 6),
+                  Normal_dist3 = rnorm(1000000, mean = 100, sd = 10))
 
-names(dat) <- c("variance = 16",
-                "variance = 25",
-                "variance = 36")
+names(dat) <- c("variance = 9",
+                "variance = 36",
+                "variance = 100")
 
 dat <- melt(dat)
 ggplot(dat) +
@@ -88,17 +94,29 @@ ggplot(dat) +
  theme_minimal()
 ```
 
+As you can see on the second graph, when the variance (or the standard deviation) decreases, the observations are closer to the mean. On the contrary, when the variance (or standard deviation) increases, it is more likely that observations will be further away from the mean.
+
 A random variable $X$ which follows a normal distribution with a mean of 430 and a variance of 17 is denoted $X ~ \sim \mathcal{N}(\mu = 430, \sigma^2 = 17)$.
+
+We have seen that, although different normal distributions have different shapes, all normal distributions have common characteristics:
+
+* They are symmetric, 50% of the population is above the mean and 50% of the population is below the mean
+* The mean, median and mode are equal
+* The empirical rule detailed earlier is applicable to all normal distributions
 
 # Probabilities and quantiles
 
-Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions `pnorm()` and `qnorm()`. Probabilities associated with a normal distribution can also be found using this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank" rel="noopener">Shiny app</a> (select the normal distribution).
+Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions `pnorm()` and `qnorm()`. Probabilities associated with a normal distribution can also be found using this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank" rel="noopener">Shiny app</a>.
 
-Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table: the **standard normal distribution**. A normal random variable $X$ can always be transformed to a standard normal random variable $Z$, a process known as "scaling" or "standardization", by using the formula:
+Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table: the **standard normal distribution**. The normal standard distribution is a special case of the normal distribution where the mean is equal to 0 and the variance is equal to 1. A normal random variable $X$ can always be transformed to a standard normal random variable $Z$, a process known as "scaling" or "standardization", by substracting the mean from the observation, and dividing the result by the standard deviation. Formally:
 
 $$Z = \frac{X - \mu}{\sigma}$$
 
-From this formula, we see that $Z$ allows to see how far away is one single observation from the mean of all observations, with the distance expressed in standard deviations. The mean of the standard normal distribution is 0, and its standard deviation is 1, $Z ~ \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)$.
+So the mean of the standard normal distribution is 0, and its variance is 1, denoted $Z ~ \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)$. From this formula, we see that $Z$, referred as standard score or $Z$ score, allows to see how far away one specific observation is from the mean of all observations, with the distance expressed in standard deviations. In other words, the $Z$ score corresponds to the number of standard deviations one observation is away from the mean. A positive $Z$ score means that the specific observation is above the mean, whereas a negative $Z$ score means that the specific observation is below the mean. $Z$ scores are often used to compare an individual to her peers.
+
+For instance, suppose a student scoring 60 at a statistics exam with the mean score of the class being 40, and scoring 60 at an economics exam with the mean score of the class being 80 (assume the standard deviations are the same for both exams). Given the "raw" scores, one would say that the student performed as well in statistics as in economics. However, taking into consideration her peers, the student performed relatively better in statistics than in economics. Computing $Z$ scores allows to take into consideration all other students (i.e., the entire distribution) and gives a better measure of comparison.
+
+Furthermore, $Z$ score also enables to compare observations that would otherwise be difficult because they have different units for example. Suppose you want to compare a salary in € with a weight in kg. Without standardization, there is no way to conclude whether someone is more extreme in terms of her wage or in terms of her weight. 
 
 ## Examples in R and by hand
 
