@@ -21,20 +21,39 @@ bibliography: bibliography.bib
 
 <div id="TOC">
 <ul>
-<li><a href="#introduction">Introduction</a></li>
+<li><a href="#what-is-a-normal-distribution">What is a normal distribution?</a></li>
 <li><a href="#empirical-rule">Empirical rule</a></li>
 <li><a href="#parameters">Parameters</a></li>
-<li><a href="#characteristics">Characteristics</a></li>
 <li><a href="#probabilities-and-quantiles">Probabilities and quantiles</a><ul>
-<li><a href="#examples-in-r-and-by-hand">Examples in R and by hand</a></li>
+<li><a href="#examples-in-r-and-by-hand">Examples in R and by hand</a><ul>
+<li><a href="#ex.-1">Ex. 1</a><ul>
+<li><a href="#in-r">In R</a></li>
+<li><a href="#by-hand">By hand</a></li>
+</ul></li>
+<li><a href="#ex.-2">Ex. 2</a><ul>
+<li><a href="#in-r-1">In R</a></li>
+<li><a href="#by-hand-1">By hand</a></li>
+</ul></li>
+<li><a href="#ex.-3">Ex. 3</a><ul>
+<li><a href="#in-r-2">In R</a></li>
+<li><a href="#by-hand-2">By hand</a></li>
+</ul></li>
+<li><a href="#ex.-4">Ex. 4</a><ul>
+<li><a href="#in-r-3">In R</a></li>
+<li><a href="#by-hand-3">By hand</a></li>
+</ul></li>
+<li><a href="#ex.-5">Ex. 5</a></li>
+</ul></li>
 </ul></li>
 <li><a href="#references">References</a></li>
 </ul>
 </div>
 
-<div id="introduction" class="section level1">
-<h1>Introduction</h1>
-<p>Many natural phenomena in real life can be approximated by a bell-shaped frequency distribution known as a normal distribution or the Gaussian distribution.</p>
+<div id="what-is-a-normal-distribution" class="section level1">
+<h1>What is a normal distribution?</h1>
+<p>The normal distribution is a function that defines how a set of measurements is distributed around the center of these measurements (i.e., the mean). Many natural phenomena in real life can be approximated by a bell-shaped frequency distribution known as a normal distribution or the Gaussian distribution.</p>
+<p>The normal distribution is a mount-shaped, unimodal and symmetric distribution where most measurements gather around the mean. Moreover, the further a measure deviates from the mean, the lower the probability. In this sense, for a given variable, it is common to find values close to the mean, but less and less likely to have values as we move away from the mean. Last but not least, since the normal distribution is symmetric around its mean, extreme values in both tails of the distribution are equivalently unlikely. For instance, given that adult height follows a normal distribution, most adults are close to the average height and extremely short adults occur as infrequently as extremely tall adults.</p>
+<p>In this article, the focus is on understanding the normal distribution, the associated empirical rule, its parameters and how to compute <span class="math inline">\(Z\)</span>-scores to find probabilities (illustrated with examples). As it is a requirement in many statistical tests, we also show 3 complementary methods to test the normality assumption in R.</p>
 </div>
 <div id="empirical-rule" class="section level1">
 <h1>Empirical rule</h1>
@@ -54,73 +73,147 @@ bibliography: bibliography.bib
 </div>
 <div id="parameters" class="section level1">
 <h1>Parameters</h1>
-<p>The normal distribution has two parameters: (i) the mean <span class="math inline">\(\mu\)</span> and (ii) the variance <span class="math inline">\(\sigma^2\)</span> (the square of the standard deviation <span class="math inline">\(\sigma\)</span>). The mean <span class="math inline">\(\mu\)</span> locates the center of the distribution and the variance <span class="math inline">\(\sigma^2\)</span> measures its spread.</p>
-<p>The mean <span class="math inline">\(\mu\)</span> can take on any finite value, whereas the variance <span class="math inline">\(\sigma^2\)</span> can assume any positive finite value (i.e., <span class="math inline">\(\sigma^2 &gt; 0\)</span>).</p>
+<p>Like many probability distributions, the shape and probabilities of the normal distribution is defined entirely by some parameters. The normal distribution has two parameters: (i) the <a href="/blog/descriptive-statistics-by-hand/#mean/">mean <span class="math inline">\(\mu\)</span></a> and (ii) the <a href="/blog/descriptive-statistics-by-hand/#variance/">variance <span class="math inline">\(\sigma^2\)</span></a> (the square of the <a href="/blog/descriptive-statistics-by-hand/#standard-deviation/">standard deviation <span class="math inline">\(\sigma\)</span></a>). The mean <span class="math inline">\(\mu\)</span> locates the center of the distribution, that is, the central tendency of the observations, and the variance <span class="math inline">\(\sigma^2\)</span> measures its spread.</p>
+<p>The mean <span class="math inline">\(\mu\)</span> can take on any finite value, whereas the variance <span class="math inline">\(\sigma^2\)</span> can assume any positive finite value (i.e., <span class="math inline">\(\sigma^2 &gt; 0\)</span>). The shape of the normal distribution changes based on these two parameters. Since there is an infinite number of combinations of the mean and variance, there is an infinite number of normal distributions, and thus an infinite number of forms.</p>
+<pre><code>## No id variables; using all as measure variables</code></pre>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 <p>A random variable <span class="math inline">\(X\)</span> which follows a normal distribution with a mean of 430 and a variance of 17 is denoted <span class="math inline">\(X ~ \sim \mathcal{N}(\mu = 430, \sigma^2 = 17)\)</span>.</p>
-</div>
-<div id="characteristics" class="section level1">
-<h1>Characteristics</h1>
-<p>A normal distribution is mount-shaped, unimodal and symmetric around the mean.</p>
 </div>
 <div id="probabilities-and-quantiles" class="section level1">
 <h1>Probabilities and quantiles</h1>
 <p>Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions <code>pnorm()</code> and <code>qnorm()</code>. Probabilities associated with a normal distribution can also be found using this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank" rel="noopener">Shiny app</a> (select the normal distribution).</p>
-<p>Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table: the <strong>standard normal distribution</strong>. A normal random variable <span class="math inline">\(X\)</span> can always be transformed to a standard normal random variable <span class="math inline">\(Z\)</span>, a process known as “scaling”, by using the formula:</p>
+<p>Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table: the <strong>standard normal distribution</strong>. A normal random variable <span class="math inline">\(X\)</span> can always be transformed to a standard normal random variable <span class="math inline">\(Z\)</span>, a process known as “scaling” or “standardization”, by using the formula:</p>
 <p><span class="math display">\[Z = \frac{X - \mu}{\sigma}\]</span></p>
 <p>From this formula, we see that <span class="math inline">\(Z\)</span> allows to see how far away is one single observation from the mean of all observations, with the distance expressed in standard deviations. The mean of the standard normal distribution is 0, and its standard deviation is 1, <span class="math inline">\(Z ~ \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)\)</span>.</p>
 <div id="examples-in-r-and-by-hand" class="section level2">
 <h2>Examples in R and by hand</h2>
-<p>Let <span class="math inline">\(Z\)</span> denote a normal random variable with mean 0 and standard deviation 1.</p>
-<ol style="list-style-type: decimal">
-<li>Find <span class="math inline">\(P(Z &gt; 1)\)</span></li>
-</ol>
+<p><em>Note that there are several ways to arrive at the solution in the following exercises. You may therefore use other steps than the ones presented to obtain the same result.</em></p>
+<div id="ex.-1" class="section level3">
+<h3>Ex. 1</h3>
+<p>Let <span class="math inline">\(Z\)</span> denote a normal random variable with mean 0 and standard deviation 1, find <span class="math inline">\(P(Z &gt; 1)\)</span>.</p>
 <p>We actually look for the shaded area in the following figure:</p>
 <div class="figure">
 <img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot%202020-01-30%20at%2014.18.54.png" alt="Standard normal distribution: P(Z &gt; 1)" style="width:100.0%" />
 <p class="caption">Standard normal distribution: <span class="math inline">\(P(Z &gt; 1)\)</span></p>
 </div>
-<p><strong>In R:</strong></p>
+<div id="in-r" class="section level4">
+<h4>In R</h4>
 <pre class="r"><code>pnorm(1,
       mean = 0,
       sd = 1, # sd stands for standard deviation
       lower.tail = FALSE)</code></pre>
 <pre><code>## [1] 0.1586553</code></pre>
 <p>We look for the probability of <span class="math inline">\(Z\)</span> being larger than 1 so we set the argument <code>lower.tail = FALSE</code>. The default <code>lower.tail = TRUE</code> would give the result for <span class="math inline">\(P(Z &lt; 1)\)</span>. Note that <span class="math inline">\(P(Z = 1) = 0\)</span> so writing <span class="math inline">\(P(Z &gt; 1)\)</span> or <span class="math inline">\(P(Z \ge 1)\)</span> is equivalent.</p>
-<p><strong>By hand:</strong></p>
-<p>To compute probabilities by hand, we need to refer to the standard normal distribution table shown below:</p>
-<div class="figure">
-<img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot%202020-01-30%20at%2015.07.44.png" alt="Standard normal distribution table. Source: Wackerly et al. (2014)." style="width:100.0%" />
-<p class="caption">Standard normal distribution table. Source: Wackerly et al. (2014).</p>
 </div>
-<ol start="2" style="list-style-type: decimal">
-<li>Find <span class="math inline">\(P(−1 \le Z \le 1)\)</span></li>
-</ol>
+<div id="by-hand" class="section level4">
+<h4>By hand</h4>
+<p>See that the random variable <span class="math inline">\(Z\)</span> has already a mean of 0 and a standard deviation of 1, so no transformation is required. To find the probabilities by hand, we need to refer to the standard normal distribution table shown below:</p>
+<div class="figure">
+<img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot%202020-01-30%20at%2015.07.44.png" alt="Standard normal distribution table (Wackerly, Mendenhall, and Scheaffer 2014)." style="width:100.0%" />
+<p class="caption">Standard normal distribution table <span class="citation">(Wackerly, Mendenhall, and Scheaffer 2014)</span>.</p>
+</div>
+<p>From the illustration at the top of the table, we see that the values inside the table correspond to the area under the normal curve <strong>above</strong> a certain <span class="math inline">\(z\)</span>. Since we are looking precisely at the probability above <span class="math inline">\(z = 1\)</span> (since we look for <span class="math inline">\(P(Z &gt; 1)\)</span>), we can simply proceed down the first (<span class="math inline">\(z\)</span>) column in the table until <span class="math inline">\(z = 1.0\)</span>. The probability is 0.1587. Thus, <span class="math inline">\(P(Z &gt; 1) = 0.1587\)</span>. This is similar to what we found using R, except that values in the table are rounded to 4 digits.</p>
+</div>
+</div>
+<div id="ex.-2" class="section level3">
+<h3>Ex. 2</h3>
+<p>Let <span class="math inline">\(Z\)</span> denote a normal random variable with mean 0 and standard deviation 1, find <span class="math inline">\(P(−1 \le Z \le 1)\)</span>.</p>
 <p>We are looking for the shaded area in the following figure:</p>
 <div class="figure">
 <img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot%202020-01-30%20at%2014.19.14.png" alt="Standard normal distribution: P(−1 \le Z \le 1)" style="width:100.0%" />
 <p class="caption">Standard normal distribution: <span class="math inline">\(P(−1 \le Z \le 1)\)</span></p>
 </div>
-<p><strong>In R:</strong></p>
+<div id="in-r-1" class="section level4">
+<h4>In R</h4>
 <pre class="r"><code>pnorm(1, lower.tail = TRUE) - pnorm(-1, lower.tail = TRUE)</code></pre>
 <pre><code>## [1] 0.6826895</code></pre>
 <p>Note that the arguments by default for the mean and the standard deviation are <code>mean = 0</code> and <code>sd = 1</code>. Since this is what we need, we can omit them.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
-<ol start="3" style="list-style-type: decimal">
-<li>Find <span class="math inline">\(P(0 \le Z \le 1.37)\)</span></li>
+</div>
+<div id="by-hand-1" class="section level4">
+<h4>By hand</h4>
+<p>For this exercise we proceed by steps:</p>
+<ol style="list-style-type: decimal">
+<li>The shaded area corresponds to the entire area under the normal curve minus the two white areas in both tails of the curve.</li>
+<li>We know that the normal distribution is symmetric.</li>
+<li>Therefore, the shaded area is the entire area under the curve minus two times the white area in the right tail of the curve (the white area in the right tail of the curve being <span class="math inline">\(P(Z &gt; 1)\)</span>).</li>
+<li>We also know that the entire area under the normal curve is 1.</li>
+<li>Thus, the shaded area is 1 minus 2 times <span class="math inline">\(P(Z &gt; 1)\)</span>:</li>
 </ol>
+<p><span class="math display">\[P(−1 \le Z \le 1) = 1 - 2 \cdot P(Z &gt; 1) = 1 - 2 \cdot 0.1587 = 0.6826\]</span></p>
+<p>where <span class="math inline">\(P(Z &gt; 1) = 0.1587\)</span> has been found in the previous exercise.</p>
+</div>
+</div>
+<div id="ex.-3" class="section level3">
+<h3>Ex. 3</h3>
+<p>Let <span class="math inline">\(Z\)</span> denote a normal random variable with mean 0 and standard deviation 1, find <span class="math inline">\(P(0 \le Z \le 1.37)\)</span>.</p>
 <p>We are looking for the shaded area in the following figure:</p>
 <div class="figure">
 <img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot%202020-01-30%20at%2014.19.46.png" alt="Standard normal distribution: P(0 \le Z \le 1.37)" style="width:100.0%" />
 <p class="caption">Standard normal distribution: <span class="math inline">\(P(0 \le Z \le 1.37)\)</span></p>
 </div>
-<p><strong>In R:</strong></p>
+<div id="in-r-2" class="section level4">
+<h4>In R</h4>
 <pre class="r"><code>pnorm(0, lower.tail = FALSE) - pnorm(1.37, lower.tail = FALSE)</code></pre>
 <pre><code>## [1] 0.4146565</code></pre>
-<ol start="4" style="list-style-type: decimal">
-<li>See another example in a context <a href="/blog/a-guide-on-how-to-read-statistical-tables/#example/">here</a></li>
+</div>
+<div id="by-hand-2" class="section level4">
+<h4>By hand</h4>
+<p>Again we proceed by steps for this exercise:</p>
+<ol style="list-style-type: decimal">
+<li>We know that <span class="math inline">\(P(Z &gt; 0) = 0.5\)</span> since the entire area under the curve is 1, half of it is 0.5.</li>
+<li>The shaded area is half of the entire area under the curve minus the area from 1.37 to infinity.</li>
+<li>The area under the curve from 1.37 to infinity corresponds to <span class="math inline">\(P(Z &gt; 1.37)\)</span>.</li>
+<li>Therefore, the shaded area is <span class="math inline">\(0.5 - P(Z &gt; 1.37)\)</span>.</li>
+<li>To find <span class="math inline">\(P(Z &gt; 1.37)\)</span>, proceed down the <span class="math inline">\(z\)</span> column in the table to the entry 1.3 and then across the top of the table to the column labeled .07 to read <span class="math inline">\(P(Z &gt; 1.37) = .0853\)</span></li>
+<li>Thus,</li>
 </ol>
+<p><span class="math display">\[P(0 \le Z \le 1.37) = P(Z &gt; 0) - P(Z &gt; 1.37) = 0.5 - 0.0853 = 0.4147\]</span></p>
+</div>
+</div>
+<div id="ex.-4" class="section level3">
+<h3>Ex. 4</h3>
+<p>Recap the example presented in the empirical rule: Suppose that the scores of an exam in statistics given to all students in a Belgian university are known to have a normal distribution with mean <span class="math inline">\(\mu = 67\)</span> and standard deviation <span class="math inline">\(\sigma = 9\)</span>. What fraction of the scores lies between 70 and 80?</p>
+<p>We are looking for the shaded area in the following figure:</p>
+<div class="figure">
+<img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot%202020-01-30%20at%2016.24.30.png" alt="P(70 \le X \le 80) where X \sim \mathcal{N}(\mu = 67, \sigma^2 = 9^2)" style="width:100.0%" />
+<p class="caption"><span class="math inline">\(P(70 \le X \le 80)\)</span> where <span class="math inline">\(X \sim \mathcal{N}(\mu = 67, \sigma^2 = 9^2)\)</span></p>
+</div>
+<div id="in-r-3" class="section level4">
+<h4>In R</h4>
+<pre class="r"><code>pnorm(70, mean = 67, sd = 9, lower.tail = FALSE) - pnorm(80, mean = 67, sd = 9, lower.tail = FALSE)</code></pre>
+<pre><code>## [1] 0.2951343</code></pre>
+</div>
+<div id="by-hand-3" class="section level4">
+<h4>By hand</h4>
+<p>Remind that we are looking for <span class="math inline">\(P(70 \le X \le 80)\)</span> where <span class="math inline">\(X \sim \mathcal{N}(\mu = 67, \sigma^2 = 9^2)\)</span>. The random variable <span class="math inline">\(X\)</span> is in its “raw” format, meaning that it has not been standardized yet since the mean is 67 and the variance is <span class="math inline">\(9^2\)</span>. We thus need to first apply the transformation to standardize the endpoints 70 and 80 with the following formula:</p>
+<p><span class="math display">\[Z = \frac{X - \mu}{\sigma}\]</span></p>
+<p>After the standardization, <span class="math inline">\(x = 70\)</span> becomes (in terms of <span class="math inline">\(z\)</span>, so in terms of deviation from the mean expressed in standard deviation):</p>
+<p><span class="math display">\[z = \frac{70 - 67}{9} = 0.3333\]</span></p>
+<p>and <span class="math inline">\(x = 80\)</span> becomes:</p>
+<p><span class="math display">\[z = \frac{80 - 67}{9} = 1.4444\]</span></p>
+<p>The figure above in terms of <span class="math inline">\(X\)</span> is now in terms of <span class="math inline">\(Z\)</span>:</p>
+<div class="figure">
+<img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot%202020-01-30%20at%2016.37.13.png" alt="P(0.3333 \le Z \le 1.4444) where Z \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)" style="width:100.0%" />
+<p class="caption"><span class="math inline">\(P(0.3333 \le Z \le 1.4444)\)</span> where <span class="math inline">\(Z \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)\)</span></p>
+</div>
+<p>Finding the probability <span class="math inline">\(P(0.3333 \le Z \le 1.4444)\)</span> is similar to exercises 1 to 3:</p>
+<ol style="list-style-type: decimal">
+<li>The shaded area corresponds to the area under the curve from <span class="math inline">\(z = 0.3333\)</span> to <span class="math inline">\(z = 1.4444\)</span>.</li>
+<li>In other words, the shaded area is the area under the curve from <span class="math inline">\(z = 0.3333\)</span> to infinity minus the area under the curve from <span class="math inline">\(z = 1.4444\)</span> to infinity.</li>
+<li>From the table, <span class="math inline">\(P(Z &gt; 0.3333) = 0.3707\)</span> and <span class="math inline">\(P(Z &gt; 1.4444) = 0.0749\)</span></li>
+<li>Thus:</li>
+</ol>
+<p><span class="math display">\[P(0.3333 \le Z \le 1.4444) = P(Z &gt; 0.3333) - P(Z &gt; 1.4444) = 0.3707 - 0.0749 = 0.2958\]</span><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>To conclude this exercice, we can say that, given that the mean scores is 67 and the standard deviation is 9, 29.58% of the students scored between 70 and 80.</p>
+</div>
+</div>
+<div id="ex.-5" class="section level3">
+<h3>Ex. 5</h3>
+<p>See another example in a context <a href="/blog/a-guide-on-how-to-read-statistical-tables/#example/">here</a>.</p>
 <p>Thanks for reading. I hope the article helped you to learn more about the normal distribution and how to test for normality in R. See other articles in <a href="/tag/statistics">statistics</a>.</p>
 <p>As always, if you have a statistical question related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me <a href="/contact/">here</a>.</p>
 <p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
+</div>
 </div>
 </div>
 <div id="references" class="section level1 unnumbered">
@@ -135,5 +228,6 @@ bibliography: bibliography.bib
 <hr />
 <ol>
 <li id="fn1"><p>The argument <code>lower.tail = TRUE</code> is also the default so we could omit it as well. However, for clarity and to make sure I compute the propabilities in the correct side of the curve, I used to keep this argument explicit by writing it.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>The difference with the probability found in R comes from the rounding.<a href="#fnref2" class="footnote-back">↩</a></p></li>
 </ol>
 </div>

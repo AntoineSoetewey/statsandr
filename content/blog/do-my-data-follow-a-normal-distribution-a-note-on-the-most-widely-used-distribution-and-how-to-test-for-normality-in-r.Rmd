@@ -18,9 +18,13 @@ draft: true
 bibliography: bibliography.bib
 ---
 
-# Introduction
+# What is a normal distribution?
 
-Many natural phenomena in real life can be approximated by a bell-shaped frequency distribution known as a normal distribution or the Gaussian distribution.
+The normal distribution is a function that defines how a set of measurements is distributed around the center of these measurements (i.e., the mean). Many natural phenomena in real life can be approximated by a bell-shaped frequency distribution known as a normal distribution or the Gaussian distribution.
+
+The normal distribution is a mount-shaped, unimodal and symmetric distribution where most measurements gather around the mean. Moreover, the further a measure deviates from the mean, the lower the probability. In this sense, for a given variable, it is common to find values close to the mean, but less and less likely to have values as we move away from the mean. Last but not least, since the normal distribution is symmetric around its mean, extreme values in both tails of the distribution are equivalently unlikely. For instance, given that adult height follows a normal distribution, most adults are close to the average height and extremely short adults occur as infrequently as extremely tall adults.
+
+In this article, the focus is on understanding the normal distribution, the associated empirical rule, its parameters and how to compute $Z$-scores to find probabilities (illustrated with examples). As it is a requirement in many statistical tests, we also show 3 complementary methods to test the normality assumption in R.
 
 # Empirical rule
 
@@ -40,21 +44,57 @@ The utility and value of the empirical rule are due to the common occurrence of 
 
 # Parameters
 
-The normal distribution has two parameters: (i) the mean $\mu$ and (ii) the variance $\sigma^2$ (the square of the standard deviation $\sigma$). The mean $\mu$ locates the center of the distribution and the variance $\sigma^2$ measures its spread.
+Like many probability distributions, the shape and probabilities of the normal distribution is defined entirely by some parameters. The normal distribution has two parameters: (i) the [mean $\mu$](/blog/descriptive-statistics-by-hand/#mean/) and (ii) the [variance $\sigma^2$](/blog/descriptive-statistics-by-hand/#variance/) (the square of the [standard deviation $\sigma$](/blog/descriptive-statistics-by-hand/#standard-deviation/)). The mean $\mu$ locates the center of the distribution, that is, the central tendency of the observations, and the variance $\sigma^2$ defines the width of the distribution, that is, the spread of the observations.
 
-The mean $\mu$ can take on any finite value, whereas the variance $\sigma^2$ can assume any positive finite value (i.e., $\sigma^2 > 0$).
+The mean $\mu$ can take on any finite value, whereas the variance $\sigma^2$ can assume any positive finite value (i.e., $\sigma^2 > 0$). The shape of the normal distribution changes based on these two parameters. Since there is an infinite number of combinations of the mean and variance, there is an infinite number of normal distributions, and thus an infinite number of forms.
+
+For instance, see how the shapes of the normal distributions vary when the two parameters change:
+
+```{r, echo = FALSE}
+library(ggplot2)
+library(reshape2)
+
+set.seed(42)
+dat <- data.frame(Normal_dist1 = rnorm(1000000, mean = 80, sd = 4),
+                  Normal_dist2 = rnorm(1000000, mean = 100, sd = 4),
+                  Normal_dist3 = rnorm(1000000, mean = 120, sd = 4))
+
+names(dat) <- c("mean = 80",
+                "mean = 100",
+                "mean = 120")
+
+dat <- melt(dat)
+ggplot(dat) +
+ aes(x = value, fill = variable) +
+ geom_density(alpha=0.25) +
+ scale_fill_hue() +
+ labs(title = "Normal distributions with different means", fill = "Distributions", subtitle = "Variance = 16") +
+ theme_minimal()
+
+dat <- data.frame(Normal_dist1 = rnorm(1000000, mean = 100, sd = 4),
+                  Normal_dist2 = rnorm(1000000, mean = 100, sd = 5),
+                  Normal_dist3 = rnorm(1000000, mean = 100, sd = 6))
+
+names(dat) <- c("variance = 16",
+                "variance = 25",
+                "variance = 36")
+
+dat <- melt(dat)
+ggplot(dat) +
+ aes(x = value, fill = variable) +
+ geom_density(alpha=0.25) +
+ scale_fill_hue() +
+ labs(title = "Normal distributions with different variances", fill = "Distributions", subtitle = "Mean = 100") +
+ theme_minimal()
+```
 
 A random variable $X$ which follows a normal distribution with a mean of 430 and a variance of 17 is denoted $X ~ \sim \mathcal{N}(\mu = 430, \sigma^2 = 17)$.
-
-# Characteristics
-
-A normal distribution is mount-shaped, unimodal and symmetric around the mean.
 
 # Probabilities and quantiles
 
 Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions `pnorm()` and `qnorm()`. Probabilities associated with a normal distribution can also be found using this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank" rel="noopener">Shiny app</a> (select the normal distribution).
 
-Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table: the **standard normal distribution**. A normal random variable $X$ can always be transformed to a standard normal random variable $Z$, a process known as "scaling", by using the formula:
+Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table: the **standard normal distribution**. A normal random variable $X$ can always be transformed to a standard normal random variable $Z$, a process known as "scaling" or "standardization", by using the formula:
 
 $$Z = \frac{X - \mu}{\sigma}$$
 
@@ -62,15 +102,17 @@ From this formula, we see that $Z$ allows to see how far away is one single obse
 
 ## Examples in R and by hand
 
-Let $Z$ denote a normal random variable with mean 0 and standard deviation 1.
+*Note that there are several ways to arrive at the solution in the following exercises. You may therefore use other steps than the ones presented to obtain the same result.*
 
-1. Find $P(Z > 1)$
+### Ex. 1
+
+Let $Z$ denote a normal random variable with mean 0 and standard deviation 1, find $P(Z > 1)$.
 
 We actually look for the shaded area in the following figure:
 
 ![Standard normal distribution: $P(Z > 1)$](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot 2020-01-30 at 14.18.54.png){width=100%}
 
-**In R:**
+#### In R
 
 ```{r}
 pnorm(1,
@@ -81,19 +123,23 @@ pnorm(1,
 
 We look for the probability of $Z$ being larger than 1 so we set the argument `lower.tail = FALSE`. The default `lower.tail = TRUE` would give the result for $P(Z < 1)$. Note that $P(Z = 1) = 0$ so writing $P(Z > 1)$ or $P(Z \ge 1)$ is equivalent.
 
-**By hand:**
+#### By hand
 
-To compute probabilities by hand, we need to refer to the standard normal distribution table shown below:
+See that the random variable $Z$ has already a mean of 0 and a standard deviation of 1, so no transformation is required. To find the probabilities by hand, we need to refer to the standard normal distribution table shown below:
 
-![Standard normal distribution table. Source: Wackerly et al. (2014).](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot 2020-01-30 at 15.07.44.png){width=100%}
+![Standard normal distribution table [@wackerly2014mathematical].](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot 2020-01-30 at 15.07.44.png){width=100%}
 
-2. Find $P(−1 \le Z \le 1)$
+From the illustration at the top of the table, we see that the values inside the table correspond to the area under the normal curve **above** a certain $z$. Since we are looking precisely at the probability above $z = 1$ (since we look for $P(Z > 1)$), we can simply proceed down the first ($z$) column in the table until $z = 1.0$. The probability is 0.1587. Thus, $P(Z > 1) = 0.1587$. This is similar to what we found using R, except that values in the table are rounded to 4 digits.
+
+### Ex. 2
+
+Let $Z$ denote a normal random variable with mean 0 and standard deviation 1, find $P(−1 \le Z \le 1)$.
 
 We are looking for the shaded area in the following figure:
 
 ![Standard normal distribution: $P(−1 \le Z \le 1)$](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot 2020-01-30 at 14.19.14.png){width=100%}
 
-**In R:**
+#### In R
 
 ```{r}
 pnorm(1, lower.tail = TRUE) - pnorm(-1, lower.tail = TRUE)
@@ -101,19 +147,93 @@ pnorm(1, lower.tail = TRUE) - pnorm(-1, lower.tail = TRUE)
 
 Note that the arguments by default for the mean and the standard deviation are `mean = 0` and `sd = 1`. Since this is what we need, we can omit them.^[The argument `lower.tail = TRUE` is also the default so we could omit it as well. However, for clarity and to make sure I compute the propabilities in the correct side of the curve, I used to keep this argument explicit by writing it.]
 
-3. Find $P(0 \le Z \le 1.37)$
+#### By hand
+
+For this exercise we proceed by steps:
+
+1. The shaded area corresponds to the entire area under the normal curve minus the two white areas in both tails of the curve.
+1. We know that the normal distribution is symmetric.
+1. Therefore, the shaded area is the entire area under the curve minus two times the white area in the right tail of the curve (the white area in the right tail of the curve being $P(Z > 1)$).
+1. We also know that the entire area under the normal curve is 1.
+1. Thus, the shaded area is 1 minus 2 times $P(Z > 1)$:
+
+$$P(−1 \le Z \le 1) = 1 - 2 \cdot P(Z > 1) = 1 - 2 \cdot 0.1587 = 0.6826$$
+
+where $P(Z > 1) = 0.1587$ has been found in the previous exercise.
+
+### Ex. 3
+
+Let $Z$ denote a normal random variable with mean 0 and standard deviation 1, find $P(0 \le Z \le 1.37)$.
 
 We are looking for the shaded area in the following figure:
 
 ![Standard normal distribution: $P(0 \le Z \le 1.37)$](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot 2020-01-30 at 14.19.46.png){width=100%}
 
-**In R:**
+#### In R
 
 ```{r}
 pnorm(0, lower.tail = FALSE) - pnorm(1.37, lower.tail = FALSE)
 ```
 
-4. See another example in a context [here](/blog/a-guide-on-how-to-read-statistical-tables/#example/)
+#### By hand
+
+Again we proceed by steps for this exercise:
+
+1. We know that $P(Z > 0) = 0.5$ since the entire area under the curve is 1, half of it is 0.5.
+1. The shaded area is half of the entire area under the curve minus the area from 1.37 to infinity.
+1. The area under the curve from 1.37 to infinity corresponds to $P(Z > 1.37)$.
+1. Therefore, the shaded area is $0.5 - P(Z > 1.37)$.
+1. To find $P(Z > 1.37)$, proceed down the $z$ column in the table to the entry 1.3 and then across the top of the table to the column labeled .07 to read $P(Z > 1.37) = .0853$
+1. Thus,
+
+$$P(0 \le Z \le 1.37) = P(Z > 0) - P(Z > 1.37) = 0.5 - 0.0853 = 0.4147$$
+
+### Ex. 4
+
+Recap the example presented in the empirical rule: Suppose that the scores of an exam in statistics given to all students in a Belgian university are known to have a normal distribution with mean $\mu = 67$ and standard deviation $\sigma = 9$. What fraction of the scores lies between 70 and 80?
+
+We are looking for the shaded area in the following figure:
+
+![$P(70 \le X \le 80)$ where $X \sim \mathcal{N}(\mu = 67, \sigma^2 = 9^2)$](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot 2020-01-30 at 16.24.30.png){width=100%}
+
+#### In R
+
+```{r}
+pnorm(70, mean = 67, sd = 9, lower.tail = FALSE) - pnorm(80, mean = 67, sd = 9, lower.tail = FALSE)
+```
+
+#### By hand
+
+Remind that we are looking for $P(70 \le X \le 80)$ where $X \sim \mathcal{N}(\mu = 67, \sigma^2 = 9^2)$. The random variable $X$ is in its "raw" format, meaning that it has not been standardized yet since the mean is 67 and the variance is $9^2$. We thus need to first apply the transformation to standardize the endpoints 70 and 80 with the following formula:
+
+$$Z = \frac{X - \mu}{\sigma}$$
+
+After the standardization, $x = 70$ becomes (in terms of $z$, so in terms of deviation from the mean expressed in standard deviation):
+
+$$z = \frac{70 - 67}{9} = 0.3333$$
+
+and $x = 80$ becomes:
+
+$$z = \frac{80 - 67}{9} = 1.4444$$
+
+The figure above in terms of $X$ is now in terms of $Z$:
+
+![$P(0.3333 \le Z \le 1.4444)$ where $Z \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)$](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot 2020-01-30 at 16.37.13.png){width=100%}
+
+Finding the probability $P(0.3333 \le Z \le 1.4444)$ is similar to exercises 1 to 3:
+
+1. The shaded area corresponds to the area under the curve from $z = 0.3333$ to $z = 1.4444$.
+1. In other words, the shaded area is the area under the curve from $z = 0.3333$ to infinity minus the area under the curve from $z = 1.4444$ to infinity.
+1. From the table, $P(Z > 0.3333) = 0.3707$ and $P(Z > 1.4444) = 0.0749$
+1. Thus:
+
+$$P(0.3333 \le Z \le 1.4444) = P(Z > 0.3333) - P(Z > 1.4444) = 0.3707 - 0.0749 = 0.2958$$^[The difference with the probability found in R comes from the rounding.]
+
+To conclude this exercice, we can say that, given that the mean scores is 67 and the standard deviation is 9, 29.58% of the students scored between 70 and 80.
+
+### Ex. 5
+
+See another example in a context [here](/blog/a-guide-on-how-to-read-statistical-tables/#example/).
 
 Thanks for reading. I hope the article helped you to learn more about the normal distribution and how to test for normality in R. See other articles in [statistics](/tag/statistics).
 
