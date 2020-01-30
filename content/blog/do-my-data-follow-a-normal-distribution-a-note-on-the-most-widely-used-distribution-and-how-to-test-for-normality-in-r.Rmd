@@ -30,7 +30,9 @@ Data possessing an approximately normal distribution have a definite variation, 
 * $\mu \pm 2 \cdot \sigma$ includes approximately 95% of the observations
 * $\mu \pm 3 \cdot \sigma$ includes almost all of the observations (99.7% to be more precise)
 
+<center>
 ![Normal distribution: empirical rule. Source: Wikipedia](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Empirical_Rule-normal-distribution.webp)
+</center>
 
 where $\mu$ and $\sigma$ correspond to the population mean and population standard deviation, respectively.
 
@@ -44,6 +46,8 @@ The normal distribution has two parameters: (i) the mean $\mu$ and (ii) the vari
 
 The mean $\mu$ can take on any finite value, whereas the variance $\sigma^2$ can assume any positive finite value (i.e., $\sigma^2 > 0$).
 
+A random variable $X$ which follows a normal distribution with a mean of 430 and a variance of 17 is denoted $X ~ \sim \mathcal{N}(\mu = 430, \sigma^2 = 17)$.
+
 # Characteristics
 
 A normal distribution is mount-shaped, unimodal and symmetric around the mean.
@@ -52,9 +56,64 @@ A normal distribution is mount-shaped, unimodal and symmetric around the mean.
 
 Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions `pnorm()` and `qnorm()`. Probabilities associated with a normal distribution can also be found using this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank" rel="noopener">Shiny app</a> (select the normal distribution).
 
-Although there are infinitely many normal distributions (since there is a normal distribution for every mean and variance), we need only one table: the **standard normal distribution**. A normal random variable $X$ can always be transformed to a standard normal random variable $Z$ by using the formula:
+Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table: the **standard normal distribution**. A normal random variable $X$ can always be transformed to a standard normal random variable $Z$, a process known as "scaling", by using the formula:
 
 $$Z = \frac{X - \mu}{\sigma}$$
+
+From this formula, we see that $Z$ allows to see how far away is one single observation from the mean of all observations, with the distance expressed in standard deviations. The mean of the standard normal distribution is 0, and its standard deviation is 1, $Z ~ \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)$.
+
+## Examples in R and by hand
+
+Let $Z$ denote a normal random variable with mean 0 and standard deviation 1.
+
+1. Find $P(Z > 1)$
+
+We actually look for the shaded area in the following figure:
+
+<center>
+![Standard normal distribution: $P(Z > 1)$](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot 2020-01-30 at 14.18.54.png)
+</center>
+
+**In R:**
+
+```{r}
+pnorm(1,
+      mean = 0,
+      sd = 1, # sd stands for standard deviation
+      lower.tail = FALSE)
+```
+
+We look for the probability of $Z$ being larger than 1 so we set the argument `lower.tail = FALSE`. The default `lower.tail = TRUE` would give the result for $P(Z < 1)$. Note that $P(Z = 1) = 0$ so writing $P(Z > 1)$ or $P(Z \ge 1)$ is equivalent.
+
+2. Find $P(−1 \le Z \le 1)$
+
+We are looking for the shaded area in the following figure:
+
+<center>
+![Standard normal distribution: $P(−1 \le Z \le 1)$](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot 2020-01-30 at 14.19.14.png)
+</center>
+
+**In R:**
+
+```{r}
+pnorm(1, lower.tail = TRUE) - pnorm(-1, lower.tail = TRUE)
+```
+
+Note that the arguments by default for the mean and the standard deviation are `mean = 0` and `sd = 1`. Since this is what we need, we can omit them.^[The argument `lower.tail = TRUE` is also the default so we could omit it as well. However, for clarity and to make sure I compute the propabilities in the correct side of the curve, I used to keep this argument explicit by writing it.]
+
+3. Find $P(0 \le Z \le 1.37)$
+
+We are looking for the shaded area in the following figure:
+
+<center>
+![Standard normal distribution: $P(0 \le Z \le 1.37)$](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Screenshot 2020-01-30 at 14.19.46.png)
+</center>
+
+**In R:**
+
+```{r}
+pnorm(0, lower.tail = FALSE) - pnorm(1.37, lower.tail = FALSE)
+```
 
 Thanks for reading. I hope the article helped you to learn more about the normal distribution and how to test for normality in R. See other articles in [statistics](/tag/statistics).
 
