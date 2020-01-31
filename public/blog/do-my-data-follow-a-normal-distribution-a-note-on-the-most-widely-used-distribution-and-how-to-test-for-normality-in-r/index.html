@@ -127,7 +127,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            13 minute read
+                            19 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -161,8 +161,8 @@
 <li><a href="#what-is-a-normal-distribution">What is a normal distribution?</a></li>
 <li><a href="#empirical-rule">Empirical rule</a></li>
 <li><a href="#parameters">Parameters</a></li>
-<li><a href="#probabilities-and-quantiles">Probabilities and quantiles</a><ul>
-<li><a href="#examples-in-r-and-by-hand">Examples in R and by hand</a><ul>
+<li><a href="#probabilities-and-standard-normal-distribution">Probabilities and standard normal distribution</a><ul>
+<li><a href="#areas-under-the-normal-distribution-in-r-and-by-hand">Areas under the normal distribution in R and by hand</a><ul>
 <li><a href="#ex.-1">Ex. 1</a><ul>
 <li><a href="#in-r">In R</a></li>
 <li><a href="#by-hand">By hand</a></li>
@@ -182,6 +182,13 @@
 <li><a href="#ex.-5">Ex. 5</a></li>
 </ul></li>
 </ul></li>
+<li><a href="#why-is-the-normal-distribution-so-crucial-in-statistics">Why is the normal distribution so crucial in statistics?</a></li>
+<li><a href="#how-to-test-the-normality-assumption">How to test the normality assumption</a><ul>
+<li><a href="#histograms">Histograms</a></li>
+<li><a href="#density-plot">Density plot</a></li>
+<li><a href="#qq-plot">QQ-plot</a></li>
+<li><a href="#normality-test">Normality test</a></li>
+</ul></li>
 <li><a href="#references">References</a></li>
 </ul>
 </div>
@@ -190,7 +197,7 @@
 <h1>What is a normal distribution?</h1>
 <p>The normal distribution is a function that defines how a set of measurements is distributed around the center of these measurements (i.e., the mean). Many natural phenomena in real life can be approximated by a bell-shaped frequency distribution known as a normal distribution or the Gaussian distribution.</p>
 <p>The normal distribution is a mount-shaped, unimodal and symmetric distribution where most measurements gather around the mean. Moreover, the further a measure deviates from the mean, the lower the probability. In this sense, for a given variable, it is common to find values close to the mean, but less and less likely to have values as we move away from the mean. Last but not least, since the normal distribution is symmetric around its mean, extreme values in both tails of the distribution are equivalently unlikely. For instance, given that adult height follows a normal distribution, most adults are close to the average height and extremely short adults occur as infrequently as extremely tall adults.</p>
-<p>In this article, the focus is on understanding the normal distribution, the associated empirical rule, its parameters and how to compute <span class="math inline">\(Z\)</span>-scores to find probabilities (illustrated with examples). As it is a requirement in many statistical tests, we also show 3 complementary methods to test the normality assumption in R.</p>
+<p>In this article, the focus is on understanding the normal distribution, the associated empirical rule, its parameters and how to compute <span class="math inline">\(Z\)</span>-scores to find probabilities (illustrated with examples). As it is a requirement in some statistical tests, we also show 4 complementary methods to test the normality assumption in R.</p>
 </div>
 <div id="empirical-rule" class="section level1">
 <h1>Empirical rule</h1>
@@ -223,10 +230,10 @@
 <li>The empirical rule detailed earlier is applicable to all normal distributions</li>
 </ul>
 </div>
-<div id="probabilities-and-quantiles" class="section level1">
-<h1>Probabilities and quantiles</h1>
-<p>Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions <code>pnorm()</code> and <code>qnorm()</code>. Probabilities associated with a normal distribution can also be found using this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank" rel="noopener">Shiny app</a>.</p>
-<p>Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table: the <strong>standard normal distribution</strong>. The normal standard distribution is a special case of the normal distribution where the mean is equal to 0 and the variance is equal to 1. A normal random variable <span class="math inline">\(X\)</span> can always be transformed to a standard normal random variable <span class="math inline">\(Z\)</span>, a process known as “scaling” or “standardization”, by substracting the mean from the observation, and dividing the result by the standard deviation. Formally:</p>
+<div id="probabilities-and-standard-normal-distribution" class="section level1">
+<h1>Probabilities and standard normal distribution</h1>
+<p>Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions <code>pnorm()</code> and <code>qnorm()</code>. Probabilities associated with a normal distribution can also be found using this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank" rel="noopener">Shiny app</a>. However, before computing probabilities, we need to learn more about the standard normal distribution and the <span class="math inline">\(Z\)</span> score.</p>
+<p>Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table to find the probabilities under the normal curve: the <strong>standard normal distribution</strong>. The normal standard distribution is a special case of the normal distribution where the mean is equal to 0 and the variance is equal to 1. A normal random variable <span class="math inline">\(X\)</span> can always be transformed to a standard normal random variable <span class="math inline">\(Z\)</span>, a process known as “scaling” or “standardization”, by substracting the mean from the observation, and dividing the result by the standard deviation. Formally:</p>
 <p><span class="math display">\[Z = \frac{X - \mu}{\sigma}\]</span></p>
 <p>where <span class="math inline">\(X\)</span> is the observation, <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> the mean and standard deviation of the population from which the observation was drawn. So the mean of the standard normal distribution is 0, and its variance is 1, denoted <span class="math inline">\(Z ~ \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)\)</span>.</p>
 <p>From this formula, we see that <span class="math inline">\(Z\)</span>, referred as standard score or <span class="math inline">\(Z\)</span> score, allows to see how far away one specific observation is from the mean of all observations, with the distance expressed in standard deviations. In other words, the <span class="math inline">\(Z\)</span> score corresponds to the number of standard deviations one observation is away from the mean. A positive <span class="math inline">\(Z\)</span> score means that the specific observation is above the mean, whereas a negative <span class="math inline">\(Z\)</span> score means that the specific observation is below the mean. <span class="math inline">\(Z\)</span> scores are often used to compare an individual to her peers, or more generally, a measurement compared to its distribution.</p>
@@ -265,15 +272,21 @@
 <li>Statistics: <span class="math inline">\(Z_{stat} = \frac{60 - 40}{11} = 2.5\)</span></li>
 <li>Economics: <span class="math inline">\(Z_{econ} = \frac{65 - 80}{12.5} = -1.2\)</span></li>
 </ul>
-<p>On the one hand, the <span class="math inline">\(Z\)</span> score for the exam in statistics is positive (<span class="math inline">\(Z_{stat} = 2.5\)</span>) which means that she performed better than the average student. On the other hand, her score for the exam in economics is negative (<span class="math inline">\(Z_{econ} = -1.2\)</span>) which means that she performed worse than the average student. Below an illustration of her notes in a normal distribution for better comparison:</p>
-<pre class="r"><code>set.seed(42)
-dat &lt;- data.frame(Normal_dist1 = rnorm(1000000,
-                                       mean = 0,
-                                       sd = 1))</code></pre>
-<p>xxx to continue</p>
-<p>Furthermore, <span class="math inline">\(Z\)</span> score also enables to compare observations that would otherwise be difficult because they have different units for example. Suppose you want to compare a salary in € with a weight in kg. Without standardization, there is no way to conclude whether someone is more extreme in terms of her wage or in terms of her weight.</p>
-<div id="examples-in-r-and-by-hand" class="section level2">
-<h2>Examples in R and by hand</h2>
+<p>On the one hand, the <span class="math inline">\(Z\)</span> score for the exam in statistics is positive (<span class="math inline">\(Z_{stat} = 2.5\)</span>) which means that she performed better than average. On the other hand, her score for the exam in economics is negative (<span class="math inline">\(Z_{econ} = -1.2\)</span>) which means that she performed worse than average. Below an illustration of her grades in a standard normal distribution for better comparison:</p>
+<pre><code>## 
+## ********************************************************</code></pre>
+<pre><code>## Note: As of version 1.0.0, cowplot does not change the</code></pre>
+<pre><code>##   default ggplot2 theme anymore. To recover the previous</code></pre>
+<pre><code>##   behavior, execute:
+##   theme_set(theme_cowplot())</code></pre>
+<pre><code>## ********************************************************</code></pre>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Although the score in economics is better in absolute terms, the score in statistics is actually relatively better when comparing each score within its own distribution.</p>
+<p>Furthermore, <span class="math inline">\(Z\)</span> score also enables to compare observations that would otherwise be difficult because they have different units for example. Suppose you want to compare a salary in € with a weight in kg. Without standardization, there is no way to conclude whether someone is more extreme in terms of her wage or in terms of her weight. Thanks to <span class="math inline">\(Z\)</span> scores, we can compare two values that were in the first place not comparable to each other.</p>
+<p>Final remark regarding the interpretation of a <span class="math inline">\(Z\)</span> score: a rule of thumb is that a value with <span class="math inline">\(Z\)</span> score between -3 and -2 or between 2 and 3 is considered as a rare value. A value with <span class="math inline">\(Z\)</span> score smaller than -3 or larger than 3 is considered as an extremely rare value. A value with any other <span class="math inline">\(Z\)</span> score is considered as not rare nor extremely rare.</p>
+<div id="areas-under-the-normal-distribution-in-r-and-by-hand" class="section level2">
+<h2>Areas under the normal distribution in R and by hand</h2>
+<p>Now that we have covered the <span class="math inline">\(Z\)</span> score, we are going to use it to determine the area under the curve of a normal distribution.</p>
 <p><em>Note that there are several ways to arrive at the solution in the following exercises. You may therefore use other steps than the ones presented to obtain the same result.</em></p>
 <div id="ex.-1" class="section level3">
 <h3>Ex. 1</h3>
@@ -397,10 +410,94 @@ dat &lt;- data.frame(Normal_dist1 = rnorm(1000000,
 <div id="ex.-5" class="section level3">
 <h3>Ex. 5</h3>
 <p>See another example in a context <a href="/blog/a-guide-on-how-to-read-statistical-tables/#example/">here</a>.</p>
-<p>Thanks for reading. I hope the article helped you to learn more about the normal distribution and how to test for normality in R. See other articles in <a href="/tag/statistics">statistics</a>.</p>
+</div>
+</div>
+</div>
+<div id="why-is-the-normal-distribution-so-crucial-in-statistics" class="section level1">
+<h1>Why is the normal distribution so crucial in statistics?</h1>
+<p>The normal distribution is important for three main reasons:</p>
+<ul>
+<li>Some statistical hypothesis tests assume that the data follow a normal distribution</li>
+<li>The central limit theorem states that, for a large number of observations (<span class="math inline">\(n &gt; 30\)</span>), no matter what is the underlying distribution of the original variable, the distribution of the sample means (<span class="math inline">\(\overline{X}_n\)</span>) and of the sum (<span class="math inline">\(S_n = \sum_{i = 1}^n X_i\)</span>) may be approached by a normal distribution</li>
+<li>Linear and nonlinear regression assume that the residuals are normally-distributed</li>
+</ul>
+</div>
+<div id="how-to-test-the-normality-assumption" class="section level1">
+<h1>How to test the normality assumption</h1>
+<p>As mentioned above, some statistical tests require that the data follow a normal distribution, or the result of the test may be flawed.</p>
+<p>In this section, we show 3 complementary methods to determine whether your data follow a normal distribution in R.</p>
+<div id="histograms" class="section level2">
+<h2>Histograms</h2>
+<p>A histogram displays the spread and shape of a distribution, so it is a good starting point to evaluate normality. Let’s have a look at the histogram of a distribution that we would expect to follow a normal distribution, the height of 1,000 adults in cm:</p>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The normal curve with the corresponding mean and variance has been added to the histogram. The histogram follows the normal curve so the data seems to follow a normal distribution.</p>
+<p>Below the minimal code for a histogram in R with the dataset <code>iris</code>:</p>
+<pre class="r"><code>data(iris)
+hist(iris$Sepal.Length)</code></pre>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># or in {ggplot2}:
+ggplot(iris) +
+ aes(x = Sepal.Length) +
+ geom_histogram(bins = 30L)</code></pre>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Histograms are however not sufficient, particularily in the case of small samples because the number of bins greatly change its appearance. Histograms are not recommended when the number of observations is less than 20 because it does not always correctly illustrate the distribution. See two examples below with dataset of 10 and 12 observations:</p>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-9-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Can you tell whether these datasets follow a normal distribution? Suprisingly, both follow a normal distribution!</p>
+</div>
+<div id="density-plot" class="section level2">
+<h2>Density plot</h2>
+<p>Density plots also provides a visual judgment about whether the data follow a normal distribution. They are similar to histograms as they also allows to analyze the spread of the distribution. However, they are a smoothed version of the histogram. Here is the density plot drawn from the dataset on the height of 12 adults discussed above:</p>
+<pre class="r"><code>library(&quot;ggpubr&quot;) # package must be installed first</code></pre>
+<pre><code>## Loading required package: magrittr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;ggpubr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:cowplot&#39;:
+## 
+##     get_legend</code></pre>
+<pre class="r"><code>ggdensity(dat_hist$value,
+          main = &quot;Density plot of adult height&quot;,
+          xlab = &quot;Height (cm)&quot;)</code></pre>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Since it is hard to test for normality from histograms and density plots only, it is recommended to corroborate these graphs with a QQ-plot. QQ-plot, also known as normality plot, is the third method presented to evaluate normality.</p>
+</div>
+<div id="qq-plot" class="section level2">
+<h2>QQ-plot</h2>
+<p>Like histograms and density plots, QQ-plots allow to visually evaluate the normality assumption. Here is the QQ-plot drawn from the dataset on the height of 12 adults discussed above:</p>
+<pre class="r"><code>library(car)
+qqPlot(dat_hist$value)</code></pre>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>## [1] 12  2</code></pre>
+<p>In <code>{ggpubr}</code>:</p>
+<pre class="r"><code>library(ggpubr)
+ggqqplot(dat_hist$value)</code></pre>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Instead of looking at the spread of the data (as it is the case with histograms and density plots), with QQ-plots we only need to ascertain whether the data points follow the line (sometimes referred as Henry’s line).</p>
+<p>If points are close to the reference line and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The height of these 12 adults seem to follow a normal distribution because all points lie within the confidence bands.</p>
+<p>When facing a non-normal distribution as shown by the QQ-plot below (systematic departure from the reference line), the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. Applying the logarithm transformation can be done with the <code>log()</code> function.</p>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Note that QQ-plots are also a convenient way to assess whether residuals from regression analysis follow a normal distributed.</p>
+</div>
+<div id="normality-test" class="section level2">
+<h2>Normality test</h2>
+<p>The 3 tools presented above were a visual inspection of the normality. Nonetheless, visual inspection may sometimes be unreliable so it is also possible to formally test whether the data follow a normal distribution with statistical tests. These normality tests compare the distribution of the data to a normal distribution in order to assess whether observations show an important deviation from normality.</p>
+<p>The two most common normality tests are Shapiro-Wilk’s test and Kolmogorov-Smirnov test. Both tests have the same hypotheses, that is:</p>
+<ul>
+<li>the null hypothesis is that the data follow a normal distribution</li>
+<li>the alternative hypothesis is that the data do not follow a normal distribution</li>
+</ul>
+<p>Shapiro-Wilk test is recommended for normality test as it provides better power than Kolmogorov-Smirnov test.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> In R, the Shapiro-Wilk test of normality can be done with the function <code>shapiro.test()</code>:</p>
+<pre class="r"><code>shapiro.test(dat_hist$value)</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  dat_hist$value
+## W = 0.93968, p-value = 0.4939</code></pre>
+<p>From the output, we see that the <span class="math inline">\(p\)</span>-value <span class="math inline">\(&gt; 0.05\)</span> implying that the data are not significantly different from a normal distribution. In other words, we can assume the normality. This test confirms the QQ-plot which also showed normality (as all points lied within the confidence bands).</p>
+<p>It is important to note that, in practice, normality tests are often considered as too conservative in the sense that for large sample size (<span class="math inline">\(n &gt; 50\)</span>), a small deviation from the normality may cause the normality condition to be violated. A normality test is a hypothesis test, so as the sample size increases, their capacity of detecting smaller differences increases. So as the number of observations increases, the Shapiro-Wilk test becomes very sensitive even to a small deviation from normality. As a consequence, it happens that accordint to the normality test the data do not follow a normal distribution although the departures from the normal distribution are negligible and the data in fact follow a normal distribution. For this reason, it is often the case that the normality condition is verified based on a combination of all methods presented in this article, that is, visual inspections with histograms and QQ-plots and a formal inspection with the Shapiro-Wilk test for instance.</p>
+<p>I personally tend to prefer QQ-plot over histograms and normality tests so I do not have to mind about the sample size. This article showed the different methods that are available, your choice will of course depends on the type of your data and the context of your analyses.</p>
+<p>Thanks for reading. I hope the article helped you to learn more about the normal distribution and how to test for normality in R. See other articles about <a href="/tags/statistics">statistics</a> or about <a href="/tags/R/">R</a>.</p>
 <p>As always, if you have a statistical question related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me <a href="/contact/">here</a>.</p>
 <p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
-</div>
 </div>
 </div>
 <div id="references" class="section level1 unnumbered">
@@ -416,6 +513,7 @@ dat &lt;- data.frame(Normal_dist1 = rnorm(1000000,
 <ol>
 <li id="fn1"><p>The argument <code>lower.tail = TRUE</code> is also the default so we could omit it as well. However, for clarity and to make sure I compute the propabilities in the correct side of the curve, I used to keep this argument explicit by writing it.<a href="#fnref1" class="footnote-back">↩</a></p></li>
 <li id="fn2"><p>The difference with the probability found in R comes from the rounding.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>The Shapiro-Wilk test is based on the correlation between the sample and the corresponding normal scores.<a href="#fnref3" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 
