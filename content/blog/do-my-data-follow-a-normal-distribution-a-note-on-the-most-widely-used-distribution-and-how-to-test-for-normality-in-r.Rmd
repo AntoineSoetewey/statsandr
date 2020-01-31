@@ -50,9 +50,9 @@ The utility and value of the empirical rule are due to the common occurrence of 
 
 # Parameters
 
-Like many probability distributions, the shape and probabilities of the normal distribution is defined entirely by some parameters. The normal distribution has two parameters: (i) the [mean $\mu$](/blog/descriptive-statistics-by-hand/#mean) and (ii) the [variance $\sigma^2$](/blog/descriptive-statistics-by-hand/#variance) (the square of the [standard deviation $\sigma$](/blog/descriptive-statistics-by-hand/#standard-deviation)). The mean $\mu$ locates the center of the distribution, that is, the central tendency of the observations, and the variance $\sigma^2$ defines the width of the distribution, that is, the spread of the observations.
+Like many probability distributions, the shape and probabilities of the normal distribution is defined entirely by some parameters. The normal distribution has two parameters: (i) the [mean $\mu$](/blog/descriptive-statistics-by-hand/#mean) and (ii) the [variance $\sigma^2$](/blog/descriptive-statistics-by-hand/#variance) (i.e., the square of the [standard deviation $\sigma$](/blog/descriptive-statistics-by-hand/#standard-deviation)). The mean $\mu$ locates the center of the distribution, that is, the central tendency of the observations, and the variance $\sigma^2$ defines the width of the distribution, that is, the spread of the observations.
 
-The mean $\mu$ can take on any finite value, whereas the variance $\sigma^2$ can assume any positive finite value (i.e., $\sigma^2 > 0$). The shape of the normal distribution changes based on these two parameters. Since there is an infinite number of combinations of the mean and variance, there is an infinite number of normal distributions, and thus an infinite number of forms.
+The mean $\mu$ can take on any finite value (i.e., $-\infty < \mu < \infty$), whereas the variance $\sigma^2$ can assume any positive finite value (i.e., $\sigma^2 > 0$). The shape of the normal distribution changes based on these two parameters. Since there is an infinite number of combinations of the mean and variance, there is an infinite number of normal distributions, and thus an infinite number of forms.
 
 For instance, see how the shapes of the normal distributions vary when the two parameters change:
 
@@ -61,37 +61,45 @@ library(ggplot2)
 library(reshape2)
 
 set.seed(42)
-dat <- data.frame(Normal_dist1 = rnorm(1000000, mean = 80, sd = 4),
-                  Normal_dist2 = rnorm(1000000, mean = 100, sd = 4),
-                  Normal_dist3 = rnorm(1000000, mean = 120, sd = 4))
+dat <- data.frame(
+  Normal_dist1 = rnorm(1000000, mean = 80, sd = 4),
+  Normal_dist2 = rnorm(1000000, mean = 100, sd = 4),
+  Normal_dist3 = rnorm(1000000, mean = 120, sd = 4)
+)
 
-names(dat) <- c("mean = 80",
-                "mean = 100",
-                "mean = 120")
-
-dat <- melt(dat)
-ggplot(dat) +
- aes(x = value, fill = variable) +
- geom_density(alpha=0.25) +
- scale_fill_hue() +
- labs(title = "Normal distributions with different means", fill = "Distributions", subtitle = "Variance = 16") +
- theme_minimal()
-
-dat <- data.frame(Normal_dist1 = rnorm(1000000, mean = 100, sd = 3),
-                  Normal_dist2 = rnorm(1000000, mean = 100, sd = 6),
-                  Normal_dist3 = rnorm(1000000, mean = 100, sd = 10))
-
-names(dat) <- c("variance = 9",
-                "variance = 36",
-                "variance = 100")
+names(dat) <- c(
+  "mean = 80",
+  "mean = 100",
+  "mean = 120"
+)
 
 dat <- melt(dat)
 ggplot(dat) +
- aes(x = value, fill = variable) +
- geom_density(alpha=0.25) +
- scale_fill_hue() +
- labs(title = "Normal distributions with different variances", fill = "Distributions", subtitle = "Mean = 100") +
- theme_minimal()
+  aes(x = value, fill = variable) +
+  geom_density(alpha = 0.25) +
+  scale_fill_hue() +
+  labs(title = "Normal distributions with different means", fill = "Distributions", subtitle = "Variance = 16") +
+  theme_minimal()
+
+dat <- data.frame(
+  Normal_dist1 = rnorm(1000000, mean = 100, sd = 3),
+  Normal_dist2 = rnorm(1000000, mean = 100, sd = 6),
+  Normal_dist3 = rnorm(1000000, mean = 100, sd = 10)
+)
+
+names(dat) <- c(
+  "variance = 9",
+  "variance = 36",
+  "variance = 100"
+)
+
+dat <- melt(dat)
+ggplot(dat) +
+  aes(x = value, fill = variable) +
+  geom_density(alpha = 0.25) +
+  scale_fill_hue() +
+  labs(title = "Normal distributions with different variances", fill = "Distributions", subtitle = "Mean = 100") +
+  theme_minimal()
 ```
 
 As you can see on the second graph, when the variance (or the standard deviation) decreases, the observations are closer to the mean. On the contrary, when the variance (or standard deviation) increases, it is more likely that observations will be further away from the mean.
@@ -119,11 +127,11 @@ From this formula, we see that $Z$, referred as standard score or $Z$ score, all
 For instance, suppose a student scoring 60 at a statistics exam with the mean score of the class being 40, and scoring 65 at an economics exam with the mean score of the class being 80. Given the "raw" scores, one would say that the student performed better in economics than in statistics. However, taking into consideration her peers, it is clear that the student performed relatively better in statistics than in economics. Computing $Z$ scores allows to take into consideration all other students (i.e., the entire distribution) and gives a better measure of comparison. Let's compute the $Z$ scores for the two exams, assuming that the score for both exams follow a normal distribution with the following parameters:
 
 <center>
-|                    | Statistics | Economics |
-|--------------------|------------|-----------|
-| Mean               | 40         | 80        |
-| Standard deviation | 8          | 12.5      |
-| Student's score    | 60         | 65        |
+|                    |   | Statistics | Economics |
+|--------------------|---|------------|-----------|
+| Mean               |   | 40         | 80        |
+| Standard deviation |   | 8          | 12.5      |
+| Student's score    |   | 60         | 65        |
 </center>
 
 <br>
@@ -135,12 +143,13 @@ $Z$ scores for:
 
 On the one hand, the $Z$ score for the exam in statistics is positive ($Z_{stat} = 2.5$) which means that she performed better than average. On the other hand, her score for the exam in economics is negative ($Z_{econ} = -1.2$) which means that she performed worse than average. Below an illustration of her grades in a standard normal distribution for better comparison:
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 library(cowplot)
 ggplot(data = data.frame(x = c(-4, 4)), aes(x)) +
   stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 1)) +
   labs(title = "Comparing statistics and economics grades using Z scores", fill = "Distributions", subtitle = "Standard normal distribution: mean = 0, variance = 1", x = "Z score", y = "density") +
   scale_y_continuous(breaks = NULL) +
+  # theme_set(theme_cowplot()) +
   theme_minimal() +
   geom_vline(xintercept = 2.5, linetype = "dashed", color = "green4") +
   geom_vline(xintercept = -1.2, linetype = "dashed", color = "red") +
@@ -150,7 +159,7 @@ ggplot(data = data.frame(x = c(-4, 4)), aes(x)) +
 
 Although the score in economics is better in absolute terms, the score in statistics is actually relatively better when comparing each score within its own distribution.
 
-Furthermore, $Z$ score also enables to compare observations that would otherwise be difficult because they have different units for example. Suppose you want to compare a salary in € with a weight in kg. Without standardization, there is no way to conclude whether someone is more extreme in terms of her wage or in terms of her weight. Thanks to $Z$ scores, we can compare two values that were in the first place not comparable to each other.
+Furthermore, $Z$ score also enables to compare observations that would otherwise be impossible because they have different units for example. Suppose you want to compare a salary in € with a weight in kg. Without standardization, there is no way to conclude whether someone is more extreme in terms of her wage or in terms of her weight. Thanks to $Z$ scores, we can compare two values that were in the first place not comparable to each other.
 
 Final remark regarding the interpretation of a $Z$ score: a rule of thumb is that a value with $Z$ score between -3 and -2 or between 2 and 3 is considered as a rare value. A value with $Z$ score smaller than -3 or larger than 3 is considered as an extremely rare value. A value with any other $Z$ score is considered as not rare nor extremely rare. 
 
@@ -172,9 +181,10 @@ We actually look for the shaded area in the following figure:
 
 ```{r}
 pnorm(1,
-      mean = 0,
-      sd = 1, # sd stands for standard deviation
-      lower.tail = FALSE)
+  mean = 0,
+  sd = 1, # sd stands for standard deviation
+  lower.tail = FALSE
+)
 ```
 
 We look for the probability of $Z$ being larger than 1 so we set the argument `lower.tail = FALSE`. The default `lower.tail = TRUE` would give the result for $P(Z < 1)$. Note that $P(Z = 1) = 0$ so writing $P(Z > 1)$ or $P(Z \ge 1)$ is equivalent.
@@ -313,17 +323,18 @@ A histogram displays the spread and shape of a distribution, so it is a good sta
 set.seed(42)
 N <- 1000
 dat_hist <- data.frame(
-  value = rnorm(N, mean = 165, sd = 5))
+  value = rnorm(N, mean = 165, sd = 5)
+)
 mu <- mean(dat_hist$value)
 variance <- var(dat_hist$value)
 
 # Set desired binwidth and number of non-missing obs
-bw = 2
-n_obs = sum(!is.na(dat_hist$value))
+bw <- 2
+n_obs <- sum(!is.na(dat_hist$value))
 
-ggplot(dat_hist, aes(value))  + 
-geom_histogram(aes(y = ..density..), fill = "steelblue", binwidth = bw, colour = "black") + 
-stat_function(fun = dnorm, args = list(mean = mean(dat_hist$value), sd = sd(dat_hist$value))) +
+ggplot(dat_hist, aes(value)) +
+  geom_histogram(aes(y = ..density..), fill = "steelblue", binwidth = bw, colour = "black") +
+  stat_function(fun = dnorm, args = list(mean = mean(dat_hist$value), sd = sd(dat_hist$value))) +
   theme_minimal() +
   labs(x = "Height (cm)", title = "Histogram of adult height and normal curve", subtitle = paste0("N = ", N, ", mean = ", round(mu, 2), ", variance = ", round(variance, 2)))
 ```
@@ -338,8 +349,8 @@ hist(iris$Sepal.Length)
 
 # or in {ggplot2}:
 ggplot(iris) +
- aes(x = Sepal.Length) +
- geom_histogram(bins = 30L)
+  aes(x = Sepal.Length) +
+  geom_histogram(bins = 30L)
 ```
 
 Histograms are however not sufficient, particularily in the case of small samples because the number of bins greatly change its appearance. Histograms are not recommended when the number of observations is less than 20 because it does not always correctly illustrate the distribution. See two examples below with dataset of 10 and 12 observations:
@@ -348,34 +359,36 @@ Histograms are however not sufficient, particularily in the case of small sample
 set.seed(2)
 N <- 10
 dat_hist <- data.frame(
-  value = rnorm(N, mean = 165, sd = 5))
+  value = rnorm(N, mean = 165, sd = 5)
+)
 mu <- mean(dat_hist$value)
 variance <- var(dat_hist$value)
 
 # Set desired binwidth and number of non-missing obs
-bw = 2
-n_obs = sum(!is.na(dat_hist$value))
+bw <- 2
+n_obs <- sum(!is.na(dat_hist$value))
 
-ggplot(dat_hist, aes(value))  + 
-geom_histogram(aes(y = ..density..), fill = "steelblue", binwidth = bw, colour = "black") + 
-stat_function(fun = dnorm, args = list(mean = mean(dat_hist$value), sd = sd(dat_hist$value))) +
+ggplot(dat_hist, aes(value)) +
+  geom_histogram(aes(y = ..density..), fill = "steelblue", binwidth = bw, colour = "black") +
+  stat_function(fun = dnorm, args = list(mean = mean(dat_hist$value), sd = sd(dat_hist$value))) +
   theme_minimal() +
   labs(x = "Height (cm)", title = "Histogram of adult height and normal curve", subtitle = paste0("N = ", N, ", mean = ", round(mu, 2), ", variance = ", round(variance, 2)))
 
 set.seed(42)
 N <- 12
 dat_hist <- data.frame(
-  value = rnorm(N, mean = 165, sd = 5))
+  value = rnorm(N, mean = 165, sd = 5)
+)
 mu <- mean(dat_hist$value)
 variance <- var(dat_hist$value)
 
 # Set desired binwidth and number of non-missing obs
-bw = 2
-n_obs = sum(!is.na(dat_hist$value))
+bw <- 2
+n_obs <- sum(!is.na(dat_hist$value))
 
-ggplot(dat_hist, aes(value))  + 
-geom_histogram(aes(y = ..density..), fill = "steelblue", binwidth = bw, colour = "black") + 
-stat_function(fun = dnorm, args = list(mean = mean(dat_hist$value), sd = sd(dat_hist$value))) +
+ggplot(dat_hist, aes(value)) +
+  geom_histogram(aes(y = ..density..), fill = "steelblue", binwidth = bw, colour = "black") +
+  stat_function(fun = dnorm, args = list(mean = mean(dat_hist$value), sd = sd(dat_hist$value))) +
   theme_minimal() +
   labs(x = "Height (cm)", title = "Histogram of adult height and normal curve", subtitle = paste0("N = ", N, ", mean = ", round(mu, 2), ", variance = ", round(variance, 2)))
 ```
@@ -389,8 +402,9 @@ Density plots also provides a visual judgment about whether the data follow a no
 ```{r}
 library("ggpubr") # package must be installed first
 ggdensity(dat_hist$value,
-          main = "Density plot of adult height",
-          xlab = "Height (cm)")
+  main = "Density plot of adult height",
+  xlab = "Height (cm)"
+)
 ```
 
 Since it is hard to test for normality from histograms and density plots only, it is recommended to corroborate these graphs with a QQ-plot. QQ-plot, also known as normality plot, is the third method presented to evaluate normality.
@@ -418,7 +432,7 @@ If points are close to the reference line and within the confidence bands, the n
 When facing a non-normal distribution as shown by the QQ-plot below (systematic departure from the reference line), the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. Applying the logarithm transformation can be done with the `log()` function.
 
 ```{r, echo = FALSE}
-ggqqplot(rbeta(100,6, 1))
+ggqqplot(rbeta(100, 6, 1))
 ```
 
 Note that QQ-plots are also a convenient way to assess whether residuals from regression analysis follow a normal distributed.
