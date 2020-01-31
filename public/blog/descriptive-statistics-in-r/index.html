@@ -557,9 +557,7 @@ ggplot(dat) +
 <h1>QQ-plot</h1>
 <div id="for-a-single-variable" class="section level2">
 <h2>For a single variable</h2>
-<p>In order to check the normality assumption of a variable (normality means that the data follow a normal distribution, also known as a Gaussion distribution), we usually use histograms and/or QQ-plots.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
-<!-- See an article discussing about [normality and how to check it](/blog/xxx/) if needed. -->
-Histograms have been presented earlier, so here is how to draw a QQ-plot:</p>
+<p>In order to check the normality assumption of a variable (normality means that the data follow a normal distribution, also known as a Gaussion distribution), we usually use histograms and/or QQ-plots.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> See an article discussing about the <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normal distribution and how to evaluate the normality assumption in R</a> if you need a refresh on that subject. Histograms have been presented earlier, so here is how to draw a QQ-plot:</p>
 <pre class="r"><code># Draw points on the qq-plot:
 qqnorm(dat$Sepal.Length)
 # Draw the reference line:
@@ -571,13 +569,10 @@ qqPlot(dat$Sepal.Length)</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
 <pre><code>## [1] 132 118</code></pre>
 <p>If points are close to the reference line (sometimes referred as Henry’s line) and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The variable <code>Sepal.Length</code> does not seem to follow a normal distribution because several points lie outside the confidence bands. When facing a non-normal distribution, the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. Applying the logarithm transformation can be done with the <code>log()</code> function.</p>
-<p>In <code>{ggplot2}</code>:</p>
-<pre class="r"><code># method 1
-qplot(sample = Sepal.Length, data = dat)</code></pre>
+<p>In <code>{ggpubr}</code>:</p>
+<pre class="r"><code>library(ggpubr)
+ggqqplot(dat$Sepal.Length)</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
-<pre class="r"><code># method 2
-ggplot(dat, aes(sample = Sepal.Length)) + stat_qq()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-2.png" width="672" /></p>
 </div>
 <div id="by-groups" class="section level2">
 <h2>By groups</h2>
@@ -610,7 +605,7 @@ ggplot(dat, aes(sample = Sepal.Length)) + stat_qq()</code></pre>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that sometimes a very limited number of observations may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified only based on histograms and QQ-plots.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).<a href="#fnref1" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 

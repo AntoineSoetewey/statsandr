@@ -91,8 +91,49 @@ bibliography: bibliography.bib
 <p>Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions <code>pnorm()</code> and <code>qnorm()</code>. Probabilities associated with a normal distribution can also be found using this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank" rel="noopener">Shiny app</a>.</p>
 <p>Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table: the <strong>standard normal distribution</strong>. The normal standard distribution is a special case of the normal distribution where the mean is equal to 0 and the variance is equal to 1. A normal random variable <span class="math inline">\(X\)</span> can always be transformed to a standard normal random variable <span class="math inline">\(Z\)</span>, a process known as “scaling” or “standardization”, by substracting the mean from the observation, and dividing the result by the standard deviation. Formally:</p>
 <p><span class="math display">\[Z = \frac{X - \mu}{\sigma}\]</span></p>
-<p>So the mean of the standard normal distribution is 0, and its variance is 1, denoted <span class="math inline">\(Z ~ \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)\)</span>. From this formula, we see that <span class="math inline">\(Z\)</span>, referred as standard score or <span class="math inline">\(Z\)</span> score, allows to see how far away one specific observation is from the mean of all observations, with the distance expressed in standard deviations. In other words, the <span class="math inline">\(Z\)</span> score corresponds to the number of standard deviations one observation is away from the mean. A positive <span class="math inline">\(Z\)</span> score means that the specific observation is above the mean, whereas a negative <span class="math inline">\(Z\)</span> score means that the specific observation is below the mean. <span class="math inline">\(Z\)</span> scores are often used to compare an individual to her peers.</p>
-<p>For instance, suppose a student scoring 60 at a statistics exam with the mean score of the class being 40, and scoring 60 at an economics exam with the mean score of the class being 80 (assume the standard deviations are the same for both exams). Given the “raw” scores, one would say that the student performed as well in statistics as in economics. However, taking into consideration her peers, the student performed relatively better in statistics than in economics. Computing <span class="math inline">\(Z\)</span> scores allows to take into consideration all other students (i.e., the entire distribution) and gives a better measure of comparison.</p>
+<p>where <span class="math inline">\(X\)</span> is the observation, <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> the mean and standard deviation of the population from which the observation was drawn. So the mean of the standard normal distribution is 0, and its variance is 1, denoted <span class="math inline">\(Z ~ \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)\)</span>.</p>
+<p>From this formula, we see that <span class="math inline">\(Z\)</span>, referred as standard score or <span class="math inline">\(Z\)</span> score, allows to see how far away one specific observation is from the mean of all observations, with the distance expressed in standard deviations. In other words, the <span class="math inline">\(Z\)</span> score corresponds to the number of standard deviations one observation is away from the mean. A positive <span class="math inline">\(Z\)</span> score means that the specific observation is above the mean, whereas a negative <span class="math inline">\(Z\)</span> score means that the specific observation is below the mean. <span class="math inline">\(Z\)</span> scores are often used to compare an individual to her peers, or more generally, a measurement compared to its distribution.</p>
+<p>For instance, suppose a student scoring 60 at a statistics exam with the mean score of the class being 40, and scoring 65 at an economics exam with the mean score of the class being 80. Given the “raw” scores, one would say that the student performed better in economics than in statistics. However, taking into consideration her peers, it is clear that the student performed relatively better in statistics than in economics. Computing <span class="math inline">\(Z\)</span> scores allows to take into consideration all other students (i.e., the entire distribution) and gives a better measure of comparison. Let’s compute the <span class="math inline">\(Z\)</span> scores for the two exams, assuming that the score for both exams follow a normal distribution with the following parameters:</p>
+<center>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>Statistics</th>
+<th>Economics</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mean</td>
+<td>40</td>
+<td>80</td>
+</tr>
+<tr class="even">
+<td>Standard deviation</td>
+<td>8</td>
+<td>12.5</td>
+</tr>
+<tr class="odd">
+<td>Student’s score</td>
+<td>60</td>
+<td>65</td>
+</tr>
+</tbody>
+</table>
+</center>
+<p><br></p>
+<p><span class="math inline">\(Z\)</span> scores for:</p>
+<ul>
+<li>Statistics: <span class="math inline">\(Z_{stat} = \frac{60 - 40}{11} = 2.5\)</span></li>
+<li>Economics: <span class="math inline">\(Z_{econ} = \frac{65 - 80}{12.5} = -1.2\)</span></li>
+</ul>
+<p>On the one hand, the <span class="math inline">\(Z\)</span> score for the exam in statistics is positive (<span class="math inline">\(Z_{stat} = 2.5\)</span>) which means that she performed better than the average student. On the other hand, her score for the exam in economics is negative (<span class="math inline">\(Z_{econ} = -1.2\)</span>) which means that she performed worse than the average student. Below an illustration of her notes in a normal distribution for better comparison:</p>
+<pre class="r"><code>set.seed(42)
+dat &lt;- data.frame(Normal_dist1 = rnorm(1000000,
+                                       mean = 0,
+                                       sd = 1))</code></pre>
+<p>xxx to continue</p>
 <p>Furthermore, <span class="math inline">\(Z\)</span> score also enables to compare observations that would otherwise be difficult because they have different units for example. Suppose you want to compare a salary in € with a weight in kg. Without standardization, there is no way to conclude whether someone is more extreme in terms of her wage or in terms of her weight.</p>
 <div id="examples-in-r-and-by-hand" class="section level2">
 <h2>Examples in R and by hand</h2>
