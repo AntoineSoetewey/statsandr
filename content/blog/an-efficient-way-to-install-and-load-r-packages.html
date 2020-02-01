@@ -21,7 +21,7 @@ output:
 <li><a href="#what-is-a-r-package-and-how-to-use-it">What is a R package and how to use it?</a></li>
 <li><a href="#inefficient-way-to-install-and-load-r-packages">Inefficient way to install and load R packages</a></li>
 <li><a href="#more-efficient-way">More efficient way</a></li>
-<li><a href="#pacman-package"><code>{pacman}</code> package</a></li>
+<li><a href="#most-efficient-way-pacman-package">Most efficient way: <code>{pacman}</code> package</a></li>
 </ul>
 </div>
 
@@ -63,7 +63,7 @@ library(&quot;lubridate&quot;)</code></pre>
 <h1>More efficient way</h1>
 <p>Then one day, a colleague of mine shared some of his code with me. I am glad he did as he introduced me to a much more efficient way to install and load R packages. He gave me the permission to share the tip, so here is the code I now use to perform the task of installing and loading R packages:</p>
 <pre class="r"><code># Package names
-packages &lt;- c(&quot;ggplot2&quot;, &quot;readxl&quot;, &quot;dplyr&quot;, &quot;tidyr&quot;, &quot;ggfortify&quot;, &quot;DT&quot;, &quot;reshape2&quot;, &quot;knitr&quot;, &quot;lubridate&quot;, &quot;pwr&quot;, &quot;psy&quot;, &quot;car&quot;, &quot;doBy&quot;, &quot;imputeMissings&quot;, &quot;RcmdrMisc&quot;, &quot;questionr&quot;, &quot;vcd&quot;, &quot;multcomp&quot;, &quot;KappaGUI&quot;, &quot;rcompanion&quot;, &quot;FactoMineR&quot;, &quot;factoextra&quot;, &quot;corrplot&quot;, &quot;ltm&quot;, &quot;goeveg&quot;, &quot;corrplot&quot;, &quot;FSA&quot;, &quot;MASS&quot;, &quot;scales&quot;, &quot;nlme&quot;, &quot;psych&quot;, &quot;ordinal&quot;, &quot;lmtest&quot;, &quot;ggpubr&quot;, &quot;dslabs&quot;, &quot;stringr&quot;, &quot;assist&quot;, &quot;ggstatsplot&quot;, &quot;forcats&quot;, &quot;styler&quot;, &quot;remedy&quot;, &quot;snakecaser&quot;, &quot;addinslist&quot;, &quot;esquisse&quot;, &quot;here&quot;, &quot;summarytools&quot;, &quot;magrittr&quot;, &quot;tidyverse&quot;, &quot;funModeling&quot;, &quot;pander&quot;, &quot;cluster&quot;)
+packages &lt;- c(&quot;ggplot2&quot;, &quot;readxl&quot;, &quot;dplyr&quot;, &quot;tidyr&quot;, &quot;ggfortify&quot;, &quot;DT&quot;, &quot;reshape2&quot;, &quot;knitr&quot;, &quot;lubridate&quot;, &quot;pwr&quot;, &quot;psy&quot;, &quot;car&quot;, &quot;doBy&quot;, &quot;imputeMissings&quot;, &quot;RcmdrMisc&quot;, &quot;questionr&quot;, &quot;vcd&quot;, &quot;multcomp&quot;, &quot;KappaGUI&quot;, &quot;rcompanion&quot;, &quot;FactoMineR&quot;, &quot;factoextra&quot;, &quot;corrplot&quot;, &quot;ltm&quot;, &quot;goeveg&quot;, &quot;corrplot&quot;, &quot;FSA&quot;, &quot;MASS&quot;, &quot;scales&quot;, &quot;nlme&quot;, &quot;psych&quot;, &quot;ordinal&quot;, &quot;lmtest&quot;, &quot;ggpubr&quot;, &quot;dslabs&quot;, &quot;stringr&quot;, &quot;assist&quot;, &quot;ggstatsplot&quot;, &quot;forcats&quot;, &quot;styler&quot;, &quot;remedy&quot;, &quot;snakecaser&quot;, &quot;addinslist&quot;, &quot;esquisse&quot;, &quot;here&quot;, &quot;summarytools&quot;, &quot;magrittr&quot;, &quot;tidyverse&quot;, &quot;funModeling&quot;, &quot;pander&quot;, &quot;cluster&quot;, &quot;abind&quot;)
 
 # Install packages not yet installed
 installed_packages &lt;- packages %in% rownames(installed.packages())
@@ -72,8 +72,7 @@ if (any(installed_packages == FALSE)) {
 }
 
 # Packages loading
-lapply(packages, library, character.only = TRUE) %&gt;%
-  invisible()</code></pre>
+invisible(lapply(packages, library, character.only = TRUE))</code></pre>
 <p>This code for installing and loading R packages is more efficient in several ways:</p>
 <ol style="list-style-type: decimal">
 <li>The function <code>install.packages()</code> accepts a vector as argument, so one line of code for each package in the past is now one line including all packages</li>
@@ -83,8 +82,8 @@ lapply(packages, library, character.only = TRUE) %&gt;%
 </ol>
 <p>From that day on, every time I need to use a new package, I simply add it to the vector <code>packages</code> at the top of the code, which is located at the top of my scripts and R Markdown documents. No matter on which computer I am working on, running the entire code will install only the missing packages and will load all of them. This greatly reduced the running time for the installation and loading of my R packages.</p>
 </div>
-<div id="pacman-package" class="section level1">
-<h1><code>{pacman}</code> package</h1>
+<div id="most-efficient-way-pacman-package" class="section level1">
+<h1>Most efficient way: <code>{pacman}</code> package</h1>
 <p>After this article was published, a reader informed me about the <code>{packman}</code> package. After having read the documentation and try it out myself, I learned that the function <code>p_load()</code> from <code>{pacman}</code> checks to see if a package is installed, if not it attempts to install the package and then loads it. It can also be applied to several packages at once, all this in a very condensed way:</p>
 <pre class="r"><code>install.packages(&quot;pacman&quot;)
 

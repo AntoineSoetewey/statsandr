@@ -24,7 +24,7 @@
 &lt;li&gt;&lt;a href=&#34;#what-is-a-r-package-and-how-to-use-it&#34;&gt;What is a R package and how to use it?&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#inefficient-way-to-install-and-load-r-packages&#34;&gt;Inefficient way to install and load R packages&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#more-efficient-way&#34;&gt;More efficient way&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#pacman-package&#34;&gt;&lt;code&gt;{pacman}&lt;/code&gt; package&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#most-efficient-way-pacman-package&#34;&gt;Most efficient way: &lt;code&gt;{pacman}&lt;/code&gt; package&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -66,7 +66,7 @@ library(&amp;quot;lubridate&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;h1&gt;More efficient way&lt;/h1&gt;
 &lt;p&gt;Then one day, a colleague of mine shared some of his code with me. I am glad he did as he introduced me to a much more efficient way to install and load R packages. He gave me the permission to share the tip, so here is the code I now use to perform the task of installing and loading R packages:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Package names
-packages &amp;lt;- c(&amp;quot;ggplot2&amp;quot;, &amp;quot;readxl&amp;quot;, &amp;quot;dplyr&amp;quot;, &amp;quot;tidyr&amp;quot;, &amp;quot;ggfortify&amp;quot;, &amp;quot;DT&amp;quot;, &amp;quot;reshape2&amp;quot;, &amp;quot;knitr&amp;quot;, &amp;quot;lubridate&amp;quot;, &amp;quot;pwr&amp;quot;, &amp;quot;psy&amp;quot;, &amp;quot;car&amp;quot;, &amp;quot;doBy&amp;quot;, &amp;quot;imputeMissings&amp;quot;, &amp;quot;RcmdrMisc&amp;quot;, &amp;quot;questionr&amp;quot;, &amp;quot;vcd&amp;quot;, &amp;quot;multcomp&amp;quot;, &amp;quot;KappaGUI&amp;quot;, &amp;quot;rcompanion&amp;quot;, &amp;quot;FactoMineR&amp;quot;, &amp;quot;factoextra&amp;quot;, &amp;quot;corrplot&amp;quot;, &amp;quot;ltm&amp;quot;, &amp;quot;goeveg&amp;quot;, &amp;quot;corrplot&amp;quot;, &amp;quot;FSA&amp;quot;, &amp;quot;MASS&amp;quot;, &amp;quot;scales&amp;quot;, &amp;quot;nlme&amp;quot;, &amp;quot;psych&amp;quot;, &amp;quot;ordinal&amp;quot;, &amp;quot;lmtest&amp;quot;, &amp;quot;ggpubr&amp;quot;, &amp;quot;dslabs&amp;quot;, &amp;quot;stringr&amp;quot;, &amp;quot;assist&amp;quot;, &amp;quot;ggstatsplot&amp;quot;, &amp;quot;forcats&amp;quot;, &amp;quot;styler&amp;quot;, &amp;quot;remedy&amp;quot;, &amp;quot;snakecaser&amp;quot;, &amp;quot;addinslist&amp;quot;, &amp;quot;esquisse&amp;quot;, &amp;quot;here&amp;quot;, &amp;quot;summarytools&amp;quot;, &amp;quot;magrittr&amp;quot;, &amp;quot;tidyverse&amp;quot;, &amp;quot;funModeling&amp;quot;, &amp;quot;pander&amp;quot;, &amp;quot;cluster&amp;quot;)
+packages &amp;lt;- c(&amp;quot;ggplot2&amp;quot;, &amp;quot;readxl&amp;quot;, &amp;quot;dplyr&amp;quot;, &amp;quot;tidyr&amp;quot;, &amp;quot;ggfortify&amp;quot;, &amp;quot;DT&amp;quot;, &amp;quot;reshape2&amp;quot;, &amp;quot;knitr&amp;quot;, &amp;quot;lubridate&amp;quot;, &amp;quot;pwr&amp;quot;, &amp;quot;psy&amp;quot;, &amp;quot;car&amp;quot;, &amp;quot;doBy&amp;quot;, &amp;quot;imputeMissings&amp;quot;, &amp;quot;RcmdrMisc&amp;quot;, &amp;quot;questionr&amp;quot;, &amp;quot;vcd&amp;quot;, &amp;quot;multcomp&amp;quot;, &amp;quot;KappaGUI&amp;quot;, &amp;quot;rcompanion&amp;quot;, &amp;quot;FactoMineR&amp;quot;, &amp;quot;factoextra&amp;quot;, &amp;quot;corrplot&amp;quot;, &amp;quot;ltm&amp;quot;, &amp;quot;goeveg&amp;quot;, &amp;quot;corrplot&amp;quot;, &amp;quot;FSA&amp;quot;, &amp;quot;MASS&amp;quot;, &amp;quot;scales&amp;quot;, &amp;quot;nlme&amp;quot;, &amp;quot;psych&amp;quot;, &amp;quot;ordinal&amp;quot;, &amp;quot;lmtest&amp;quot;, &amp;quot;ggpubr&amp;quot;, &amp;quot;dslabs&amp;quot;, &amp;quot;stringr&amp;quot;, &amp;quot;assist&amp;quot;, &amp;quot;ggstatsplot&amp;quot;, &amp;quot;forcats&amp;quot;, &amp;quot;styler&amp;quot;, &amp;quot;remedy&amp;quot;, &amp;quot;snakecaser&amp;quot;, &amp;quot;addinslist&amp;quot;, &amp;quot;esquisse&amp;quot;, &amp;quot;here&amp;quot;, &amp;quot;summarytools&amp;quot;, &amp;quot;magrittr&amp;quot;, &amp;quot;tidyverse&amp;quot;, &amp;quot;funModeling&amp;quot;, &amp;quot;pander&amp;quot;, &amp;quot;cluster&amp;quot;, &amp;quot;abind&amp;quot;)
 
 # Install packages not yet installed
 installed_packages &amp;lt;- packages %in% rownames(installed.packages())
@@ -75,8 +75,7 @@ if (any(installed_packages == FALSE)) {
 }
 
 # Packages loading
-lapply(packages, library, character.only = TRUE) %&amp;gt;%
-  invisible()&lt;/code&gt;&lt;/pre&gt;
+invisible(lapply(packages, library, character.only = TRUE))&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This code for installing and loading R packages is more efficient in several ways:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
 &lt;li&gt;The function &lt;code&gt;install.packages()&lt;/code&gt; accepts a vector as argument, so one line of code for each package in the past is now one line including all packages&lt;/li&gt;
@@ -86,8 +85,8 @@ lapply(packages, library, character.only = TRUE) %&amp;gt;%
 &lt;/ol&gt;
 &lt;p&gt;From that day on, every time I need to use a new package, I simply add it to the vector &lt;code&gt;packages&lt;/code&gt; at the top of the code, which is located at the top of my scripts and R Markdown documents. No matter on which computer I am working on, running the entire code will install only the missing packages and will load all of them. This greatly reduced the running time for the installation and loading of my R packages.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div id=&#34;pacman-package&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;&lt;code&gt;{pacman}&lt;/code&gt; package&lt;/h1&gt;
+&lt;div id=&#34;most-efficient-way-pacman-package&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Most efficient way: &lt;code&gt;{pacman}&lt;/code&gt; package&lt;/h1&gt;
 &lt;p&gt;After this article was published, a reader informed me about the &lt;code&gt;{packman}&lt;/code&gt; package. After having read the documentation and try it out myself, I learned that the function &lt;code&gt;p_load()&lt;/code&gt; from &lt;code&gt;{pacman}&lt;/code&gt; checks to see if a package is installed, if not it attempts to install the package and then loads it. It can also be applied to several packages at once, all this in a very condensed way:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;install.packages(&amp;quot;pacman&amp;quot;)
 
