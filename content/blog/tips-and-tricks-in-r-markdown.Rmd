@@ -238,6 +238,52 @@ The addin I use most ofen is probably the `{esquisse}` addin, which allows to dr
 
 RStudio addins are quite diverse and require a more detailed explanation, so I wrote an article focusing on these addins. See the article [here](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/).
 
+# `{pander}` for easthetics
+
+The `pander()` function from the `{pander}` package is very useful for R Markdown documents and reporting. It is not actually a shortcut but it greatly improves the easthetics of R outputs.
+
+For instance, see below the difference between the default output of a [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r) and the output from the same test with the `pander()` function (using the `diamonds` dataset from the `{ggplot2}` package):
+
+```{r}
+library(ggplot2)
+dat <- diamonds
+
+test <- chisq.test(table(dat$cut, dat$color))
+test
+
+library(pander)
+pander(test)
+```
+
+All information that you need are displayed in an elegant table. The `pander()` function works on many statistical tests (not to say all of them, but I have not tried it on *all* available tests in R) and on regression models:
+
+```{r}
+# Linear model with lm()
+model <- lm(price ~ carat + x + y + z, data = dat)
+model
+
+pander(model)
+```
+
+The pander function also makes datasets, tables, vectors, etc. more readable in R Markdown output. For example, see the differences below:
+
+```{r}
+head(diamonds) # first 6 observations of a dataset
+pander(head(diamonds))
+
+summary(diamonds) # main descriptive statistics
+pander(summary(diamonds))
+
+table(dat$cut, dat$color) # contingency table
+pander(table(dat$cut, dat$color))
+
+names(dat) # variable names
+pander(names(dat))
+
+rnorm(4) # generates 4 observations from a standard normal distribution
+pander(rnorm(4))
+```
+
 # Others
 
 Similar to many other programs, you can also use:

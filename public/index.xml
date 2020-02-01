@@ -1767,6 +1767,7 @@ ggqqplot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;&lt;a href=&#34;#new-code-chunk-in-r-markdown&#34;&gt;New code chunk in R Markdown&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#reformat-code&#34;&gt;Reformat code&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#rstudio-addins&#34;&gt;RStudio addins&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#pander-for-easthetics&#34;&gt;&lt;code&gt;{pander}&lt;/code&gt; for easthetics&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#others&#34;&gt;Others&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
@@ -1930,6 +1931,486 @@ for (i in 1:10) {
 &lt;p&gt;RStudio addins are extensions which provide a simple mechanism for executing advanced R functions from within RStudio. In simpler words, when executing an addin (by clicking a button in the Addins menu), the corresponding code is executed without you having to write the code. RStudio addins have the advantage that they allow you to execute complex and advanced code much more easily than if you would have to write it yourself.&lt;/p&gt;
 &lt;p&gt;The addin I use most ofen is probably the &lt;code&gt;{esquisse}&lt;/code&gt; addin, which allows to draw plots from the &lt;code&gt;{ggplot2}&lt;/code&gt; package in a user-friendly and interactive way, and without having to write the code myself.&lt;/p&gt;
 &lt;p&gt;RStudio addins are quite diverse and require a more detailed explanation, so I wrote an article focusing on these addins. See the article &lt;a href=&#34;/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pander-for-easthetics&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;code&gt;{pander}&lt;/code&gt; for easthetics&lt;/h1&gt;
+&lt;p&gt;The &lt;code&gt;pander()&lt;/code&gt; function from the &lt;code&gt;{pander}&lt;/code&gt; package is very useful for R Markdown documents and reporting. It is not actually a shortcut but it greatly improves the easthetics of R outputs.&lt;/p&gt;
+&lt;p&gt;For instance, see below the difference between the default output of a &lt;a href=&#34;/blog/chi-square-test-of-independence-in-r&#34;&gt;Chi-square test of independence&lt;/a&gt; and the output from the same test with the &lt;code&gt;pander()&lt;/code&gt; function (using the &lt;code&gt;diamonds&lt;/code&gt; dataset from the &lt;code&gt;{ggplot2}&lt;/code&gt; package):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+dat &amp;lt;- diamonds
+
+test &amp;lt;- chisq.test(table(dat$cut, dat$color))
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Pearson&amp;#39;s Chi-squared test
+## 
+## data:  table(dat$cut, dat$color)
+## X-squared = 310.32, df = 24, p-value &amp;lt; 2.2e-16&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(pander)
+pander(test)&lt;/code&gt;&lt;/pre&gt;
+&lt;table style=&#34;width:56%;&#34;&gt;
+&lt;caption&gt;Pearson’s Chi-squared test: &lt;code&gt;table(dat$cut, dat$color)&lt;/code&gt;&lt;/caption&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;23%&#34; /&gt;
+&lt;col width=&#34;6%&#34; /&gt;
+&lt;col width=&#34;25%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;Test statistic&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;df&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;P value&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;310.3&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;24&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.395e-51 * * *&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;All information that you need are displayed in an elegant table. The &lt;code&gt;pander()&lt;/code&gt; function works on many statistical tests (not to say all of them, but I have not tried it on &lt;em&gt;all&lt;/em&gt; available tests in R) and on regression models:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Linear model with lm()
+model &amp;lt;- lm(price ~ carat + x + y + z, data = dat)
+model&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## lm(formula = price ~ carat + x + y + z, data = dat)
+## 
+## Coefficients:
+## (Intercept)        carat            x            y            z  
+##      1921.2      10233.9       -884.2        166.0       -576.2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(model)&lt;/code&gt;&lt;/pre&gt;
+&lt;table style=&#34;width:90%;&#34;&gt;
+&lt;caption&gt;Fitting linear model: price ~ carat + x + y + z&lt;/caption&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;25%&#34; /&gt;
+&lt;col width=&#34;15%&#34; /&gt;
+&lt;col width=&#34;18%&#34; /&gt;
+&lt;col width=&#34;13%&#34; /&gt;
+&lt;col width=&#34;18%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt; &lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Estimate&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Std. Error&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;t value&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Pr(&amp;gt;|t|)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;(Intercept)&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1921&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;104.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;18.41&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.977e-75&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;carat&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;10234&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;62.94&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;162.6&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;x&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-884.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;40.47&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-21.85&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2.317e-105&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;y&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;166&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;25.86&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;6.421&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.365e-10&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;z&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-576.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;39.28&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-14.67&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.277e-48&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The pander function also makes datasets, tables, vectors, etc. more readable in R Markdown output. For example, see the differences below:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(diamonds) # first 6 observations of a dataset&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 6 x 10
+##   carat cut       color clarity depth table price     x     y     z
+##   &amp;lt;dbl&amp;gt; &amp;lt;ord&amp;gt;     &amp;lt;ord&amp;gt; &amp;lt;ord&amp;gt;   &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;int&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
+## 1 0.23  Ideal     E     SI2      61.5    55   326  3.95  3.98  2.43
+## 2 0.21  Premium   E     SI1      59.8    61   326  3.89  3.84  2.31
+## 3 0.23  Good      E     VS1      56.9    65   327  4.05  4.07  2.31
+## 4 0.290 Premium   I     VS2      62.4    58   334  4.2   4.23  2.63
+## 5 0.31  Good      J     SI2      63.3    58   335  4.34  4.35  2.75
+## 6 0.24  Very Good J     VVS2     62.8    57   336  3.94  3.96  2.48&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(head(diamonds))&lt;/code&gt;&lt;/pre&gt;
+&lt;table style=&#34;width:100%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;14%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;8%&#34; /&gt;
+&lt;col width=&#34;8%&#34; /&gt;
+&lt;col width=&#34;8%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;carat&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;cut&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;color&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;clarity&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;depth&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;table&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;price&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;x&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;y&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;z&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.23&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Ideal&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;E&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;SI2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;61.5&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;55&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;326&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.95&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.98&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2.43&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.21&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Premium&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;E&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;SI1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;59.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;61&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;326&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.89&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.84&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2.31&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.23&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Good&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;E&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;VS1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;56.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;65&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;327&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;4.05&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;4.07&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2.31&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.29&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Premium&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;I&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;VS2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;62.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;58&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;334&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;4.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;4.23&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2.63&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.31&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Good&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;J&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;SI2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;63.3&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;58&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;335&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;4.34&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;4.35&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2.75&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.24&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Very Good&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;J&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;VVS2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;62.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;57&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;336&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.94&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.96&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2.48&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(diamonds) # main descriptive statistics&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##      carat               cut        color        clarity          depth      
+##  Min.   :0.2000   Fair     : 1610   D: 6775   SI1    :13065   Min.   :43.00  
+##  1st Qu.:0.4000   Good     : 4906   E: 9797   VS2    :12258   1st Qu.:61.00  
+##  Median :0.7000   Very Good:12082   F: 9542   SI2    : 9194   Median :61.80  
+##  Mean   :0.7979   Premium  :13791   G:11292   VS1    : 8171   Mean   :61.75  
+##  3rd Qu.:1.0400   Ideal    :21551   H: 8304   VVS2   : 5066   3rd Qu.:62.50  
+##  Max.   :5.0100                     I: 5422   VVS1   : 3655   Max.   :79.00  
+##                                     J: 2808   (Other): 2531                  
+##      table           price             x                y         
+##  Min.   :43.00   Min.   :  326   Min.   : 0.000   Min.   : 0.000  
+##  1st Qu.:56.00   1st Qu.:  950   1st Qu.: 4.710   1st Qu.: 4.720  
+##  Median :57.00   Median : 2401   Median : 5.700   Median : 5.710  
+##  Mean   :57.46   Mean   : 3933   Mean   : 5.731   Mean   : 5.735  
+##  3rd Qu.:59.00   3rd Qu.: 5324   3rd Qu.: 6.540   3rd Qu.: 6.540  
+##  Max.   :95.00   Max.   :18823   Max.   :10.740   Max.   :58.900  
+##                                                                   
+##        z         
+##  Min.   : 0.000  
+##  1st Qu.: 2.910  
+##  Median : 3.530  
+##  Mean   : 3.539  
+##  3rd Qu.: 4.040  
+##  Max.   :31.800  
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(summary(diamonds))&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+&lt;caption&gt;Table continues below&lt;/caption&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;22%&#34; /&gt;
+&lt;col width=&#34;23%&#34; /&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;col width=&#34;20%&#34; /&gt;
+&lt;col width=&#34;20%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;carat&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;cut&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;color&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;clarity&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;depth&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Min. :0.2000&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Fair : 1610&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;D: 6775&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;SI1 :13065&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Min. :43.00&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1st Qu.:0.4000&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Good : 4906&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;E: 9797&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;VS2 :12258&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1st Qu.:61.00&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Median :0.7000&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Very Good:12082&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;F: 9542&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;SI2 : 9194&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Median :61.80&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Mean :0.7979&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Premium :13791&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;G:11292&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;VS1 : 8171&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Mean :61.75&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;3rd Qu.:1.0400&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Ideal :21551&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;H: 8304&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;VVS2 : 5066&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3rd Qu.:62.50&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Max. :5.0100&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;I: 5422&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;VVS1 : 3655&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Max. :79.00&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;J: 2808&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;(Other): 2531&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;19%&#34; /&gt;
+&lt;col width=&#34;19%&#34; /&gt;
+&lt;col width=&#34;20%&#34; /&gt;
+&lt;col width=&#34;20%&#34; /&gt;
+&lt;col width=&#34;20%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;table&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;price&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;x&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;y&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;z&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Min. :43.00&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Min. : 326&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Min. : 0.000&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Min. : 0.000&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Min. : 0.000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1st Qu.:56.00&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1st Qu.: 950&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1st Qu.: 4.710&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1st Qu.: 4.720&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1st Qu.: 2.910&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Median :57.00&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Median : 2401&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Median : 5.700&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Median : 5.710&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Median : 3.530&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Mean :57.46&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Mean : 3933&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Mean : 5.731&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Mean : 5.735&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Mean : 3.539&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;3rd Qu.:59.00&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3rd Qu.: 5324&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3rd Qu.: 6.540&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3rd Qu.: 6.540&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3rd Qu.: 4.040&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;Max. :95.00&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Max. :18823&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Max. :10.740&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Max. :58.900&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Max. :31.800&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;table(dat$cut, dat$color) # contingency table&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##            
+##                D    E    F    G    H    I    J
+##   Fair       163  224  312  314  303  175  119
+##   Good       662  933  909  871  702  522  307
+##   Very Good 1513 2400 2164 2299 1824 1204  678
+##   Premium   1603 2337 2331 2924 2360 1428  808
+##   Ideal     2834 3903 3826 4884 3115 2093  896&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(table(dat$cut, dat$color))&lt;/code&gt;&lt;/pre&gt;
+&lt;table style=&#34;width:90%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;22%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;col width=&#34;9%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt; &lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;D&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;E&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;F&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;G&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;H&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;I&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;J&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;Fair&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;163&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;224&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;312&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;314&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;303&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;175&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;119&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;Good&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;662&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;933&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;909&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;871&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;702&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;522&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;307&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;Very Good&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1513&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2400&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2164&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2299&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1824&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1204&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;678&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;Premium&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1603&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2337&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2331&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2924&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2360&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1428&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;808&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;&lt;strong&gt;Ideal&lt;/strong&gt;&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2834&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3903&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3826&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;4884&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3115&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2093&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;896&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;names(dat) # variable names&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##  [1] &amp;quot;carat&amp;quot;   &amp;quot;cut&amp;quot;     &amp;quot;color&amp;quot;   &amp;quot;clarity&amp;quot; &amp;quot;depth&amp;quot;   &amp;quot;table&amp;quot;   &amp;quot;price&amp;quot;  
+##  [8] &amp;quot;x&amp;quot;       &amp;quot;y&amp;quot;       &amp;quot;z&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(names(dat))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;carat&lt;/em&gt;, &lt;em&gt;cut&lt;/em&gt;, &lt;em&gt;color&lt;/em&gt;, &lt;em&gt;clarity&lt;/em&gt;, &lt;em&gt;depth&lt;/em&gt;, &lt;em&gt;table&lt;/em&gt;, &lt;em&gt;price&lt;/em&gt;, &lt;em&gt;x&lt;/em&gt;, &lt;em&gt;y&lt;/em&gt; and &lt;em&gt;z&lt;/em&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rnorm(4) # generates 4 observations from a standard normal distribution&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -1.1730887  0.8364277  0.5856214  0.6309018&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(rnorm(4))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;-1.085&lt;/em&gt;, &lt;em&gt;0.1015&lt;/em&gt;, &lt;em&gt;1.465&lt;/em&gt; and &lt;em&gt;1.145&lt;/em&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;others&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Others&lt;/h1&gt;

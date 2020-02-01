@@ -127,7 +127,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            6 minute read
+                            11 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -166,6 +166,7 @@
 <li><a href="#new-code-chunk-in-r-markdown">New code chunk in R Markdown</a></li>
 <li><a href="#reformat-code">Reformat code</a></li>
 <li><a href="#rstudio-addins">RStudio addins</a></li>
+<li><a href="#pander-for-easthetics"><code>{pander}</code> for easthetics</a></li>
 <li><a href="#others">Others</a></li>
 </ul>
 </div>
@@ -329,6 +330,486 @@ for (i in 1:10) {
 <p>RStudio addins are extensions which provide a simple mechanism for executing advanced R functions from within RStudio. In simpler words, when executing an addin (by clicking a button in the Addins menu), the corresponding code is executed without you having to write the code. RStudio addins have the advantage that they allow you to execute complex and advanced code much more easily than if you would have to write it yourself.</p>
 <p>The addin I use most ofen is probably the <code>{esquisse}</code> addin, which allows to draw plots from the <code>{ggplot2}</code> package in a user-friendly and interactive way, and without having to write the code myself.</p>
 <p>RStudio addins are quite diverse and require a more detailed explanation, so I wrote an article focusing on these addins. See the article <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/">here</a>.</p>
+</div>
+<div id="pander-for-easthetics" class="section level1">
+<h1><code>{pander}</code> for easthetics</h1>
+<p>The <code>pander()</code> function from the <code>{pander}</code> package is very useful for R Markdown documents and reporting. It is not actually a shortcut but it greatly improves the easthetics of R outputs.</p>
+<p>For instance, see below the difference between the default output of a <a href="/blog/chi-square-test-of-independence-in-r">Chi-square test of independence</a> and the output from the same test with the <code>pander()</code> function (using the <code>diamonds</code> dataset from the <code>{ggplot2}</code> package):</p>
+<pre class="r"><code>library(ggplot2)
+dat &lt;- diamonds
+
+test &lt;- chisq.test(table(dat$cut, dat$color))
+test</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  table(dat$cut, dat$color)
+## X-squared = 310.32, df = 24, p-value &lt; 2.2e-16</code></pre>
+<pre class="r"><code>library(pander)
+pander(test)</code></pre>
+<table style="width:56%;">
+<caption>Pearson’s Chi-squared test: <code>table(dat$cut, dat$color)</code></caption>
+<colgroup>
+<col width="23%" />
+<col width="6%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Test statistic</th>
+<th align="center">df</th>
+<th align="center">P value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">310.3</td>
+<td align="center">24</td>
+<td align="center">1.395e-51 * * *</td>
+</tr>
+</tbody>
+</table>
+<p>All information that you need are displayed in an elegant table. The <code>pander()</code> function works on many statistical tests (not to say all of them, but I have not tried it on <em>all</em> available tests in R) and on regression models:</p>
+<pre class="r"><code># Linear model with lm()
+model &lt;- lm(price ~ carat + x + y + z, data = dat)
+model</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = price ~ carat + x + y + z, data = dat)
+## 
+## Coefficients:
+## (Intercept)        carat            x            y            z  
+##      1921.2      10233.9       -884.2        166.0       -576.2</code></pre>
+<pre class="r"><code>pander(model)</code></pre>
+<table style="width:90%;">
+<caption>Fitting linear model: price ~ carat + x + y + z</caption>
+<colgroup>
+<col width="25%" />
+<col width="15%" />
+<col width="18%" />
+<col width="13%" />
+<col width="18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Estimate</th>
+<th align="center">Std. Error</th>
+<th align="center">t value</th>
+<th align="center">Pr(&gt;|t|)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>(Intercept)</strong></td>
+<td align="center">1921</td>
+<td align="center">104.4</td>
+<td align="center">18.41</td>
+<td align="center">1.977e-75</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>carat</strong></td>
+<td align="center">10234</td>
+<td align="center">62.94</td>
+<td align="center">162.6</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x</strong></td>
+<td align="center">-884.2</td>
+<td align="center">40.47</td>
+<td align="center">-21.85</td>
+<td align="center">2.317e-105</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>y</strong></td>
+<td align="center">166</td>
+<td align="center">25.86</td>
+<td align="center">6.421</td>
+<td align="center">1.365e-10</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>z</strong></td>
+<td align="center">-576.2</td>
+<td align="center">39.28</td>
+<td align="center">-14.67</td>
+<td align="center">1.277e-48</td>
+</tr>
+</tbody>
+</table>
+<p>The pander function also makes datasets, tables, vectors, etc. more readable in R Markdown output. For example, see the differences below:</p>
+<pre class="r"><code>head(diamonds) # first 6 observations of a dataset</code></pre>
+<pre><code>## # A tibble: 6 x 10
+##   carat cut       color clarity depth table price     x     y     z
+##   &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 0.23  Ideal     E     SI2      61.5    55   326  3.95  3.98  2.43
+## 2 0.21  Premium   E     SI1      59.8    61   326  3.89  3.84  2.31
+## 3 0.23  Good      E     VS1      56.9    65   327  4.05  4.07  2.31
+## 4 0.290 Premium   I     VS2      62.4    58   334  4.2   4.23  2.63
+## 5 0.31  Good      J     SI2      63.3    58   335  4.34  4.35  2.75
+## 6 0.24  Very Good J     VVS2     62.8    57   336  3.94  3.96  2.48</code></pre>
+<pre class="r"><code>pander(head(diamonds))</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="9%" />
+<col width="12%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">carat</th>
+<th align="center">cut</th>
+<th align="center">color</th>
+<th align="center">clarity</th>
+<th align="center">depth</th>
+<th align="center">table</th>
+<th align="center">price</th>
+<th align="center">x</th>
+<th align="center">y</th>
+<th align="center">z</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0.23</td>
+<td align="center">Ideal</td>
+<td align="center">E</td>
+<td align="center">SI2</td>
+<td align="center">61.5</td>
+<td align="center">55</td>
+<td align="center">326</td>
+<td align="center">3.95</td>
+<td align="center">3.98</td>
+<td align="center">2.43</td>
+</tr>
+<tr class="even">
+<td align="center">0.21</td>
+<td align="center">Premium</td>
+<td align="center">E</td>
+<td align="center">SI1</td>
+<td align="center">59.8</td>
+<td align="center">61</td>
+<td align="center">326</td>
+<td align="center">3.89</td>
+<td align="center">3.84</td>
+<td align="center">2.31</td>
+</tr>
+<tr class="odd">
+<td align="center">0.23</td>
+<td align="center">Good</td>
+<td align="center">E</td>
+<td align="center">VS1</td>
+<td align="center">56.9</td>
+<td align="center">65</td>
+<td align="center">327</td>
+<td align="center">4.05</td>
+<td align="center">4.07</td>
+<td align="center">2.31</td>
+</tr>
+<tr class="even">
+<td align="center">0.29</td>
+<td align="center">Premium</td>
+<td align="center">I</td>
+<td align="center">VS2</td>
+<td align="center">62.4</td>
+<td align="center">58</td>
+<td align="center">334</td>
+<td align="center">4.2</td>
+<td align="center">4.23</td>
+<td align="center">2.63</td>
+</tr>
+<tr class="odd">
+<td align="center">0.31</td>
+<td align="center">Good</td>
+<td align="center">J</td>
+<td align="center">SI2</td>
+<td align="center">63.3</td>
+<td align="center">58</td>
+<td align="center">335</td>
+<td align="center">4.34</td>
+<td align="center">4.35</td>
+<td align="center">2.75</td>
+</tr>
+<tr class="even">
+<td align="center">0.24</td>
+<td align="center">Very Good</td>
+<td align="center">J</td>
+<td align="center">VVS2</td>
+<td align="center">62.8</td>
+<td align="center">57</td>
+<td align="center">336</td>
+<td align="center">3.94</td>
+<td align="center">3.96</td>
+<td align="center">2.48</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>summary(diamonds) # main descriptive statistics</code></pre>
+<pre><code>##      carat               cut        color        clarity          depth      
+##  Min.   :0.2000   Fair     : 1610   D: 6775   SI1    :13065   Min.   :43.00  
+##  1st Qu.:0.4000   Good     : 4906   E: 9797   VS2    :12258   1st Qu.:61.00  
+##  Median :0.7000   Very Good:12082   F: 9542   SI2    : 9194   Median :61.80  
+##  Mean   :0.7979   Premium  :13791   G:11292   VS1    : 8171   Mean   :61.75  
+##  3rd Qu.:1.0400   Ideal    :21551   H: 8304   VVS2   : 5066   3rd Qu.:62.50  
+##  Max.   :5.0100                     I: 5422   VVS1   : 3655   Max.   :79.00  
+##                                     J: 2808   (Other): 2531                  
+##      table           price             x                y         
+##  Min.   :43.00   Min.   :  326   Min.   : 0.000   Min.   : 0.000  
+##  1st Qu.:56.00   1st Qu.:  950   1st Qu.: 4.710   1st Qu.: 4.720  
+##  Median :57.00   Median : 2401   Median : 5.700   Median : 5.710  
+##  Mean   :57.46   Mean   : 3933   Mean   : 5.731   Mean   : 5.735  
+##  3rd Qu.:59.00   3rd Qu.: 5324   3rd Qu.: 6.540   3rd Qu.: 6.540  
+##  Max.   :95.00   Max.   :18823   Max.   :10.740   Max.   :58.900  
+##                                                                   
+##        z         
+##  Min.   : 0.000  
+##  1st Qu.: 2.910  
+##  Median : 3.530  
+##  Mean   : 3.539  
+##  3rd Qu.: 4.040  
+##  Max.   :31.800  
+## </code></pre>
+<pre class="r"><code>pander(summary(diamonds))</code></pre>
+<table>
+<caption>Table continues below</caption>
+<colgroup>
+<col width="22%" />
+<col width="23%" />
+<col width="12%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">carat</th>
+<th align="center">cut</th>
+<th align="center">color</th>
+<th align="center">clarity</th>
+<th align="center">depth</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Min. :0.2000</td>
+<td align="center">Fair : 1610</td>
+<td align="center">D: 6775</td>
+<td align="center">SI1 :13065</td>
+<td align="center">Min. :43.00</td>
+</tr>
+<tr class="even">
+<td align="center">1st Qu.:0.4000</td>
+<td align="center">Good : 4906</td>
+<td align="center">E: 9797</td>
+<td align="center">VS2 :12258</td>
+<td align="center">1st Qu.:61.00</td>
+</tr>
+<tr class="odd">
+<td align="center">Median :0.7000</td>
+<td align="center">Very Good:12082</td>
+<td align="center">F: 9542</td>
+<td align="center">SI2 : 9194</td>
+<td align="center">Median :61.80</td>
+</tr>
+<tr class="even">
+<td align="center">Mean :0.7979</td>
+<td align="center">Premium :13791</td>
+<td align="center">G:11292</td>
+<td align="center">VS1 : 8171</td>
+<td align="center">Mean :61.75</td>
+</tr>
+<tr class="odd">
+<td align="center">3rd Qu.:1.0400</td>
+<td align="center">Ideal :21551</td>
+<td align="center">H: 8304</td>
+<td align="center">VVS2 : 5066</td>
+<td align="center">3rd Qu.:62.50</td>
+</tr>
+<tr class="even">
+<td align="center">Max. :5.0100</td>
+<td align="center">NA</td>
+<td align="center">I: 5422</td>
+<td align="center">VVS1 : 3655</td>
+<td align="center">Max. :79.00</td>
+</tr>
+<tr class="odd">
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">J: 2808</td>
+<td align="center">(Other): 2531</td>
+<td align="center">NA</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col width="19%" />
+<col width="19%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">table</th>
+<th align="center">price</th>
+<th align="center">x</th>
+<th align="center">y</th>
+<th align="center">z</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Min. :43.00</td>
+<td align="center">Min. : 326</td>
+<td align="center">Min. : 0.000</td>
+<td align="center">Min. : 0.000</td>
+<td align="center">Min. : 0.000</td>
+</tr>
+<tr class="even">
+<td align="center">1st Qu.:56.00</td>
+<td align="center">1st Qu.: 950</td>
+<td align="center">1st Qu.: 4.710</td>
+<td align="center">1st Qu.: 4.720</td>
+<td align="center">1st Qu.: 2.910</td>
+</tr>
+<tr class="odd">
+<td align="center">Median :57.00</td>
+<td align="center">Median : 2401</td>
+<td align="center">Median : 5.700</td>
+<td align="center">Median : 5.710</td>
+<td align="center">Median : 3.530</td>
+</tr>
+<tr class="even">
+<td align="center">Mean :57.46</td>
+<td align="center">Mean : 3933</td>
+<td align="center">Mean : 5.731</td>
+<td align="center">Mean : 5.735</td>
+<td align="center">Mean : 3.539</td>
+</tr>
+<tr class="odd">
+<td align="center">3rd Qu.:59.00</td>
+<td align="center">3rd Qu.: 5324</td>
+<td align="center">3rd Qu.: 6.540</td>
+<td align="center">3rd Qu.: 6.540</td>
+<td align="center">3rd Qu.: 4.040</td>
+</tr>
+<tr class="even">
+<td align="center">Max. :95.00</td>
+<td align="center">Max. :18823</td>
+<td align="center">Max. :10.740</td>
+<td align="center">Max. :58.900</td>
+<td align="center">Max. :31.800</td>
+</tr>
+<tr class="odd">
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>table(dat$cut, dat$color) # contingency table</code></pre>
+<pre><code>##            
+##                D    E    F    G    H    I    J
+##   Fair       163  224  312  314  303  175  119
+##   Good       662  933  909  871  702  522  307
+##   Very Good 1513 2400 2164 2299 1824 1204  678
+##   Premium   1603 2337 2331 2924 2360 1428  808
+##   Ideal     2834 3903 3826 4884 3115 2093  896</code></pre>
+<pre class="r"><code>pander(table(dat$cut, dat$color))</code></pre>
+<table style="width:90%;">
+<colgroup>
+<col width="22%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">D</th>
+<th align="center">E</th>
+<th align="center">F</th>
+<th align="center">G</th>
+<th align="center">H</th>
+<th align="center">I</th>
+<th align="center">J</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Fair</strong></td>
+<td align="center">163</td>
+<td align="center">224</td>
+<td align="center">312</td>
+<td align="center">314</td>
+<td align="center">303</td>
+<td align="center">175</td>
+<td align="center">119</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Good</strong></td>
+<td align="center">662</td>
+<td align="center">933</td>
+<td align="center">909</td>
+<td align="center">871</td>
+<td align="center">702</td>
+<td align="center">522</td>
+<td align="center">307</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Very Good</strong></td>
+<td align="center">1513</td>
+<td align="center">2400</td>
+<td align="center">2164</td>
+<td align="center">2299</td>
+<td align="center">1824</td>
+<td align="center">1204</td>
+<td align="center">678</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Premium</strong></td>
+<td align="center">1603</td>
+<td align="center">2337</td>
+<td align="center">2331</td>
+<td align="center">2924</td>
+<td align="center">2360</td>
+<td align="center">1428</td>
+<td align="center">808</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Ideal</strong></td>
+<td align="center">2834</td>
+<td align="center">3903</td>
+<td align="center">3826</td>
+<td align="center">4884</td>
+<td align="center">3115</td>
+<td align="center">2093</td>
+<td align="center">896</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>names(dat) # variable names</code></pre>
+<pre><code>##  [1] &quot;carat&quot;   &quot;cut&quot;     &quot;color&quot;   &quot;clarity&quot; &quot;depth&quot;   &quot;table&quot;   &quot;price&quot;  
+##  [8] &quot;x&quot;       &quot;y&quot;       &quot;z&quot;</code></pre>
+<pre class="r"><code>pander(names(dat))</code></pre>
+<p><em>carat</em>, <em>cut</em>, <em>color</em>, <em>clarity</em>, <em>depth</em>, <em>table</em>, <em>price</em>, <em>x</em>, <em>y</em> and <em>z</em></p>
+<pre class="r"><code>rnorm(4) # generates 4 observations from a standard normal distribution</code></pre>
+<pre><code>## [1] -1.1730887  0.8364277  0.5856214  0.6309018</code></pre>
+<pre class="r"><code>pander(rnorm(4))</code></pre>
+<p><em>-1.085</em>, <em>0.1015</em>, <em>1.465</em> and <em>1.145</em></p>
 </div>
 <div id="others" class="section level1">
 <h1>Others</h1>
@@ -514,6 +995,9 @@ if (!doNotTrack) {
 
     
         
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
 
     
 </body>
