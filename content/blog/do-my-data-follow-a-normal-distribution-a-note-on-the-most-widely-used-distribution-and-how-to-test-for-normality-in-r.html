@@ -306,19 +306,26 @@ hist(iris$Sepal.Length)</code></pre>
 <p>Histograms are however not sufficient, particularily in the case of small samples because the number of bins greatly change its appearance. Histograms are not recommended when the number of observations is less than 20 because it does not always correctly illustrate the distribution. See two examples below with dataset of 10 and 12 observations:</p>
 <p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-10-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Can you tell whether these datasets follow a normal distribution? Suprisingly, both follow a normal distribution!</p>
+<p>In the remaining of the article, we will use the dataset of the 12 adults. If you would like to follow my code in your own script, here is how I generated the data:</p>
+<pre class="r"><code>set.seed(42)
+N &lt;- 12
+dat_hist &lt;- data.frame(
+  value = rnorm(N, mean = 165, sd = 5)
+)</code></pre>
+<p>Note that <code>set.seed(42)</code> is important to obtain the exact same data as me.</p>
 </div>
 <div id="density-plot" class="section level2">
 <h2>Density plot</h2>
 <p>Density plots also provide a visual judgment about whether the data follow a normal distribution. They are similar to histograms as they also allow to analyze the spread and the shape of the distribution. However, they are a smoothed version of the histogram. Here is the density plot drawn from the dataset on the height of the 12 adults discussed above:</p>
 <pre class="r"><code>plot(density(dat_hist$value))</code></pre>
-<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>In <code>{ggpubr}</code>:</p>
 <pre class="r"><code>library(&quot;ggpubr&quot;) # package must be installed first
 ggdensity(dat_hist$value,
   main = &quot;Density plot of adult height&quot;,
   xlab = &quot;Height (cm)&quot;
 )</code></pre>
-<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Since it is hard to test for normality from histograms and density plots only, it is recommended to corroborate these graphs with a QQ-plot. QQ-plot, also known as normality plot, is the third method presented to evaluate normality.</p>
 </div>
 <div id="qq-plot" class="section level2">
@@ -326,16 +333,16 @@ ggdensity(dat_hist$value,
 <p>Like histograms and density plots, QQ-plots allow to visually evaluate the normality assumption. Here is the QQ-plot drawn from the dataset on the height of the 12 adults discussed above:</p>
 <pre class="r"><code>library(car)
 qqPlot(dat_hist$value)</code></pre>
-<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 12  2</code></pre>
 <p>In <code>{ggpubr}</code>:</p>
 <pre class="r"><code>library(ggpubr)
 ggqqplot(dat_hist$value)</code></pre>
-<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Instead of looking at the spread of the data (as it is the case with histograms and density plots), with QQ-plots we only need to ascertain whether the data points follow the line (sometimes referred as Henry’s line).</p>
 <p>If points are close to the reference line and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The height of these 12 adults seem to follow a normal distribution because all points lie within the confidence bands.</p>
 <p>When facing a non-normal distribution as shown by the QQ-plot below (systematic departure from the reference line), the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. Applying the logarithm transformation can be done with the <code>log()</code> function.</p>
-<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Note that QQ-plots are also a convenient way to assess whether residuals from regression analysis follow a normal distribution.</p>
 </div>
 <div id="normality-test" class="section level2">
