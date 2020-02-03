@@ -12,4 +12,4 @@ Below are the 10 most recent comments on the blog in case you want to follow the
 
 <br>
 
-<script type="text/javascript" src="https://funbutlearn.disqus.com/combination_widget.js?num_items=10&hide_mods=0&color=grey&default_tab=recent&excerpt_length=70"></script>
+<script type="text/javascript" src="https://statsandr.disqus.com/combination_widget.js?num_items=10&hide_mods=0&color=grey&default_tab=recent&excerpt_length=70"></script>
