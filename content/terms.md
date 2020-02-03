@@ -1,7 +1,7 @@
 ---
 title: 'Terms and policies'
 date: "2019-12-25"
-# description: "Description for the page."
+description: "Terms and policies, privacy policy, disclosure policy and license."
 ---
 
 This is my personal blog written and edited by me. Your use of this website, in any and all forms, constitutes an acceptance of these terms and policies. This page is reviewed and revised from time to time.

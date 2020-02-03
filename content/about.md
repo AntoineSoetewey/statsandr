@@ -1,8 +1,8 @@
 ---
-title: About
+title: "About"
 date: "2019-12-16"
-# description: About description.
-menu: main
+description: "Learn more about the author of the blog."
+menu: "main"
 ---
 
 Hello, my name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a PhD student in statistics at UCLouvain (Belgium). My research interests focus on survival analysis and bio-statistical procedures applied to cancer patients.
