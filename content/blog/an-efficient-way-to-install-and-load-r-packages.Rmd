@@ -82,7 +82,9 @@ This code for installing and loading R packages is more efficient in several way
 
 From that day on, every time I need to use a new package, I simply add it to the vector `packages` at the top of the code, which is located at the top of my scripts and R Markdown documents. No matter on which computer I am working on, running the entire code will install only the missing packages and will load all of them. This greatly reduced the running time for the installation and loading of my R packages.
 
-# Most efficient way: `{pacman}` package
+# Most efficient way
+
+## `{pacman}` package
 
 After this article was published, a reader informed me about the `{packman}` package. After having read the documentation and try it out myself, I learned that the function `p_load()` from `{pacman}` checks to see if a package is installed, if not it attempts to install the package and then loads it. It can also be applied to several packages at once, all this in a very condensed way:
 
@@ -91,6 +93,27 @@ install.packages("pacman")
 
 pacman::p_load(ggplot2, tidyr, dplyr)
 ```
+
+Find more about this package on <a href="https://cran.r-project.org/web/packages/pacman/index.html" target="_blank" rel="noopener">CRAN</a>.
+
+## `{librarian}` package
+
+Like pacman, the `shelf()` function from `{librarian}` package automatically installs, updates, and load R packages that are not yet installed in a single function. The function accepts packages from CRAN, GitHub, and Bioconductor and it accepts multiple package entries, provided as a comma-separated list of unquoted names (so no `""` around package names).
+
+Last but not least, the `{librarian}` package allows to load packages automatically at the start of every R session (thanks to the `lib_startup()` function) and search for new packages on CRAN by keywords or regular expressions (thanks to the `browse_cran()` function).
+
+Here is an example of how to install missing packages and load them with the `shelf()` function:
+
+```{r, eval = FALSE}
+# From CRAN:
+install.packages("librarian")
+
+librarian::shelf(ggplot2, DesiQuintans/desiderata, pander)
+```
+
+For CRAN packages, provide the package name as normal without `""` and for GitHub packages, provide the username and package name separated by `/` (i.e., `UserName/RepoName`).
+
+Find more about this package on <a href="https://cran.r-project.org/web/packages/librarian/index.html" target="_blank" rel="noopener">CRAN</a>.
 
 Thanks for reading. I hope the article helped you to install and load R packages in a more efficient way.
 

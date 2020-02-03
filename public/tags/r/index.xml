@@ -24,7 +24,10 @@
 &lt;li&gt;&lt;a href=&#34;#what-is-a-r-package-and-how-to-use-it&#34;&gt;What is a R package and how to use it?&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#inefficient-way-to-install-and-load-r-packages&#34;&gt;Inefficient way to install and load R packages&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#more-efficient-way&#34;&gt;More efficient way&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#most-efficient-way-pacman-package&#34;&gt;Most efficient way: &lt;code&gt;{pacman}&lt;/code&gt; package&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#most-efficient-way&#34;&gt;Most efficient way&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#pacman-package&#34;&gt;&lt;code&gt;{pacman}&lt;/code&gt; package&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#librarian-package&#34;&gt;&lt;code&gt;{librarian}&lt;/code&gt; package&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -85,18 +88,34 @@ invisible(lapply(packages, library, character.only = TRUE))&lt;/code&gt;&lt;/pre
 &lt;/ol&gt;
 &lt;p&gt;From that day on, every time I need to use a new package, I simply add it to the vector &lt;code&gt;packages&lt;/code&gt; at the top of the code, which is located at the top of my scripts and R Markdown documents. No matter on which computer I am working on, running the entire code will install only the missing packages and will load all of them. This greatly reduced the running time for the installation and loading of my R packages.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div id=&#34;most-efficient-way-pacman-package&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Most efficient way: &lt;code&gt;{pacman}&lt;/code&gt; package&lt;/h1&gt;
+&lt;div id=&#34;most-efficient-way&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Most efficient way&lt;/h1&gt;
+&lt;div id=&#34;pacman-package&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;{pacman}&lt;/code&gt; package&lt;/h2&gt;
 &lt;p&gt;After this article was published, a reader informed me about the &lt;code&gt;{packman}&lt;/code&gt; package. After having read the documentation and try it out myself, I learned that the function &lt;code&gt;p_load()&lt;/code&gt; from &lt;code&gt;{pacman}&lt;/code&gt; checks to see if a package is installed, if not it attempts to install the package and then loads it. It can also be applied to several packages at once, all this in a very condensed way:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;install.packages(&amp;quot;pacman&amp;quot;)
 
 pacman::p_load(ggplot2, tidyr, dplyr)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Find more about this package on &lt;a href=&#34;https://cran.r-project.org/web/packages/pacman/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CRAN&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;librarian-package&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;{librarian}&lt;/code&gt; package&lt;/h2&gt;
+&lt;p&gt;Like pacman, the &lt;code&gt;shelf()&lt;/code&gt; function from &lt;code&gt;{librarian}&lt;/code&gt; package automatically installs, updates, and load R packages that are not yet installed in a single function. The function accepts packages from CRAN, GitHub, and Bioconductor and it accepts multiple package entries, provided as a comma-separated list of unquoted names (so no &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; around package names).&lt;/p&gt;
+&lt;p&gt;Last but not least, the &lt;code&gt;{librarian}&lt;/code&gt; package allows to load packages automatically at the start of every R session (thanks to the &lt;code&gt;lib_startup()&lt;/code&gt; function) and search for new packages on CRAN by keywords or regular expressions (thanks to the &lt;code&gt;browse_cran()&lt;/code&gt; function).&lt;/p&gt;
+&lt;p&gt;Here is an example of how to install missing packages and load them with the &lt;code&gt;shelf()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# From CRAN:
+install.packages(&amp;quot;librarian&amp;quot;)
+
+librarian::shelf(ggplot2, DesiQuintans/desiderata, pander)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For CRAN packages, provide the package name as normal without &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; and for GitHub packages, provide the username and package name separated by &lt;code&gt;/&lt;/code&gt; (i.e., &lt;code&gt;UserName/RepoName&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Find more about this package on &lt;a href=&#34;https://cran.r-project.org/web/packages/librarian/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CRAN&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Thanks for reading. I hope the article helped you to install and load R packages in a more efficient way.&lt;/p&gt;
 &lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;A special thanks Danilo for informing me about the &lt;code&gt;{pacman}&lt;/code&gt; package.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Related articles:&lt;/strong&gt;&lt;/p&gt;
 &lt;script src=&#34;//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&amp;detail=-1&amp;limit=5&amp;showtitle=false&amp;type=js&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 </description>
     </item>
