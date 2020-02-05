@@ -1,0 +1,76 @@
+---
+title: 'Clustering analysis: k-means and hierarchical clustering by hand and in R'
+author: Antoine Soetewey
+date: '2020-02-05'
+slug: clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r
+categories: []
+tags:
+  - R
+  - Statistics
+meta_img: image/image.png
+# description: Description for the page.
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+draft: true
+---
+
+# What is clustering analysis?
+
+Clustering analysis is a form of exploratory data analysis in which observations are divided into different groups that share common characteristics.
+
+The purpose of cluster analysis (also known as classification) is to construct groups (or classes or *clusters*) while ensuring the following property: Within a group the observations must be similar, while the differences between observations belonging to different groups must be significant.
+
+There are two main types of classification:
+
+1. *k*-means clustering
+2. Hierarchical clustering
+
+The first is generally used when the number of classes is fixed in advance, while the second is generally used for an unknown number of classes and helps to determine this optimal number. Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the *ascending* classification is presented in this article. 
+
+Clustering algorithms use the **distance** in order to separate observations into different groups. Therefore, before diving into the presentation of the two classification methods, a reminder exercise on how to compute distances between points is presented.
+
+## Application 1: Computing distances
+
+Let a data set containing the points $\boldsymbol{a} = (0, 0)'$, $\boldsymbol{b} = (1, 0)'$ and $\boldsymbol{c} = (5, 5)'$. Compute the matrix of Euclidean distances between the points.
+
+Solution:
+
+```{r}
+# We create the points in R
+a <- c(0, 0)
+b <- c(1, 0)
+c <- c(5, 5)
+
+X <- rbind(a, b, c) #a, b and c are combined per line
+colnames(X) <- c("x", "y") #rename columns. rownames() to rename rows
+X
+```
+
+By the Pythagorean theorem, we will remember that the distance between 2 points $(x_a, y_a)$ and $(x_b, y_b)$ in $\mathbb{R}^2$ is given by $\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}$. For the distance between the points $\boldsymbol{b} = (1, 0)'$ and $\boldsymbol{c} = (5, 5)'$ in the statement, we have :
+
+\begin{equation}
+\sqrt{(x_b - x_c)^2 + (y_b - y_c)^2} = \sqrt{(1-5)^2 + (0-5)^2} = 6.403124
+\end{equation}
+
+There is a function in R that allows you to find the distance in a very simple way:
+
+```{r}
+# The distance is found using the dist() function:
+distance <- dist(X, method = "euclidean") #the argument "method" is not
+# mandatory because the Euclidean method is the default one.
+distance
+```
+
+The distance matrix gives the distance between the different points. The Euclidean distance between the points $\boldsymbol{b}$ and $\boldsymbol{c}$ is `r round(distance[3], 6)`, which corresponds well to what we found above via the Pythagorean formula.
+
+Thanks for reading. I hope this article helped you understand the different clustering methods and to compute them by hand and in R.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me [here](/contact/).
+
+Get updates every time a new article is published by [subscribing to this blog](/subscribe/).
+
+**Related articles:**
+
+<script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>

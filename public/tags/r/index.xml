@@ -6,10 +6,76 @@
     <description>Recent content in R on Stats and R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Fri, 31 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 05 Feb 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Clustering analysis: k-means and hierarchical clustering by hand and in R</title>
+      <link>/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/</link>
+      <pubDate>Wed, 05 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#what-is-clustering-analysis&#34;&gt;What is clustering analysis?&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#application-1-computing-distances&#34;&gt;Application 1: Computing distances&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div id=&#34;what-is-clustering-analysis&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;What is clustering analysis?&lt;/h1&gt;
+&lt;p&gt;Clustering analysis is a form of exploratory data analysis in which observations are divided into different groups that share common characteristics.&lt;/p&gt;
+&lt;p&gt;The purpose of cluster analysis (also known as classification) is to construct groups (or classes or &lt;em&gt;clusters&lt;/em&gt;) while ensuring the following property: Within a group the observations must be similar, while the differences between observations belonging to different groups must be significant.&lt;/p&gt;
+&lt;p&gt;There are two main types of classification:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;em&gt;k&lt;/em&gt;-means clustering&lt;/li&gt;
+&lt;li&gt;Hierarchical clustering&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The first is generally used when the number of classes is fixed in advance, while the second is generally used for an unknown number of classes and helps to determine this optimal number. Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the &lt;em&gt;ascending&lt;/em&gt; classification is presented in this article.&lt;/p&gt;
+&lt;p&gt;Clustering algorithms use the &lt;strong&gt;distance&lt;/strong&gt; in order to separate observations into different groups. Therefore, before diving into the presentation of the two classification methods, a reminder exercise on how to compute distances between points is presented.&lt;/p&gt;
+&lt;div id=&#34;application-1-computing-distances&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Application 1: Computing distances&lt;/h2&gt;
+&lt;p&gt;Let a data set containing the points &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{a} = (0, 0)&amp;#39;\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{b} = (1, 0)&amp;#39;\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{c} = (5, 5)&amp;#39;\)&lt;/span&gt;. Compute the matrix of Euclidean distances between the points.&lt;/p&gt;
+&lt;p&gt;Solution:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# We create the points in R
+a &amp;lt;- c(0, 0)
+b &amp;lt;- c(1, 0)
+c &amp;lt;- c(5, 5)
+
+X &amp;lt;- rbind(a, b, c) #a, b and c are combined per line
+colnames(X) &amp;lt;- c(&amp;quot;x&amp;quot;, &amp;quot;y&amp;quot;) #rename columns. rownames() to rename rows
+X&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   x y
+## a 0 0
+## b 1 0
+## c 5 5&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;By the Pythagorean theorem, we will remember that the distance between 2 points &lt;span class=&#34;math inline&#34;&gt;\((x_a, y_a)\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\((x_b, y_b)\)&lt;/span&gt; in &lt;span class=&#34;math inline&#34;&gt;\(\mathbb{R}^2\)&lt;/span&gt; is given by &lt;span class=&#34;math inline&#34;&gt;\(\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}\)&lt;/span&gt;. For the distance between the points &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{b} = (1, 0)&amp;#39;\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{c} = (5, 5)&amp;#39;\)&lt;/span&gt; in the statement, we have :&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\begin{equation}
+\sqrt{(x_b - x_c)^2 + (y_b - y_c)^2} = \sqrt{(1-5)^2 + (0-5)^2} = 6.403124
+\end{equation}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;There is a function in R that allows you to find the distance in a very simple way:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# The distance is found using the dist() function:
+distance &amp;lt;- dist(X, method = &amp;quot;euclidean&amp;quot;) #the argument &amp;quot;method&amp;quot; is not
+# mandatory because the Euclidean method is the default one.
+distance&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##          a        b
+## b 1.000000         
+## c 7.071068 6.403124&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The distance matrix gives the distance between the different points. The Euclidean distance between the points &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{b}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{c}\)&lt;/span&gt; is 6.403124, which corresponds well to what we found above via the Pythagorean formula.&lt;/p&gt;
+&lt;p&gt;Thanks for reading. I hope this article helped you understand the different clustering methods and to compute them by hand and in R.&lt;/p&gt;
+&lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Related articles:&lt;/strong&gt;&lt;/p&gt;
+&lt;script src=&#34;//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Findex.xml&amp;detail=-1&amp;limit=5&amp;showtitle=false&amp;type=js&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>An efficient way to install and load R packages</title>
@@ -110,7 +176,7 @@ pacman::p_load(ggplot2, tidyr, dplyr)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# From CRAN:
 install.packages(&amp;quot;librarian&amp;quot;)
 
-librarian::shelf(ggplot2, DesiQuintans/desiderata, pander)&lt;/code&gt;&lt;/pre&gt;
+librarian::shelf(ggplot2, DesiQuintans / desiderata, pander)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;For CRAN packages, provide the package name as normal without &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; and for GitHub packages, provide the username and package name separated by &lt;code&gt;/&lt;/code&gt; (i.e., &lt;code&gt;UserName/RepoName&lt;/code&gt; as shown for the &lt;code&gt;desiderata&lt;/code&gt; package).&lt;/p&gt;
 &lt;p&gt;Find more about this package on &lt;a href=&#34;https://cran.r-project.org/web/packages/librarian/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CRAN&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Thanks for reading. I hope the article helped you to install and load R packages in a more efficient way.&lt;/p&gt;

@@ -1,0 +1,74 @@
+---
+title: 'Clustering analysis: k-means and hierarchical clustering by hand and in R'
+author: Antoine Soetewey
+date: '2020-02-05'
+slug: clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r
+categories: []
+tags:
+  - R
+  - Statistics
+meta_img: image/image.png
+# description: Description for the page.
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+draft: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#what-is-clustering-analysis">What is clustering analysis?</a><ul>
+<li><a href="#application-1-computing-distances">Application 1: Computing distances</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="what-is-clustering-analysis" class="section level1">
+<h1>What is clustering analysis?</h1>
+<p>Clustering analysis is a form of exploratory data analysis in which observations are divided into different groups that share common characteristics.</p>
+<p>The purpose of cluster analysis (also known as classification) is to construct groups (or classes or <em>clusters</em>) while ensuring the following property: Within a group the observations must be similar, while the differences between observations belonging to different groups must be significant.</p>
+<p>There are two main types of classification:</p>
+<ol style="list-style-type: decimal">
+<li><em>k</em>-means clustering</li>
+<li>Hierarchical clustering</li>
+</ol>
+<p>The first is generally used when the number of classes is fixed in advance, while the second is generally used for an unknown number of classes and helps to determine this optimal number. Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the <em>ascending</em> classification is presented in this article.</p>
+<p>Clustering algorithms use the <strong>distance</strong> in order to separate observations into different groups. Therefore, before diving into the presentation of the two classification methods, a reminder exercise on how to compute distances between points is presented.</p>
+<div id="application-1-computing-distances" class="section level2">
+<h2>Application 1: Computing distances</h2>
+<p>Let a data set containing the points <span class="math inline">\(\boldsymbol{a} = (0, 0)&#39;\)</span>, <span class="math inline">\(\boldsymbol{b} = (1, 0)&#39;\)</span> and <span class="math inline">\(\boldsymbol{c} = (5, 5)&#39;\)</span>. Compute the matrix of Euclidean distances between the points.</p>
+<p>Solution:</p>
+<pre class="r"><code># We create the points in R
+a &lt;- c(0, 0)
+b &lt;- c(1, 0)
+c &lt;- c(5, 5)
+
+X &lt;- rbind(a, b, c) #a, b and c are combined per line
+colnames(X) &lt;- c(&quot;x&quot;, &quot;y&quot;) #rename columns. rownames() to rename rows
+X</code></pre>
+<pre><code>##   x y
+## a 0 0
+## b 1 0
+## c 5 5</code></pre>
+<p>By the Pythagorean theorem, we will remember that the distance between 2 points <span class="math inline">\((x_a, y_a)\)</span> and <span class="math inline">\((x_b, y_b)\)</span> in <span class="math inline">\(\mathbb{R}^2\)</span> is given by <span class="math inline">\(\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}\)</span>. For the distance between the points <span class="math inline">\(\boldsymbol{b} = (1, 0)&#39;\)</span> and <span class="math inline">\(\boldsymbol{c} = (5, 5)&#39;\)</span> in the statement, we have :</p>
+<p><span class="math display">\[\begin{equation}
+\sqrt{(x_b - x_c)^2 + (y_b - y_c)^2} = \sqrt{(1-5)^2 + (0-5)^2} = 6.403124
+\end{equation}\]</span></p>
+<p>There is a function in R that allows you to find the distance in a very simple way:</p>
+<pre class="r"><code># The distance is found using the dist() function:
+distance &lt;- dist(X, method = &quot;euclidean&quot;) #the argument &quot;method&quot; is not
+# mandatory because the Euclidean method is the default one.
+distance</code></pre>
+<pre><code>##          a        b
+## b 1.000000         
+## c 7.071068 6.403124</code></pre>
+<p>The distance matrix gives the distance between the different points. The Euclidean distance between the points <span class="math inline">\(\boldsymbol{b}\)</span> and <span class="math inline">\(\boldsymbol{c}\)</span> is 6.403124, which corresponds well to what we found above via the Pythagorean formula.</p>
+<p>Thanks for reading. I hope this article helped you understand the different clustering methods and to compute them by hand and in R.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me <a href="/contact/">here</a>.</p>
+<p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
+<p><strong>Related articles:</strong></p>
+<script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
+</div>
+</div>
