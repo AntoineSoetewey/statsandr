@@ -30,11 +30,11 @@
 &lt;li&gt;&lt;a href=&#34;#kmeans-with-2-groups&#34;&gt;&lt;code&gt;kmeans()&lt;/code&gt; with 2 groups&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#quality-of-a-k-means-partition&#34;&gt;Quality of a &lt;em&gt;k&lt;/em&gt;-means partition&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#nstart-for-several-initial-centers&#34;&gt;&lt;code&gt;nstart&lt;/code&gt; for several initial centers&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#kmeans-with-3-groups&#34;&gt;&lt;code&gt;kmeans()&lt;/code&gt; with 3 groups&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#kmeans-with-3-groups&#34;&gt;&lt;code&gt;kmeans()&lt;/code&gt; with 3 groups&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#manual-application-and-verification-in-r&#34;&gt;Manual application and verification in R&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#references&#34;&gt;References&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -52,7 +52,7 @@
 &lt;div id=&#34;application-1-computing-distances&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Application 1: Computing distances&lt;/h2&gt;
 &lt;p&gt;Let a data set containing the points &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{a} = (0, 0)&amp;#39;\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{b} = (1, 0)&amp;#39;\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{c} = (5, 5)&amp;#39;\)&lt;/span&gt;. Compute the matrix of Euclidean distances between the points.&lt;/p&gt;
-&lt;p&gt;Solution:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;The points are as follows:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# We create the points in R
 a &amp;lt;- c(0, 0)
@@ -71,7 +71,7 @@ X # display the points&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\begin{equation}
 \sqrt{(x_b - x_c)^2 + (y_b - y_c)^2} = \sqrt{(1-5)^2 + (0-5)^2} = 6.403124
 \end{equation}\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;dist()&lt;/code&gt; function in R allows you to find the distance of points in a matrix or dataframe in a very simple way:&lt;/p&gt;
+&lt;p&gt;We can proceed similarly for all pairs of points to find the distance matrix by hand. In R, the &lt;code&gt;dist()&lt;/code&gt; function allows you to find the distance of points in a matrix or dataframe in a very simple way:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# The distance is found using the dist() function:
 distance &amp;lt;- dist(X, method = &amp;quot;euclidean&amp;quot;)
 distance # display the distance matrix&lt;/code&gt;&lt;/pre&gt;
@@ -161,17 +161,17 @@ Eurojobs # displays dataset&lt;/code&gt;&lt;/pre&gt;
 # the model for all observations:
 print(model$cluster)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##        Belgium        Denmark         France     W. Germany        Ireland 
-##              2              2              2              2              1 
+##              1              1              1              1              2 
 ##          Italy     Luxembourg    Netherlands United Kingdom        Austria 
-##              2              2              2              2              2 
+##              1              1              1              1              1 
 ##        Finland         Greece         Norway       Portugal          Spain 
-##              2              1              2              1              1 
+##              1              2              1              2              2 
 ##         Sweden    Switzerland         Turkey       Bulgaria Czechoslovakia 
-##              2              2              1              1              2 
+##              1              1              2              2              1 
 ##     E. Germany        Hungary         Poland        Rumania           USSR 
-##              2              1              1              1              1 
+##              1              2              2              2              2 
 ##     Yugoslavia 
-##              1&lt;/code&gt;&lt;/pre&gt;
+##              2&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that the argument &lt;code&gt;centers = 2&lt;/code&gt; is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling &lt;code&gt;print(model$cluster)&lt;/code&gt; or &lt;code&gt;model$cluster&lt;/code&gt; is the same. This output specifies the group (&lt;em&gt;i.e.&lt;/em&gt;, 1 or 2) to which each country belongs.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;quality-of-a-k-means-partition&#34; class=&#34;section level3&#34;&gt;
@@ -209,14 +209,596 @@ BSS3 / TSS3 * 100&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 74.59455&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It can be seen that the classification into three groups allows for a higher explained percentage and a higher quality. This will always be the case: with more classes, the partition will be finer, and the &lt;em&gt;BSS&lt;/em&gt; contribution will be higher. On the other hand, the “model” will be more complex, requiring more classes. In the extreme case where &lt;em&gt;k = n&lt;/em&gt; (each observation is a singleton class), we have &lt;em&gt;BSS = TSS&lt;/em&gt;, but the partition has lost all interest.&lt;/p&gt;
 &lt;p&gt;Now that the &lt;em&gt;k&lt;/em&gt;-means clustering has been detailed in R, see how to do the algorithm by hand in the following sections.&lt;/p&gt;
-&lt;div id=&#34;manual-application-and-verification-in-r&#34; class=&#34;section level4&#34;&gt;
-&lt;h4&gt;Manual application and verification in R&lt;/h4&gt;
-&lt;p&gt;Perform &lt;strong&gt;by hand&lt;/strong&gt; the &lt;em&gt;k&lt;/em&gt;-means algorithm for the points shown in the graph below, with $k = $2 and with the points $i=$5 and $i=$6 as initial centers. Then &lt;strong&gt;check&lt;/strong&gt; your answer &lt;strong&gt;in R&lt;/strong&gt; and give the quality of the partition.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;manual-application-and-verification-in-r&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Manual application and verification in R&lt;/h3&gt;
+&lt;p&gt;Perform &lt;strong&gt;by hand&lt;/strong&gt; the &lt;em&gt;k&lt;/em&gt;-means algorithm for the points shown in the graph below, with &lt;em&gt;k&lt;/em&gt; = 2 and with the points &lt;em&gt;i&lt;/em&gt; = 5 and &lt;em&gt;i&lt;/em&gt; = 6 as initial centers. Compute the quality of the partition you just found and then then &lt;strong&gt;check&lt;/strong&gt; your answers &lt;strong&gt;in R&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;Solution in R :&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution by hand:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Step 1. Here are the coordinates of the 6 points:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+point
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+x
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+y
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+7
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+3
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+4
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+1
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+5
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+9
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+7
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+8
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;And the initial centers:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Group 1: point 5 with center &lt;em&gt;(9, 7)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Group 2: point 6 with center &lt;em&gt;(6, 8)&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Step 2. Compute the distance matrix point by point with the Pythagorean theorem. Remind that the distance between the point &lt;em&gt;a&lt;/em&gt; and the point &lt;em&gt;b&lt;/em&gt; is found with:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;We apply this theorem to each pair of points, to finally have the following distance matrix (rounded to two decimals):&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;##       1     2     3     4     5
+## 2  3.61                        
+## 3  5.10  2.24                  
+## 4  7.28  5.66  3.61            
+## 5  4.47  5.39  7.62 10.82      
+## 6  5.10  3.61  5.66  9.22  3.16&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Step 3. Based on the distance matrix computed in step 2, we can put each point to its closest group and compute the coordinates of the center.&lt;/p&gt;
+&lt;p&gt;We first put each point in its closest group:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;point 1 is closer to point 5 than to point 6 because the distance between points 1 and 5 is 4.47 while the distance between points 1 and 6 is 5.10&lt;/li&gt;
+&lt;li&gt;point 2 is closer to point 6 than to point 5 because the distance between points 2 and 5 is 5.39 while the distance between points 2 and 6 is 3.61&lt;/li&gt;
+&lt;li&gt;point 3 is closer to point 6 than to point 5 because the distance between points 3 and 5 is 7.62 while the distance between points 3 and 6 is 5.66&lt;/li&gt;
+&lt;li&gt;point 4 is closer to point 6 than to point 5 because the distance between points 4 and 5 is 10.82 while the distance between points 4 and 6 is 9.22&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note that computing the distances between each point and the points 5 and 6 is sufficient. There is no need to compute the distance between the points 1 and 2 for example, as we compare each point to the initial centers (which are points 5 and 6).&lt;/p&gt;
+&lt;p&gt;We then compute the coordinates of the centers of the two groups by taking the mean of the coordinates &lt;em&gt;x&lt;/em&gt; and &lt;em&gt;y&lt;/em&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Group 1 includes the points 5 and 1 with &lt;em&gt;(8, 5)&lt;/em&gt; as center (&lt;span class=&#34;math inline&#34;&gt;\(8 = \frac{9+7}{2}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(5 = \frac{7+3}{2}\)&lt;/span&gt;)&lt;/li&gt;
+&lt;li&gt;Group 2 includes the points 6, 2, 3 and 4 with &lt;em&gt;(3, 4.5)&lt;/em&gt; as center (&lt;span class=&#34;math inline&#34;&gt;\(3 = \frac{6+4+2+0}{4}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(4.5 = \frac{8+5+4+1}{4}\)&lt;/span&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We thus have:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+points
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+center
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+cluster 1
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5 &amp;amp; 1
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+(8, 5)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+cluster 2
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6, 2, 3 &amp;amp; 4
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+(3, 4.5)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Step 4. We make sure that the allocation is optimal by checking that each point is in the nearest cluster. The distance between a point and the center of a cluster is again computed thanks to the Pythagorean theorem. Thus, we have:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-scde{color:#009901;text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+.tg .tg-yi9q{color:#009901;text-align:left;vertical-align:top}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+points
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+Distance to cluster 1
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+Distance to cluster 2
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+2.24
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+4.27
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+1.12
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6.08
+&lt;/td&gt;
+&lt;td class=&#34;tg-yi9q&#34;&gt;
+1.12
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+8.94
+&lt;/td&gt;
+&lt;td class=&#34;tg-yi9q&#34;&gt;
+4.61
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+5
+&lt;/td&gt;
+&lt;td class=&#34;tg-yi9q&#34;&gt;
+2.24
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6.5
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-yi9q&#34;&gt;
+3.61
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+4.61
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;The minimal distance between the points and the two clusters is colored in green.&lt;/p&gt;
+&lt;p&gt;We check that each point is in the correct group (i.e., the closest cluster). According to the distance in the table above, point 6 seems to be closer to the cluster 1 than to the cluster 2. Therefore, the allocation is not optimal and point 6 should be reallocated to cluster 1.&lt;/p&gt;
+&lt;p&gt;Step 5. We compute again the centers of the clusters after this reallocation. The centers are found by taking the mean of the coordinates &lt;em&gt;x&lt;/em&gt; and &lt;em&gt;y&lt;/em&gt; of the points belonging to the cluster. We thus have:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+points
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+center
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+cluster 1
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1, 5 &amp;amp; 6
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+(7.33, 6)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+cluster 2
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+2, 3 &amp;amp; 4
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+(2, 3.33)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;where, for instance, 3.33 is simply &lt;span class=&#34;math inline&#34;&gt;\(\frac{5+4+1}{3}\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Step 6. Repeat step 4 until the allocation is optimal. If the allocation is optimal, the algorithm stops. In our example:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-scde{color:#009901;text-align:left;vertical-align:middle}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+points
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+Distance to cluster 1
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+Distance to cluster 2
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+3.02
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5.01
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+3.48
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+2.61
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5.69
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+0.67
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+8.87
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+3.07
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+1.95
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+7.9
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+2.4
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5.08
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;All points are correctly allocated to its nearest cluster, so the allocation is optimal and the algorithm stops.&lt;/p&gt;
+&lt;p&gt;Step 7. State the final partition and the centers. In our example:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+points
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+center
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+cluster 1
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1, 5 &amp;amp; 6
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+(7.33, 6)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+cluster 2
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+2, 3 &amp;amp; 4
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+(2, 3.33)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;We are now going to compute the quality of the partition we just found. Remember that we need to compute the BSS and TSS to find the quality. Below the steps to compute the quality of this partition by &lt;em&gt;k&lt;/em&gt;-means, based on this summary table:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+.tg .tg-0a7q{border-color:#000000;text-align:left;vertical-align:middle}
+.tg .tg-73oq{border-color:#000000;text-align:left;vertical-align:top}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34; colspan=&#34;2&#34;&gt;
+cluster 1
+&lt;/th&gt;
+&lt;th class=&#34;tg-0lax&#34;&gt;
+&lt;/th&gt;
+&lt;th class=&#34;tg-0lax&#34; colspan=&#34;2&#34;&gt;
+cluster 2
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+point
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+x
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+y
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+point
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+x
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+y
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td class=&#34;tg-0a7q&#34;&gt;
+7
+&lt;/td&gt;
+&lt;td class=&#34;tg-0a7q&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+5
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+5
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+9
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+7
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+4
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+8
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+1
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+mean
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+7.33
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+3.33
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Step 1. Compute the overall mean of the &lt;em&gt;x&lt;/em&gt; and &lt;em&gt;y&lt;/em&gt; coordinates:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\overline{\overline{x}} = \frac{7+4+2+0+9+6+3+5+4+1+7+8}{12} = 4.67\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Step 2. Compute TSS and WSS:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[TSS = (7-4.67)^2 + (4-4.67)^2 + (2-4.67)^2 + (0-4.67)^2 \\+ (9-4.67)^2 + (6-4.67)^2 + (3-4.67)^2 + (5-4.67)^2 \\ + (4-4.67)^2 + (1-4.67)^2 + (7-4.67)^2 + (8-4.67)^2 = 88.67\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Regarding WSS, it is splitted for cluster 1 and for cluster 2. For cluster 1:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[WSS[1] = (7-7.33)^2 + (9 - 7.33)^2 + (6 - 7.33)^2 \\ + (3-6)^2 + (7-6)^2 + (8-6)^2 = 18.67\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;For cluster 2:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[WSS[2] = (4-2)^2 + (2-2)^2 + (0-2)^2 \\ + (5-3.33)^2 + (4-3.33)^2 + (1-3.33)^2 = 16.67\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;And &lt;span class=&#34;math display&#34;&gt;\[WSS = WSS[1] + WSS[2] = 18.67 + 16.67 = 35.34\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;To find the BSS:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[BSS = TSS - WSS = 88.67-35.34 = 53.33\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Finally, the quality of the partition is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Quality = \frac{BSS}{TSS} = \frac{53.33}{88.67} = 0.6014\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;So the quality of the partition is 60.14%.&lt;/p&gt;
+&lt;p&gt;We are now going to verify all these solutions (the partition, the centers and the quality) in R.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution in R :&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As you can imagine, the solution in R us much shorter and requires much less computation on the user side:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- matrix(c(7,3,4,5,2,4,0,1,9,7,6,8),
             nrow = 6, byrow = TRUE)
-X&lt;/code&gt;&lt;/pre&gt;
+X # display the coordinates of the points&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##      [,1] [,2]
 ## [1,]    7    3
 ## [2,]    4    5
@@ -225,9 +807,11 @@ X&lt;/code&gt;&lt;/pre&gt;
 ## [5,]    9    7
 ## [6,]    6    8&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# take rows 5 and 6 of the X matrix as initial centres
-res.k &amp;lt;- kmeans(X, centers = X [c(5,6), ], algorithm = &amp;quot;Lloyd&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The reason for adding the argument &lt;code&gt;algorithm = &amp;quot;Lloyd&amp;quot;&lt;/code&gt; can be found in the usage of the R function &lt;code&gt;kmeans()&lt;/code&gt;. In fact, there are several variants of the &lt;em&gt;k&lt;/em&gt;-means algorithm. The default choice is the Hartigan &amp;amp; Wong (1979) version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of Lloyd (1957), we find the same solution in R and by hand. For more information, you can consult the documentation of the &lt;code&gt;kmeans()&lt;/code&gt; function (via &lt;code&gt;?kmeans&lt;/code&gt;) and read the articles mentioned.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# We extract the coordinates of the 2 final centres
+res.k &amp;lt;- kmeans(X, centers = X[c(5,6), ], algorithm = &amp;quot;Lloyd&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Unlike in the previous application with the dataset &lt;code&gt;Eurojobs.csv&lt;/code&gt; where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set &lt;code&gt;centers = X[c(5,6), ]&lt;/code&gt; to indicate that that there are 2 centers, and that they are going to be the points 5 and 6.&lt;/p&gt;
+&lt;p&gt;The reason for adding the argument &lt;code&gt;algorithm = &amp;quot;Lloyd&amp;quot;&lt;/code&gt; can be found in the usage of the R function &lt;code&gt;kmeans()&lt;/code&gt;. In fact, there are several variants of the &lt;em&gt;k&lt;/em&gt;-means algorithm. The default choice is the &lt;span class=&#34;citation&#34;&gt;Hartigan and Wong (1979)&lt;/span&gt; version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of &lt;span class=&#34;citation&#34;&gt;Lloyd (1982)&lt;/span&gt;, we find the same solution in R and by hand. For more information, you can consult the documentation of the &lt;code&gt;kmeans()&lt;/code&gt; function (via &lt;code&gt;?kmeans&lt;/code&gt;) and read the articles mentioned.&lt;/p&gt;
+&lt;p&gt;The solution is then found by extracting the coordinates of the final centers and then&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# We extract the coordinates of the 2 final centers
 res.k$centers&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##       [,1]     [,2]
 ## 1 7.333333 6.000000
@@ -241,6 +825,16 @@ res.k$centers&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;strong&gt;Related articles:&lt;/strong&gt;&lt;/p&gt;
 &lt;script src=&#34;//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&amp;detail=-1&amp;limit=5&amp;showtitle=false&amp;type=js&#34;&gt;&lt;/script&gt;
 &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1 unnumbered&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;div id=&#34;refs&#34; class=&#34;references&#34;&gt;
+&lt;div id=&#34;ref-jaaw28m&#34;&gt;
+&lt;p&gt;Hartigan, J. A., and M. A. Wong. 1979. “A K-Means Clustering Algorithm.” &lt;em&gt;Applied Statistics&lt;/em&gt; 28: 100–108.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;ref-lloyd1982least&#34;&gt;
+&lt;p&gt;Lloyd, Stuart. 1982. “Least Squares Quantization in Pcm.” &lt;em&gt;IEEE Transactions on Information Theory&lt;/em&gt; 28 (2). IEEE: 129–37.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
