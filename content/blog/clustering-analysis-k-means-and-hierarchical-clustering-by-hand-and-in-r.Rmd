@@ -61,15 +61,174 @@ The `dist()` function in R allows you to find the distance of points in a matrix
  
 ```{r}
 # The distance is found using the dist() function:
-distance <- dist(X, method = "euclidean") # the argument "method" is not
-# mandatory because the Euclidean method is the default one.
+distance <- dist(X, method = "euclidean")
 distance # display the distance matrix
 ```
 
-The distance matrix gives the distance between the different points. The Euclidean distance between the points $\boldsymbol{b}$ and $\boldsymbol{c}$ is `r round(distance[3], 6)`, which corresponds to what we found above via the Pythagorean formula.
+Note that the argument `method = "euclidean"` is not mandatory because the Euclidean method is the default one.
 
+The distance matrix resulting from the `dist()` function gives the distance between the different points. The Euclidean distance between the points $\boldsymbol{b}$ and $\boldsymbol{c}$ is `r round(distance[3], 6)`, which corresponds to what we found above via the Pythagorean formula.
 
+Now that the distance has been presented, let's see how to perform clustering analysis with the k-means algorithm. 
 
+# *k*-means clustering
+
+The first form of classification is the method called _*k*-means clustering_ or the mobile center algorithm. As a reminder, this method aims at partitioning $n$ observations into $k$ clusters in which each observation belongs to the cluster with the closest average, serving as a prototype of the cluster. It is presented below.
+
+## Application 2: *k*-means clustering
+
+### Data
+
+For this exercise, the `Eurojobs.csv` database available [here](/blog/data/Eurojobs.csv) is used.
+
+This database contains the percentage of the population employed in different industries in 26 European countries in 1979. It contains 10 variables:
+
+* `Country` - the name of the country (identifier)
+* `Agr` - % of workforce employed in agriculture
+* `Min` - % in mining
+* `Man` - % in manufacturing
+* `PS` - % in power supplies industries
+* `Con` - % in construction
+* `SI` - % in service industries
+* `Fin` - % in finance
+* `SPS` - % in social and personal services
+* `TC` - % in transportation and communications
+
+We first import the dataset. See [how to import data into R](/blog/how-to-import-an-excel-file-in-rstudio) if you need a reminder.
+
+```{r, warning = FALSE, message = FALSE}
+# Import data
+Eurojobs <- read.csv(file = "https://www.statsandr.com/blog/data/Eurojobs.csv",
+                     sep = ",", dec = ".", header = TRUE)
+head(Eurojobs) # head() is used to display only the first 6 observations
+```
+
+Note that there is a numbering before the first variable `Country`. For more clarity, we will replace this numbering by the country. To do this, we add the argument `row.names = 1` to the import function `read.csv()` to specify that the first column corresponds to the row names:
+
+```{r}
+Eurojobs <- read.csv(
+  file = "https://www.statsandr.com/blog/data/Eurojobs.csv",
+  sep = ",", dec = ".", header = TRUE, row.names = 1
+)
+Eurojobs # displays dataset
+dim(Eurojobs) # displays the number of rows and columns
+```
+
+We now have a "clean" dataset of 26 observations and 9 variables on which we can base the classification. Note that in this case it is not necessary to standardize the data because they are all expressed in the same unit (in percentage). If this was not the case, we would have had to standardize the data via the `scale()` function (see below for an example where the data is standardized before classification). The so-called *k*-means clustering is done via the `kmeans()` function. We apply the classification with 2 classes and then 3 classes.
+
+### `kmeans()` with 2 groups
+
+```{r}
+model <- kmeans(Eurojobs, centers = 2)
+
+# displays the class determined by
+# the model for all observations:
+print(model$cluster)
+```
+
+Note that the argument `centers = 2` is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling `print(model$cluster)` or `model$cluster` is the same. This output specifies the group (*i.e.*, 1 or 2) to which each country belongs.
+
+### Quality of a *k*-means partition
+
+The quality of a partition is found by calculating the percentage of the *TSS* "explained" by the partition using the following formula:
+
+\begin{equation}
+\dfrac{\operatorname{BSS}}{\operatorname{TSS}} \times 100\%,
+\end{equation}
+
+where *BSS* and *TSS* stands for *Between Sum of Squares* and *Total Sum of Squares*, respectively. The higher the percentage, the better the score because it means that *BSS* is large and/or *WSS* is small.
+
+Here is how you can check the quality of the partition in R:
+
+```{r}
+# BSS and TSS are extracted from the model
+(BSS <- model$betweenss)
+(TSS <- model$totss)
+
+# We calculate the quality of the partition
+BSS / TSS * 100
+```
+
+The quality of the partition is `r round(BSS / TSS * 100, 2)`%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters!) in order to determine the best partition among the ones considered.
+
+### `nstart` for several initial centers
+
+The *k*-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command `kmeans(Eurojobs, centers = 2)` may give slightly different results every tume , and thus slight differences in the quality of the partitions. The `nstart` argument in the `kmeans()` function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:
+
+```{r}
+model2 <- kmeans(Eurojobs, centers = 2, nstart = 10)
+100 * model2$betweenss / model2$totss
+```
+
+Depending on the initial random choices, this new partition will be better or not compared to the first one.
+
+### `kmeans()` with 3 groups
+
+```{r}
+model3 <- kmeans(Eurojobs, centers = 3)
+BSS3 <- model3$betweenss
+TSS3 <- model3$totss
+BSS3 / TSS3 * 100
+```
+
+It can be seen that the classification into three groups allows for a higher explained percentage and a higher quality. This will always be the case: with more classes, the partition will be finer, and the *BSS* contribution will be higher. On the other hand, the "model" will be more complex, requiring more classes. In the extreme case where *k = n* (each observation is a singleton class), we have *BSS = TSS*, but the partition has lost all interest.
+
+Now that the *k*-means clustering has been detailed in R, see how to do the algorithm by hand in the following sections.
+
+#### Manual application and verification in R
+
+Perform **by hand** the *k*-means algorithm for the points shown in the graph below, with $k = $2 and with the points $i=$5 and $i=$6 as initial centers. Then **check** your answer **in R** and give the quality of the partition.
+
+```{r, echo = FALSE}
+set.seed(seed = 2018 * 02 * 15)
+n <- 6
+
+all.points.different <- FALSE
+while (!all.points.different) {
+  X <- matrix(round(rnorm(n * 2, mean = 4, sd = 2)), nrow = n)
+  all.points.different <- all(apply(X, MARGIN = 2, FUN = function(x) length(unique(x)) == n))
+}
+row.names(X) <- 1:n
+centres <- X[c(5,6), ]
+
+pretty.plot <- 
+  function(X)
+  {
+    plot(X, asp = 1, xlab = "V1", ylab = "V2",
+	xlim = c(min(X)-1, max(X)+1), ylim = c(min(X)-1, max(X)+1))
+    axis(side = 1, at = min(X):max(X))
+    axis(side = 2, at = min(X):max(X))
+    for (z in (min(X)-1):(max(X)+1)) {
+      abline(h = z, lwd = 2, col = "gray", lty = "dotted")
+      abline(v = z, lwd = 2, col = "gray", lty = "dotted")
+    }
+    text(X, labels = row.names(X), pos = 1, cex = 1.5)
+  }
+
+pretty.plot(X)
+points(centres, pch = 8)
+```
+
+Solution in R :
+
+```{r}
+X <- matrix(c(7,3,4,5,2,4,0,1,9,7,6,8),
+            nrow = 6, byrow = TRUE)
+X
+
+# take rows 5 and 6 of the X matrix as initial centres
+res.k <- kmeans(X, centers = X [c(5,6), ], algorithm = "Lloyd")
+```
+
+The reason for adding the argument `algorithm = "Lloyd"` can be found in the usage of the R function `kmeans()`. In fact, there are several variants of the *k*-means algorithm. The default choice is the Hartigan & Wong (1979) version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of Lloyd (1957), we find the same solution in R and by hand. For more information, you can consult the documentation of the `kmeans()` function (via `?kmeans`) and read the articles mentioned.
+
+```{r}
+# We extract the coordinates of the 2 final centres
+res.k$centers
+
+# quality of the partition
+100 * res.k$betweenss / res.k$totss
+```
 
 
 
