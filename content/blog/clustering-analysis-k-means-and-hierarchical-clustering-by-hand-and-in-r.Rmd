@@ -1,7 +1,7 @@
 ---
-title: 'Clustering analysis: k-means and hierarchical clustering by hand and in R'
+title: "Clustering analysis k-means and hierarchical clustering by hand and in R"
 author: Antoine Soetewey
-date: '2020-02-05'
+date: "2020-02-05"
 slug: clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r
 categories: []
 tags:
@@ -27,7 +27,7 @@ There are two main types of classification:
 1. *k*-means clustering
 2. Hierarchical clustering
 
-The first is generally used when the **number of classes is fixed** in advance, while the second is generally used for an **unknown number of classes** and helps to determine this optimal number. Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the *ascending* classification is presented in this article. 
+The first is generally used when the **number of classes is fixed** in advance, while the second is generally used for an **unknown number of classes** and helps to determine this optimal number. Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the *ascending* classification is presented in this article.
 
 Clustering algorithms use the **distance** in order to separate observations into different groups. Therefore, before diving into the presentation of the two classification methods, a reminder exercise on how to compute distances between points is presented.
 
@@ -37,37 +37,41 @@ Let a data set containing the points $\boldsymbol{a} = (0, 0)'$, $\boldsymbol{b}
 
 Solution:
 
-<!-- The data are as follows: -->
+The points are as follows:
 
-<!-- ```{r, echo = FALSE} -->
-<!-- # We create the points in R -->
-<!-- a <- c(0, 0) -->
-<!-- b <- c(1, 0) -->
-<!-- c <- c(5, 5) -->
+```{r}
+# We create the points in R
+a <- c(0, 0)
+b <- c(1, 0)
+c <- c(5, 5)
 
-<!-- X <- rbind(a, b, c) # a, b and c are combined per row -->
-<!-- colnames(X) <- c("x", "y") # rename columns -->
+X <- rbind(a, b, c) # a, b and c are combined per row
+colnames(X) <- c("x", "y") # rename columns
 
-<!-- library(pander) -->
-<!-- pander(X) -->
-<!-- ``` -->
+X # display the points
+```
 
-<!-- By the Pythagorean theorem, we will remember that the distance between 2 points $(x_a, y_a)$ and $(x_b, y_b)$ in $\mathbb{R}^2$ is given by $\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}$. For the distance between the points $\boldsymbol{b} = (1, 0)'$ and $\boldsymbol{c} = (5, 5)'$ in the statement, we have : -->
+By the Pythagorean theorem, we will remember that the distance between 2 points $(x_a, y_a)$ and $(x_b, y_b)$ in $\mathbb{R}^2$ is given by $\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}$. So for instance, for the distance between the points $\boldsymbol{b} = (1, 0)'$ and $\boldsymbol{c} = (5, 5)'$ presented in the statement above, we have :
 
-<!-- \begin{equation} -->
-<!-- \sqrt{(x_b - x_c)^2 + (y_b - y_c)^2} = \sqrt{(1-5)^2 + (0-5)^2} = 6.403124 -->
-<!-- \end{equation} -->
+\begin{equation}
+\sqrt{(x_b - x_c)^2 + (y_b - y_c)^2} = \sqrt{(1-5)^2 + (0-5)^2} = 6.403124
+\end{equation}
 
-<!-- There is a function in R that allows you to find the distance in a very simple way: -->
+The `dist()` function in R allows you to find the distance of points in a matrix or dataframe in a very simple way:
+ 
+```{r}
+# The distance is found using the dist() function:
+distance <- dist(X, method = "euclidean") # the argument "method" is not
+# mandatory because the Euclidean method is the default one.
+distance # display the distance matrix
+```
 
-<!-- ```{r} -->
-<!-- # The distance is found using the dist() function: -->
-<!-- distance <- dist(X, method = "euclidean") #the argument "method" is not -->
-<!-- # mandatory because the Euclidean method is the default one. -->
-<!-- distance -->
-<!-- ``` -->
+The distance matrix gives the distance between the different points. The Euclidean distance between the points $\boldsymbol{b}$ and $\boldsymbol{c}$ is `r round(distance[3], 6)`, which corresponds to what we found above via the Pythagorean formula.
 
-<!-- The distance matrix gives the distance between the different points. The Euclidean distance between the points $\boldsymbol{b}$ and $\boldsymbol{c}$ is `r round(distance[3], 6)`, which corresponds well to what we found above via the Pythagorean formula. -->
+
+
+
+
 
 Thanks for reading. I hope this article helped you understand the different clustering methods and to compute them by hand and in R.
 
@@ -77,4 +81,4 @@ Get updates every time a new article is published by [subscribing to this blog](
 
 **Related articles:**
 
-<script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
+<script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
