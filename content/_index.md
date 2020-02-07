@@ -19,6 +19,7 @@ You can also:
 
 * See [all articles](/blog/) or [articles by categories](/tags/) for more advanced articles
 * Learn more [about me](/about/)
+* Follow me on [towardsdatascience.com](https://towardsdatascience.com/@ant.soetewey) or [medium.com](https://medium.com/@ant.soetewey)
 * [Subscribe to this blog](/subscribe/) to receive updates everytime a new article is published
 * See the [most recent comments](/recent-comments/) so you can follow the discussion
 

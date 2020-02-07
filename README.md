@@ -14,6 +14,7 @@ You can also:
 
 * See [all articles](https://www.statsandr.com/blog/) or [articles by categories](https://www.statsandr.com/tags/) for more advanced articles
 * Learn more [about me](https://www.statsandr.com/about/)
+* Follow me on [towardsdatascience.com](https://towardsdatascience.com/@ant.soetewey) or [medium.com](https://medium.com/@ant.soetewey)
 * [Subscribe to this blog](https://www.statsandr.com/subscribe/) to receive updates every time a new article is published
 * See the [most recent comments](https://www.statsandr.com/recent-comments/) so you can follow the discussion
 
