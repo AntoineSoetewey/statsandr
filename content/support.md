@@ -7,6 +7,7 @@ description: "See the different ways you can support this blog so I can continue
 1. [Donation](#donation)
 1. [Amazon](#amazon)
 1. [Spread the word](#word)
+1. [Follow me](#follow)
 1. [Recommendations](#recommendations)
 
 Running and maintaining a blog is not free unfortunately ([Shiny app](/tags/shiny/) servers being the biggest expense). There are several ways you can contribute to this blog. Any help will be greatly appreciated!
@@ -33,7 +34,17 @@ If you shop on Amazon, using my referral links below will make me earn a small c
 <a name="word"></a>
 ## Spread the word
 
-If you have found any of the content on this blog useful please consider linking to [https://www.statsandr.com/](/) or subscribing by [email](/subscribe/) or via the [feed](/index.xml).
+If you have found any of the content on this blog useful please consider linking to [https://www.statsandr.com/](/).
+
+<a name="follow"></a>
+## Follow me
+
+You can follow me via the following channels:
+
+* [medium.com]()
+* [towardsdatascience.com]()
+* [GitHub]()
+* subscribe to this blog by [email](/subscribe/) or via the [feed](/index.xml)
 
 <a name="recommendations"></a>
 ## Recommendations
