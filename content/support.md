@@ -41,10 +41,10 @@ If you have found any of the content on this blog useful please consider linking
 
 You can follow me via the following channels:
 
-* [medium.com]()
-* [towardsdatascience.com]()
-* [GitHub]()
+* [medium.com](https://medium.com/@ant.soetewey)
+* [towardsdatascience.com](https://towardsdatascience.com/@ant.soetewey)
 * subscribe to this blog by [email](/subscribe/) or via the [feed](/index.xml)
+* [GitHub](https://github.com/AntoineSoetewey)
 
 <a name="recommendations"></a>
 ## Recommendations
