@@ -1,0 +1,627 @@
+---
+title: "Clustering analysis k-means and hierarchical clustering by hand and in R"
+author: Antoine Soetewey
+date: "2020-02-05"
+slug: clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r
+categories: []
+tags:
+  - R
+  - Statistics
+meta_img: image/image.png
+# description: Description for the page.
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+draft: true
+bibliography: bibliography.bib
+---
+
+# What is clustering analysis?
+
+Clustering analysis is a form of exploratory data analysis in which observations are divided into different groups that share common characteristics.
+
+The purpose of cluster analysis (also known as classification) is to construct groups (or classes or *clusters*) while ensuring the following property: Within a group the observations must be similar, while the differences between observations belonging to different groups must be significant.
+
+There are two main types of classification:
+
+1. *k*-means clustering
+2. Hierarchical clustering
+
+The first is generally used when the **number of classes is fixed** in advance, while the second is generally used for an **unknown number of classes** and helps to determine this optimal number. Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the *ascending* classification is presented in this article.
+
+Clustering algorithms use the **distance** in order to separate observations into different groups. Therefore, before diving into the presentation of the two classification methods, a reminder exercise on how to compute distances between points is presented.
+
+## Application 1: Computing distances
+
+Let a data set containing the points $\boldsymbol{a} = (0, 0)'$, $\boldsymbol{b} = (1, 0)'$ and $\boldsymbol{c} = (5, 5)'$. Compute the matrix of Euclidean distances between the points.
+
+**Solution:**
+
+The points are as follows:
+
+```{r}
+# We create the points in R
+a <- c(0, 0)
+b <- c(1, 0)
+c <- c(5, 5)
+
+X <- rbind(a, b, c) # a, b and c are combined per row
+colnames(X) <- c("x", "y") # rename columns
+
+X # display the points
+```
+
+By the Pythagorean theorem, we will remember that the distance between 2 points $(x_a, y_a)$ and $(x_b, y_b)$ in $\mathbb{R}^2$ is given by $\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}$. So for instance, for the distance between the points $\boldsymbol{b} = (1, 0)'$ and $\boldsymbol{c} = (5, 5)'$ presented in the statement above, we have :
+
+\begin{equation}
+\sqrt{(x_b - x_c)^2 + (y_b - y_c)^2} = \sqrt{(1-5)^2 + (0-5)^2} = 6.403124
+\end{equation}
+
+We can proceed similarly for all pairs of points to find the distance matrix by hand. In R, the `dist()` function allows you to find the distance of points in a matrix or dataframe in a very simple way:
+ 
+```{r}
+# The distance is found using the dist() function:
+distance <- dist(X, method = "euclidean")
+distance # display the distance matrix
+```
+
+Note that the argument `method = "euclidean"` is not mandatory because the Euclidean method is the default one.
+
+The distance matrix resulting from the `dist()` function gives the distance between the different points. The Euclidean distance between the points $\boldsymbol{b}$ and $\boldsymbol{c}$ is `r round(distance[3], 6)`, which corresponds to what we found above via the Pythagorean formula.
+
+Now that the distance has been presented, let's see how to perform clustering analysis with the k-means algorithm. 
+
+# *k*-means clustering
+
+The first form of classification is the method called _*k*-means clustering_ or the mobile center algorithm. As a reminder, this method aims at partitioning $n$ observations into $k$ clusters in which each observation belongs to the cluster with the closest average, serving as a prototype of the cluster. It is presented below.
+
+## Application 2: *k*-means clustering
+
+### Data
+
+For this exercise, the `Eurojobs.csv` database available [here](/blog/data/Eurojobs.csv) is used.
+
+This database contains the percentage of the population employed in different industries in 26 European countries in 1979. It contains 10 variables:
+
+* `Country` - the name of the country (identifier)
+* `Agr` - % of workforce employed in agriculture
+* `Min` - % in mining
+* `Man` - % in manufacturing
+* `PS` - % in power supplies industries
+* `Con` - % in construction
+* `SI` - % in service industries
+* `Fin` - % in finance
+* `SPS` - % in social and personal services
+* `TC` - % in transportation and communications
+
+We first import the dataset. See [how to import data into R](/blog/how-to-import-an-excel-file-in-rstudio) if you need a reminder.
+
+```{r, warning = FALSE, message = FALSE}
+# Import data
+Eurojobs <- read.csv(file = "https://www.statsandr.com/blog/data/Eurojobs.csv",
+                     sep = ",", dec = ".", header = TRUE)
+head(Eurojobs) # head() is used to display only the first 6 observations
+```
+
+Note that there is a numbering before the first variable `Country`. For more clarity, we will replace this numbering by the country. To do this, we add the argument `row.names = 1` to the import function `read.csv()` to specify that the first column corresponds to the row names:
+
+```{r}
+Eurojobs <- read.csv(
+  file = "https://www.statsandr.com/blog/data/Eurojobs.csv",
+  sep = ",", dec = ".", header = TRUE, row.names = 1
+)
+Eurojobs # displays dataset
+dim(Eurojobs) # displays the number of rows and columns
+```
+
+We now have a "clean" dataset of 26 observations and 9 variables on which we can base the classification. Note that in this case it is not necessary to standardize the data because they are all expressed in the same unit (in percentage). If this was not the case, we would have had to standardize the data via the `scale()` function (see below for an example where the data is standardized before classification). The so-called *k*-means clustering is done via the `kmeans()` function. We apply the classification with 2 classes and then 3 classes.
+
+### `kmeans()` with 2 groups
+
+```{r}
+model <- kmeans(Eurojobs, centers = 2)
+
+# displays the class determined by
+# the model for all observations:
+print(model$cluster)
+```
+
+Note that the argument `centers = 2` is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling `print(model$cluster)` or `model$cluster` is the same. This output specifies the group (*i.e.*, 1 or 2) to which each country belongs.
+
+### Quality of a *k*-means partition
+
+The quality of a partition is found by calculating the percentage of the *TSS* "explained" by the partition using the following formula:
+
+\begin{equation}
+\dfrac{\operatorname{BSS}}{\operatorname{TSS}} \times 100\%,
+\end{equation}
+
+where *BSS* and *TSS* stands for *Between Sum of Squares* and *Total Sum of Squares*, respectively. The higher the percentage, the better the score because it means that *BSS* is large and/or *WSS* is small.
+
+Here is how you can check the quality of the partition in R:
+
+```{r}
+# BSS and TSS are extracted from the model
+(BSS <- model$betweenss)
+(TSS <- model$totss)
+
+# We calculate the quality of the partition
+BSS / TSS * 100
+```
+
+The quality of the partition is `r round(BSS / TSS * 100, 2)`%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters!) in order to determine the best partition among the ones considered.
+
+### `nstart` for several initial centers
+
+The *k*-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command `kmeans(Eurojobs, centers = 2)` may give slightly different results every tume , and thus slight differences in the quality of the partitions. The `nstart` argument in the `kmeans()` function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:
+
+```{r}
+model2 <- kmeans(Eurojobs, centers = 2, nstart = 10)
+100 * model2$betweenss / model2$totss
+```
+
+Depending on the initial random choices, this new partition will be better or not compared to the first one.
+
+### `kmeans()` with 3 groups
+
+```{r}
+model3 <- kmeans(Eurojobs, centers = 3)
+BSS3 <- model3$betweenss
+TSS3 <- model3$totss
+BSS3 / TSS3 * 100
+```
+
+It can be seen that the classification into three groups allows for a higher explained percentage and a higher quality. This will always be the case: with more classes, the partition will be finer, and the *BSS* contribution will be higher. On the other hand, the "model" will be more complex, requiring more classes. In the extreme case where *k = n* (each observation is a singleton class), we have *BSS = TSS*, but the partition has lost all interest.
+
+Now that the *k*-means clustering has been detailed in R, see how to do the algorithm by hand in the following sections.
+
+### Manual application and verification in R
+
+Perform **by hand** the *k*-means algorithm for the points shown in the graph below, with *k* = 2 and with the points *i* = 5 and *i* = 6 as initial centers. Compute the quality of the partition you just found and then then **check** your answers **in R**.
+
+```{r, echo = FALSE}
+set.seed(seed = 2018 * 02 * 15)
+n <- 6
+
+all.points.different <- FALSE
+while (!all.points.different) {
+  X <- matrix(round(rnorm(n * 2, mean = 4, sd = 2)), nrow = n)
+  all.points.different <- all(apply(X, MARGIN = 2, FUN = function(x) length(unique(x)) == n))
+}
+row.names(X) <- 1:n
+centres <- X[c(5,6), ]
+
+pretty.plot <- 
+  function(X)
+  {
+    plot(X, asp = 1, xlab = "x", ylab = "y",
+	xlim = c(min(X)-1, max(X)+1), ylim = c(min(X)-1, max(X)+1))
+    axis(side = 1, at = min(X):max(X))
+    axis(side = 2, at = min(X):max(X))
+    for (z in (min(X)-1):(max(X)+1)) {
+      abline(h = z, lwd = 2, col = "gray", lty = "dotted")
+      abline(v = z, lwd = 2, col = "gray", lty = "dotted")
+    }
+    text(X, labels = row.names(X), pos = 1, cex = 1.5)
+  }
+
+pretty.plot(X)
+points(centres, pch = 8)
+```
+
+**Solution by hand:**
+
+Step 1. Here are the coordinates of the 6 points:
+
+<center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-cly1">point</th>
+    <th class="tg-cly1">x</th>
+    <th class="tg-cly1">y</th>
+  </tr>
+  <tr>
+    <td class="tg-cly1">1</td>
+    <td class="tg-cly1">7</td>
+    <td class="tg-cly1">3</td>
+  </tr>
+  <tr>
+    <td class="tg-cly1">2</td>
+    <td class="tg-cly1">4</td>
+    <td class="tg-cly1">5</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">3</td>
+    <td class="tg-0lax">2</td>
+    <td class="tg-0lax">4</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">4</td>
+    <td class="tg-0lax">0</td>
+    <td class="tg-0lax">1</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">5</td>
+    <td class="tg-0lax">9</td>
+    <td class="tg-0lax">7</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">6</td>
+    <td class="tg-0lax">6</td>
+    <td class="tg-0lax">8</td>
+  </tr>
+</table>
+</center>
+<br>
+
+And the initial centers:
+
+* Group 1: point 5 with center *(9, 7)*
+* Group 2: point 6 with center *(6, 8)*
+
+Step 2. Compute the distance matrix point by point with the Pythagorean theorem. Remind that the distance between the point *a* and the point *b* is found with:
+
+$$\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}$$
+
+We apply this theorem to each pair of points, to finally have the following distance matrix (rounded to two decimals):
+
+```{r, echo = FALSE}
+round(dist(X), 2)
+```
+
+Step 3. Based on the distance matrix computed in step 2, we can put each point to its closest group and compute the coordinates of the center.
+
+We first put each point in its closest group:
+
+* point 1 is closer to point 5 than to point 6 because the distance between points 1 and 5 is 4.47 while the distance between points 1 and 6 is 5.10
+* point 2 is closer to point 6 than to point 5 because the distance between points 2 and 5 is 5.39 while the distance between points 2 and 6 is 3.61
+* point 3 is closer to point 6 than to point 5 because the distance between points 3 and 5 is 7.62 while the distance between points 3 and 6 is 5.66
+* point 4 is closer to point 6 than to point 5 because the distance between points 4 and 5 is 10.82 while the distance between points 4 and 6 is 9.22
+
+Note that computing the distances between each point and the points 5 and 6 is sufficient. There is no need to compute the distance between the points 1 and 2 for example, as we compare each point to the initial centers (which are points 5 and 6).
+
+We then compute the coordinates of the centers of the two groups by taking the mean of the coordinates *x* and *y*:
+
+* Group 1 includes the points 5 and 1 with *(8, 5)* as center ($8 = \frac{9+7}{2}$ and $5 = \frac{7+3}{2}$)
+* Group 2 includes the points 6, 2, 3 and 4 with *(3, 4.5)* as center ($3 = \frac{6+4+2+0}{4}$ and $4.5 = \frac{8+5+4+1}{4}$)
+
+We thus have:
+
+<center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-cly1"></th>
+    <th class="tg-cly1">points</th>
+    <th class="tg-cly1">center</th>
+  </tr>
+  <tr>
+    <td class="tg-cly1">cluster 1</td>
+    <td class="tg-cly1">5 &amp; 1</td>
+    <td class="tg-cly1">(8, 5)</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">cluster 2</td>
+    <td class="tg-0lax">6, 2, 3 &amp; 4</td>
+    <td class="tg-0lax">(3, 4.5)</td>
+  </tr>
+</table>
+</center>
+<br>
+
+Step 4. We make sure that the allocation is optimal by checking that each point is in the nearest cluster. The distance between a point and the center of a cluster is again computed thanks to the Pythagorean theorem. Thus, we have:
+
+<center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-scde{color:#009901;text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+.tg .tg-yi9q{color:#009901;text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-cly1">points</th>
+    <th class="tg-cly1">Distance to cluster 1</th>
+    <th class="tg-cly1">Distance to cluster 2</th>
+  </tr>
+  <tr>
+    <td class="tg-cly1">1</td>
+    <td class="tg-scde">2.24</td>
+    <td class="tg-cly1">4.27</td>
+  </tr>
+  <tr>
+    <td class="tg-cly1">2</td>
+    <td class="tg-cly1">4</td>
+    <td class="tg-scde">1.12</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">3</td>
+    <td class="tg-0lax">6.08</td>
+    <td class="tg-yi9q">1.12</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">4</td>
+    <td class="tg-0lax">8.94</td>
+    <td class="tg-yi9q">4.61</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">5</td>
+    <td class="tg-yi9q">2.24</td>
+    <td class="tg-0lax">6.5</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">6</td>
+    <td class="tg-yi9q">3.61</td>
+    <td class="tg-0lax">4.61</td>
+  </tr>
+</table>
+</center>
+<br>
+
+The minimal distance between the points and the two clusters is colored in green.
+
+We check that each point is in the correct group (i.e., the closest cluster). According to the distance in the table above, point 6 seems to be closer to the cluster 1 than to the cluster 2. Therefore, the allocation is not optimal and point 6 should be reallocated to cluster 1.
+
+Step 5. We compute again the centers of the clusters after this reallocation. The centers are found by taking the mean of the coordinates *x* and *y* of the points belonging to the cluster. We thus have:
+
+<center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-cly1"></th>
+    <th class="tg-cly1">points</th>
+    <th class="tg-cly1">center</th>
+  </tr>
+  <tr>
+    <td class="tg-cly1">cluster 1</td>
+    <td class="tg-cly1">1, 5 &amp; 6</td>
+    <td class="tg-cly1">(7.33, 6)</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">cluster 2</td>
+    <td class="tg-0lax">2, 3 &amp; 4</td>
+    <td class="tg-0lax">(2, 3.33)</td>
+  </tr>
+</table>
+</center>
+<br>
+
+where, for instance, 3.33 is simply $\frac{5+4+1}{3}$.
+
+Step 6. Repeat step 4 until the allocation is optimal. If the allocation is optimal, the algorithm stops. In our example:
+
+<center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-scde{color:#009901;text-align:left;vertical-align:middle}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-cly1">points</th>
+    <th class="tg-cly1">Distance to cluster 1</th>
+    <th class="tg-cly1">Distance to cluster 2</th>
+  </tr>
+  <tr>
+    <td class="tg-cly1">1</td>
+    <td class="tg-scde">3.02</td>
+    <td class="tg-cly1">5.01</td>
+  </tr>
+  <tr>
+    <td class="tg-cly1">2</td>
+    <td class="tg-cly1">3.48</td>
+    <td class="tg-scde">2.61</td>
+  </tr>
+  <tr>
+    <td class="tg-cly1">3</td>
+    <td class="tg-cly1">5.69</td>
+    <td class="tg-scde">0.67</td>
+  </tr>
+  <tr>
+    <td class="tg-cly1">4</td>
+    <td class="tg-cly1">8.87</td>
+    <td class="tg-scde">3.07</td>
+  </tr>
+  <tr>
+    <td class="tg-cly1">5</td>
+    <td class="tg-scde">1.95</td>
+    <td class="tg-cly1">7.9</td>
+  </tr>
+  <tr>
+    <td class="tg-cly1">6</td>
+    <td class="tg-scde">2.4</td>
+    <td class="tg-cly1">5.08</td>
+  </tr>
+</table>
+</center>
+<br>
+
+All points are correctly allocated to its nearest cluster, so the allocation is optimal and the algorithm stops.
+
+Step 7. State the final partition and the centers. In our example:
+
+<center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-cly1"></th>
+    <th class="tg-cly1">points</th>
+    <th class="tg-cly1">center</th>
+  </tr>
+  <tr>
+    <td class="tg-cly1">cluster 1</td>
+    <td class="tg-cly1">1, 5 &amp; 6</td>
+    <td class="tg-cly1">(7.33, 6)</td>
+  </tr>
+  <tr>
+    <td class="tg-cly1">cluster 2</td>
+    <td class="tg-cly1">2, 3 &amp; 4</td>
+    <td class="tg-cly1">(2, 3.33)</td>
+  </tr>
+</table>
+</center>
+<br>
+
+We are now going to compute the quality of the partition we just found. Remember that we need to compute the BSS and TSS to find the quality. Below the steps to compute the quality of this partition by *k*-means, based on this summary table:
+
+<center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+.tg .tg-0a7q{border-color:#000000;text-align:left;vertical-align:middle}
+.tg .tg-73oq{border-color:#000000;text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-cly1"></th>
+    <th class="tg-cly1" colspan="2">cluster 1</th>
+    <th class="tg-0lax"></th>
+    <th class="tg-0lax" colspan="2">cluster 2</th>
+  </tr>
+  <tr>
+    <td class="tg-cly1">point</td>
+    <td class="tg-cly1">x</td>
+    <td class="tg-cly1">y</td>
+    <td class="tg-0lax">point</td>
+    <td class="tg-0lax">x</td>
+    <td class="tg-0lax">y</td>
+  </tr>
+  <tr>
+    <td class="tg-cly1">1</td>
+    <td class="tg-0a7q">7</td>
+    <td class="tg-0a7q">3</td>
+    <td class="tg-0lax">2</td>
+    <td class="tg-73oq">4</td>
+    <td class="tg-73oq">5</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">5</td>
+    <td class="tg-73oq">9</td>
+    <td class="tg-73oq">7</td>
+    <td class="tg-0lax">3</td>
+    <td class="tg-73oq">2</td>
+    <td class="tg-73oq">4</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">6</td>
+    <td class="tg-73oq">6</td>
+    <td class="tg-73oq">8</td>
+    <td class="tg-0lax">4</td>
+    <td class="tg-73oq">0</td>
+    <td class="tg-73oq">1</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">mean</td>
+    <td class="tg-0lax">7.33</td>
+    <td class="tg-0lax"></td>
+    <td class="tg-0lax">6</td>
+    <td class="tg-0lax">2</td>
+    <td class="tg-0lax">3.33</td>
+  </tr>
+</table>
+</center>
+<br>
+
+Step 1. Compute the overall mean of the *x* and *y* coordinates:
+
+$$\overline{\overline{x}} = \frac{7+4+2+0+9+6+3+5+4+1+7+8}{12} = 4.67$$
+
+Step 2. Compute TSS and WSS:
+
+$$TSS = (7-4.67)^2 + (4-4.67)^2 + (2-4.67)^2 + (0-4.67)^2 \\+ (9-4.67)^2 + (6-4.67)^2 + (3-4.67)^2 + (5-4.67)^2 \\ + (4-4.67)^2 + (1-4.67)^2 + (7-4.67)^2 + (8-4.67)^2 = 88.67$$
+
+Regarding WSS, it is splitted for cluster 1 and for cluster 2. For cluster 1:
+
+$$WSS[1] = (7-7.33)^2 + (9 - 7.33)^2 + (6 - 7.33)^2 \\ + (3-6)^2 + (7-6)^2 + (8-6)^2 = 18.67$$
+
+For cluster 2:
+
+$$WSS[2] = (4-2)^2 + (2-2)^2 + (0-2)^2 \\ + (5-3.33)^2 + (4-3.33)^2 + (1-3.33)^2 = 16.67$$
+
+And $$WSS = WSS[1] + WSS[2] = 18.67 + 16.67 = 35.34$$
+
+To find the BSS:
+
+$$BSS = TSS - WSS = 88.67-35.34 = 53.33$$
+
+Finally, the quality of the partition is:
+
+$$Quality = \frac{BSS}{TSS} = \frac{53.33}{88.67} = 0.6014$$
+
+So the quality of the partition is 60.14%.
+
+We are now going to verify all these solutions (the partition, the centers and the quality) in R.
+
+**Solution in R :**
+
+As you can imagine, the solution in R us much shorter and requires much less computation on the user side:
+
+```{r}
+X <- matrix(c(7,3,4,5,2,4,0,1,9,7,6,8),
+            nrow = 6, byrow = TRUE)
+X # display the coordinates of the points
+
+# take rows 5 and 6 of the X matrix as initial centres
+res.k <- kmeans(X, centers = X[c(5,6), ], algorithm = "Lloyd")
+```
+
+Unlike in the previous application with the dataset `Eurojobs.csv` where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set `centers = X[c(5,6), ]` to indicate that that there are 2 centers, and that they are going to be the points 5 and 6.
+
+The reason for adding the argument `algorithm = "Lloyd"` can be found in the usage of the R function `kmeans()`. In fact, there are several variants of the *k*-means algorithm. The default choice is the @jaaw28m version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of @lloyd1982least, we find the same solution in R and by hand. For more information, you can consult the documentation of the `kmeans()` function (via `?kmeans`) and read the articles mentioned.
+
+The solution is then found by extracting the coordinates of the final centers and then 
+
+```{r}
+# We extract the coordinates of the 2 final centers
+res.k$centers
+
+# quality of the partition
+100 * res.k$betweenss / res.k$totss
+```
+
+
+
+Thanks for reading. I hope this article helped you understand the different clustering methods and to compute them by hand and in R.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me [here](/contact/).
+
+Get updates every time a new article is published by [subscribing to this blog](/subscribe/).
+
+**Related articles:**
+
+<script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
+
+# References

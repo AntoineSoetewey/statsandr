@@ -12,6 +12,836 @@
     
     
     <item>
+      <title>Clustering analysis k-means and hierarchical clustering by hand and in R</title>
+      <link>/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/</link>
+      <pubDate>Wed, 05 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#what-is-clustering-analysis&#34;&gt;What is clustering analysis?&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#application-1-computing-distances&#34;&gt;Application 1: Computing distances&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#k-means-clustering&#34;&gt;&lt;em&gt;k&lt;/em&gt;-means clustering&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#application-2-k-means-clustering&#34;&gt;Application 2: &lt;em&gt;k&lt;/em&gt;-means clustering&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#data&#34;&gt;Data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#kmeans-with-2-groups&#34;&gt;&lt;code&gt;kmeans()&lt;/code&gt; with 2 groups&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#quality-of-a-k-means-partition&#34;&gt;Quality of a &lt;em&gt;k&lt;/em&gt;-means partition&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#nstart-for-several-initial-centers&#34;&gt;&lt;code&gt;nstart&lt;/code&gt; for several initial centers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#kmeans-with-3-groups&#34;&gt;&lt;code&gt;kmeans()&lt;/code&gt; with 3 groups&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#manual-application-and-verification-in-r&#34;&gt;Manual application and verification in R&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#references&#34;&gt;References&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div id=&#34;what-is-clustering-analysis&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;What is clustering analysis?&lt;/h1&gt;
+&lt;p&gt;Clustering analysis is a form of exploratory data analysis in which observations are divided into different groups that share common characteristics.&lt;/p&gt;
+&lt;p&gt;The purpose of cluster analysis (also known as classification) is to construct groups (or classes or &lt;em&gt;clusters&lt;/em&gt;) while ensuring the following property: Within a group the observations must be similar, while the differences between observations belonging to different groups must be significant.&lt;/p&gt;
+&lt;p&gt;There are two main types of classification:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;em&gt;k&lt;/em&gt;-means clustering&lt;/li&gt;
+&lt;li&gt;Hierarchical clustering&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The first is generally used when the &lt;strong&gt;number of classes is fixed&lt;/strong&gt; in advance, while the second is generally used for an &lt;strong&gt;unknown number of classes&lt;/strong&gt; and helps to determine this optimal number. Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the &lt;em&gt;ascending&lt;/em&gt; classification is presented in this article.&lt;/p&gt;
+&lt;p&gt;Clustering algorithms use the &lt;strong&gt;distance&lt;/strong&gt; in order to separate observations into different groups. Therefore, before diving into the presentation of the two classification methods, a reminder exercise on how to compute distances between points is presented.&lt;/p&gt;
+&lt;div id=&#34;application-1-computing-distances&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Application 1: Computing distances&lt;/h2&gt;
+&lt;p&gt;Let a data set containing the points &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{a} = (0, 0)&amp;#39;\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{b} = (1, 0)&amp;#39;\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{c} = (5, 5)&amp;#39;\)&lt;/span&gt;. Compute the matrix of Euclidean distances between the points.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The points are as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# We create the points in R
+a &amp;lt;- c(0, 0)
+b &amp;lt;- c(1, 0)
+c &amp;lt;- c(5, 5)
+
+X &amp;lt;- rbind(a, b, c) # a, b and c are combined per row
+colnames(X) &amp;lt;- c(&amp;quot;x&amp;quot;, &amp;quot;y&amp;quot;) # rename columns
+
+X # display the points&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   x y
+## a 0 0
+## b 1 0
+## c 5 5&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;By the Pythagorean theorem, we will remember that the distance between 2 points &lt;span class=&#34;math inline&#34;&gt;\((x_a, y_a)\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\((x_b, y_b)\)&lt;/span&gt; in &lt;span class=&#34;math inline&#34;&gt;\(\mathbb{R}^2\)&lt;/span&gt; is given by &lt;span class=&#34;math inline&#34;&gt;\(\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}\)&lt;/span&gt;. So for instance, for the distance between the points &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{b} = (1, 0)&amp;#39;\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{c} = (5, 5)&amp;#39;\)&lt;/span&gt; presented in the statement above, we have :&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\begin{equation}
+\sqrt{(x_b - x_c)^2 + (y_b - y_c)^2} = \sqrt{(1-5)^2 + (0-5)^2} = 6.403124
+\end{equation}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;We can proceed similarly for all pairs of points to find the distance matrix by hand. In R, the &lt;code&gt;dist()&lt;/code&gt; function allows you to find the distance of points in a matrix or dataframe in a very simple way:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# The distance is found using the dist() function:
+distance &amp;lt;- dist(X, method = &amp;quot;euclidean&amp;quot;)
+distance # display the distance matrix&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##          a        b
+## b 1.000000         
+## c 7.071068 6.403124&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note that the argument &lt;code&gt;method = &amp;quot;euclidean&amp;quot;&lt;/code&gt; is not mandatory because the Euclidean method is the default one.&lt;/p&gt;
+&lt;p&gt;The distance matrix resulting from the &lt;code&gt;dist()&lt;/code&gt; function gives the distance between the different points. The Euclidean distance between the points &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{b}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\boldsymbol{c}\)&lt;/span&gt; is 6.403124, which corresponds to what we found above via the Pythagorean formula.&lt;/p&gt;
+&lt;p&gt;Now that the distance has been presented, let’s see how to perform clustering analysis with the k-means algorithm.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;k-means-clustering&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;em&gt;k&lt;/em&gt;-means clustering&lt;/h1&gt;
+&lt;p&gt;The first form of classification is the method called &lt;em&gt;&lt;em&gt;k&lt;/em&gt;-means clustering&lt;/em&gt; or the mobile center algorithm. As a reminder, this method aims at partitioning &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; observations into &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt; clusters in which each observation belongs to the cluster with the closest average, serving as a prototype of the cluster. It is presented below.&lt;/p&gt;
+&lt;div id=&#34;application-2-k-means-clustering&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Application 2: &lt;em&gt;k&lt;/em&gt;-means clustering&lt;/h2&gt;
+&lt;div id=&#34;data&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Data&lt;/h3&gt;
+&lt;p&gt;For this exercise, the &lt;code&gt;Eurojobs.csv&lt;/code&gt; database available &lt;a href=&#34;/blog/data/Eurojobs.csv&#34;&gt;here&lt;/a&gt; is used.&lt;/p&gt;
+&lt;p&gt;This database contains the percentage of the population employed in different industries in 26 European countries in 1979. It contains 10 variables:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Country&lt;/code&gt; - the name of the country (identifier)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Agr&lt;/code&gt; - % of workforce employed in agriculture&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Min&lt;/code&gt; - % in mining&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Man&lt;/code&gt; - % in manufacturing&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PS&lt;/code&gt; - % in power supplies industries&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Con&lt;/code&gt; - % in construction&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SI&lt;/code&gt; - % in service industries&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Fin&lt;/code&gt; - % in finance&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SPS&lt;/code&gt; - % in social and personal services&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TC&lt;/code&gt; - % in transportation and communications&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We first import the dataset. See &lt;a href=&#34;/blog/how-to-import-an-excel-file-in-rstudio&#34;&gt;how to import data into R&lt;/a&gt; if you need a reminder.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Import data
+Eurojobs &amp;lt;- read.csv(file = &amp;quot;https://www.statsandr.com/blog/data/Eurojobs.csv&amp;quot;,
+                     sep = &amp;quot;,&amp;quot;, dec = &amp;quot;.&amp;quot;, header = TRUE)
+head(Eurojobs) # head() is used to display only the first 6 observations&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##      Country  Agr Min  Man  PS  Con   SI Fin  SPS  TC
+## 1    Belgium  3.3 0.9 27.6 0.9  8.2 19.1 6.2 26.6 7.2
+## 2    Denmark  9.2 0.1 21.8 0.6  8.3 14.6 6.5 32.2 7.1
+## 3     France 10.8 0.8 27.5 0.9  8.9 16.8 6.0 22.6 5.7
+## 4 W. Germany  6.7 1.3 35.8 0.9  7.3 14.4 5.0 22.3 6.1
+## 5    Ireland 23.2 1.0 20.7 1.3  7.5 16.8 2.8 20.8 6.1
+## 6      Italy 15.9 0.6 27.6 0.5 10.0 18.1 1.6 20.1 5.7&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note that there is a numbering before the first variable &lt;code&gt;Country&lt;/code&gt;. For more clarity, we will replace this numbering by the country. To do this, we add the argument &lt;code&gt;row.names = 1&lt;/code&gt; to the import function &lt;code&gt;read.csv()&lt;/code&gt; to specify that the first column corresponds to the row names:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Eurojobs &amp;lt;- read.csv(
+  file = &amp;quot;https://www.statsandr.com/blog/data/Eurojobs.csv&amp;quot;,
+  sep = &amp;quot;,&amp;quot;, dec = &amp;quot;.&amp;quot;, header = TRUE, row.names = 1
+)
+Eurojobs # displays dataset&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                 Agr Min  Man  PS  Con   SI  Fin  SPS  TC
+## Belgium         3.3 0.9 27.6 0.9  8.2 19.1  6.2 26.6 7.2
+## Denmark         9.2 0.1 21.8 0.6  8.3 14.6  6.5 32.2 7.1
+## France         10.8 0.8 27.5 0.9  8.9 16.8  6.0 22.6 5.7
+## W. Germany      6.7 1.3 35.8 0.9  7.3 14.4  5.0 22.3 6.1
+## Ireland        23.2 1.0 20.7 1.3  7.5 16.8  2.8 20.8 6.1
+## Italy          15.9 0.6 27.6 0.5 10.0 18.1  1.6 20.1 5.7
+## Luxembourg      7.7 3.1 30.8 0.8  9.2 18.5  4.6 19.2 6.2
+## Netherlands     6.3 0.1 22.5 1.0  9.9 18.0  6.8 28.5 6.8
+## United Kingdom  2.7 1.4 30.2 1.4  6.9 16.9  5.7 28.3 6.4
+## Austria        12.7 1.1 30.2 1.4  9.0 16.8  4.9 16.8 7.0
+## Finland        13.0 0.4 25.9 1.3  7.4 14.7  5.5 24.3 7.6
+## Greece         41.4 0.6 17.6 0.6  8.1 11.5  2.4 11.0 6.7
+## Norway          9.0 0.5 22.4 0.8  8.6 16.9  4.7 27.6 9.4
+## Portugal       27.8 0.3 24.5 0.6  8.4 13.3  2.7 16.7 5.7
+## Spain          22.9 0.8 28.5 0.7 11.5  9.7  8.5 11.8 5.5
+## Sweden          6.1 0.4 25.9 0.8  7.2 14.4  6.0 32.4 6.8
+## Switzerland     7.7 0.2 37.8 0.8  9.5 17.5  5.3 15.4 5.7
+## Turkey         66.8 0.7  7.9 0.1  2.8  5.2  1.1 11.9 3.2
+## Bulgaria       23.6 1.9 32.3 0.6  7.9  8.0  0.7 18.2 6.7
+## Czechoslovakia 16.5 2.9 35.5 1.2  8.7  9.2  0.9 17.9 7.0
+## E. Germany      4.2 2.9 41.2 1.3  7.6 11.2  1.2 22.1 8.4
+## Hungary        21.7 3.1 29.6 1.9  8.2  9.4  0.9 17.2 8.0
+## Poland         31.1 2.5 25.7 0.9  8.4  7.5  0.9 16.1 6.9
+## Rumania        34.7 2.1 30.1 0.6  8.7  5.9  1.3 11.7 5.0
+## USSR           23.7 1.4 25.8 0.6  9.2  6.1  0.5 23.6 9.3
+## Yugoslavia     48.7 1.5 16.8 1.1  4.9  6.4 11.3  5.3 4.0&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dim(Eurojobs) # displays the number of rows and columns&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 26  9&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We now have a “clean” dataset of 26 observations and 9 variables on which we can base the classification. Note that in this case it is not necessary to standardize the data because they are all expressed in the same unit (in percentage). If this was not the case, we would have had to standardize the data via the &lt;code&gt;scale()&lt;/code&gt; function (see below for an example where the data is standardized before classification). The so-called &lt;em&gt;k&lt;/em&gt;-means clustering is done via the &lt;code&gt;kmeans()&lt;/code&gt; function. We apply the classification with 2 classes and then 3 classes.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;kmeans-with-2-groups&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;&lt;code&gt;kmeans()&lt;/code&gt; with 2 groups&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model &amp;lt;- kmeans(Eurojobs, centers = 2)
+
+# displays the class determined by
+# the model for all observations:
+print(model$cluster)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##        Belgium        Denmark         France     W. Germany        Ireland 
+##              1              1              1              1              2 
+##          Italy     Luxembourg    Netherlands United Kingdom        Austria 
+##              1              1              1              1              1 
+##        Finland         Greece         Norway       Portugal          Spain 
+##              1              2              1              2              2 
+##         Sweden    Switzerland         Turkey       Bulgaria Czechoslovakia 
+##              1              1              2              2              1 
+##     E. Germany        Hungary         Poland        Rumania           USSR 
+##              1              2              2              2              2 
+##     Yugoslavia 
+##              2&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note that the argument &lt;code&gt;centers = 2&lt;/code&gt; is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling &lt;code&gt;print(model$cluster)&lt;/code&gt; or &lt;code&gt;model$cluster&lt;/code&gt; is the same. This output specifies the group (&lt;em&gt;i.e.&lt;/em&gt;, 1 or 2) to which each country belongs.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;quality-of-a-k-means-partition&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Quality of a &lt;em&gt;k&lt;/em&gt;-means partition&lt;/h3&gt;
+&lt;p&gt;The quality of a partition is found by calculating the percentage of the &lt;em&gt;TSS&lt;/em&gt; “explained” by the partition using the following formula:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\begin{equation}
+\dfrac{\operatorname{BSS}}{\operatorname{TSS}} \times 100\%,
+\end{equation}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;em&gt;BSS&lt;/em&gt; and &lt;em&gt;TSS&lt;/em&gt; stands for &lt;em&gt;Between Sum of Squares&lt;/em&gt; and &lt;em&gt;Total Sum of Squares&lt;/em&gt;, respectively. The higher the percentage, the better the score because it means that &lt;em&gt;BSS&lt;/em&gt; is large and/or &lt;em&gt;WSS&lt;/em&gt; is small.&lt;/p&gt;
+&lt;p&gt;Here is how you can check the quality of the partition in R:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# BSS and TSS are extracted from the model
+(BSS &amp;lt;- model$betweenss)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 4823.535&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;(TSS &amp;lt;- model$totss)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 9299.59&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# We calculate the quality of the partition
+BSS / TSS * 100&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 51.86826&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The quality of the partition is 51.87%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters!) in order to determine the best partition among the ones considered.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;nstart-for-several-initial-centers&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;&lt;code&gt;nstart&lt;/code&gt; for several initial centers&lt;/h3&gt;
+&lt;p&gt;The &lt;em&gt;k&lt;/em&gt;-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command &lt;code&gt;kmeans(Eurojobs, centers = 2)&lt;/code&gt; may give slightly different results every tume , and thus slight differences in the quality of the partitions. The &lt;code&gt;nstart&lt;/code&gt; argument in the &lt;code&gt;kmeans()&lt;/code&gt; function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model2 &amp;lt;- kmeans(Eurojobs, centers = 2, nstart = 10)
+100 * model2$betweenss / model2$totss&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 54.2503&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Depending on the initial random choices, this new partition will be better or not compared to the first one.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;kmeans-with-3-groups&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;&lt;code&gt;kmeans()&lt;/code&gt; with 3 groups&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model3 &amp;lt;- kmeans(Eurojobs, centers = 3)
+BSS3 &amp;lt;- model3$betweenss
+TSS3 &amp;lt;- model3$totss
+BSS3 / TSS3 * 100&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 74.59455&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It can be seen that the classification into three groups allows for a higher explained percentage and a higher quality. This will always be the case: with more classes, the partition will be finer, and the &lt;em&gt;BSS&lt;/em&gt; contribution will be higher. On the other hand, the “model” will be more complex, requiring more classes. In the extreme case where &lt;em&gt;k = n&lt;/em&gt; (each observation is a singleton class), we have &lt;em&gt;BSS = TSS&lt;/em&gt;, but the partition has lost all interest.&lt;/p&gt;
+&lt;p&gt;Now that the &lt;em&gt;k&lt;/em&gt;-means clustering has been detailed in R, see how to do the algorithm by hand in the following sections.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;manual-application-and-verification-in-r&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Manual application and verification in R&lt;/h3&gt;
+&lt;p&gt;Perform &lt;strong&gt;by hand&lt;/strong&gt; the &lt;em&gt;k&lt;/em&gt;-means algorithm for the points shown in the graph below, with &lt;em&gt;k&lt;/em&gt; = 2 and with the points &lt;em&gt;i&lt;/em&gt; = 5 and &lt;em&gt;i&lt;/em&gt; = 6 as initial centers. Compute the quality of the partition you just found and then then &lt;strong&gt;check&lt;/strong&gt; your answers &lt;strong&gt;in R&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution by hand:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Step 1. Here are the coordinates of the 6 points:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+point
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+x
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+y
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+7
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+3
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+4
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+1
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+5
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+9
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+7
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+8
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;And the initial centers:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Group 1: point 5 with center &lt;em&gt;(9, 7)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Group 2: point 6 with center &lt;em&gt;(6, 8)&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Step 2. Compute the distance matrix point by point with the Pythagorean theorem. Remind that the distance between the point &lt;em&gt;a&lt;/em&gt; and the point &lt;em&gt;b&lt;/em&gt; is found with:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;We apply this theorem to each pair of points, to finally have the following distance matrix (rounded to two decimals):&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;##       1     2     3     4     5
+## 2  3.61                        
+## 3  5.10  2.24                  
+## 4  7.28  5.66  3.61            
+## 5  4.47  5.39  7.62 10.82      
+## 6  5.10  3.61  5.66  9.22  3.16&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Step 3. Based on the distance matrix computed in step 2, we can put each point to its closest group and compute the coordinates of the center.&lt;/p&gt;
+&lt;p&gt;We first put each point in its closest group:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;point 1 is closer to point 5 than to point 6 because the distance between points 1 and 5 is 4.47 while the distance between points 1 and 6 is 5.10&lt;/li&gt;
+&lt;li&gt;point 2 is closer to point 6 than to point 5 because the distance between points 2 and 5 is 5.39 while the distance between points 2 and 6 is 3.61&lt;/li&gt;
+&lt;li&gt;point 3 is closer to point 6 than to point 5 because the distance between points 3 and 5 is 7.62 while the distance between points 3 and 6 is 5.66&lt;/li&gt;
+&lt;li&gt;point 4 is closer to point 6 than to point 5 because the distance between points 4 and 5 is 10.82 while the distance between points 4 and 6 is 9.22&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note that computing the distances between each point and the points 5 and 6 is sufficient. There is no need to compute the distance between the points 1 and 2 for example, as we compare each point to the initial centers (which are points 5 and 6).&lt;/p&gt;
+&lt;p&gt;We then compute the coordinates of the centers of the two groups by taking the mean of the coordinates &lt;em&gt;x&lt;/em&gt; and &lt;em&gt;y&lt;/em&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Group 1 includes the points 5 and 1 with &lt;em&gt;(8, 5)&lt;/em&gt; as center (&lt;span class=&#34;math inline&#34;&gt;\(8 = \frac{9+7}{2}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(5 = \frac{7+3}{2}\)&lt;/span&gt;)&lt;/li&gt;
+&lt;li&gt;Group 2 includes the points 6, 2, 3 and 4 with &lt;em&gt;(3, 4.5)&lt;/em&gt; as center (&lt;span class=&#34;math inline&#34;&gt;\(3 = \frac{6+4+2+0}{4}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(4.5 = \frac{8+5+4+1}{4}\)&lt;/span&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We thus have:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+points
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+center
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+cluster 1
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5 &amp;amp; 1
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+(8, 5)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+cluster 2
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6, 2, 3 &amp;amp; 4
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+(3, 4.5)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Step 4. We make sure that the allocation is optimal by checking that each point is in the nearest cluster. The distance between a point and the center of a cluster is again computed thanks to the Pythagorean theorem. Thus, we have:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-scde{color:#009901;text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+.tg .tg-yi9q{color:#009901;text-align:left;vertical-align:top}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+points
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+Distance to cluster 1
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+Distance to cluster 2
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+2.24
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+4.27
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+1.12
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6.08
+&lt;/td&gt;
+&lt;td class=&#34;tg-yi9q&#34;&gt;
+1.12
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+8.94
+&lt;/td&gt;
+&lt;td class=&#34;tg-yi9q&#34;&gt;
+4.61
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+5
+&lt;/td&gt;
+&lt;td class=&#34;tg-yi9q&#34;&gt;
+2.24
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6.5
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-yi9q&#34;&gt;
+3.61
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+4.61
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;The minimal distance between the points and the two clusters is colored in green.&lt;/p&gt;
+&lt;p&gt;We check that each point is in the correct group (i.e., the closest cluster). According to the distance in the table above, point 6 seems to be closer to the cluster 1 than to the cluster 2. Therefore, the allocation is not optimal and point 6 should be reallocated to cluster 1.&lt;/p&gt;
+&lt;p&gt;Step 5. We compute again the centers of the clusters after this reallocation. The centers are found by taking the mean of the coordinates &lt;em&gt;x&lt;/em&gt; and &lt;em&gt;y&lt;/em&gt; of the points belonging to the cluster. We thus have:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+points
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+center
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+cluster 1
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1, 5 &amp;amp; 6
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+(7.33, 6)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+cluster 2
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+2, 3 &amp;amp; 4
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+(2, 3.33)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;where, for instance, 3.33 is simply &lt;span class=&#34;math inline&#34;&gt;\(\frac{5+4+1}{3}\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Step 6. Repeat step 4 until the allocation is optimal. If the allocation is optimal, the algorithm stops. In our example:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-scde{color:#009901;text-align:left;vertical-align:middle}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+points
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+Distance to cluster 1
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+Distance to cluster 2
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+3.02
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5.01
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+3.48
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+2.61
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5.69
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+0.67
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+8.87
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+3.07
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+1.95
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+7.9
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-scde&#34;&gt;
+2.4
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+5.08
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;All points are correctly allocated to its nearest cluster, so the allocation is optimal and the algorithm stops.&lt;/p&gt;
+&lt;p&gt;Step 7. State the final partition and the centers. In our example:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+points
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+center
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+cluster 1
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1, 5 &amp;amp; 6
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+(7.33, 6)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+cluster 2
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+2, 3 &amp;amp; 4
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+(2, 3.33)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;We are now going to compute the quality of the partition we just found. Remember that we need to compute the BSS and TSS to find the quality. Below the steps to compute the quality of this partition by &lt;em&gt;k&lt;/em&gt;-means, based on this summary table:&lt;/p&gt;
+&lt;center&gt;
+&lt;style type=&#34;text/css&#34;&gt;
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+.tg .tg-0a7q{border-color:#000000;text-align:left;vertical-align:middle}
+.tg .tg-73oq{border-color:#000000;text-align:left;vertical-align:top}
+&lt;/style&gt;
+&lt;table class=&#34;tg&#34;&gt;
+&lt;tr&gt;
+&lt;th class=&#34;tg-cly1&#34;&gt;
+&lt;/th&gt;
+&lt;th class=&#34;tg-cly1&#34; colspan=&#34;2&#34;&gt;
+cluster 1
+&lt;/th&gt;
+&lt;th class=&#34;tg-0lax&#34;&gt;
+&lt;/th&gt;
+&lt;th class=&#34;tg-0lax&#34; colspan=&#34;2&#34;&gt;
+cluster 2
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+point
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+x
+&lt;/td&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+y
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+point
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+x
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+y
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-cly1&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td class=&#34;tg-0a7q&#34;&gt;
+7
+&lt;/td&gt;
+&lt;td class=&#34;tg-0a7q&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+5
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+5
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+9
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+7
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+4
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+8
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td class=&#34;tg-73oq&#34;&gt;
+1
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+mean
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+7.33
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td class=&#34;tg-0lax&#34;&gt;
+3.33
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Step 1. Compute the overall mean of the &lt;em&gt;x&lt;/em&gt; and &lt;em&gt;y&lt;/em&gt; coordinates:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\overline{\overline{x}} = \frac{7+4+2+0+9+6+3+5+4+1+7+8}{12} = 4.67\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Step 2. Compute TSS and WSS:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[TSS = (7-4.67)^2 + (4-4.67)^2 + (2-4.67)^2 + (0-4.67)^2 \\+ (9-4.67)^2 + (6-4.67)^2 + (3-4.67)^2 + (5-4.67)^2 \\ + (4-4.67)^2 + (1-4.67)^2 + (7-4.67)^2 + (8-4.67)^2 = 88.67\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Regarding WSS, it is splitted for cluster 1 and for cluster 2. For cluster 1:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[WSS[1] = (7-7.33)^2 + (9 - 7.33)^2 + (6 - 7.33)^2 \\ + (3-6)^2 + (7-6)^2 + (8-6)^2 = 18.67\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;For cluster 2:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[WSS[2] = (4-2)^2 + (2-2)^2 + (0-2)^2 \\ + (5-3.33)^2 + (4-3.33)^2 + (1-3.33)^2 = 16.67\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;And &lt;span class=&#34;math display&#34;&gt;\[WSS = WSS[1] + WSS[2] = 18.67 + 16.67 = 35.34\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;To find the BSS:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[BSS = TSS - WSS = 88.67-35.34 = 53.33\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Finally, the quality of the partition is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Quality = \frac{BSS}{TSS} = \frac{53.33}{88.67} = 0.6014\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;So the quality of the partition is 60.14%.&lt;/p&gt;
+&lt;p&gt;We are now going to verify all these solutions (the partition, the centers and the quality) in R.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution in R :&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As you can imagine, the solution in R us much shorter and requires much less computation on the user side:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- matrix(c(7,3,4,5,2,4,0,1,9,7,6,8),
+            nrow = 6, byrow = TRUE)
+X # display the coordinates of the points&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##      [,1] [,2]
+## [1,]    7    3
+## [2,]    4    5
+## [3,]    2    4
+## [4,]    0    1
+## [5,]    9    7
+## [6,]    6    8&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# take rows 5 and 6 of the X matrix as initial centres
+res.k &amp;lt;- kmeans(X, centers = X[c(5,6), ], algorithm = &amp;quot;Lloyd&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Unlike in the previous application with the dataset &lt;code&gt;Eurojobs.csv&lt;/code&gt; where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set &lt;code&gt;centers = X[c(5,6), ]&lt;/code&gt; to indicate that that there are 2 centers, and that they are going to be the points 5 and 6.&lt;/p&gt;
+&lt;p&gt;The reason for adding the argument &lt;code&gt;algorithm = &amp;quot;Lloyd&amp;quot;&lt;/code&gt; can be found in the usage of the R function &lt;code&gt;kmeans()&lt;/code&gt;. In fact, there are several variants of the &lt;em&gt;k&lt;/em&gt;-means algorithm. The default choice is the &lt;span class=&#34;citation&#34;&gt;Hartigan and Wong (1979)&lt;/span&gt; version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of &lt;span class=&#34;citation&#34;&gt;Lloyd (1982)&lt;/span&gt;, we find the same solution in R and by hand. For more information, you can consult the documentation of the &lt;code&gt;kmeans()&lt;/code&gt; function (via &lt;code&gt;?kmeans&lt;/code&gt;) and read the articles mentioned.&lt;/p&gt;
+&lt;p&gt;The solution is then found by extracting the coordinates of the final centers and then&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# We extract the coordinates of the 2 final centers
+res.k$centers&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##       [,1]     [,2]
+## 1 7.333333 6.000000
+## 2 2.000000 3.333333&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# quality of the partition
+100 * res.k$betweenss / res.k$totss&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 60.15038&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Thanks for reading. I hope this article helped you understand the different clustering methods and to compute them by hand and in R.&lt;/p&gt;
+&lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Related articles:&lt;/strong&gt;&lt;/p&gt;
+&lt;script src=&#34;//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&amp;detail=-1&amp;limit=5&amp;showtitle=false&amp;type=js&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1 unnumbered&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;div id=&#34;refs&#34; class=&#34;references&#34;&gt;
+&lt;div id=&#34;ref-jaaw28m&#34;&gt;
+&lt;p&gt;Hartigan, J. A., and M. A. Wong. 1979. “A K-Means Clustering Algorithm.” &lt;em&gt;Applied Statistics&lt;/em&gt; 28: 100–108.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;ref-lloyd1982least&#34;&gt;
+&lt;p&gt;Lloyd, Stuart. 1982. “Least Squares Quantization in Pcm.” &lt;em&gt;IEEE Transactions on Information Theory&lt;/em&gt; 28 (2). IEEE: 129–37.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Recent comments</title>
       <link>/recent-comments/</link>
       <pubDate>Mon, 03 Feb 2020 00:00:00 +0000</pubDate>
@@ -168,7 +998,7 @@ pacman::p_load(ggplot2, tidyr, dplyr)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# From CRAN:
 install.packages(&amp;quot;librarian&amp;quot;)
 
-librarian::shelf(ggplot2, DesiQuintans/desiderata, pander)&lt;/code&gt;&lt;/pre&gt;
+librarian::shelf(ggplot2, DesiQuintans / desiderata, pander)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;For CRAN packages, provide the package name as normal without &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; and for GitHub packages, provide the username and package name separated by &lt;code&gt;/&lt;/code&gt; (i.e., &lt;code&gt;UserName/RepoName&lt;/code&gt; as shown for the &lt;code&gt;desiderata&lt;/code&gt; package).&lt;/p&gt;
 &lt;p&gt;Find more about this package on &lt;a href=&#34;https://cran.r-project.org/web/packages/librarian/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CRAN&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Thanks for reading. I hope the article helped you to install and load R packages in a more efficient way.&lt;/p&gt;
@@ -2599,6 +3429,10 @@ model&lt;/code&gt;&lt;/pre&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/descriptive-statistics-by-hand_files/descriptive-statistics-by-hand.jpeg&#34; alt=&#34;Photo by Pop &amp;amp; Zebra&#34; style=&#34;width:100.0%&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Photo by Pop &amp;amp; Zebra&lt;/p&gt;
+&lt;/div&gt;
 &lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;This article explains how to compute the main descriptive statistics by hand and how to interpret them. To learn how to compute these measures in R, read the article “&lt;a href=&#34;/blog/descriptive-statistics-in-r/&#34;&gt;Descriptive statistics in R&lt;/a&gt;”.&lt;/p&gt;
@@ -2778,6 +3612,7 @@ Below a visual representation of the mean:&lt;/p&gt;
 &lt;li&gt;standard deviation&lt;/li&gt;
 &lt;li&gt;variance&lt;/li&gt;
 &lt;li&gt;interquartile range&lt;/li&gt;
+&lt;li&gt;coefficient of variation&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;As for location measures, we detail and compute by hand each of these statistics one by one.&lt;/p&gt;
 &lt;div id=&#34;range&#34; class=&#34;section level2&#34;&gt;
@@ -2816,7 +3651,7 @@ Below a visual representation of the mean:&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;160.4&lt;/em&gt;, &lt;em&gt;175.8&lt;/em&gt; and &lt;em&gt;181.5&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;The mean is still 172.6 (rounded to 1 decimal) since the mean is the same whether it is a population or a sample. The standard deviation is now:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[s = \sqrt{\frac{1}{3 - 1} \big[(160.4 - 172.6)^2 + (175.8 - 172.6)^2 + (181.5 - 172.6)^2 \big]}\]&lt;/span&gt;
-&lt;span class=&#34;math display&#34;&gt;\[\sigma = 10.92\]&lt;/span&gt;&lt;/p&gt;
+&lt;span class=&#34;math display&#34;&gt;\[s = 10.92\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;In conclusion, the standard deviation for the heights of these 3 adults is 10.92 cm. The interpretation is the same than for a population.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -2829,7 +3664,7 @@ Below a visual representation of the mean:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\sigma^2 = \frac{1}{n}\sum^n_{i = 1}(x_i - \mu)^2\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;As you can see, the formula for variance is the same than for standard deviation, except that the square root is removed for the variance. Remember the heights of our population of 3 adults:&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;160.4&lt;/em&gt;, &lt;em&gt;175.8&lt;/em&gt; and &lt;em&gt;181.5&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;The standard deviation was 8.91, so the variance of the height of these adults is &lt;span class=&#34;math inline&#34;&gt;\(8.91^2 = 79.39\)&lt;/span&gt; &lt;span class=&#34;math inline&#34;&gt;\(cm^2\)&lt;/span&gt; (see below why the unit of a variance is &lt;span class=&#34;math inline&#34;&gt;\(unit^2\)&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;The standard deviation was 8.91 cm, so the variance of the height of these adults is &lt;span class=&#34;math inline&#34;&gt;\(8.91^2 = 79.39\)&lt;/span&gt; &lt;span class=&#34;math inline&#34;&gt;\(cm^2\)&lt;/span&gt; (see below why the unit of a variance is &lt;span class=&#34;math inline&#34;&gt;\(unit^2\)&lt;/span&gt;).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;variance-for-a-sample&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Variance for a sample&lt;/h3&gt;
@@ -2837,7 +3672,7 @@ Below a visual representation of the mean:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[s^2 = \frac{1}{n-1}\sum^n_{i = 1}(x_i - \bar{x})^2\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;Imagine again that the 3 adults in the previous section is a sample instead of a population:&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;160.4&lt;/em&gt;, &lt;em&gt;175.8&lt;/em&gt; and &lt;em&gt;181.5&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;The standard deviation for this sample was 10.92, so the variance of the height of these adults is 119.14 &lt;span class=&#34;math inline&#34;&gt;\(cm^2\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The standard deviation for this sample was 10.92 cm, so the variance of the height of these adults is 119.14 &lt;span class=&#34;math inline&#34;&gt;\(cm^2\)&lt;/span&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;standard-deviation-vs.variance&#34; class=&#34;section level2&#34;&gt;
@@ -2899,7 +3734,7 @@ Below a visual representation of the mean:&lt;/p&gt;
 &lt;h2&gt;Coefficient of variation vs. standard deviation&lt;/h2&gt;
 &lt;p&gt;Although the coefficient of variation is rather unknown to the public, it is, in fact, worth presenting when making descriptive statistics.&lt;/p&gt;
 &lt;p&gt;The standard deviation should always be understood in the context of the mean of the data and is dependent on its unit. The standard deviation has the advantage that it tells by how far on average the data is from the mean in terms of unit in which the data has been measured. Standard deviation is useful when considering variables with same units and approximately same means. However, standard deviation becomes less useful when comparing variables with different units or widely different means. For instance, a variable with a standard deviation of 10 cm cannot be compared to a variable with a standard deviation of 10€ to conclude which one is the most dispersed.&lt;/p&gt;
-&lt;p&gt;The coefficient of variation is a ratio of two statistics with the same units. It has thus no unit and is independent of the unit in which the data has been measured. Being unit-free, coefficients of variation computed on datasets or variables with different units or widely different means can be compared to conclude, in fine, which data or variables is more (or less) dispersed. For instance, consider a sample of 10 women with their heights in cm and their salaries in €. The coefficients of variation are 0.032 and 0.061 respectively for the height and the salary. We can conclude that, relative to their respective average, the salaries vary more than the height for these women.&lt;/p&gt;
+&lt;p&gt;The coefficient of variation is a ratio of two statistics with the same units. It has thus no unit and is independent of the unit in which the data has been measured. Being unit-free, coefficients of variation computed on datasets or variables with different units or widely different means can be compared to conclude, in fine, which data or variables is more (or less) dispersed. For instance, consider a sample of 10 women with their heights in cm and their salaries in €. The coefficients of variation are 0.032 and 0.061 respectively for the height and the salary. We can conclude that, relative to their respective average, their salaries vary more than their heights for these women (since the coefficient of variation is larger for the salary compared to the coefficient variation for the height).&lt;/p&gt;
 &lt;p&gt;This concludes a relatively long article, thanks for reading! I hope the article helped you to understand and compute the different descriptive statistics by hand. If you would like to learn how to compute these measures in R, read the article “&lt;a href=&#34;/blog/descriptive-statistics-in-r/&#34;&gt;Descriptive statistics in R&lt;/a&gt;”.&lt;/p&gt;
 &lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
@@ -4725,6 +5560,10 @@ A list of all the pages and articles found on the blog. If you cannot find what 
 &lt;/ul&gt;
 &lt;/div&gt;
 
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/how-to-import-an-excel-file-in-rstudio_files/how-to-import-an-excel-file-in-r.jpeg&#34; alt=&#34;Photo by Avi Waxman&#34; style=&#34;width:100.0%&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Photo by Avi Waxman&lt;/p&gt;
+&lt;/div&gt;
 &lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;As we have seen in this article on &lt;a href=&#34;/blog/how-to-install-r-and-rstudio/&#34;&gt;how to install R and RStudio&lt;/a&gt;, R is useful for many kind of computational tasks and statistical analyses. However, it would not be so powerful and useful without the possibility to import datasets into R. As you will most likely use R with your own data, being able to import it into R is crucial for any user.&lt;/p&gt;
