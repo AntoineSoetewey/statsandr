@@ -38,7 +38,10 @@
 &lt;/ul&gt;
 &lt;/div&gt;
 
-&lt;p&gt;xxx add image and add it to YAML&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r-statsandr.com.jpeg&#34; alt=&#34;Photo by Nikola Johnny Mirkovic&#34; style=&#34;width:100.0%&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Photo by Nikola Johnny Mirkovic&lt;/p&gt;
+&lt;/div&gt;
 &lt;div id=&#34;what-is-clustering-analysis&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;What is clustering analysis?&lt;/h1&gt;
 &lt;p&gt;Clustering analysis is a form of exploratory data analysis in which observations are divided into different groups that share common characteristics.&lt;/p&gt;
@@ -162,17 +165,17 @@ Eurojobs # displays dataset&lt;/code&gt;&lt;/pre&gt;
 # the model for all observations:
 print(model$cluster)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##        Belgium        Denmark         France     W. Germany        Ireland 
-##              2              2              2              2              2 
+##              1              1              1              1              2 
 ##          Italy     Luxembourg    Netherlands United Kingdom        Austria 
-##              2              2              2              2              2 
+##              1              1              1              1              1 
 ##        Finland         Greece         Norway       Portugal          Spain 
-##              2              1              2              2              2 
+##              1              2              1              2              2 
 ##         Sweden    Switzerland         Turkey       Bulgaria Czechoslovakia 
-##              2              2              1              2              2 
+##              1              1              2              2              1 
 ##     E. Germany        Hungary         Poland        Rumania           USSR 
-##              2              2              1              1              2 
+##              1              2              2              2              2 
 ##     Yugoslavia 
-##              1&lt;/code&gt;&lt;/pre&gt;
+##              2&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that the argument &lt;code&gt;centers = 2&lt;/code&gt; is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling &lt;code&gt;print(model$cluster)&lt;/code&gt; or &lt;code&gt;model$cluster&lt;/code&gt; is the same. This output specifies the group (&lt;em&gt;i.e.&lt;/em&gt;, 1 or 2) to which each country belongs.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;quality-of-a-k-means-partition&#34; class=&#34;section level3&#34;&gt;
@@ -185,20 +188,20 @@ print(model$cluster)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Here is how you can check the quality of the partition in R:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# BSS and TSS are extracted from the model
 (BSS &amp;lt;- model$betweenss)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 5045.056&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 4823.535&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;(TSS &amp;lt;- model$totss)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 9299.59&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# We calculate the quality of the partition
 BSS / TSS * 100&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 54.2503&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The quality of the partition is 54.25%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters!) in order to determine the best partition among the ones considered.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 51.86826&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The quality of the partition is 51.87%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters!) in order to determine the best partition among the ones considered.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;nstart-for-several-initial-centers&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;&lt;code&gt;nstart&lt;/code&gt; for several initial centers&lt;/h3&gt;
 &lt;p&gt;The &lt;em&gt;k&lt;/em&gt;-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command &lt;code&gt;kmeans(Eurojobs, centers = 2)&lt;/code&gt; may give slightly different results every tume , and thus slight differences in the quality of the partitions. The &lt;code&gt;nstart&lt;/code&gt; argument in the &lt;code&gt;kmeans()&lt;/code&gt; function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model2 &amp;lt;- kmeans(Eurojobs, centers = 2, nstart = 10)
 100 * model2$betweenss / model2$totss&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 54.2503&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 51.86826&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Depending on the initial random choices, this new partition will be better or not compared to the first one.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;kmeans-with-3-groups&#34; class=&#34;section level3&#34;&gt;
@@ -794,8 +797,8 @@ mean
 &lt;p&gt;Finally, the quality of the partition is:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Quality = \frac{BSS}{TSS} = \frac{53.33}{88.67} = 0.6014\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;So the quality of the partition is 60.14%.&lt;/p&gt;
-&lt;p&gt;We are now going to verify all these solutions (the partition, the centers and the quality) in R.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Solution in R :&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;We are now going to verify all these solutions (the partition, the final centers and the quality) in R.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution in R:&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;As you can imagine, the solution in R us much shorter and requires much less computation on the user side:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- matrix(c(7,3,4,5,2,4,0,1,9,7,6,8),
             nrow = 6, byrow = TRUE)
