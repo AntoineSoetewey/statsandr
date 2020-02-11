@@ -34,6 +34,15 @@
 &lt;li&gt;&lt;a href=&#34;#manual-application-and-verification-in-r&#34;&gt;Manual application and verification in R&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#hierarchical-clustering&#34;&gt;Hierarchical clustering&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#application-3-hierarchical-clustering&#34;&gt;Application 3: hierarchical clustering&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#data-1&#34;&gt;Data&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#solutions-by-hand&#34;&gt;Solutions by hand&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#single-linkage&#34;&gt;Single linkage&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#references&#34;&gt;References&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
@@ -216,7 +225,7 @@ BSS3 / TSS3 * 100&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;manual-application-and-verification-in-r&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Manual application and verification in R&lt;/h3&gt;
-&lt;p&gt;Perform &lt;strong&gt;by hand&lt;/strong&gt; the &lt;em&gt;k&lt;/em&gt;-means algorithm for the points shown in the graph below, with &lt;em&gt;k&lt;/em&gt; = 2 and with the points &lt;em&gt;i&lt;/em&gt; = 5 and &lt;em&gt;i&lt;/em&gt; = 6 as initial centers. Compute the quality of the partition you just found and then then &lt;strong&gt;check&lt;/strong&gt; your answers &lt;strong&gt;in R&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Perform &lt;strong&gt;by hand&lt;/strong&gt; the &lt;em&gt;k&lt;/em&gt;-means algorithm for the points shown in the graph below, with &lt;em&gt;k&lt;/em&gt; = 2 and with the points &lt;em&gt;i&lt;/em&gt; = 5 and &lt;em&gt;i&lt;/em&gt; = 6 as initial centers. Compute the quality of the partition you just found and then &lt;strong&gt;check&lt;/strong&gt; your answers &lt;strong&gt;in R&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Solution by hand:&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;Step 1. Here are the coordinates of the 6 points:&lt;/p&gt;
@@ -817,20 +826,85 @@ X # display the coordinates of the points&lt;/code&gt;&lt;/pre&gt;
 res.k &amp;lt;- kmeans(X, centers = X[c(5,6), ], algorithm = &amp;quot;Lloyd&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Unlike in the previous application with the dataset &lt;code&gt;Eurojobs.csv&lt;/code&gt; where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set &lt;code&gt;centers = X[c(5,6), ]&lt;/code&gt; to indicate that that there are 2 centers, and that they are going to be the points 5 and 6.&lt;/p&gt;
 &lt;p&gt;The reason for adding the argument &lt;code&gt;algorithm = &amp;quot;Lloyd&amp;quot;&lt;/code&gt; can be found in the usage of the R function &lt;code&gt;kmeans()&lt;/code&gt;. In fact, there are several variants of the &lt;em&gt;k&lt;/em&gt;-means algorithm. The default choice is the &lt;span class=&#34;citation&#34;&gt;Hartigan and Wong (1979)&lt;/span&gt; version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of &lt;span class=&#34;citation&#34;&gt;Lloyd (1982)&lt;/span&gt;, we find the same solution in R and by hand. For more information, you can consult the documentation of the &lt;code&gt;kmeans()&lt;/code&gt; function (via &lt;code&gt;?kmeans&lt;/code&gt;) and read the articles mentioned.&lt;/p&gt;
-&lt;p&gt;The solution is then found by extracting the coordinates of the final centers and then&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# We extract the coordinates of the 2 final centers
-res.k$centers&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##       [,1]     [,2]
-## 1 7.333333 6.000000
-## 2 2.000000 3.333333&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# quality of the partition
-100 * res.k$betweenss / res.k$totss&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] 60.15038&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The solution is then found by extracting&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the partition:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;res.k$cluster&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 1 2 2 2 1 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Points 1, 5 and 6 belong to cluster 1, points 2, 3 and 4 belong to cluster 2.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the coordinates of the final centers:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# We extract the coordinates of the 2 final centers, rounded to 2 decimals
+round(res.k$centers, digits = 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   [,1] [,2]
+## 1 7.33 6.00
+## 2 2.00 3.33&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;and then the quality of the partition:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;res.k$betweenss / res.k$totss&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.6015038&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The 3 results are equal to what we found by hand (except the quality which is slightly different due to rounding).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;hierarchical-clustering&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Hierarchical clustering&lt;/h1&gt;
+&lt;p&gt;Remind that the difference with the partition by &lt;em&gt;k&lt;/em&gt;-means is that for hierarchical clustering, the number of classes is &lt;strong&gt;not&lt;/strong&gt; specified in advance. Hierarchical clustering will help to determine the optimal number of clusters.&lt;/p&gt;
+&lt;p&gt;In this article, the 3 main types of hierarchical clustering are discussed:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Single linkage&lt;/li&gt;
+&lt;li&gt;Complete linkage&lt;/li&gt;
+&lt;li&gt;Average linkage&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In the following sections, we perform these 3 algorithms by hand and verify the results in R.&lt;/p&gt;
+&lt;div id=&#34;application-3-hierarchical-clustering&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Application 3: hierarchical clustering&lt;/h2&gt;
+&lt;div id=&#34;data-1&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Data&lt;/h3&gt;
+&lt;p&gt;Using the data from the graph and the table below, perform &lt;strong&gt;by hand&lt;/strong&gt; the 3 algorithms (single, complete and average linkage). Then &lt;strong&gt;check&lt;/strong&gt; your answers &lt;strong&gt;in R&lt;/strong&gt; and draw the dendrograms.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;##      V1    V2
+## 1  2.03  0.06
+## 2 -0.64 -0.10
+## 3 -0.42 -0.53
+## 4 -0.36  0.07
+## 5  1.14  0.37&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;solutions-by-hand&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;Solutions by hand&lt;/h4&gt;
+&lt;p&gt;Step 1. For all 3 algorithms, we first need to compute the distance matrix between the 5 points thanks to the Pythagorean theorem. Remind that the distance between the point &lt;em&gt;a&lt;/em&gt; and the point &lt;em&gt;b&lt;/em&gt; is found with:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;We apply this theorem to each pair of points, to finally have the following distance matrix (rounded to three decimals):&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;##       1     2     3     4
+## 2 2.675                  
+## 3 2.520 0.483            
+## 4 2.390 0.328 0.603      
+## 5 0.942 1.841 1.801 1.530&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;single-linkage&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;Single linkage&lt;/h5&gt;
+&lt;p&gt;Step 2. From the distance matrix computed in step 1, we see that the &lt;strong&gt;smallest distance&lt;/strong&gt; = 0.328 between points 2 and 4. Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The new distances between the points 2 and 4 and all other points are now:&lt;/p&gt;
+&lt;p&gt;Step 3. The new coordinates&lt;/p&gt;
+&lt;p&gt;Solution in R :&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- matrix(c(2.03,0.06,-0.64,-0.10,-0.42,-0.53,-0.36,0.07,1.14,0.37), nrow = 5, byrow = TRUE)
+
+#Algorithme de Ward et dendrogramme
+hclust_ward &amp;lt;- hclust(dist(X)^2 / (2 * nrow(X)), method = &amp;quot;ward.D&amp;quot;)
+plot(hclust_ward)
+rect.hclust(hclust_ward, k = 2, border = &amp;quot;blue&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;barplot(hclust_ward$height,
+        ylab = &amp;quot;aggregation level&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-21-2.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Note that determining the number of clusters using the dendrogram is not a strict rule. You can also consider the &lt;em&gt;Silhouette plot&lt;/em&gt;, &lt;em&gt;elbow plot&lt;/em&gt; or some numerical measures such as Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (&lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt;), and you choose the value of &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt; where the error is smallest. However, these methods are outside the scope of this course and the method presented with the dendrogram is sufficient.&lt;/p&gt;
 &lt;p&gt;Thanks for reading. I hope this article helped you understand the different clustering methods and to compute them by hand and in R.&lt;/p&gt;
 &lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Related articles:&lt;/strong&gt;&lt;/p&gt;
 &lt;script src=&#34;//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&amp;detail=-1&amp;limit=5&amp;showtitle=false&amp;type=js&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;

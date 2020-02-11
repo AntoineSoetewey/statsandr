@@ -193,7 +193,7 @@ Now that the *k*-means clustering has been detailed in R, see how to do the algo
 
 ### Manual application and verification in R
 
-Perform **by hand** the *k*-means algorithm for the points shown in the graph below, with *k* = 2 and with the points *i* = 5 and *i* = 6 as initial centers. Compute the quality of the partition you just found and then then **check** your answers **in R**.
+Perform **by hand** the *k*-means algorithm for the points shown in the graph below, with *k* = 2 and with the points *i* = 5 and *i* = 6 as initial centers. Compute the quality of the partition you just found and then **check** your answers **in R**.
 
 ```{r, echo = FALSE}
 set.seed(seed = 2018 * 02 * 15)
@@ -638,8 +638,8 @@ Points 1, 5 and 6 belong to cluster 1, points 2, 3 and 4 belong to cluster 2.
 * the coordinates of the final centers:
 
 ```{r}
-# We extract the coordinates of the 2 final centers
-res.k$centers
+# We extract the coordinates of the 2 final centers, rounded to 2 decimals
+round(res.k$centers, digits = 2)
 ```
 
 * and then the quality of the partition:
@@ -666,22 +666,42 @@ In the following sections, we perform these 3 algorithms by hand and verify the 
 
 ### Data
 
-Using the data from the graph and the table below, perform **by hand** the 3 algorithms (single, complete and average linkage). Then **check** your answers **in R** and draw the dendrogram.
+Using the data from the graph and the table below, perform **by hand** the 3 algorithms (single, complete and average linkage). Then **check** your answers **in R** and draw the dendrograms.
 
 ```{r, echo = FALSE}
 n <- 5
 set.seed(seed = 2018 * 02 * 13)
 X <- as.data.frame(round(matrix(data = rnorm(2*n), nrow = n, byrow = TRUE), 2))
 plot(X, asp = 1); text(X, labels = 1:5, pos = 3, cex = 1.5)
-pander(X)
+X
 ```
+
+#### Solutions by hand
+
+Step 1. For all 3 algorithms, we first need to compute the distance matrix between the 5 points thanks to the Pythagorean theorem. Remind that the distance between the point *a* and the point *b* is found with:
+
+$$\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}$$
+
+We apply this theorem to each pair of points, to finally have the following distance matrix (rounded to three decimals):
+
+```{r, echo = FALSE}
+round(dist(X), 3)
+```
+
+##### Single linkage
+
+Step 2. From the distance matrix computed in step 1, we see that the **smallest distance** = 0.328 between points 2 and 4. Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The new distances between the points 2 and 4 and all other points are now:
+
+
+
+Step 3. The new coordinates 
 
 Solution in R :
 
-```{r, eval = FALSE}
+```{r}
 X <- matrix(c(2.03,0.06,-0.64,-0.10,-0.42,-0.53,-0.36,0.07,1.14,0.37), nrow = 5, byrow = TRUE)
 
-#Ward's algorithm and dendrogram #
+#Algorithme de Ward et dendrogramme
 hclust_ward <- hclust(dist(X)^2 / (2 * nrow(X)), method = "ward.D")
 plot(hclust_ward)
 rect.hclust(hclust_ward, k = 2, border = "blue")
