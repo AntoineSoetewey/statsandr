@@ -1,5 +1,5 @@
 ---
-title: "Clustering analysis: k-means and hierarchical clustering by hand and in R"
+title: "The complete guide to clustering analysis: k-means and hierarchical clustering by hand and in R"
 author: Antoine Soetewey
 date: "2020-02-05"
 slug: clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r
@@ -667,115 +667,117 @@ cluster 2
 .tg .tg-0a7q{border-color:#000000;text-align:left;vertical-align:middle}
 .tg .tg-73oq{border-color:#000000;text-align:left;vertical-align:top}
 </style>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+</style>
 <table class="tg">
 <tr>
-<th class="tg-cly1">
-</th>
-<th class="tg-cly1" colspan="2">
+<th class="tg-0pky" colspan="3">
 cluster 1
 </th>
-<th class="tg-0lax">
-</th>
-<th class="tg-0lax" colspan="2">
+<th class="tg-0pky" colspan="3">
 cluster 2
 </th>
 </tr>
 <tr>
-<td class="tg-cly1">
+<td class="tg-0pky">
 point
 </td>
-<td class="tg-cly1">
+<td class="tg-0pky">
 x
 </td>
-<td class="tg-cly1">
+<td class="tg-0pky">
 y
 </td>
-<td class="tg-0lax">
+<td class="tg-0pky">
 point
 </td>
-<td class="tg-0lax">
+<td class="tg-0pky">
 x
 </td>
-<td class="tg-0lax">
+<td class="tg-0pky">
 y
 </td>
 </tr>
 <tr>
-<td class="tg-cly1">
+<td class="tg-0pky">
 1
 </td>
-<td class="tg-0a7q">
+<td class="tg-0pky">
 7
 </td>
-<td class="tg-0a7q">
+<td class="tg-0pky">
 3
 </td>
-<td class="tg-0lax">
+<td class="tg-0pky">
 2
 </td>
-<td class="tg-73oq">
+<td class="tg-0pky">
 4
 </td>
-<td class="tg-73oq">
+<td class="tg-0pky">
 5
 </td>
 </tr>
 <tr>
-<td class="tg-0lax">
+<td class="tg-0pky">
 5
 </td>
-<td class="tg-73oq">
+<td class="tg-0pky">
 9
 </td>
-<td class="tg-73oq">
+<td class="tg-0pky">
 7
 </td>
-<td class="tg-0lax">
+<td class="tg-0pky">
 3
 </td>
-<td class="tg-73oq">
+<td class="tg-0pky">
 2
 </td>
-<td class="tg-73oq">
+<td class="tg-0pky">
 4
 </td>
 </tr>
 <tr>
-<td class="tg-0lax">
+<td class="tg-0pky">
 6
 </td>
-<td class="tg-73oq">
+<td class="tg-0pky">
 6
 </td>
-<td class="tg-73oq">
+<td class="tg-0pky">
 8
 </td>
-<td class="tg-0lax">
+<td class="tg-0pky">
 4
 </td>
-<td class="tg-73oq">
+<td class="tg-0pky">
 0
 </td>
-<td class="tg-73oq">
+<td class="tg-0pky">
 1
 </td>
 </tr>
 <tr>
-<td class="tg-0lax">
+<td class="tg-0pky">
 mean
 </td>
-<td class="tg-0lax">
+<td class="tg-0pky">
 7.33
 </td>
-<td class="tg-0lax">
-</td>
-<td class="tg-0lax">
+<td class="tg-0pky">
 6
 </td>
-<td class="tg-0lax">
+<td class="tg-0pky">
+</td>
+<td class="tg-0pky">
 2
 </td>
-<td class="tg-0lax">
+<td class="tg-0pky">
 3.33
 </td>
 </tr>
@@ -798,7 +800,7 @@ mean
 <p>So the quality of the partition is 60.14%.</p>
 <p>We are now going to verify all these solutions (the partition, the final centers and the quality) in R.</p>
 <p><strong>Solution in R:</strong></p>
-<p>As you can imagine, the solution in R us much shorter and requires much less computation on the user side:</p>
+<p>As you can imagine, the solution in R us much shorter and requires much less computation on the user side. We first need to enter the data as a matrix:</p>
 <pre class="r"><code>X &lt;- matrix(c(7,3,4,5,2,4,0,1,9,7,6,8),
             nrow = 6, byrow = TRUE)
 X # display the coordinates of the points</code></pre>
@@ -809,6 +811,7 @@ X # display the coordinates of the points</code></pre>
 ## [4,]    0    1
 ## [5,]    9    7
 ## [6,]    6    8</code></pre>
+<p>We now perform the <em>k</em>-means via the <code>kmeans()</code> function with the point 5 and 6 as initial centers:</p>
 <pre class="r"><code># take rows 5 and 6 of the X matrix as initial centres
 res.k &lt;- kmeans(X, centers = X[c(5,6), ], algorithm = &quot;Lloyd&quot;)</code></pre>
 <p>Unlike in the previous application with the dataset <code>Eurojobs.csv</code> where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set <code>centers = X[c(5,6), ]</code> to indicate that that there are 2 centers, and that they are going to be the points 5 and 6.</p>

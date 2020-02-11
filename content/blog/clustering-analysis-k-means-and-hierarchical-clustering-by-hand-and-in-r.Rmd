@@ -1,5 +1,5 @@
 ---
-title: "Clustering analysis: k-means and hierarchical clustering by hand and in R"
+title: "The complete guide to clustering analysis: k-means and hierarchical clustering by hand and in R"
 author: Antoine Soetewey
 date: "2020-02-05"
 slug: clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r
@@ -519,52 +519,56 @@ We are now going to compute the quality of the partition we just found. Remember
 .tg .tg-0a7q{border-color:#000000;text-align:left;vertical-align:middle}
 .tg .tg-73oq{border-color:#000000;text-align:left;vertical-align:top}
 </style>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+</style>
 <table class="tg">
   <tr>
-    <th class="tg-cly1"></th>
-    <th class="tg-cly1" colspan="2">cluster 1</th>
-    <th class="tg-0lax"></th>
-    <th class="tg-0lax" colspan="2">cluster 2</th>
+    <th class="tg-0pky" colspan="3">cluster 1</th>
+    <th class="tg-0pky" colspan="3">cluster 2</th>
   </tr>
   <tr>
-    <td class="tg-cly1">point</td>
-    <td class="tg-cly1">x</td>
-    <td class="tg-cly1">y</td>
-    <td class="tg-0lax">point</td>
-    <td class="tg-0lax">x</td>
-    <td class="tg-0lax">y</td>
+    <td class="tg-0pky">point</td>
+    <td class="tg-0pky">x</td>
+    <td class="tg-0pky">y</td>
+    <td class="tg-0pky">point</td>
+    <td class="tg-0pky">x</td>
+    <td class="tg-0pky">y</td>
   </tr>
   <tr>
-    <td class="tg-cly1">1</td>
-    <td class="tg-0a7q">7</td>
-    <td class="tg-0a7q">3</td>
-    <td class="tg-0lax">2</td>
-    <td class="tg-73oq">4</td>
-    <td class="tg-73oq">5</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">7</td>
+    <td class="tg-0pky">3</td>
+    <td class="tg-0pky">2</td>
+    <td class="tg-0pky">4</td>
+    <td class="tg-0pky">5</td>
   </tr>
   <tr>
-    <td class="tg-0lax">5</td>
-    <td class="tg-73oq">9</td>
-    <td class="tg-73oq">7</td>
-    <td class="tg-0lax">3</td>
-    <td class="tg-73oq">2</td>
-    <td class="tg-73oq">4</td>
+    <td class="tg-0pky">5</td>
+    <td class="tg-0pky">9</td>
+    <td class="tg-0pky">7</td>
+    <td class="tg-0pky">3</td>
+    <td class="tg-0pky">2</td>
+    <td class="tg-0pky">4</td>
   </tr>
   <tr>
-    <td class="tg-0lax">6</td>
-    <td class="tg-73oq">6</td>
-    <td class="tg-73oq">8</td>
-    <td class="tg-0lax">4</td>
-    <td class="tg-73oq">0</td>
-    <td class="tg-73oq">1</td>
+    <td class="tg-0pky">6</td>
+    <td class="tg-0pky">6</td>
+    <td class="tg-0pky">8</td>
+    <td class="tg-0pky">4</td>
+    <td class="tg-0pky">0</td>
+    <td class="tg-0pky">1</td>
   </tr>
   <tr>
-    <td class="tg-0lax">mean</td>
-    <td class="tg-0lax">7.33</td>
-    <td class="tg-0lax"></td>
-    <td class="tg-0lax">6</td>
-    <td class="tg-0lax">2</td>
-    <td class="tg-0lax">3.33</td>
+    <td class="tg-0pky">mean</td>
+    <td class="tg-0pky">7.33</td>
+    <td class="tg-0pky">6</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky">2</td>
+    <td class="tg-0pky">3.33</td>
   </tr>
 </table>
 </center>
@@ -602,13 +606,17 @@ We are now going to verify all these solutions (the partition, the final centers
 
 **Solution in R:**
 
-As you can imagine, the solution in R us much shorter and requires much less computation on the user side:
+As you can imagine, the solution in R us much shorter and requires much less computation on the user side. We first need to enter the data as a matrix:
 
 ```{r}
 X <- matrix(c(7,3,4,5,2,4,0,1,9,7,6,8),
             nrow = 6, byrow = TRUE)
 X # display the coordinates of the points
+```
 
+We now perform the *k*-means via the `kmeans()` function with the point 5 and 6 as initial centers:
+
+```{r}
 # take rows 5 and 6 of the X matrix as initial centres
 res.k <- kmeans(X, centers = X[c(5,6), ], algorithm = "Lloyd")
 ```
@@ -617,17 +625,71 @@ Unlike in the previous application with the dataset `Eurojobs.csv` where the ini
 
 The reason for adding the argument `algorithm = "Lloyd"` can be found in the usage of the R function `kmeans()`. In fact, there are several variants of the *k*-means algorithm. The default choice is the @jaaw28m version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of @lloyd1982least, we find the same solution in R and by hand. For more information, you can consult the documentation of the `kmeans()` function (via `?kmeans`) and read the articles mentioned.
 
-The solution is then found by extracting the coordinates of the final centers and then 
+The solution is then found by extracting
+
+* the partition:
+
+```{r}
+res.k$cluster
+```
+
+Points 1, 5 and 6 belong to cluster 1, points 2, 3 and 4 belong to cluster 2.
+
+* the coordinates of the final centers:
 
 ```{r}
 # We extract the coordinates of the 2 final centers
 res.k$centers
-
-# quality of the partition
-100 * res.k$betweenss / res.k$totss
 ```
 
+* and then the quality of the partition:
 
+```{r}
+res.k$betweenss / res.k$totss
+```
+
+The 3 results are equal to what we found by hand (except the quality which is slightly different due to rounding).
+
+# Hierarchical clustering
+
+Remind that the difference with the partition by *k*-means is that for hierarchical clustering, the number of classes is **not** specified in advance. Hierarchical clustering will help to determine the optimal number of clusters.
+
+In this article, the 3 main types of hierarchical clustering are discussed:
+
+* Single linkage
+* Complete linkage
+* Average linkage
+
+In the following sections, we perform these 3 algorithms by hand and verify the results in R.
+
+## Application 3: hierarchical clustering
+
+### Data
+
+Using the data from the graph and the table below, perform **by hand** the 3 algorithms (single, complete and average linkage). Then **check** your answers **in R** and draw the dendrogram.
+
+```{r, echo = FALSE}
+n <- 5
+set.seed(seed = 2018 * 02 * 13)
+X <- as.data.frame(round(matrix(data = rnorm(2*n), nrow = n, byrow = TRUE), 2))
+plot(X, asp = 1); text(X, labels = 1:5, pos = 3, cex = 1.5)
+pander(X)
+```
+
+Solution in R :
+
+```{r, eval = FALSE}
+X <- matrix(c(2.03,0.06,-0.64,-0.10,-0.42,-0.53,-0.36,0.07,1.14,0.37), nrow = 5, byrow = TRUE)
+
+#Ward's algorithm and dendrogram #
+hclust_ward <- hclust(dist(X)^2 / (2 * nrow(X)), method = "ward.D")
+plot(hclust_ward)
+rect.hclust(hclust_ward, k = 2, border = "blue")
+barplot(hclust_ward$height,
+        ylab = "aggregation level")
+```
+
+Note that determining the number of clusters using the dendrogram is not a strict rule. You can also consider the _Silhouette plot_, _elbow plot_ or some numerical measures such as Dunn's index, Hubert's gamma, etc., which show the variation of the error with the number of clusters ($k$), and you choose the value of $k$ where the error is smallest. However, these methods are outside the scope of this course and the method presented with the dendrogram is sufficient.
 
 Thanks for reading. I hope this article helped you understand the different clustering methods and to compute them by hand and in R.
 
