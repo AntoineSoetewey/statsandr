@@ -9,7 +9,7 @@ meta_img: contribute_files/submit-article-blog-statsandr.com.jpg
 <br>
 
 <center>
-<img src="/contribute_files/submit-article-blog-statsandr.com.jpg" alt="Photo by Florian Klauer" width="80%"/>
+<img src="/contribute_files/submit-article-blog-statsandr.com.jpg" width="80%"/>
 </center>
 
 <br>
@@ -32,3 +32,8 @@ Before submitting your article, please bear in mind the following points:
 * If you are having an issue with the online form, you can send a link to your article via the [contact page](/contact/). (But please do not send your article via this page if you already submitted it via the contribution form.)
 * All articles that are accepted on the blog will be published on <a href="https://medium.com/@ant.soetewey" target="_blank" rel="noopener">www.medium.com</a> and on the <a href="https://towardsdatascience.com/@ant.soetewey" target="_blank" rel="noopener">www.towardsdatascience.com</a> publication. Moreover, it will also be published on <a href="https://rweekly.org/live" target="_blank" rel="noopener">www.rweekly.org</a> and, if it is related to R, to <a href="https://www.r-bloggers.com/author/r-on-stats-and-r/" target="_blank" rel="noopener">www.r-bloggers.com</a>.
 * A link to the original post will be added at the end of the article.
+
+<br>
+<hr></hr>
+
+<sup id="fn1">*Photo by Florian Klauer</sup>
