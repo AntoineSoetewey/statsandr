@@ -25,7 +25,7 @@ Before submitting your article, please bear in mind the following points:
 
 * At the moment I only accept articles that have already been published somewhere else.
 * To avoid any of us being penalized by Google for duplicate content, please mention the link to your article in the [contribution form](https://antoine233987.typeform.com/to/nlWzhn).
-* I personally read and check the content and formatting of your article to guarantee its correctness and so that it fits into this blog. I may edit the article with minor corrections, without changing the content. I might also remove images that do not have 
+* I personally read and check the content and formatting of your article to guarantee its correctness and so that it fits into this blog. I may edit the article with minor corrections, without changing the content. I might also remove images that do not have xxx 
 * It is your responsibility to ensure you have the permission to use all content, images, and videos you include in your articles.
-* You can edit and remove your article from our publication at any time.
-* At the moment, I only accept articles that are written in .Rmd or .md
+* You can edit and remove your article from the blog at any time.
+* This blog is written in R and deployed thanks to the {blogdown} package. Therefore, it is must easier for me to publish articles written in R Markdown (.Rmd) or Markdown (.md). However, if your article is in another format, feel free to submit it as well.
