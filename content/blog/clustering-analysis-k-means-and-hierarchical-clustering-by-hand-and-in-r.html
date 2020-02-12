@@ -44,10 +44,12 @@ bibliography: bibliography.bib
 <li><a href="#solution-by-hand-1">Solution by hand</a><ul>
 <li><a href="#single-linkage">Single linkage</a></li>
 <li><a href="#complete-linkage">Complete linkage</a></li>
+<li><a href="#average-linkage">Average linkage</a></li>
 </ul></li>
 <li><a href="#solution-in-r-1">Solution in R</a><ul>
 <li><a href="#single-linkage-1">Single linkage</a></li>
 <li><a href="#complete-linkage-1">Complete linkage</a></li>
+<li><a href="#average-linkage-1">Average linkage</a></li>
 </ul></li>
 </ul></li>
 </ul></li>
@@ -899,7 +901,7 @@ round(res.k$centers, digits = 2)</code></pre>
 ## 5 0.942 1.841 1.801 1.530</code></pre>
 <div id="single-linkage" class="section level4">
 <h4>Single linkage</h4>
-<p>Step 2. From the distance matrix computed in step 1, we see that the <strong>smallest distance</strong> = 0.328 between points 2 and 4. 0.328 corresponds to the first height (more on this later when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The points are thus: 1, 2 &amp; 4, 3 and 5. The new distances between the points 2 &amp; 4 and all other points are now:</p>
+<p>Step 2. From the distance matrix computed in step 1, we see that the <strong>smallest distance</strong> = 0.328 between points 2 and 4. 0.328 corresponds to the first height (more on this later when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The groups are thus: 1, 2 &amp; 4, 3 and 5. The new distances between the points 2 &amp; 4 and all other points are now:</p>
 <center>
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
@@ -1001,7 +1003,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>we apply the same process for points 3 and 2 &amp; 4: the initial distance between points 3 and 2 is 0.483 and the initial distance between points 3 and 4 is 0.603. The minimum distance between these 2 distances is 0.483 so the new distance between points 3 and 2 &amp; 4 is 0.483</li>
 <li>follow the same process for all other points</li>
 </ul>
-<p>Step 3. Based on the distance matrix in step 2, the smallest distance is 0.483 between points 3 and 2 &amp; 4 (the second height for the dendrogram). Since points 3 and 2 &amp; 4 are the closest to each other, they are combined to form a new group, the group 2 &amp; 3 &amp; 4. The points are thus: 1, 2 &amp; 3 &amp; 4 and 5. We construct the new distance matrix based on the same process detailed in step 2:</p>
+<p>Step 3. Based on the distance matrix in step 2, the smallest distance is 0.483 between points 3 and 2 &amp; 4 (the second height for the dendrogram). Since points 3 and 2 &amp; 4 are the closest to each other, they are combined to form a new group, the group 2 &amp; 3 &amp; 4. The groups are thus: 1, 2 &amp; 3 &amp; 4 and 5. We construct the new distance matrix based on the same process detailed in step 2:</p>
 <center>
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
@@ -1072,7 +1074,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>the distance between points 1 and 2 &amp; 3 &amp; 4 is thus 2.390</li>
 <li>same process for points 5 and 2 &amp; 3 &amp; 4</li>
 </ul>
-<p>Step 4. Based on the distance matrix in step 3, the smallest distance is 0.942 between points 1 and 5 (the third height in the dendrogram). Since points 1 and 5 are the closest to each other, they are combined to form a new group, the group 1 &amp; 5. The points are thus: 1 &amp; 5 and 2 &amp; 3 &amp; 4. We construct the new distance matrix based on the same process detailed in steps 2 and 3:</p>
+<p>Step 4. Based on the distance matrix in step 3, the smallest distance is 0.942 between points 1 and 5 (the third height in the dendrogram). Since points 1 and 5 are the closest to each other, they are combined to form a new group, the group 1 &amp; 5. The groups are thus: 1 &amp; 5 and 2 &amp; 3 &amp; 4. We construct the new distance matrix based on the same process detailed in steps 2 and 3:</p>
 <center>
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
@@ -1135,14 +1137,14 @@ round(res.k$centers, digits = 2)</code></pre>
 <div id="complete-linkage" class="section level4">
 <h4>Complete linkage</h4>
 <p>Complete linkage is quite similar to single linkage, except that instead of taking the smallest distance when computing the new distance between points that have been grouped, the <strong>maximum distance</strong> is taken.</p>
-<p>The steps to perform the hierarchical clustering with the complete linkage (maximum) is detailed below.</p>
+<p>The steps to perform the hierarchical clustering with the complete linkage (maximum) are detailed below.</p>
 <p>Step 1. Step 1 is exactly the same than for single linkage, that is, we compute the distance matrix of the 5 points thanks to the Pythagorean theorem. This gives us the following distance matrix:</p>
 <pre><code>##       1     2     3     4
 ## 2 2.675                  
 ## 3 2.520 0.483            
 ## 4 2.390 0.328 0.603      
 ## 5 0.942 1.841 1.801 1.530</code></pre>
-<p>Step 2. From the distance matrix computed in step 1, we see that the <strong>smallest distance</strong> = 0.328 between points 2 and 4. It is important to note that even if we apply the complete linkage, in the distance matrix the points are brought together based on the smallest distance. This is the case for all 3 algorithms. The difference between the 3 algorithms is how to compute the new distances between the new combination of points (the single linkage takes the minimum between the distances, the complete linkage takes the maximum distance and the average linkage takes the average distance). 0.328 corresponds to the first height (which will be used when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The points are thus: 1, 2 &amp; 4, 3 and 5. The new distances between the points 2 &amp; 4 and all other points are now:</p>
+<p>Step 2. From the distance matrix computed in step 1, we see that the <strong>smallest distance</strong> = 0.328 between points 2 and 4. It is important to note that even if we apply the complete linkage, in the distance matrix the points are brought together based on the smallest distance. This is the case for all 3 algorithms. The difference between the 3 algorithms lies in how to compute the new distances between the new combination of points (the single linkage takes the minimum between the distances, the complete linkage takes the maximum distance and the average linkage takes the average distance). 0.328 corresponds to the first height (which will be used when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The groups are thus: 1, 2 &amp; 4, 3 and 5. The new distances between the points 2 &amp; 4 and all other points are now:</p>
 <center>
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
@@ -1244,7 +1246,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>we apply the same process for points 3 and 2 &amp; 4: the initial distance between points 3 and 2 is 0.483 and the initial distance between points 3 and 4 is 0.603. The maximum distance between these 2 distances is 0.603 so the new distance between points 3 and 2 &amp; 4 is 0.603</li>
 <li>follow the same process for all other points</li>
 </ul>
-<p>Step 3. Based on the distance matrix in step 2, the smallest distance is 0.603 between points 3 and 2 &amp; 4 (the second height for the dendrogram). Since points 3 and 2 &amp; 4 are the closest to each other, they are combined to form a new group, the group 2 &amp; 3 &amp; 4. The points are thus: 1, 2 &amp; 3 &amp; 4 and 5. We construct the new distance matrix based on the same process detailed in step 2:</p>
+<p>Step 3. Based on the distance matrix in step 2, the smallest distance is 0.603 between points 3 and 2 &amp; 4 (the second height for the dendrogram). Since points 3 and 2 &amp; 4 are the closest to each other, they are combined to form a new group, the group 2 &amp; 3 &amp; 4. The groups are thus: 1, 2 &amp; 3 &amp; 4 and 5. We construct the new distance matrix based on the same process detailed in step 2:</p>
 <center>
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
@@ -1315,7 +1317,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>the distance between points 1 and 2 &amp; 3 &amp; 4 is thus 2.675</li>
 <li>same process for points 5 and 2 &amp; 3 &amp; 4</li>
 </ul>
-<p>Step 4. Based on the distance matrix in step 3, the smallest distance is 0.942 between points 1 and 5 (the third height in the dendrogram). Since points 1 and 5 are the closest to each other, they are combined to form a new group, the group 1 &amp; 5. The points are thus: 1 &amp; 5 and 2 &amp; 3 &amp; 4. We construct the new distance matrix based on the same process detailed in steps 2 and 3:</p>
+<p>Step 4. Based on the distance matrix in step 3, the smallest distance is 0.942 between points 1 and 5 (the third height in the dendrogram). Since points 1 and 5 are the closest to each other, they are combined to form a new group, the group 1 &amp; 5. The groups are thus: 1 &amp; 5 and 2 &amp; 3 &amp; 4. We construct the new distance matrix based on the same process detailed in steps 2 and 3:</p>
 <center>
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
@@ -1375,6 +1377,250 @@ round(res.k$centers, digits = 2)</code></pre>
 </ul>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
 </div>
+<div id="average-linkage" class="section level4">
+<h4>Average linkage</h4>
+<p>With the average linkage criterion, it is not the minimum nor the maximum distance that is taken when computing the new distance between points that have been grouped, but it is, as you guessed by now, the <strong>average distance</strong> between the points.</p>
+<p>The steps to perform the hierarchical clustering with the average linkage are detailed below.</p>
+<p>Step 1. Step 1 is exactly the same than for single and complete linkage, that is, we compute the distance matrix of the 5 points thanks to the Pythagorean theorem. This gives us the following distance matrix:</p>
+<pre><code>##       1     2     3     4
+## 2 2.675                  
+## 3 2.520 0.483            
+## 4 2.390 0.328 0.603      
+## 5 0.942 1.841 1.801 1.530</code></pre>
+<p>Step 2. From the distance matrix computed in step 1, we see that the <strong>smallest distance</strong> = 0.328 between points 2 and 4. It is important to note that even if we apply the average linkage, in the distance matrix the points are brought together based on the smallest distance. This is the case for all 3 algorithms. The difference between the 3 algorithms lies in how to compute the new distances between the new combination of points (the single linkage takes the minimum between the distances, the complete linkage takes the maximum distance and the average linkage takes the average distance). 0.328 corresponds to the first height (which will be used when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The groups are thus: 1, 2 &amp; 4, 3 and 5. The new distances between the points 2 &amp; 4 and all other points are now:</p>
+<center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+<tr>
+<th class="tg-0pky">
+</th>
+<th class="tg-0pky">
+1
+</th>
+<th class="tg-0pky">
+2 &amp; 4
+</th>
+<th class="tg-0pky">
+3
+</th>
+<th class="tg-0pky">
+5
+</th>
+</tr>
+<tr>
+<td class="tg-0pky">
+1
+</td>
+<td class="tg-0pky">
+0
+</td>
+<td class="tg-0pky">
+</td>
+<td class="tg-0pky">
+</td>
+<td class="tg-0pky">
+</td>
+</tr>
+<tr>
+<td class="tg-0pky">
+2 &amp; 4
+</td>
+<td class="tg-0pky">
+2.5325
+</td>
+<td class="tg-0pky">
+0
+</td>
+<td class="tg-0pky">
+</td>
+<td class="tg-0pky">
+</td>
+</tr>
+<tr>
+<td class="tg-0pky">
+3
+</td>
+<td class="tg-0pky">
+2.520
+</td>
+<td class="tg-0pky">
+0.543
+</td>
+<td class="tg-0pky">
+0
+</td>
+<td class="tg-0pky">
+</td>
+</tr>
+<tr>
+<td class="tg-0pky">
+5
+</td>
+<td class="tg-0pky">
+0.942
+</td>
+<td class="tg-0pky">
+1.6855
+</td>
+<td class="tg-0pky">
+1.801
+</td>
+<td class="tg-0pky">
+0
+</td>
+</tr>
+</table>
+</center>
+<p><br></p>
+<p>To construct this new distance matrix, proceed point by point:</p>
+<ul>
+<li>the distance between points 1 and 3 has not changed, so the distance is unchanged compared to the inital distance matrix (found in step 1), which was 2.520</li>
+<li>same goes for the distance between points 1 and 5 and points 3 and 5, the distances are the same than in the initial distance matrix since the points have not changed</li>
+<li>the distance between points 1 and 2 &amp; 4 has changed since points 2 &amp; 4 are now together</li>
+<li>since we are applying the <strong>average linkage</strong> criterion, the new distance between points 1 and 2 &amp; 4 corresponds to the <strong>average distance</strong> between the distance between points 1 and 2 and the distance between points 1 and 4</li>
+<li>initial distance between points 1 and 2 is 2.675 and initial distance between points 1 and 4 is 2.390</li>
+<li>therefore, the average distance between these two distances is <span class="math inline">\(\frac{2.675 + 2.390}{2} = 2.5325\)</span></li>
+<li>2.5325 is thus the new distance between points 1 and 2 &amp; 4</li>
+<li>we apply the same process for points 3 and 2 &amp; 4: the initial distance between points 3 and 2 is 0.483 and the initial distance between points 3 and 4 is 0.603. The average distance between these 2 distances is 0.543 so the new distance between points 3 and 2 &amp; 4 is 0.543</li>
+<li>follow the same process for all other points</li>
+</ul>
+<p>Step 3. Based on the distance matrix in step 2, the smallest distance is 0.543 between points 3 and 2 &amp; 4 (the second height for the dendrogram). Since points 3 and 2 &amp; 4 are the closest to each other, they are combined to form a new group, the group 2 &amp; 3 &amp; 4. The groups are thus: 1, 2 &amp; 3 &amp; 4 and 5. We construct the new distance matrix based on the same process detailed in step 2:</p>
+<center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+</style>
+<table class="tg">
+<tr>
+<th class="tg-cly1">
+</th>
+<th class="tg-cly1">
+1
+</th>
+<th class="tg-cly1">
+2 &amp; 3 &amp; 4
+</th>
+<th class="tg-cly1">
+5
+</th>
+</tr>
+<tr>
+<td class="tg-cly1">
+1
+</td>
+<td class="tg-cly1">
+0
+</td>
+<td class="tg-cly1">
+</td>
+<td class="tg-cly1">
+</td>
+</tr>
+<tr>
+<td class="tg-cly1">
+2 &amp; 3 &amp; 4
+</td>
+<td class="tg-cly1">
+2.528333
+</td>
+<td class="tg-cly1">
+0
+</td>
+<td class="tg-cly1">
+</td>
+</tr>
+<tr>
+<td class="tg-cly1">
+5
+</td>
+<td class="tg-cly1">
+0.942
+</td>
+<td class="tg-cly1">
+1.724
+</td>
+<td class="tg-cly1">
+0
+</td>
+</tr>
+</table>
+</center>
+<p><br></p>
+<ul>
+<li>points 1 and 5 have not change, so the distance between these two points are the same than in previous step</li>
+<li>from step 2 we see that the distance between points 1 and 2 &amp; 4 is 2.5325 and the distance between points 1 and 3 is 2.520</li>
+<li>since we apply the average linkage criterion, we take the average distance</li>
+<li>however, we have to take into the consideration that there are 2 points in the group 2 &amp; 4, while only one point in the group 3</li>
+<li>the average distance for the distance between 1 and 2 &amp; 3 &amp; 4 is thus: <span class="math inline">\(\frac{(2 \cdot 2.5325) + (1 \cdot 2.520)}{3} = 2.528333\)</span></li>
+<li>same process for points 5 and 2 &amp; 3 &amp; 4: <span class="math inline">\(\frac{(2 \cdot 1.6855) + (1 \cdot 1.801)}{3} = 1.724\)</span></li>
+</ul>
+<p>Step 4. Based on the distance matrix in step 3, the smallest distance is 0.942 between points 1 and 5 (the third height in the dendrogram). Since points 1 and 5 are the closest to each other, they are combined to form a new group, the group 1 &amp; 5. The groups are thus: 1 &amp; 5 and 2 &amp; 3 &amp; 4. We construct the new distance matrix based on the same process detailed in steps 2 and 3:</p>
+<center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-cly1{text-align:left;vertical-align:middle}
+</style>
+<table class="tg">
+<tr>
+<th class="tg-cly1">
+</th>
+<th class="tg-cly1">
+1 &amp; 5
+</th>
+<th class="tg-cly1">
+2 &amp; 3 &amp; 4
+</th>
+</tr>
+<tr>
+<td class="tg-cly1">
+1 &amp; 5
+</td>
+<td class="tg-cly1">
+0
+</td>
+<td class="tg-cly1">
+</td>
+</tr>
+<tr>
+<td class="tg-cly1">
+2 &amp; 3 &amp; 4
+</td>
+<td class="tg-cly1">
+2.126167
+</td>
+<td class="tg-cly1">
+0
+</td>
+</tr>
+</table>
+</center>
+<p><br></p>
+<ul>
+<li>the only distance left to compute is the distance between points 1 &amp; 5 and 2 &amp; 3 &amp; 4</li>
+<li>from the previous step we see that the distance between points 1 and 2 &amp; 3 &amp; 4 is 2.528333 and the distance between points 5 and 2 &amp; 3 &amp; 4 is 1.724</li>
+<li>since we apply the average linkage criterion, we take the average distance, which is <span class="math inline">\(\frac{2.528333 + 1.724}{2} = 2.126167\)</span></li>
+<li>the distance between points 1 &amp; 5 and 2 &amp; 3 &amp; 4 is thus 2.126167</li>
+</ul>
+<p>Step 5. The final combination of points is the combination of points 1 &amp; 5 and 2 &amp; 3 &amp; 4, with a final height of 2.126167. Heights are used to draw the dendrogram in the final step.</p>
+<p>Step 6. Draw the dendrogram thanks to the combination of points and the heights found above. Remember that:</p>
+<ul>
+<li>the first combination of points was between points 2 and 4, with a height of 0.328</li>
+<li>the second combination was between points 3 and 2 &amp; 4 with a height of 0.543</li>
+<li>the third combination was between points 1 and 5 with a height of 0.942</li>
+<li>the final combination was between points 1 &amp; 5 and 2 &amp; 3 &amp; 4 with a height of 2.126167</li>
+<li>this is exactly what is illustrated in the following dendrogram:</li>
+</ul>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+</div>
 </div>
 <div id="solution-in-r-1" class="section level3">
 <h3>Solution in R</h3>
@@ -1383,47 +1629,63 @@ round(res.k$centers, digits = 2)</code></pre>
             nrow = 5, byrow = TRUE)</code></pre>
 <div id="single-linkage-1" class="section level4">
 <h4>Single linkage</h4>
-<p>We can apply the hierarchical clustering with the single linkage criterion thanks to the <code>hclust()</code> function with the <code>method = &quot;single&quot;</code> as argument:</p>
+<p>We can apply the hierarchical clustering with the single linkage criterion thanks to the <code>hclust()</code> function with the argument <code>method = &quot;single&quot;</code>:</p>
 <pre class="r"><code># Hierarchical clustering: single linkage 
 hclust &lt;- hclust(dist(X), method = &quot;single&quot;)</code></pre>
 <p>Note that the <code>hclust()</code> function requires a distance matrix. If your data is not already a distance matrix (like in our case, as the matrix <code>X</code> corresponds to the coordinates of the 5 points), you can transform it into a distance matrix with the <code>dist()</code> function.</p>
 <p>We can now plot the dendrogram to check our results by hand found above:</p>
 <pre class="r"><code>plot(hclust)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
 <p>Remember that hierarchical clustering is used to determine the optimal number of clusters. This optimal number of clusters can be determined thanks to the dendrogram. For this, we usually look at the largest difference of heights:</p>
 <div class="figure">
 <img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/dendrogram-single-linkage.png" alt="How to determine the number of clusters from a dendrogram? Take the largest difference of heights and count how many vertical lines you see" />
 <p class="caption">How to determine the number of clusters from a dendrogram? Take the largest difference of heights and count how many vertical lines you see</p>
 </div>
-<p>The largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. To determine the optimal number of clusters, simply count how many vertical lines you see within this largest difference. In our case, the optimal number of clusters is 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
+<p>The largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. To determine the optimal number of clusters, simply count how many vertical lines you see within this largest difference. In our case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
 <pre class="r"><code>plot(hclust)
 rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
             border = &quot;blue&quot;)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
 <p>Finally, we could also determine the optimal number of cluster thanks to a barplot the heights (stored in <code>$height</code> of the clustering output):</p>
 <pre class="r"><code>barplot(hclust$height,
         names.arg = (nrow(X) - 1) : 1) # show the number of cluster below each bars</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
 <p>Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.</p>
 <p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider the <em>Silhouette plot</em>, <em>elbow plot</em> or some numerical measures such as Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. However, these methods are outside the scope of this course and the method presented with the dendrogram is sufficient.</p>
 </div>
 <div id="complete-linkage-1" class="section level4">
 <h4>Complete linkage</h4>
-<p>We can apply the hierarchical clustering with the complete linkage criterion thanks to the <code>hclust()</code> function with the <code>method = &quot;complete&quot;</code> as argument:</p>
+<p>We can apply the hierarchical clustering with the complete linkage criterion thanks to the <code>hclust()</code> function with the argument <code>method = &quot;complete&quot;</code>:</p>
 <pre class="r"><code># Hierarchical clustering: complete linkage 
 hclust &lt;- hclust(dist(X), method = &quot;complete&quot;)</code></pre>
 <p>Note that the <code>hclust()</code> function requires a distance matrix. If your data is not already a distance matrix (like in our case, as the matrix <code>X</code> corresponds to the coordinates of the 5 points), you can transform it into a distance matrix with the <code>dist()</code> function.</p>
 <p>We can now plot the dendrogram to check our results by hand found above:</p>
 <pre class="r"><code>plot(hclust)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
-<p>Like for the single linkage, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
+<p>Like for the single linkage, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
 <pre class="r"><code>plot(hclust)
 rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
             border = &quot;blue&quot;)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
-<p>Thanks for reading. I hope this article helped you understand the different clustering methods and to compute them by hand and in R.</p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+</div>
+<div id="average-linkage-1" class="section level4">
+<h4>Average linkage</h4>
+<p>We can apply the hierarchical clustering with the average linkage criterion thanks to the <code>hclust()</code> function with the argument <code>method = &quot;average&quot;</code>:</p>
+<pre class="r"><code># Hierarchical clustering: average linkage 
+hclust &lt;- hclust(dist(X), method = &quot;average&quot;)</code></pre>
+<p>Note that the <code>hclust()</code> function requires a distance matrix. If your data is not already a distance matrix (like in our case, as the matrix <code>X</code> corresponds to the coordinates of the 5 points), you can transform it into a distance matrix with the <code>dist()</code> function.</p>
+<p>We can now plot the dendrogram to check our results by hand found above:</p>
+<pre class="r"><code>plot(hclust)</code></pre>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
+<p>Like for the single and complete linkages, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
+<pre class="r"><code>plot(hclust)
+rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
+            border = &quot;blue&quot;)</code></pre>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+<p>Thanks for reading. I hope this article helped you understand the different clustering methods and how to compute them by hand and in R.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me <a href="/contact/">here</a>.</p>
 <p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
 <p><strong>Related articles:</strong></p>
