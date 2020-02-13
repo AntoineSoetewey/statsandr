@@ -817,11 +817,12 @@ mean
 <p><span class="math display">\[\overline{\overline{x}} = \frac{7+4+2+0+9+6+3+5+4+1+7+8}{12} = 4.67\]</span></p>
 <p>Step 2. Compute TSS and WSS:</p>
 <p><span class="math display">\[TSS = (7-4.67)^2 + (4-4.67)^2 + (2-4.67)^2 + (0-4.67)^2 \\+ (9-4.67)^2 + (6-4.67)^2 + (3-4.67)^2 + (5-4.67)^2 \\ + (4-4.67)^2 + (1-4.67)^2 + (7-4.67)^2 + (8-4.67)^2 = 88.67\]</span></p>
-<p>Regarding WSS, it is splitted for cluster 1 and for cluster 2. For cluster 1:</p>
+<p>Regarding WSS, it is splitted between cluster 1 and cluster 2. For cluster 1:</p>
 <p><span class="math display">\[WSS[1] = (7-7.33)^2 + (9 - 7.33)^2 + (6 - 7.33)^2 \\ + (3-6)^2 + (7-6)^2 + (8-6)^2 = 18.67\]</span></p>
 <p>For cluster 2:</p>
 <p><span class="math display">\[WSS[2] = (4-2)^2 + (2-2)^2 + (0-2)^2 \\ + (5-3.33)^2 + (4-3.33)^2 + (1-3.33)^2 = 16.67\]</span></p>
-<p>And <span class="math display">\[WSS = WSS[1] + WSS[2] = 18.67 + 16.67 = 35.34\]</span></p>
+<p>And the total WSS is</p>
+<p><span class="math display">\[WSS = WSS[1] + WSS[2] = 18.67 + 16.67 = 35.34\]</span></p>
 <p>To find the BSS:</p>
 <p><span class="math display">\[BSS = TSS - WSS = 88.67-35.34 = 53.33\]</span></p>
 <p>Finally, the quality of the partition is:</p>
@@ -844,9 +845,10 @@ X # display the coordinates of the points</code></pre>
 ## [5,]    9    7
 ## [6,]    6    8</code></pre>
 <p>We now perform the <em>k</em>-means via the <code>kmeans()</code> function with the point 5 and 6 as initial centers:</p>
-<pre class="r"><code># take rows 5 and 6 of the X matrix as initial centres
-res.k &lt;- kmeans(X, centers = X[c(5, 6), ], algorithm = &quot;Lloyd&quot;)</code></pre>
-<p>Unlike in the previous application with the dataset <code>Eurojobs.csv</code> where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set <code>centers = X[c(5,6), ]</code> to indicate that that there are 2 centers, and that they are going to be the points 5 and 6.</p>
+<pre class="r"><code># take rows 5 and 6 of the X matrix as initial centers
+res.k &lt;- kmeans(X, centers = X[c(5, 6), ],
+                algorithm = &quot;Lloyd&quot;)</code></pre>
+<p>Unlike in the previous application with the dataset <code>Eurojobs.csv</code> where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set <code>centers = X[c(5,6), ]</code> to indicate that that there are 2 centers, and that they are going to be the points 5 and 6 (see a reminder on <a href="/blog/data-manipulation-in-r">how to subset a dataframe</a> if needed).</p>
 <p>The reason for adding the argument <code>algorithm = &quot;Lloyd&quot;</code> can be found in the usage of the R function <code>kmeans()</code>. In fact, there are several variants of the <em>k</em>-means algorithm. The default choice is the <span class="citation">Hartigan and Wong (1979)</span> version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of <span class="citation">Lloyd (1982)</span>, we find the same solution in R and by hand. For more information, you can consult the documentation of the <code>kmeans()</code> function (via <code>?kmeans</code>) and read the articles mentioned.</p>
 <p>The solution is then found by extracting</p>
 <ul>

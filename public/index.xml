@@ -867,11 +867,12 @@ mean
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\overline{\overline{x}} = \frac{7+4+2+0+9+6+3+5+4+1+7+8}{12} = 4.67\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;Step 2. Compute TSS and WSS:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[TSS = (7-4.67)^2 + (4-4.67)^2 + (2-4.67)^2 + (0-4.67)^2 \\+ (9-4.67)^2 + (6-4.67)^2 + (3-4.67)^2 + (5-4.67)^2 \\ + (4-4.67)^2 + (1-4.67)^2 + (7-4.67)^2 + (8-4.67)^2 = 88.67\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Regarding WSS, it is splitted for cluster 1 and for cluster 2. For cluster 1:&lt;/p&gt;
+&lt;p&gt;Regarding WSS, it is splitted between cluster 1 and cluster 2. For cluster 1:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[WSS[1] = (7-7.33)^2 + (9 - 7.33)^2 + (6 - 7.33)^2 \\ + (3-6)^2 + (7-6)^2 + (8-6)^2 = 18.67\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;For cluster 2:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[WSS[2] = (4-2)^2 + (2-2)^2 + (0-2)^2 \\ + (5-3.33)^2 + (4-3.33)^2 + (1-3.33)^2 = 16.67\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;And &lt;span class=&#34;math display&#34;&gt;\[WSS = WSS[1] + WSS[2] = 18.67 + 16.67 = 35.34\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;And the total WSS is&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[WSS = WSS[1] + WSS[2] = 18.67 + 16.67 = 35.34\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;To find the BSS:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[BSS = TSS - WSS = 88.67-35.34 = 53.33\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;Finally, the quality of the partition is:&lt;/p&gt;
@@ -894,9 +895,10 @@ X # display the coordinates of the points&lt;/code&gt;&lt;/pre&gt;
 ## [5,]    9    7
 ## [6,]    6    8&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We now perform the &lt;em&gt;k&lt;/em&gt;-means via the &lt;code&gt;kmeans()&lt;/code&gt; function with the point 5 and 6 as initial centers:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# take rows 5 and 6 of the X matrix as initial centres
-res.k &amp;lt;- kmeans(X, centers = X[c(5, 6), ], algorithm = &amp;quot;Lloyd&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Unlike in the previous application with the dataset &lt;code&gt;Eurojobs.csv&lt;/code&gt; where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set &lt;code&gt;centers = X[c(5,6), ]&lt;/code&gt; to indicate that that there are 2 centers, and that they are going to be the points 5 and 6.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# take rows 5 and 6 of the X matrix as initial centers
+res.k &amp;lt;- kmeans(X, centers = X[c(5, 6), ],
+                algorithm = &amp;quot;Lloyd&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Unlike in the previous application with the dataset &lt;code&gt;Eurojobs.csv&lt;/code&gt; where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set &lt;code&gt;centers = X[c(5,6), ]&lt;/code&gt; to indicate that that there are 2 centers, and that they are going to be the points 5 and 6 (see a reminder on &lt;a href=&#34;/blog/data-manipulation-in-r&#34;&gt;how to subset a dataframe&lt;/a&gt; if needed).&lt;/p&gt;
 &lt;p&gt;The reason for adding the argument &lt;code&gt;algorithm = &amp;quot;Lloyd&amp;quot;&lt;/code&gt; can be found in the usage of the R function &lt;code&gt;kmeans()&lt;/code&gt;. In fact, there are several variants of the &lt;em&gt;k&lt;/em&gt;-means algorithm. The default choice is the &lt;span class=&#34;citation&#34;&gt;Hartigan and Wong (1979)&lt;/span&gt; version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of &lt;span class=&#34;citation&#34;&gt;Lloyd (1982)&lt;/span&gt;, we find the same solution in R and by hand. For more information, you can consult the documentation of the &lt;code&gt;kmeans()&lt;/code&gt; function (via &lt;code&gt;?kmeans&lt;/code&gt;) and read the articles mentioned.&lt;/p&gt;
 &lt;p&gt;The solution is then found by extracting&lt;/p&gt;
 &lt;ul&gt;
