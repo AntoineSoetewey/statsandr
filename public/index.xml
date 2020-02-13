@@ -182,8 +182,10 @@ distance # display the distance matrix&lt;/code&gt;&lt;/pre&gt;
 &lt;/ul&gt;
 &lt;p&gt;We first import the dataset. See &lt;a href=&#34;/blog/how-to-import-an-excel-file-in-rstudio&#34;&gt;how to import data into R&lt;/a&gt; if you need a reminder.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Import data
-Eurojobs &amp;lt;- read.csv(file = &amp;quot;data/Eurojobs.csv&amp;quot;,
-                     sep = &amp;quot;,&amp;quot;, dec = &amp;quot;.&amp;quot;, header = TRUE)
+Eurojobs &amp;lt;- read.csv(
+  file = &amp;quot;data/Eurojobs.csv&amp;quot;,
+  sep = &amp;quot;,&amp;quot;, dec = &amp;quot;.&amp;quot;, header = TRUE
+)
 head(Eurojobs) # head() is used to display only the first 6 observations&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##      Country  Agr Min  Man  PS  Con   SI Fin  SPS  TC
 ## 1    Belgium  3.3 0.9 27.6 0.9  8.2 19.1 6.2 26.6 7.2
@@ -248,17 +250,17 @@ print(model$cluster)&lt;/code&gt;&lt;/pre&gt;
 ##              1              2              2              2              2 
 ##     Yugoslavia 
 ##              2&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Note that the argument &lt;code&gt;centers = 2&lt;/code&gt; is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling &lt;code&gt;print(model$cluster)&lt;/code&gt; or &lt;code&gt;model$cluster&lt;/code&gt; is the same. This output specifies the group (&lt;em&gt;i.e.&lt;/em&gt;, 1 or 2) to which each country belongs.&lt;/p&gt;
+&lt;p&gt;Note that the argument &lt;code&gt;centers = 2&lt;/code&gt; is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling &lt;code&gt;print(model$cluster)&lt;/code&gt; or &lt;code&gt;model$cluster&lt;/code&gt; is the same. This output specifies the group (i.e., 1 or 2) to which each country belongs to.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;quality-of-a-k-means-partition&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Quality of a &lt;em&gt;k&lt;/em&gt;-means partition&lt;/h3&gt;
-&lt;p&gt;The quality of a partition is found by calculating the percentage of the &lt;em&gt;TSS&lt;/em&gt; “explained” by the partition using the following formula:&lt;/p&gt;
+&lt;p&gt;The quality of a &lt;em&gt;k&lt;/em&gt;-means partition is found by calculating the percentage of the &lt;em&gt;TSS&lt;/em&gt; “explained” by the partition using the following formula:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\begin{equation}
-\dfrac{\operatorname{BSS}}{\operatorname{TSS}} \times 100\%,
+\dfrac{\operatorname{BSS}}{\operatorname{TSS}} \times 100\%
 \end{equation}\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;where &lt;em&gt;BSS&lt;/em&gt; and &lt;em&gt;TSS&lt;/em&gt; stands for &lt;em&gt;Between Sum of Squares&lt;/em&gt; and &lt;em&gt;Total Sum of Squares&lt;/em&gt;, respectively. The higher the percentage, the better the score because it means that &lt;em&gt;BSS&lt;/em&gt; is large and/or &lt;em&gt;WSS&lt;/em&gt; is small.&lt;/p&gt;
+&lt;p&gt;where &lt;em&gt;BSS&lt;/em&gt; and &lt;em&gt;TSS&lt;/em&gt; stands for &lt;em&gt;Between Sum of Squares&lt;/em&gt; and &lt;em&gt;Total Sum of Squares&lt;/em&gt;, respectively. The higher the percentage, the better the score (and thus the quality) because it means that &lt;em&gt;BSS&lt;/em&gt; is large and/or &lt;em&gt;WSS&lt;/em&gt; is small.&lt;/p&gt;
 &lt;p&gt;Here is how you can check the quality of the partition in R:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# BSS and TSS are extracted from the model
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# BSS and TSS are extracted from the model and stored
 (BSS &amp;lt;- model$betweenss)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 4823.535&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;(TSS &amp;lt;- model$totss)&lt;/code&gt;&lt;/pre&gt;
@@ -270,7 +272,7 @@ BSS / TSS * 100&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;nstart-for-several-initial-centers&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;&lt;code&gt;nstart&lt;/code&gt; for several initial centers&lt;/h3&gt;
-&lt;p&gt;The &lt;em&gt;k&lt;/em&gt;-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command &lt;code&gt;kmeans(Eurojobs, centers = 2)&lt;/code&gt; may give slightly different results every tume , and thus slight differences in the quality of the partitions. The &lt;code&gt;nstart&lt;/code&gt; argument in the &lt;code&gt;kmeans()&lt;/code&gt; function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;k&lt;/em&gt;-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command &lt;code&gt;kmeans(Eurojobs, centers = 2)&lt;/code&gt; may give slightly different results every time it is run, and thus slight differences in the quality of the partitions. The &lt;code&gt;nstart&lt;/code&gt; argument in the &lt;code&gt;kmeans()&lt;/code&gt; function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model2 &amp;lt;- kmeans(Eurojobs, centers = 2, nstart = 10)
 100 * model2$betweenss / model2$totss&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 54.2503&lt;/code&gt;&lt;/pre&gt;
@@ -878,8 +880,9 @@ mean
 &lt;div id=&#34;solution-in-r&#34; class=&#34;section level4&#34;&gt;
 &lt;h4&gt;Solution in R&lt;/h4&gt;
 &lt;p&gt;As you can imagine, the solution in R us much shorter and requires much less computation on the user side. We first need to enter the data as a matrix or dataframe:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- matrix(c(7,3,4,5,2,4,0,1,9,7,6,8),
-            nrow = 6, byrow = TRUE)
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- matrix(c(7, 3, 4, 5, 2, 4, 0, 1, 9, 7, 6, 8),
+  nrow = 6, byrow = TRUE
+)
 X # display the coordinates of the points&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##      [,1] [,2]
 ## [1,]    7    3
@@ -890,7 +893,7 @@ X # display the coordinates of the points&lt;/code&gt;&lt;/pre&gt;
 ## [6,]    6    8&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We now perform the &lt;em&gt;k&lt;/em&gt;-means via the &lt;code&gt;kmeans()&lt;/code&gt; function with the point 5 and 6 as initial centers:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# take rows 5 and 6 of the X matrix as initial centres
-res.k &amp;lt;- kmeans(X, centers = X[c(5,6), ], algorithm = &amp;quot;Lloyd&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+res.k &amp;lt;- kmeans(X, centers = X[c(5, 6), ], algorithm = &amp;quot;Lloyd&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Unlike in the previous application with the dataset &lt;code&gt;Eurojobs.csv&lt;/code&gt; where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set &lt;code&gt;centers = X[c(5,6), ]&lt;/code&gt; to indicate that that there are 2 centers, and that they are going to be the points 5 and 6.&lt;/p&gt;
 &lt;p&gt;The reason for adding the argument &lt;code&gt;algorithm = &amp;quot;Lloyd&amp;quot;&lt;/code&gt; can be found in the usage of the R function &lt;code&gt;kmeans()&lt;/code&gt;. In fact, there are several variants of the &lt;em&gt;k&lt;/em&gt;-means algorithm. The default choice is the &lt;span class=&#34;citation&#34;&gt;Hartigan and Wong (1979)&lt;/span&gt; version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of &lt;span class=&#34;citation&#34;&gt;Lloyd (1982)&lt;/span&gt;, we find the same solution in R and by hand. For more information, you can consult the documentation of the &lt;code&gt;kmeans()&lt;/code&gt; function (via &lt;code&gt;?kmeans&lt;/code&gt;) and read the articles mentioned.&lt;/p&gt;
 &lt;p&gt;The solution is then found by extracting&lt;/p&gt;
@@ -1677,12 +1680,13 @@ round(res.k$centers, digits = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;solution-in-r-1&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Solution in R&lt;/h3&gt;
 &lt;p&gt;To perform the hierarchical clustering with any of the 3 criterion in R, we first need to enter the data (in this case as a matrix format, but it can also be performed on dataframes):&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- matrix(c(2.03,0.06,-0.64,-0.10,-0.42,-0.53,-0.36,0.07,1.14,0.37),
-            nrow = 5, byrow = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- matrix(c(2.03, 0.06, -0.64, -0.10, -0.42, -0.53, -0.36, 0.07, 1.14, 0.37),
+  nrow = 5, byrow = TRUE
+)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;single-linkage-1&#34; class=&#34;section level4&#34;&gt;
 &lt;h4&gt;Single linkage&lt;/h4&gt;
 &lt;p&gt;We can apply the hierarchical clustering with the single linkage criterion thanks to the &lt;code&gt;hclust()&lt;/code&gt; function with the argument &lt;code&gt;method = &amp;quot;single&amp;quot;&lt;/code&gt;:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Hierarchical clustering: single linkage 
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Hierarchical clustering: single linkage
 hclust &amp;lt;- hclust(dist(X), method = &amp;quot;single&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that the &lt;code&gt;hclust()&lt;/code&gt; function requires a distance matrix. If your data is not already a distance matrix (like in our case, as the matrix &lt;code&gt;X&lt;/code&gt; corresponds to the coordinates of the 5 points), you can transform it into a distance matrix with the &lt;code&gt;dist()&lt;/code&gt; function.&lt;/p&gt;
 &lt;p&gt;We can now plot the dendrogram to check our results by hand found above:&lt;/p&gt;
@@ -1696,12 +1700,15 @@ hclust &amp;lt;- hclust(dist(X), method = &amp;quot;single&amp;quot;)&lt;/code&g
 &lt;/div&gt;
 &lt;p&gt;The largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp;amp; 3 &amp;amp; 4 with the group 1 &amp;amp; 5. To determine the optimal number of clusters, simply count how many vertical lines you see within this largest difference. In our case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the &lt;code&gt;rect.hclust()&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(hclust)
-rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
-            border = &amp;quot;blue&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+rect.hclust(hclust,
+  k = 2, # k is used to specify the number of clusters
+  border = &amp;quot;blue&amp;quot;
+)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Finally, we could also determine the optimal number of cluster thanks to a barplot the heights (stored in &lt;code&gt;$height&lt;/code&gt; of the clustering output):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;barplot(hclust$height,
-        names.arg = (nrow(X) - 1) : 1) # show the number of cluster below each bars&lt;/code&gt;&lt;/pre&gt;
+  names.arg = (nrow(X) - 1):1
+) # show the number of cluster below each bars&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.&lt;/p&gt;
 &lt;p&gt;Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider the &lt;em&gt;Silhouette plot&lt;/em&gt;, &lt;em&gt;elbow plot&lt;/em&gt; or some numerical measures such as Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (&lt;em&gt;k&lt;/em&gt;), and you choose the value of &lt;em&gt;k&lt;/em&gt; where the error is smallest. However, these methods are outside the scope of this course and the method presented with the dendrogram is sufficient.&lt;/p&gt;
@@ -1709,7 +1716,7 @@ rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
 &lt;div id=&#34;complete-linkage-1&#34; class=&#34;section level4&#34;&gt;
 &lt;h4&gt;Complete linkage&lt;/h4&gt;
 &lt;p&gt;We can apply the hierarchical clustering with the complete linkage criterion thanks to the &lt;code&gt;hclust()&lt;/code&gt; function with the argument &lt;code&gt;method = &amp;quot;complete&amp;quot;&lt;/code&gt;:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Hierarchical clustering: complete linkage 
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Hierarchical clustering: complete linkage
 hclust &amp;lt;- hclust(dist(X), method = &amp;quot;complete&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that the &lt;code&gt;hclust()&lt;/code&gt; function requires a distance matrix. If your data is not already a distance matrix (like in our case, as the matrix &lt;code&gt;X&lt;/code&gt; corresponds to the coordinates of the 5 points), you can transform it into a distance matrix with the &lt;code&gt;dist()&lt;/code&gt; function.&lt;/p&gt;
 &lt;p&gt;We can now plot the dendrogram to check our results by hand found above:&lt;/p&gt;
@@ -1718,14 +1725,16 @@ hclust &amp;lt;- hclust(dist(X), method = &amp;quot;complete&amp;quot;)&lt;/code
 &lt;p&gt;As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.&lt;/p&gt;
 &lt;p&gt;Like for the single linkage, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp;amp; 3 &amp;amp; 4 with the group 1 &amp;amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the &lt;code&gt;rect.hclust()&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(hclust)
-rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
-            border = &amp;quot;blue&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+rect.hclust(hclust,
+  k = 2, # k is used to specify the number of clusters
+  border = &amp;quot;blue&amp;quot;
+)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-33-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;average-linkage-1&#34; class=&#34;section level4&#34;&gt;
 &lt;h4&gt;Average linkage&lt;/h4&gt;
 &lt;p&gt;We can apply the hierarchical clustering with the average linkage criterion thanks to the &lt;code&gt;hclust()&lt;/code&gt; function with the argument &lt;code&gt;method = &amp;quot;average&amp;quot;&lt;/code&gt;:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Hierarchical clustering: average linkage 
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Hierarchical clustering: average linkage
 hclust &amp;lt;- hclust(dist(X), method = &amp;quot;average&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that the &lt;code&gt;hclust()&lt;/code&gt; function requires a distance matrix. If your data is not already a distance matrix (like in our case, as the matrix &lt;code&gt;X&lt;/code&gt; corresponds to the coordinates of the 5 points), you can transform it into a distance matrix with the &lt;code&gt;dist()&lt;/code&gt; function.&lt;/p&gt;
 &lt;p&gt;We can now plot the dendrogram to check our results by hand found above:&lt;/p&gt;
@@ -1734,8 +1743,10 @@ hclust &amp;lt;- hclust(dist(X), method = &amp;quot;average&amp;quot;)&lt;/code&
 &lt;p&gt;As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.&lt;/p&gt;
 &lt;p&gt;Like for the single and complete linkages, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp;amp; 3 &amp;amp; 4 with the group 1 &amp;amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the &lt;code&gt;rect.hclust()&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(hclust)
-rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
-            border = &amp;quot;blue&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+rect.hclust(hclust,
+  k = 2, # k is used to specify the number of clusters
+  border = &amp;quot;blue&amp;quot;
+)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-36-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;

@@ -101,8 +101,10 @@ We first import the dataset. See [how to import data into R](/blog/how-to-import
 
 ```{r, warning = FALSE, message = FALSE}
 # Import data
-Eurojobs <- read.csv(file = "data/Eurojobs.csv",
-                     sep = ",", dec = ".", header = TRUE)
+Eurojobs <- read.csv(
+  file = "data/Eurojobs.csv",
+  sep = ",", dec = ".", header = TRUE
+)
 head(Eurojobs) # head() is used to display only the first 6 observations
 ```
 
@@ -134,22 +136,22 @@ model <- kmeans(Eurojobs, centers = 2)
 print(model$cluster)
 ```
 
-Note that the argument `centers = 2` is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling `print(model$cluster)` or `model$cluster` is the same. This output specifies the group (*i.e.*, 1 or 2) to which each country belongs.
+Note that the argument `centers = 2` is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling `print(model$cluster)` or `model$cluster` is the same. This output specifies the group (i.e., 1 or 2) to which each country belongs to.
 
 ### Quality of a *k*-means partition
 
-The quality of a partition is found by calculating the percentage of the *TSS* "explained" by the partition using the following formula:
+The quality of a *k*-means partition is found by calculating the percentage of the *TSS* "explained" by the partition using the following formula:
 
 \begin{equation}
-\dfrac{\operatorname{BSS}}{\operatorname{TSS}} \times 100\%,
+\dfrac{\operatorname{BSS}}{\operatorname{TSS}} \times 100\%
 \end{equation}
 
-where *BSS* and *TSS* stands for *Between Sum of Squares* and *Total Sum of Squares*, respectively. The higher the percentage, the better the score because it means that *BSS* is large and/or *WSS* is small.
+where *BSS* and *TSS* stands for *Between Sum of Squares* and *Total Sum of Squares*, respectively. The higher the percentage, the better the score (and thus the quality) because it means that *BSS* is large and/or *WSS* is small.
 
 Here is how you can check the quality of the partition in R:
 
 ```{r}
-# BSS and TSS are extracted from the model
+# BSS and TSS are extracted from the model and stored
 (BSS <- model$betweenss)
 (TSS <- model$totss)
 
@@ -161,7 +163,7 @@ The quality of the partition is `r round(BSS / TSS * 100, 2)`%. This value has n
 
 ### `nstart` for several initial centers
 
-The *k*-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command `kmeans(Eurojobs, centers = 2)` may give slightly different results every tume , and thus slight differences in the quality of the partitions. The `nstart` argument in the `kmeans()` function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:
+The *k*-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command `kmeans(Eurojobs, centers = 2)` may give slightly different results every time it is run, and thus slight differences in the quality of the partitions. The `nstart` argument in the `kmeans()` function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:
 
 ```{r, echo = FALSE}
 set.seed(42)
@@ -207,16 +209,17 @@ while (!all.points.different) {
   all.points.different <- all(apply(X, MARGIN = 2, FUN = function(x) length(unique(x)) == n))
 }
 row.names(X) <- 1:n
-centres <- X[c(5,6), ]
+centres <- X[c(5, 6), ]
 
-pretty.plot <- 
-  function(X)
-  {
-    plot(X, asp = 1, xlab = "x", ylab = "y",
-	xlim = c(min(X)-1, max(X)+1), ylim = c(min(X)-1, max(X)+1))
+pretty.plot <-
+  function(X) {
+    plot(X,
+      asp = 1, xlab = "x", ylab = "y",
+      xlim = c(min(X) - 1, max(X) + 1), ylim = c(min(X) - 1, max(X) + 1)
+    )
     axis(side = 1, at = min(X):max(X))
     axis(side = 2, at = min(X):max(X))
-    for (z in (min(X)-1):(max(X)+1)) {
+    for (z in (min(X) - 1):(max(X) + 1)) {
       abline(h = z, lwd = 2, col = "gray", lty = "dotted")
       abline(v = z, lwd = 2, col = "gray", lty = "dotted")
     }
@@ -611,8 +614,9 @@ We are now going to verify all these solutions (the partition, the final centers
 As you can imagine, the solution in R us much shorter and requires much less computation on the user side. We first need to enter the data as a matrix or dataframe:
 
 ```{r}
-X <- matrix(c(7,3,4,5,2,4,0,1,9,7,6,8),
-            nrow = 6, byrow = TRUE)
+X <- matrix(c(7, 3, 4, 5, 2, 4, 0, 1, 9, 7, 6, 8),
+  nrow = 6, byrow = TRUE
+)
 X # display the coordinates of the points
 ```
 
@@ -620,7 +624,7 @@ We now perform the *k*-means via the `kmeans()` function with the point 5 and 6 
 
 ```{r}
 # take rows 5 and 6 of the X matrix as initial centres
-res.k <- kmeans(X, centers = X[c(5,6), ], algorithm = "Lloyd")
+res.k <- kmeans(X, centers = X[c(5, 6), ], algorithm = "Lloyd")
 ```
 
 Unlike in the previous application with the dataset `Eurojobs.csv` where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set `centers = X[c(5,6), ]` to indicate that that there are 2 centers, and that they are going to be the points 5 and 6.
@@ -673,8 +677,9 @@ Using the data from the graph and the table below, perform **by hand** the 3 alg
 ```{r, echo = FALSE}
 n <- 5
 set.seed(seed = 2018 * 02 * 13)
-X <- as.data.frame(round(matrix(data = rnorm(2*n), nrow = n, byrow = TRUE), 2))
-plot(X, asp = 1); text(X, labels = 1:5, pos = 3, cex = 1.5)
+X <- as.data.frame(round(matrix(data = rnorm(2 * n), nrow = n, byrow = TRUE), 2))
+plot(X, asp = 1)
+text(X, labels = 1:5, pos = 3, cex = 1.5)
 X
 ```
 
@@ -1184,8 +1189,9 @@ plot(hclust)
 To perform the hierarchical clustering with any of the 3 criterion in R, we first need to enter the data (in this case as a matrix format, but it can also be performed on dataframes):
 
 ```{r}
-X <- matrix(c(2.03,0.06,-0.64,-0.10,-0.42,-0.53,-0.36,0.07,1.14,0.37),
-            nrow = 5, byrow = TRUE)
+X <- matrix(c(2.03, 0.06, -0.64, -0.10, -0.42, -0.53, -0.36, 0.07, 1.14, 0.37),
+  nrow = 5, byrow = TRUE
+)
 ```
 
 #### Single linkage
@@ -1193,7 +1199,7 @@ X <- matrix(c(2.03,0.06,-0.64,-0.10,-0.42,-0.53,-0.36,0.07,1.14,0.37),
 We can apply the hierarchical clustering with the single linkage criterion thanks to the `hclust()` function with the argument `method = "single"`:
 
 ```{r}
-# Hierarchical clustering: single linkage 
+# Hierarchical clustering: single linkage
 hclust <- hclust(dist(X), method = "single")
 ```
 
@@ -1215,15 +1221,18 @@ The largest difference of heights in the dendrogram occurs before the final comb
 
 ```{r}
 plot(hclust)
-rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
-            border = "blue")
+rect.hclust(hclust,
+  k = 2, # k is used to specify the number of clusters
+  border = "blue"
+)
 ```
 
 Finally, we could also determine the optimal number of cluster thanks to a barplot the heights (stored in `$height` of the clustering output):
 
 ```{r}
 barplot(hclust$height,
-        names.arg = (nrow(X) - 1) : 1) # show the number of cluster below each bars
+  names.arg = (nrow(X) - 1):1
+) # show the number of cluster below each bars
 ```
 
 Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.
@@ -1235,7 +1244,7 @@ Note that determining the number of clusters using the dendrogram or barplot is 
 We can apply the hierarchical clustering with the complete linkage criterion thanks to the `hclust()` function with the argument `method = "complete"`:
 
 ```{r}
-# Hierarchical clustering: complete linkage 
+# Hierarchical clustering: complete linkage
 hclust <- hclust(dist(X), method = "complete")
 ```
 
@@ -1253,8 +1262,10 @@ Like for the single linkage, the largest difference of heights in the dendrogram
 
 ```{r}
 plot(hclust)
-rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
-            border = "blue")
+rect.hclust(hclust,
+  k = 2, # k is used to specify the number of clusters
+  border = "blue"
+)
 ```
 
 #### Average linkage
@@ -1262,7 +1273,7 @@ rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
 We can apply the hierarchical clustering with the average linkage criterion thanks to the `hclust()` function with the argument `method = "average"`:
 
 ```{r}
-# Hierarchical clustering: average linkage 
+# Hierarchical clustering: average linkage
 hclust <- hclust(dist(X), method = "average")
 ```
 
@@ -1280,8 +1291,10 @@ Like for the single and complete linkages, the largest difference of heights in 
 
 ```{r}
 plot(hclust)
-rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
-            border = "blue")
+rect.hclust(hclust,
+  k = 2, # k is used to specify the number of clusters
+  border = "blue"
+)
 ```
 
 # *k*-means versus hierarchical clustering
