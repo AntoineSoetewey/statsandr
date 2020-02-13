@@ -117,7 +117,7 @@ Eurojobs # displays dataset
 dim(Eurojobs) # displays the number of rows and columns
 ```
 
-We now have a "clean" dataset of 26 observations and 9 variables on which we can base the classification. Note that in this case it is not necessary to standardize the data because they are all expressed in the same unit (in percentage). If this was not the case, we would have had to standardize the data via the `scale()` function (see below for an example where the data is standardized before classification). The so-called *k*-means clustering is done via the `kmeans()` function. We apply the classification with 2 classes and then 3 classes.
+We now have a "clean" dataset of 26 observations and 9 variables on which we can base the classification. Note that in this case it is not necessary to standardize the data because they are all expressed in the same unit (in percentage). If this was not the case, we would have had to standardize the data via the `scale()` function. The so-called *k*-means clustering is done via the `kmeans()` function. We apply the classification with 2 classes and then 3 classes.
 
 ### `kmeans()` with 2 groups
 
@@ -194,6 +194,8 @@ Now that the *k*-means clustering has been detailed in R, see how to do the algo
 ### Manual application and verification in R
 
 Perform **by hand** the *k*-means algorithm for the points shown in the graph below, with *k* = 2 and with the points *i* = 5 and *i* = 6 as initial centers. Compute the quality of the partition you just found and then **check** your answers **in R**.
+
+*Assume that the variables have the same units so there is no need to scale the data.*
 
 ```{r, echo = FALSE}
 set.seed(seed = 2018 * 02 * 15)
@@ -1284,19 +1286,9 @@ rect.hclust(hclust, k = 2, # k is used to specify the number of clusters
 
 # *k*-means versus hierarchical clustering
 
-Choosing between *k*-means and hierarchical clustering is not always easy. If you have a good reason to think that there is a specific number of clusters in your dataset (for example if you would like to distinguish diseased patients and healty patients but you do not know which group the patients belong to), you should probably opt for the *k*-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset, then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.
+Choosing between *k*-means and hierarchical clustering is not always easy. If you have a good reason to think that there is a specific number of clusters in your dataset (for example if you would like to distinguish diseased and healty patients depending on some characteristics but you do not know which group patients belong to), you should probably opt for the *k*-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.
 
-In addition to this, below are some advantages and disadvantages of both methods to help you make your choice (this list is non-exhaustive):
-
-## *k*-means
-
-### Advantages
-
-* Easy to implement
-* If the number of clusters is small and with a large number of variables, *k*-means may be computationally faster than hierarchical clustering
-
-### Disadvantages
-
+In order to help you make your choice note that, on the one hand, with a large number of variables, *k*-means may be computationally faster than hierarchical clustering if the number of clusters is small. On the other hand, the result of a hierarchical clustering is a structure that is more informative and interpretable than the unstructured set of flat clusters returned by *k*-means. Therefore, it is easier to determine the optimal number of clusters by looking at the dendrogram of a hierarchical clustering, instead of predicting this optimal number in advance in case of *k*-means.
 
 Thanks for reading. I hope this article helped you understand the different clustering methods and how to compute them by hand and in R.
 
