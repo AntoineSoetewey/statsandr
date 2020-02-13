@@ -9,15 +9,9 @@ Welcome to the blog [Stats and R](/). As the name suggests, this blog is about [
 
 The goal of this website is to make statistics easy to understand by illustrating statistical notions with examples and using plain English. When possible, for all statistical concepts covered in this blog, there is also an article on how to apply them in R.
 
-If you are new to this blog and to R, I invite you to start with the following articles:
+If you are new to this blog and to R, I invite you to:
 
-* [How to install R and RStudio](/blog/how-to-install-r-and-rstudio/)
-* [How to import an Excel file in RStudio](/blog/how-to-import-an-excel-file-in-rstudio/)
-* [Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/) or [in R](/blog/descriptive-statistics-in-r/)
-
-You can also:
-
-* See [all articles](/blog/) or [articles by categories](/tags/) for more advanced articles
+* See [all articles](/blog/) or [articles by categories](/tags/)
 * Learn more [about me](/about/)
 * Follow me on [towardsdatascience.com](https://towardsdatascience.com/@ant.soetewey) or [medium.com](https://medium.com/@ant.soetewey)
 * [Subscribe to this blog](/subscribe/) to receive updates everytime a new article is published

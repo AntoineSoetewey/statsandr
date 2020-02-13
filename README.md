@@ -4,18 +4,13 @@ Welcome to the blog [Stats and R](https://www.statsandr.com/). As the name sugge
 
 The goal of this website is to make statistics easy to understand by illustrating with examples and using plain English. When possible, for all statistical concepts covered here, I also write an article on how to apply these concepts in R.
 
-If you are new to this blog and to R, I invite you to start with the following articles:
+If you are new to this blog and to R, I invite you to:
 
-* [How to install R and RStudio](https://www.statsandr.com/blog/how-to-install-r-and-rstudio/)
-* [How to import an Excel file in RStudio](https://www.statsandr.com/blog/how-to-import-an-excel-file-in-rstudio/)
-* [Descriptive statistics by hand](https://www.statsandr.com/blog/descriptive-statistics-by-hand/) or [in R](https://www.statsandr.com/blog/descriptive-statistics-in-r/)
-
-You can also:
-
-* See [all articles](https://www.statsandr.com/blog/) or [articles by categories](https://www.statsandr.com/tags/) for more advanced articles
+* See [all articles](https://www.statsandr.com/blog/) or [articles by categories](https://www.statsandr.com/tags/)
 * Learn more [about me](https://www.statsandr.com/about/)
 * Follow me on [towardsdatascience.com](https://towardsdatascience.com/@ant.soetewey) or [medium.com](https://medium.com/@ant.soetewey)
 * [Subscribe to this blog](https://www.statsandr.com/subscribe/) to receive updates every time a new article is published
+* [Contribute](https://www.statsandr.com/contribute/) by submitting your article
 * See the [most recent comments](https://www.statsandr.com/recent-comments/) so you can follow the discussion
 
 If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me](https://www.statsandr.com/contact/).
