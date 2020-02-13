@@ -9,7 +9,7 @@ Welcome to the blog [Stats and R](/). As the name suggests, this blog is about [
 
 The goal of this website is to make statistics easy to understand by illustrating statistical notions with examples and using plain English. When possible, for all statistical concepts covered in this blog, there is also an article on how to apply them in R.
 
-If you are new to this blog and to R, I invite you to:
+If you are new to this blog, I invite you to:
 
 * See [all articles](/blog/) or [articles by categories](/tags/)
 * Learn more [about me](/about/)
