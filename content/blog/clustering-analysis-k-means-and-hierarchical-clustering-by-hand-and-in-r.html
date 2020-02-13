@@ -1661,13 +1661,13 @@ rect.hclust(hclust,
   border = &quot;blue&quot;
 )</code></pre>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
-<p>Finally, we could also determine the optimal number of cluster thanks to a barplot the heights (stored in <code>$height</code> of the clustering output):</p>
+<p>Finally, we could also determine the optimal number of cluster thanks to a barplot of the heights (stored in <code>$height</code> of the clustering output):</p>
 <pre class="r"><code>barplot(hclust$height,
-  names.arg = (nrow(X) - 1):1
-) # show the number of cluster below each bars</code></pre>
+  names.arg = (nrow(X) - 1):1 # show the number of cluster below each bars
+)</code></pre>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
 <p>Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.</p>
-<p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider the <em>Silhouette plot</em>, <em>elbow plot</em> or some numerical measures such as Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. However, these methods are outside the scope of this course and the method presented with the dendrogram is sufficient.</p>
+<p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider the <em>Silhouette plot</em>, <em>elbow plot</em> or some numerical measures such as Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. However, these methods are outside the scope of this course and the method presented with the dendrogram is generally sufficient.</p>
 </div>
 <div id="complete-linkage-1" class="section level4">
 <h4>Complete linkage</h4>
@@ -1681,7 +1681,7 @@ hclust &lt;- hclust(dist(X), method = &quot;complete&quot;)</code></pre>
 <pre class="r"><code>plot(hclust)</code></pre>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
-<p>Like for the single linkage, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
+<p>Similar to the single linkage, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
 <pre class="r"><code>plot(hclust)
 rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
@@ -1701,7 +1701,7 @@ hclust &lt;- hclust(dist(X), method = &quot;average&quot;)</code></pre>
 <pre class="r"><code>plot(hclust)</code></pre>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
-<p>Like for the single and complete linkages, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
+<p>Like the single and complete linkages, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
 <pre class="r"><code>plot(hclust)
 rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
@@ -1714,8 +1714,8 @@ rect.hclust(hclust,
 </div>
 <div id="k-means-versus-hierarchical-clustering" class="section level1">
 <h1><em>k</em>-means versus hierarchical clustering</h1>
-<p>Choosing between <em>k</em>-means and hierarchical clustering is not always easy. If you have a good reason to think that there is a specific number of clusters in your dataset (for example if you would like to distinguish diseased and healty patients depending on some characteristics but you do not know which group patients belong to), you should probably opt for the <em>k</em>-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.</p>
-<p>In order to help you make your choice note that, on the one hand, with a large number of variables, <em>k</em>-means may be computationally faster than hierarchical clustering if the number of clusters is small. On the other hand, the result of a hierarchical clustering is a structure that is more informative and interpretable than the unstructured set of flat clusters returned by <em>k</em>-means. Therefore, it is easier to determine the optimal number of clusters by looking at the dendrogram of a hierarchical clustering, instead of predicting this optimal number in advance in case of <em>k</em>-means.</p>
+<p>Choosing between <em>k</em>-means and hierarchical clustering is not always easy. If you have a good reason to think that there is a specific number of clusters in your dataset (for example if you would like to distinguish diseased and healty patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the <em>k</em>-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.</p>
+<p>In addition to this, if you are still undecided note that, on the one hand, with a large number of variables, <em>k</em>-means may be computationally faster than hierarchical clustering if the number of clusters is small. On the other hand, the result of a hierarchical clustering is a structure that is more informative and interpretable than the unstructured set of flat clusters returned by <em>k</em>-means. Therefore, it is easier to determine the optimal number of clusters by looking at the dendrogram of a hierarchical clustering than trying to predict this optimal number in advance in case of <em>k</em>-means.</p>
 <p>Thanks for reading. I hope this article helped you understand the different clustering methods and how to compute them by hand and in R.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me <a href="/contact/">here</a>.</p>
 <p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
