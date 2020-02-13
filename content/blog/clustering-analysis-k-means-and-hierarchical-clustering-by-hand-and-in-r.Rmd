@@ -634,11 +634,11 @@ res.k <- kmeans(X, centers = X[c(5, 6), ],
 
 Unlike in the previous application with the dataset `Eurojobs.csv` where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set `centers = X[c(5,6), ]` to indicate that that there are 2 centers, and that they are going to be the points 5 and 6 (see a reminder on [how to subset a dataframe](/blog/data-manipulation-in-r) if needed).
 
-The reason for adding the argument `algorithm = "Lloyd"` can be found in the usage of the R function `kmeans()`. In fact, there are several variants of the *k*-means algorithm. The default choice is the @jaaw28m version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of @lloyd1982least, we find the same solution in R and by hand. For more information, you can consult the documentation of the `kmeans()` function (via `?kmeans`) and read the articles mentioned.
+The reason for adding the argument `algorithm = "Lloyd"` can be found in the usage of the R function `kmeans()`. In fact, there are several variants of the *k*-means algorithm. The default choice is the @jaaw28m version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of @lloyd1982least, we find the same solution in R and by hand. For more information, you can consult the documentation of the `kmeans()` function (via `?kmeans` or `help(kmeans)`) and read the articles mentioned.
 
-The solution is then found by extracting
+The solution in R is then found by extracting
 
-* the partition:
+* the partition with `$cluster`:
 
 ```{r}
 res.k$cluster
@@ -646,14 +646,14 @@ res.k$cluster
 
 Points 1, 5 and 6 belong to cluster 1, points 2, 3 and 4 belong to cluster 2.
 
-* the coordinates of the final centers:
+* the coordinates of the final centers with `$centers`:
 
 ```{r}
 # We extract the coordinates of the 2 final centers, rounded to 2 decimals
 round(res.k$centers, digits = 2)
 ```
 
-* and then the quality of the partition:
+* and then the quality of the partition by dividing the BSS to the TSS:
 
 ```{r}
 res.k$betweenss / res.k$totss
@@ -671,13 +671,13 @@ In this article, the 3 main types of hierarchical clustering are discussed:
 * Complete linkage (maximum distance)
 * Average linkage (average distance)
 
-In the following sections, we perform these 3 algorithms by hand and verify the results in R.
+In the following sections, we first perform these 3 algorithms by hand and then verify the results in R.
 
 ## Application 3: hierarchical clustering
 
 ### Data
 
-Using the data from the graph and the table below, perform **by hand** the 3 algorithms (single, complete and average linkage). Then **check** your answers **in R** and draw the dendrograms.
+Using the data from the graph and the table below, perform **by hand** the 3 algorithms (single, complete and average linkage) and draw the dendrograms. Then **check** your answers **in R**.
 
 ```{r, echo = FALSE}
 n <- 5
@@ -690,7 +690,7 @@ X
 
 ### Solution by hand
 
-Step 1. For all 3 algorithms, we first need to compute the distance matrix between the 5 points thanks to the Pythagorean theorem. Remind that the distance between the point *a* and the point *b* is found with:
+Step 1. For all 3 algorithms, we first need to compute the distance matrix between the 5 points thanks to the Pythagorean theorem. Remind that the distance between point *a* and point *b* is found with:
 
 $$\sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}$$
 
@@ -702,7 +702,7 @@ round(dist(X), 3)
 
 #### Single linkage
 
-Step 2. From the distance matrix computed in step 1, we see that the **smallest distance** = 0.328 between points 2 and 4. 0.328 corresponds to the first height (more on this later when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The groups are thus: 1, 2 & 4, 3 and 5. The new distances between the points 2 & 4 and all other points are now:
+Step 2. From the distance matrix computed in step 1, we see that the **smallest distance** = 0.328 between points 2 and 4. 0.328 corresponds to the first height (more on this later when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The groups are thus: 1, 2 & 4, 3 and 5. The new distances between the group 2 & 4 and all other points are now:
 
 <center>
 <style type="text/css">
@@ -754,10 +754,10 @@ Step 2. From the distance matrix computed in step 1, we see that the **smallest 
 To construct this new distance matrix, proceed point by point:
 
 * the distance between points 1 and 3 has not changed, so the distance is unchanged compared to the inital distance matrix (found in step 1), which was 2.520
-* same goes for the distance between points 1 and 5 and points 3 and 5, the distances are the same than in the initial distance matrix since the points have not changed
+* same goes for the distance between points 1 and 5 and points 3 and 5; the distances are the same than in the initial distance matrix since the points have not changed
 * the distance between points 1 and 2 & 4 has changed since points 2 & 4 are now together
 * since we are applying the **single linkage** criterion, the new distance between points 1 and 2 & 4 corresponds to the **minimum distance** between the distance between points 1 and 2 and the distance between points 1 and 4
-* initial distance between points 1 and 2 is 2.675 and initial distance between points 1 and 4 is 2.390
+* the initial distance between points 1 and 2 is 2.675 and the initial distance between points 1 and 4 is 2.390
 * therefore, the minimum distance between these two distances is 2.390
 * 2.390 is thus the new distance between points 1 and 2 & 4
 * we apply the same process for points 3 and 2 & 4: the initial distance between points 3 and 2 is 0.483 and the initial distance between points 3 and 4 is 0.603. The minimum distance between these 2 distances is 0.483 so the new distance between points 3 and 2 & 4 is 0.483
@@ -841,9 +841,9 @@ Step 4. Based on the distance matrix in step 3, the smallest distance is 0.942 b
 * since we apply the single linkage criterion, we take the minimum distance, which is 1.530
 * the distance between points 1 & 5 and 2 & 3 & 4 is thus 1.530
 
-Step 5. The final combination of points is the combination of points 1 & 5 and 2 & 3 & 4, with a final height of 1.530. Heights are used to draw the dendrogram in the final step.
+Step 5. The final combination of points is the combination of points 1 & 5 and 2 & 3 & 4, with a final height of 1.530. Heights are used to draw the dendrogram in the sixth and final step.
 
-Step 6. Draw the dendrogram thanks to the combination of points and the heights found above. Remember that:
+Step 6. Draw the dendrogram thanks to the combination of points and heights found above. Remember that:
 
 * the first combination of points was between points 2 and 4, with a height of 0.328
 * the second combination was between points 3 and 2 & 4 with a height of 0.483
@@ -868,7 +868,7 @@ Step 1. Step 1 is exactly the same than for single linkage, that is, we compute 
 round(dist(X), 3)
 ```
 
-Step 2. From the distance matrix computed in step 1, we see that the **smallest distance** = 0.328 between points 2 and 4. It is important to note that even if we apply the complete linkage, in the distance matrix the points are brought together based on the smallest distance. This is the case for all 3 algorithms. The difference between the 3 algorithms lies in how to compute the new distances between the new combination of points (the single linkage takes the minimum between the distances, the complete linkage takes the maximum distance and the average linkage takes the average distance). 0.328 corresponds to the first height (which will be used when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The groups are thus: 1, 2 & 4, 3 and 5. The new distances between the points 2 & 4 and all other points are now:
+Step 2. From the distance matrix computed in step 1, we see that the **smallest distance** = 0.328 between points 2 and 4. It is important to note that even if we apply the complete linkage, in the distance matrix the points are brought together based on the smallest distance. This is the case for all 3 algorithms. The difference between the 3 algorithms lies in how to compute the new distances between the new combination of points (the single linkage takes the minimum between the distances, the complete linkage takes the maximum distance and the average linkage takes the average distance). 0.328 corresponds to the first height (which will be used when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The groups are thus: 1, 2 & 4, 3 and 5. The new distances between the group 2 & 4 and all other points are now:
 
 <center>
 <style type="text/css">
@@ -917,13 +917,13 @@ Step 2. From the distance matrix computed in step 1, we see that the **smallest 
 </center>
 <br>
 
-To construct this new distance matrix, proceed point by point:
+To construct this new distance matrix, proceed point by point as we did for single linkage:
 
 * the distance between points 1 and 3 has not changed, so the distance is unchanged compared to the inital distance matrix (found in step 1), which was 2.520
-* same goes for the distance between points 1 and 5 and points 3 and 5, the distances are the same than in the initial distance matrix since the points have not changed
+* same goes for the distance between points 1 and 5 and points 3 and 5; the distances are the same than in the initial distance matrix since the points have not changed
 * the distance between points 1 and 2 & 4 has changed since points 2 & 4 are now together
 * since we are applying the **complete linkage** criterion, the new distance between points 1 and 2 & 4 corresponds to the **maximum distance** between the distance between points 1 and 2 and the distance between points 1 and 4
-* initial distance between points 1 and 2 is 2.675 and initial distance between points 1 and 4 is 2.390
+* the initial distance between points 1 and 2 is 2.675 and the initial distance between points 1 and 4 is 2.390
 * therefore, the maximum distance between these two distances is 2.675
 * 2.675 is thus the new distance between points 1 and 2 & 4
 * we apply the same process for points 3 and 2 & 4: the initial distance between points 3 and 2 is 0.483 and the initial distance between points 3 and 4 is 0.603. The maximum distance between these 2 distances is 0.603 so the new distance between points 3 and 2 & 4 is 0.603
@@ -1007,9 +1007,9 @@ Step 4. Based on the distance matrix in step 3, the smallest distance is 0.942 b
 * since we apply the complete linkage criterion, we take the maximum distance, which is 2.675
 * the distance between points 1 & 5 and 2 & 3 & 4 is thus 2.675
 
-Step 5. The final combination of points is the combination of points 1 & 5 and 2 & 3 & 4, with a final height of 2.675. Heights are used to draw the dendrogram in the final step.
+Step 5. The final combination of points is the combination of points 1 & 5 and 2 & 3 & 4, with a final height of 2.675. Heights are used to draw the dendrogram in the sixth and final step.
 
-Step 6. Draw the dendrogram thanks to the combination of points and the heights found above. Remember that:
+Step 6. Draw the dendrogram thanks to the combination of points and heights found above. Remember that:
 
 * the first combination of points was between points 2 and 4, with a height of 0.328
 * the second combination was between points 3 and 2 & 4 with a height of 0.603
@@ -1034,7 +1034,7 @@ Step 1. Step 1 is exactly the same than for single and complete linkage, that is
 round(dist(X), 3)
 ```
 
-Step 2. From the distance matrix computed in step 1, we see that the **smallest distance** = 0.328 between points 2 and 4. It is important to note that even if we apply the average linkage, in the distance matrix the points are brought together based on the smallest distance. This is the case for all 3 algorithms. The difference between the 3 algorithms lies in how to compute the new distances between the new combination of points (the single linkage takes the minimum between the distances, the complete linkage takes the maximum distance and the average linkage takes the average distance). 0.328 corresponds to the first height (which will be used when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The groups are thus: 1, 2 & 4, 3 and 5. The new distances between the points 2 & 4 and all other points are now:
+Step 2. From the distance matrix computed in step 1, we see that the **smallest distance** = 0.328 between points 2 and 4. It is important to note that even if we apply the average linkage, in the distance matrix the points are brought together based on the smallest distance. This is the case for all 3 algorithms. The difference between the 3 algorithms lies in how to compute the new distances between the new combination of points (the single linkage takes the minimum between the distances, the complete linkage takes the maximum distance and the average linkage takes the average distance). 0.328 corresponds to the first height (which will be used when drawing the dendrogram). Since points 2 and 4 are the closest to each other, these 2 points are put together to form a single group. The groups are thus: 1, 2 & 4, 3 and 5. The new distances between the group 2 & 4 and all other points are now:
 
 <center>
 <style type="text/css">
@@ -1083,13 +1083,13 @@ Step 2. From the distance matrix computed in step 1, we see that the **smallest 
 </center>
 <br>
 
-To construct this new distance matrix, proceed point by point:
+To construct this new distance matrix, proceed point by point as we did for the two previous criteria:
 
 * the distance between points 1 and 3 has not changed, so the distance is unchanged compared to the inital distance matrix (found in step 1), which was 2.520
-* same goes for the distance between points 1 and 5 and points 3 and 5, the distances are the same than in the initial distance matrix since the points have not changed
+* same goes for the distance between points 1 and 5 and points 3 and 5; the distances are the same than in the initial distance matrix since the points have not changed
 * the distance between points 1 and 2 & 4 has changed since points 2 & 4 are now together
 * since we are applying the **average linkage** criterion, the new distance between points 1 and 2 & 4 corresponds to the **average distance** between the distance between points 1 and 2 and the distance between points 1 and 4
-* initial distance between points 1 and 2 is 2.675 and initial distance between points 1 and 4 is 2.390
+* the initial distance between points 1 and 2 is 2.675 and the initial distance between points 1 and 4 is 2.390
 * therefore, the average distance between these two distances is $\frac{2.675 + 2.390}{2} = 2.5325$
 * 2.5325 is thus the new distance between points 1 and 2 & 4
 * we apply the same process for points 3 and 2 & 4: the initial distance between points 3 and 2 is 0.483 and the initial distance between points 3 and 4 is 0.603. The average distance between these 2 distances is 0.543 so the new distance between points 3 and 2 & 4 is 0.543
@@ -1136,7 +1136,7 @@ Step 3. Based on the distance matrix in step 2, the smallest distance is 0.543 b
 * points 1 and 5 have not change, so the distance between these two points are the same than in previous step
 * from step 2 we see that the distance between points 1 and 2 & 4 is 2.5325 and the distance between points 1 and 3 is 2.520
 * since we apply the average linkage criterion, we take the average distance
-* however, we have to take into the consideration that there are 2 points in the group 2 & 4, while only one point in the group 3
+* however, we have to take into the consideration that there are 2 points in the group 2 & 4, while there is only one point in the group 3
 * the average distance for the distance between 1 and 2 & 3 & 4 is thus: $\frac{(2 \cdot 2.5325) + (1 \cdot 2.520)}{3} = 2.528333$
 * same process for points 5 and 2 & 3 & 4: $\frac{(2 \cdot 1.6855) + (1 \cdot 1.801)}{3} = 1.724$
 
@@ -1174,9 +1174,9 @@ Step 4. Based on the distance matrix in step 3, the smallest distance is 0.942 b
 * since we apply the average linkage criterion, we take the average distance, which is $\frac{2.528333 + 1.724}{2} = 2.126167$
 * the distance between points 1 & 5 and 2 & 3 & 4 is thus 2.126167
 
-Step 5. The final combination of points is the combination of points 1 & 5 and 2 & 3 & 4, with a final height of 2.126167. Heights are used to draw the dendrogram in the final step.
+Step 5. The final combination of points is the combination of points 1 & 5 and 2 & 3 & 4, with a final height of 2.126167. Heights are used to draw the dendrogram in the sixth and final step.
 
-Step 6. Draw the dendrogram thanks to the combination of points and the heights found above. Remember that:
+Step 6. Draw the dendrogram thanks to the combination of points and heights found above. Remember that:
 
 * the first combination of points was between points 2 and 4, with a height of 0.328
 * the second combination was between points 3 and 2 & 4 with a height of 0.543
@@ -1191,7 +1191,7 @@ plot(hclust)
 
 ### Solution in R
 
-To perform the hierarchical clustering with any of the 3 criterion in R, we first need to enter the data (in this case as a matrix format, but it can also be performed on dataframes):
+To perform the hierarchical clustering with any of the 3 criterion in R, we first need to enter the data (in this case as a matrix format, but it can also be entered as dataframes):
 
 ```{r}
 X <- matrix(c(2.03, 0.06, -0.64, -0.10, -0.42, -0.53, -0.36, 0.07, 1.14, 0.37),
@@ -1210,9 +1210,10 @@ hclust <- hclust(dist(X), method = "single")
 
 Note that the `hclust()` function requires a distance matrix. If your data is not already a distance matrix (like in our case, as the matrix `X` corresponds to the coordinates of the 5 points), you can transform it into a distance matrix with the `dist()` function.
 
-We can now plot the dendrogram to check our results by hand found above:
+We can now extract the heights and plot the dendrogram to check our results by hand found above:
 
 ```{r}
+round(hclust$height, 3)
 plot(hclust)
 ```
 
@@ -1255,9 +1256,10 @@ hclust <- hclust(dist(X), method = "complete")
 
 Note that the `hclust()` function requires a distance matrix. If your data is not already a distance matrix (like in our case, as the matrix `X` corresponds to the coordinates of the 5 points), you can transform it into a distance matrix with the `dist()` function.
 
-We can now plot the dendrogram to check our results by hand found above:
+We can now extract the heights and plot the dendrogram to check our results by hand found above:
 
 ```{r}
+round(hclust$height, 3)
 plot(hclust)
 ```
 
@@ -1284,9 +1286,10 @@ hclust <- hclust(dist(X), method = "average")
 
 Note that the `hclust()` function requires a distance matrix. If your data is not already a distance matrix (like in our case, as the matrix `X` corresponds to the coordinates of the 5 points), you can transform it into a distance matrix with the `dist()` function.
 
-We can now plot the dendrogram to check our results by hand found above:
+We can now extract the heights and plot the dendrogram to check our results by hand found above:
 
 ```{r}
+round(hclust$height, 3)
 plot(hclust)
 ```
 
