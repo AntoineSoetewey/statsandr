@@ -208,7 +208,7 @@ print(model$cluster)</code></pre>
 <p><span class="math display">\[\begin{equation}
 \dfrac{\operatorname{BSS}}{\operatorname{TSS}} \times 100\%
 \end{equation}\]</span></p>
-<p>where <em>BSS</em> and <em>TSS</em> stands for <em>Between Sum of Squares</em> and <em>Total Sum of Squares</em>, respectively. The higher the percentage, the better the score (and thus the quality) because it means that <em>BSS</em> is large and/or <em>WSS</em> is small.</p>
+<p>where <em>BSS</em> and <em>TSS</em> stand for <em>Between Sum of Squares</em> and <em>Total Sum of Squares</em>, respectively. The higher the percentage, the better the score (and thus the quality) because it means that <em>BSS</em> is large and/or <em>WSS</em> is small.</p>
 <p>Here is how you can check the quality of the partition in R:</p>
 <pre class="r"><code># BSS and TSS are extracted from the model and stored
 (BSS &lt;- model$betweenss)</code></pre>
@@ -878,13 +878,21 @@ round(res.k$centers, digits = 2)</code></pre>
 <div id="hierarchical-clustering" class="section level1">
 <h1>Hierarchical clustering</h1>
 <p>Remind that the difference with the partition by <em>k</em>-means is that for hierarchical clustering, the number of classes is <strong>not</strong> specified in advance. Hierarchical clustering will help to determine the optimal number of clusters.</p>
-<p>In this article, the 3 main types of hierarchical clustering are discussed:</p>
+<p>Before applying hierarchical clustering by hand and in R, let’s see how it is working step by step:</p>
+<ol style="list-style-type: decimal">
+<li>It starts by putting every point in its own cluster, so each cluster is a singleton</li>
+<li>It then merges the 2 points that are closest to each other based on the distances from the distance matrix. The consequence is that there is one less cluster</li>
+<li>It then recalculates the distances between the new and old clusters and save them in a new distance matrix which will be used in the next step</li>
+<li>Finally, steps 1 and 2 are repeated until all clusters are merged into one single cluster including all points.</li>
+</ol>
+<p>There exists four main methods to measure the distance between clusters, referred as linkage methods:</p>
 <ul>
-<li>Single linkage (minimum distance)</li>
-<li>Complete linkage (maximum distance)</li>
-<li>Average linkage (average distance)</li>
+<li>Single linkage: computes the minimum distance between clusters before merging them.</li>
+<li>Complete linkage: computes the maximum distance between clusters before merging them.</li>
+<li>Average linkage: computes the average distance between clusters before merging them.</li>
+<li>Centroid linkage: calculutes centroids for both clusters, then computes the distance between the two before merging them.</li>
 </ul>
-<p>In the following sections, we first perform these 3 algorithms by hand and then verify the results in R.</p>
+<p>In the following sections, only the three first linkage methods are presented (first by hand and then the results are verified in R).</p>
 <div id="application-3-hierarchical-clustering" class="section level2">
 <h2>Application 3: hierarchical clustering</h2>
 <div id="data-1" class="section level3">
@@ -1142,6 +1150,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>this is exactly what is illustrated in the following dendrogram:</li>
 </ul>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p>In hierarchical clustering, dendrograms are used to show the sequence of combinations of the clusters. The distances of merge between clusters, called heights, are illustrated on the y-axis.</p>
 </div>
 <div id="complete-linkage" class="section level4">
 <h4>Complete linkage</h4>
@@ -1667,7 +1676,7 @@ rect.hclust(hclust,
 )</code></pre>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
 <p>Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.</p>
-<p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider the <em>silhouette plot</em>, <em>elbow plot</em> or some numerical measures such as Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. However, these methods are outside the scope of this course and the method presented with the dendrogram is generally sufficient.</p>
+<p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the <em>silhouette plot</em>, <em>elbow plot</em> or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better). However, these methods are outside the scope of this course and the method presented with the dendrogram is generally sufficient.</p>
 </div>
 <div id="complete-linkage-1" class="section level4">
 <h4>Complete linkage</h4>
