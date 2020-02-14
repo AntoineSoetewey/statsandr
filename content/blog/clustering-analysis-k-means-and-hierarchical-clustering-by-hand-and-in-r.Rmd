@@ -141,7 +141,8 @@ Note that the argument `centers = 2` is used to set the number of clusters, dete
 The cluster for each observation can be stored directly in the dataset as a column:
 
 ```{r}
-Eurojobs_cluster <- data.frame(Eurojobs, cluster = as.factor(model$cluster))
+Eurojobs_cluster <- data.frame(Eurojobs,
+                               cluster = as.factor(model$cluster))
 head(Eurojobs_cluster)
 ```
 
@@ -637,8 +638,10 @@ We now perform the *k*-means via the `kmeans()` function with the point 5 and 6 
 
 ```{r}
 # take rows 5 and 6 of the X matrix as initial centers
-res.k <- kmeans(X, centers = X[c(5, 6), ],
-                algorithm = "Lloyd")
+res.k <- kmeans(X,
+  centers = X[c(5, 6), ],
+  algorithm = "Lloyd"
+)
 ```
 
 Unlike in the previous application with the dataset `Eurojobs.csv` where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set `centers = X[c(5,6), ]` to indicate that that there are 2 centers, and that they are going to be the points 5 and 6 (see a reminder on [how to subset a dataframe](/blog/data-manipulation-in-r) if needed).
@@ -686,7 +689,7 @@ There exists four main methods to measure the distance between clusters, referre
 * Single linkage: computes the minimum distance between clusters before merging them.
 * Complete linkage: computes the maximum distance between clusters before merging them.
 * Average linkage: computes the average distance between clusters before merging them.
-* Centroid linkage: calculutes centroids for both clusters, then computes the distance between the two before merging them.
+* Centroid linkage: calculates centroids for both clusters, then computes the distance between the two before merging them.
 
 In the following sections, only the three first linkage methods are presented (first by hand and then the results are verified in R).
 
@@ -1264,7 +1267,7 @@ barplot(hclust$height,
 
 Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.
 
-Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the _silhouette plot_, _elbow plot_ or some numerical measures like Dunn's index, Hubert's gamma, etc., which show the variation of the error with the number of clusters (*k*), and you choose the value of *k* where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn's Index (the higher the index, the better). However, these methods are outside the scope of this course and the method presented with the dendrogram is generally sufficient.
+Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the _silhouette plot_, _elbow plot_ or some numerical measures like Dunn's index, Hubert's gamma, etc., which show the variation of the error with the number of clusters (*k*), and you choose the value of *k* where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn's Index (the higher the index, the better). However, these methods are beyond the scope of this course and the method presented with the dendrogram is generally sufficient.
 
 #### Complete linkage
 

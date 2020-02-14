@@ -203,7 +203,8 @@ print(model$cluster)&lt;/code&gt;&lt;/pre&gt;
 ##              2&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that the argument &lt;code&gt;centers = 2&lt;/code&gt; is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling &lt;code&gt;print(model$cluster)&lt;/code&gt; or &lt;code&gt;model$cluster&lt;/code&gt; is the same. This output specifies the group (i.e., 1 or 2) to which each country belongs to.&lt;/p&gt;
 &lt;p&gt;The cluster for each observation can be stored directly in the dataset as a column:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Eurojobs_cluster &amp;lt;- data.frame(Eurojobs, cluster = as.factor(model$cluster))
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Eurojobs_cluster &amp;lt;- data.frame(Eurojobs,
+                               cluster = as.factor(model$cluster))
 head(Eurojobs_cluster)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##             Agr Min  Man  PS  Con   SI Fin  SPS  TC cluster
 ## Belgium     3.3 0.9 27.6 0.9  8.2 19.1 6.2 26.6 7.2       1
@@ -858,8 +859,10 @@ X # display the coordinates of the points&lt;/code&gt;&lt;/pre&gt;
 ## [6,]    6    8&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We now perform the &lt;em&gt;k&lt;/em&gt;-means via the &lt;code&gt;kmeans()&lt;/code&gt; function with the point 5 and 6 as initial centers:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# take rows 5 and 6 of the X matrix as initial centers
-res.k &amp;lt;- kmeans(X, centers = X[c(5, 6), ],
-                algorithm = &amp;quot;Lloyd&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+res.k &amp;lt;- kmeans(X,
+  centers = X[c(5, 6), ],
+  algorithm = &amp;quot;Lloyd&amp;quot;
+)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Unlike in the previous application with the dataset &lt;code&gt;Eurojobs.csv&lt;/code&gt; where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set &lt;code&gt;centers = X[c(5,6), ]&lt;/code&gt; to indicate that that there are 2 centers, and that they are going to be the points 5 and 6 (see a reminder on &lt;a href=&#34;/blog/data-manipulation-in-r&#34;&gt;how to subset a dataframe&lt;/a&gt; if needed).&lt;/p&gt;
 &lt;p&gt;The reason for adding the argument &lt;code&gt;algorithm = &amp;quot;Lloyd&amp;quot;&lt;/code&gt; can be found in the usage of the R function &lt;code&gt;kmeans()&lt;/code&gt;. In fact, there are several variants of the &lt;em&gt;k&lt;/em&gt;-means algorithm. The default choice is the &lt;span class=&#34;citation&#34;&gt;Hartigan and Wong (1979)&lt;/span&gt; version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of &lt;span class=&#34;citation&#34;&gt;Lloyd (1982)&lt;/span&gt;, we find the same solution in R and by hand. For more information, you can consult the documentation of the &lt;code&gt;kmeans()&lt;/code&gt; function (via &lt;code&gt;?kmeans&lt;/code&gt; or &lt;code&gt;help(kmeans)&lt;/code&gt;) and read the articles mentioned.&lt;/p&gt;
 &lt;p&gt;The solution in R is then found by extracting&lt;/p&gt;
@@ -902,7 +905,7 @@ round(res.k$centers, digits = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;Single linkage: computes the minimum distance between clusters before merging them.&lt;/li&gt;
 &lt;li&gt;Complete linkage: computes the maximum distance between clusters before merging them.&lt;/li&gt;
 &lt;li&gt;Average linkage: computes the average distance between clusters before merging them.&lt;/li&gt;
-&lt;li&gt;Centroid linkage: calculutes centroids for both clusters, then computes the distance between the two before merging them.&lt;/li&gt;
+&lt;li&gt;Centroid linkage: calculates centroids for both clusters, then computes the distance between the two before merging them.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;In the following sections, only the three first linkage methods are presented (first by hand and then the results are verified in R).&lt;/p&gt;
 &lt;div id=&#34;application-3-hierarchical-clustering&#34; class=&#34;section level2&#34;&gt;
@@ -1689,7 +1692,7 @@ rect.hclust(hclust,
 )&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.&lt;/p&gt;
-&lt;p&gt;Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the &lt;em&gt;silhouette plot&lt;/em&gt;, &lt;em&gt;elbow plot&lt;/em&gt; or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (&lt;em&gt;k&lt;/em&gt;), and you choose the value of &lt;em&gt;k&lt;/em&gt; where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better). However, these methods are outside the scope of this course and the method presented with the dendrogram is generally sufficient.&lt;/p&gt;
+&lt;p&gt;Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the &lt;em&gt;silhouette plot&lt;/em&gt;, &lt;em&gt;elbow plot&lt;/em&gt; or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (&lt;em&gt;k&lt;/em&gt;), and you choose the value of &lt;em&gt;k&lt;/em&gt; where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better). However, these methods are beyond the scope of this course and the method presented with the dendrogram is generally sufficient.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;complete-linkage-1&#34; class=&#34;section level4&#34;&gt;
 &lt;h4&gt;Complete linkage&lt;/h4&gt;

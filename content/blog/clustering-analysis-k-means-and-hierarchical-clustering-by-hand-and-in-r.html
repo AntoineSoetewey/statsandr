@@ -202,7 +202,8 @@ print(model$cluster)</code></pre>
 ##              2</code></pre>
 <p>Note that the argument <code>centers = 2</code> is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling <code>print(model$cluster)</code> or <code>model$cluster</code> is the same. This output specifies the group (i.e., 1 or 2) to which each country belongs to.</p>
 <p>The cluster for each observation can be stored directly in the dataset as a column:</p>
-<pre class="r"><code>Eurojobs_cluster &lt;- data.frame(Eurojobs, cluster = as.factor(model$cluster))
+<pre class="r"><code>Eurojobs_cluster &lt;- data.frame(Eurojobs,
+                               cluster = as.factor(model$cluster))
 head(Eurojobs_cluster)</code></pre>
 <pre><code>##             Agr Min  Man  PS  Con   SI Fin  SPS  TC cluster
 ## Belgium     3.3 0.9 27.6 0.9  8.2 19.1 6.2 26.6 7.2       1
@@ -857,8 +858,10 @@ X # display the coordinates of the points</code></pre>
 ## [6,]    6    8</code></pre>
 <p>We now perform the <em>k</em>-means via the <code>kmeans()</code> function with the point 5 and 6 as initial centers:</p>
 <pre class="r"><code># take rows 5 and 6 of the X matrix as initial centers
-res.k &lt;- kmeans(X, centers = X[c(5, 6), ],
-                algorithm = &quot;Lloyd&quot;)</code></pre>
+res.k &lt;- kmeans(X,
+  centers = X[c(5, 6), ],
+  algorithm = &quot;Lloyd&quot;
+)</code></pre>
 <p>Unlike in the previous application with the dataset <code>Eurojobs.csv</code> where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set <code>centers = X[c(5,6), ]</code> to indicate that that there are 2 centers, and that they are going to be the points 5 and 6 (see a reminder on <a href="/blog/data-manipulation-in-r">how to subset a dataframe</a> if needed).</p>
 <p>The reason for adding the argument <code>algorithm = &quot;Lloyd&quot;</code> can be found in the usage of the R function <code>kmeans()</code>. In fact, there are several variants of the <em>k</em>-means algorithm. The default choice is the <span class="citation">Hartigan and Wong (1979)</span> version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of <span class="citation">Lloyd (1982)</span>, we find the same solution in R and by hand. For more information, you can consult the documentation of the <code>kmeans()</code> function (via <code>?kmeans</code> or <code>help(kmeans)</code>) and read the articles mentioned.</p>
 <p>The solution in R is then found by extracting</p>
@@ -901,7 +904,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>Single linkage: computes the minimum distance between clusters before merging them.</li>
 <li>Complete linkage: computes the maximum distance between clusters before merging them.</li>
 <li>Average linkage: computes the average distance between clusters before merging them.</li>
-<li>Centroid linkage: calculutes centroids for both clusters, then computes the distance between the two before merging them.</li>
+<li>Centroid linkage: calculates centroids for both clusters, then computes the distance between the two before merging them.</li>
 </ul>
 <p>In the following sections, only the three first linkage methods are presented (first by hand and then the results are verified in R).</p>
 <div id="application-3-hierarchical-clustering" class="section level2">
@@ -1688,7 +1691,7 @@ rect.hclust(hclust,
 )</code></pre>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p>Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.</p>
-<p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the <em>silhouette plot</em>, <em>elbow plot</em> or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better). However, these methods are outside the scope of this course and the method presented with the dendrogram is generally sufficient.</p>
+<p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the <em>silhouette plot</em>, <em>elbow plot</em> or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better). However, these methods are beyond the scope of this course and the method presented with the dendrogram is generally sufficient.</p>
 </div>
 <div id="complete-linkage-1" class="section level4">
 <h4>Complete linkage</h4>
