@@ -168,7 +168,7 @@
 <li><a href="#data">Data</a></li>
 <li><a href="#kmeans-with-2-groups"><code>kmeans()</code> with 2 groups</a></li>
 <li><a href="#quality-of-a-k-means-partition">Quality of a <em>k</em>-means partition</a></li>
-<li><a href="#nstart-for-several-initial-centers"><code>nstart</code> for several initial centers</a></li>
+<li><a href="#nstart-for-several-initial-centers-and-better-stability"><code>nstart</code> for several initial centers and better stability</a></li>
 <li><a href="#kmeans-with-3-groups"><code>kmeans()</code> with 3 groups</a></li>
 <li><a href="#manual-application-and-verification-in-r">Manual application and verification in R</a><ul>
 <li><a href="#solution-by-hand">Solution by hand</a></li>
@@ -368,13 +368,14 @@ BSS / TSS * 100</code></pre>
 <pre><code>## [1] 51.86826</code></pre>
 <p>The quality of the partition is 51.87%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters!) in order to determine the best partition among the ones considered.</p>
 </div>
-<div id="nstart-for-several-initial-centers" class="section level3">
-<h3><code>nstart</code> for several initial centers</h3>
+<div id="nstart-for-several-initial-centers-and-better-stability" class="section level3">
+<h3><code>nstart</code> for several initial centers and better stability</h3>
 <p>The <em>k</em>-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command <code>kmeans(Eurojobs, centers = 2)</code> may give slightly different results every time it is run, and thus slight differences in the quality of the partitions. The <code>nstart</code> argument in the <code>kmeans()</code> function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:</p>
 <pre class="r"><code>model2 &lt;- kmeans(Eurojobs, centers = 2, nstart = 10)
 100 * model2$betweenss / model2$totss</code></pre>
 <pre><code>## [1] 54.2503</code></pre>
 <p>Depending on the initial random choices, this new partition will be better or not compared to the first one. In our example, the partition is better as the quality increased to 54.25%.</p>
+<p>One of the main limitation often cited regarding <em>k</em>-means is the stability of the results. As the initial centers are randomly chosen, running the same command may yield different results. Adding the <code>nstart</code> argument in the <code>kmeans()</code> function limits this issue as it will generate several different initializations and take the most optimal one.</p>
 </div>
 <div id="kmeans-with-3-groups" class="section level3">
 <h3><code>kmeans()</code> with 3 groups</h3>

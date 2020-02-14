@@ -31,7 +31,7 @@
 &lt;li&gt;&lt;a href=&#34;#data&#34;&gt;Data&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#kmeans-with-2-groups&#34;&gt;&lt;code&gt;kmeans()&lt;/code&gt; with 2 groups&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#quality-of-a-k-means-partition&#34;&gt;Quality of a &lt;em&gt;k&lt;/em&gt;-means partition&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#nstart-for-several-initial-centers&#34;&gt;&lt;code&gt;nstart&lt;/code&gt; for several initial centers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#nstart-for-several-initial-centers-and-better-stability&#34;&gt;&lt;code&gt;nstart&lt;/code&gt; for several initial centers and better stability&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#kmeans-with-3-groups&#34;&gt;&lt;code&gt;kmeans()&lt;/code&gt; with 3 groups&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#manual-application-and-verification-in-r&#34;&gt;Manual application and verification in R&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#solution-by-hand&#34;&gt;Solution by hand&lt;/a&gt;&lt;/li&gt;
@@ -231,13 +231,14 @@ BSS / TSS * 100&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 51.86826&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The quality of the partition is 51.87%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters!) in order to determine the best partition among the ones considered.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div id=&#34;nstart-for-several-initial-centers&#34; class=&#34;section level3&#34;&gt;
-&lt;h3&gt;&lt;code&gt;nstart&lt;/code&gt; for several initial centers&lt;/h3&gt;
+&lt;div id=&#34;nstart-for-several-initial-centers-and-better-stability&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;&lt;code&gt;nstart&lt;/code&gt; for several initial centers and better stability&lt;/h3&gt;
 &lt;p&gt;The &lt;em&gt;k&lt;/em&gt;-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command &lt;code&gt;kmeans(Eurojobs, centers = 2)&lt;/code&gt; may give slightly different results every time it is run, and thus slight differences in the quality of the partitions. The &lt;code&gt;nstart&lt;/code&gt; argument in the &lt;code&gt;kmeans()&lt;/code&gt; function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model2 &amp;lt;- kmeans(Eurojobs, centers = 2, nstart = 10)
 100 * model2$betweenss / model2$totss&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 54.2503&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Depending on the initial random choices, this new partition will be better or not compared to the first one. In our example, the partition is better as the quality increased to 54.25%.&lt;/p&gt;
+&lt;p&gt;One of the main limitation often cited regarding &lt;em&gt;k&lt;/em&gt;-means is the stability of the results. As the initial centers are randomly chosen, running the same command may yield different results. Adding the &lt;code&gt;nstart&lt;/code&gt; argument in the &lt;code&gt;kmeans()&lt;/code&gt; function limits this issue as it will generate several different initializations and take the most optimal one.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;kmeans-with-3-groups&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;&lt;code&gt;kmeans()&lt;/code&gt; with 3 groups&lt;/h3&gt;
