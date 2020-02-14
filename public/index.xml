@@ -202,6 +202,16 @@ print(model$cluster)&lt;/code&gt;&lt;/pre&gt;
 ##     Yugoslavia 
 ##              2&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that the argument &lt;code&gt;centers = 2&lt;/code&gt; is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling &lt;code&gt;print(model$cluster)&lt;/code&gt; or &lt;code&gt;model$cluster&lt;/code&gt; is the same. This output specifies the group (i.e., 1 or 2) to which each country belongs to.&lt;/p&gt;
+&lt;p&gt;The cluster for each observation can be stored directly in the dataset as a column:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Eurojobs_cluster &amp;lt;- data.frame(Eurojobs, cluster = as.factor(model$cluster))
+head(Eurojobs_cluster)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##             Agr Min  Man  PS  Con   SI Fin  SPS  TC cluster
+## Belgium     3.3 0.9 27.6 0.9  8.2 19.1 6.2 26.6 7.2       1
+## Denmark     9.2 0.1 21.8 0.6  8.3 14.6 6.5 32.2 7.1       1
+## France     10.8 0.8 27.5 0.9  8.9 16.8 6.0 22.6 5.7       1
+## W. Germany  6.7 1.3 35.8 0.9  7.3 14.4 5.0 22.3 6.1       1
+## Ireland    23.2 1.0 20.7 1.3  7.5 16.8 2.8 20.8 6.1       2
+## Italy      15.9 0.6 27.6 0.5 10.0 18.1 1.6 20.1 5.7       1&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;quality-of-a-k-means-partition&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Quality of a &lt;em&gt;k&lt;/em&gt;-means partition&lt;/h3&gt;
@@ -244,7 +254,7 @@ BSS3 / TSS3 * 100&lt;/code&gt;&lt;/pre&gt;
 &lt;h3&gt;Manual application and verification in R&lt;/h3&gt;
 &lt;p&gt;Perform &lt;strong&gt;by hand&lt;/strong&gt; the &lt;em&gt;k&lt;/em&gt;-means algorithm for the points shown in the graph below, with &lt;em&gt;k&lt;/em&gt; = 2 and with the points &lt;em&gt;i&lt;/em&gt; = 5 and &lt;em&gt;i&lt;/em&gt; = 6 as initial centers. Compute the quality of the partition you just found and then &lt;strong&gt;check&lt;/strong&gt; your answers &lt;strong&gt;in R&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Assume that the variables have the same units so there is no need to scale the data.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;div id=&#34;solution-by-hand&#34; class=&#34;section level4&#34;&gt;
 &lt;h4&gt;Solution by hand&lt;/h4&gt;
 &lt;p&gt;Step 1. Here are the coordinates of the 6 points:&lt;/p&gt;
@@ -899,13 +909,14 @@ round(res.k$centers, digits = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;data-1&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Data&lt;/h3&gt;
 &lt;p&gt;Using the data from the graph and the table below, perform &lt;strong&gt;by hand&lt;/strong&gt; the 3 algorithms (single, complete and average linkage) and draw the dendrograms. Then &lt;strong&gt;check&lt;/strong&gt; your answers &lt;strong&gt;in R&lt;/strong&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;##      V1    V2
 ## 1  2.03  0.06
 ## 2 -0.64 -0.10
 ## 3 -0.42 -0.53
 ## 4 -0.36  0.07
 ## 5  1.14  0.37&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;Assume that the variables have the same units so there is no need to scale the data.&lt;/em&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;solution-by-hand-1&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Solution by hand&lt;/h3&gt;
@@ -1150,7 +1161,7 @@ round(res.k$centers, digits = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;the final combination was between points 1 &amp;amp; 5 and 2 &amp;amp; 3 &amp;amp; 4 with a height of 1.530&lt;/li&gt;
 &lt;li&gt;this is exactly what is illustrated in the following dendrogram:&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-22-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;In hierarchical clustering, dendrograms are used to show the sequence of combinations of the clusters. The distances of merge between clusters, called heights, are illustrated on the y-axis.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;complete-linkage&#34; class=&#34;section level4&#34;&gt;
@@ -1394,7 +1405,7 @@ round(res.k$centers, digits = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;the final combination was between points 1 &amp;amp; 5 and 2 &amp;amp; 3 &amp;amp; 4 with a height of 2.675&lt;/li&gt;
 &lt;li&gt;this is exactly what is illustrated in the following dendrogram:&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;average-linkage&#34; class=&#34;section level4&#34;&gt;
 &lt;h4&gt;Average linkage&lt;/h4&gt;
@@ -1638,7 +1649,7 @@ round(res.k$centers, digits = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;the final combination was between points 1 &amp;amp; 5 and 2 &amp;amp; 3 &amp;amp; 4 with a height of 2.126167&lt;/li&gt;
 &lt;li&gt;this is exactly what is illustrated in the following dendrogram:&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-25-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;solution-in-r-1&#34; class=&#34;section level3&#34;&gt;
@@ -1657,7 +1668,7 @@ hclust &amp;lt;- hclust(dist(X), method = &amp;quot;single&amp;quot;)&lt;/code&g
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;round(hclust$height, 3)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.328 0.483 0.942 1.530&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(hclust)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.&lt;/p&gt;
 &lt;p&gt;Remember that hierarchical clustering is used to determine the optimal number of clusters. This optimal number of clusters can be determined thanks to the dendrogram. For this, we usually look at the largest difference of heights:&lt;/p&gt;
 &lt;div class=&#34;figure&#34;&gt;
@@ -1670,12 +1681,12 @@ rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
   border = &amp;quot;blue&amp;quot;
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Finally, we could also determine the optimal number of cluster thanks to a barplot of the heights (stored in &lt;code&gt;$height&lt;/code&gt; of the clustering output):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;barplot(hclust$height,
   names.arg = (nrow(X) - 1):1 # show the number of cluster below each bars
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.&lt;/p&gt;
 &lt;p&gt;Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the &lt;em&gt;silhouette plot&lt;/em&gt;, &lt;em&gt;elbow plot&lt;/em&gt; or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (&lt;em&gt;k&lt;/em&gt;), and you choose the value of &lt;em&gt;k&lt;/em&gt; where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better). However, these methods are outside the scope of this course and the method presented with the dendrogram is generally sufficient.&lt;/p&gt;
 &lt;/div&gt;
@@ -1689,7 +1700,7 @@ hclust &amp;lt;- hclust(dist(X), method = &amp;quot;complete&amp;quot;)&lt;/code
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;round(hclust$height, 3)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.328 0.603 0.942 2.675&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(hclust)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-32-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-33-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.&lt;/p&gt;
 &lt;p&gt;Similar to the single linkage, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp;amp; 3 &amp;amp; 4 with the group 1 &amp;amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the &lt;code&gt;rect.hclust()&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(hclust)
@@ -1697,7 +1708,7 @@ rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
   border = &amp;quot;blue&amp;quot;
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-33-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-34-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;average-linkage-1&#34; class=&#34;section level4&#34;&gt;
 &lt;h4&gt;Average linkage&lt;/h4&gt;
@@ -1709,7 +1720,7 @@ hclust &amp;lt;- hclust(dist(X), method = &amp;quot;average&amp;quot;)&lt;/code&
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;round(hclust$height, 3)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.328 0.543 0.942 2.126&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(hclust)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-35-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-36-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.&lt;/p&gt;
 &lt;p&gt;Like the single and complete linkages, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp;amp; 3 &amp;amp; 4 with the group 1 &amp;amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the &lt;code&gt;rect.hclust()&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(hclust)
@@ -1717,14 +1728,14 @@ rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
   border = &amp;quot;blue&amp;quot;
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-36-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-37-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;k-means-versus-hierarchical-clustering&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;&lt;em&gt;k&lt;/em&gt;-means versus hierarchical clustering&lt;/h1&gt;
-&lt;p&gt;Choosing between &lt;em&gt;k&lt;/em&gt;-means and hierarchical clustering is not always easy. If you have a good reason to think that there is a specific number of clusters in your dataset (for example if you would like to distinguish diseased and healthy patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the &lt;em&gt;k&lt;/em&gt;-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.&lt;/p&gt;
+&lt;p&gt;Clustering is rather a subjective statistical analysis and there can be more than one appropriate algorithm, depending on the dataset at hand or the type of problem to be solved. So choosing between &lt;em&gt;k&lt;/em&gt;-means and hierarchical clustering is not always easy. If you have a good reason to think that there is a specific number of clusters in your dataset (for example if you would like to distinguish diseased and healthy patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the &lt;em&gt;k&lt;/em&gt;-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.&lt;/p&gt;
 &lt;p&gt;In addition to this, if you are still undecided note that, on the one hand, with a large number of variables, &lt;em&gt;k&lt;/em&gt;-means may be computationally faster than hierarchical clustering if the number of clusters is small. On the other hand, the result of a hierarchical clustering is a structure that is more informative and interpretable than the unstructured set of flat clusters returned by &lt;em&gt;k&lt;/em&gt;-means. Therefore, it is easier to determine the optimal number of clusters by looking at the dendrogram of a hierarchical clustering than trying to predict this optimal number in advance in case of &lt;em&gt;k&lt;/em&gt;-means.&lt;/p&gt;
 &lt;p&gt;Thanks for reading. I hope this article helped you understand the different clustering methods and how to compute them by hand and in R.&lt;/p&gt;
 &lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
@@ -7036,6 +7047,7 @@ rnorm(3, mean = 10, sd = 2)&lt;/code&gt;&lt;/pre&gt;
       <description>&lt;p&gt;Hello, my name is &lt;a href=&#34;https://www.antoinesoetewey.com/&#34;&gt;Antoine Soetewey&lt;/a&gt;. I am a PhD student in statistics at UCLouvain (Belgium). My research interests focus on survival analysis and bio-statistical procedures applied to cancer patients.&lt;/p&gt;
 &lt;p&gt;In parallel with my doctoral thesis, I am teaching assistant for several courses in statistics and probability at bachelor and master’s level. I also provide trainings and workshops in statistics and R in a Belgian consulting company.&lt;/p&gt;
 &lt;p&gt;For more information about myself please visit &lt;a href=&#34;https://www.antoinesoetewey.com/&#34;&gt;www.antoinesoetewey.com&lt;/a&gt;. All opinions and views are my own and do not represent my employer.&lt;/p&gt;
+&lt;p&gt;This blog was launched to help academics and professionals to grasp important statistical concepts, using examples and plain English.&lt;/p&gt;
 &lt;p&gt;If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to &lt;a href=&#34;/contact/&#34;&gt;contact me&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>

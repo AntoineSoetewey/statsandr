@@ -138,6 +138,13 @@ print(model$cluster)
 
 Note that the argument `centers = 2` is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling `print(model$cluster)` or `model$cluster` is the same. This output specifies the group (i.e., 1 or 2) to which each country belongs to.
 
+The cluster for each observation can be stored directly in the dataset as a column:
+
+```{r}
+Eurojobs_cluster <- data.frame(Eurojobs, cluster = as.factor(model$cluster))
+head(Eurojobs_cluster)
+```
+
 ### Quality of a *k*-means partition
 
 The quality of a *k*-means partition is found by calculating the percentage of the *TSS* "explained" by the partition using the following formula:
@@ -695,6 +702,8 @@ plot(X, asp = 1)
 text(X, labels = 1:5, pos = 3, cex = 1.5)
 X
 ```
+
+*Assume that the variables have the same units so there is no need to scale the data.*
 
 ### Solution by hand
 
@@ -1317,7 +1326,7 @@ rect.hclust(hclust,
 
 # *k*-means versus hierarchical clustering
 
-Choosing between *k*-means and hierarchical clustering is not always easy. If you have a good reason to think that there is a specific number of clusters in your dataset (for example if you would like to distinguish diseased and healthy patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the *k*-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.
+Clustering is rather a subjective statistical analysis and there can be more than one appropriate algorithm, depending on the dataset at hand or the type of problem to be solved. So choosing between *k*-means and hierarchical clustering is not always easy. If you have a good reason to think that there is a specific number of clusters in your dataset (for example if you would like to distinguish diseased and healthy patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the *k*-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.
 
 In addition to this, if you are still undecided note that, on the one hand, with a large number of variables, *k*-means may be computationally faster than hierarchical clustering if the number of clusters is small. On the other hand, the result of a hierarchical clustering is a structure that is more informative and interpretable than the unstructured set of flat clusters returned by *k*-means. Therefore, it is easier to determine the optimal number of clusters by looking at the dendrogram of a hierarchical clustering than trying to predict this optimal number in advance in case of *k*-means.
 
