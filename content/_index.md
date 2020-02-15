@@ -14,7 +14,7 @@ If you are new to this blog, I invite you to:
 * See [all articles](/blog/) or [articles by categories](/tags/)
 * Learn more [about me](/about/)
 * Follow me on [towardsdatascience.com](https://towardsdatascience.com/@ant.soetewey) or [medium.com](https://medium.com/@ant.soetewey)
-* [Subscribe to this blog](/subscribe/) to receive updates everytime a new article is published
+* [Subscribe to this blog](/subscribe/) to receive updates every time a new article is published
 * [Contribute](/contribute/) by submitting your article
 * See the [most recent comments](/recent-comments/) so you can follow the discussion
 
