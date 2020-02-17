@@ -21,7 +21,16 @@
 
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#r-markdown-what-and-why&#34;&gt;R Markdown: what and why?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#r-markdown-what-why-and-how&#34;&gt;R Markdown: what, why and how?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#before-you-start&#34;&gt;Before you start&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#components-of-a-.rmd-file&#34;&gt;Components of a &lt;code&gt;.Rmd&lt;/code&gt; file&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#yaml-header&#34;&gt;YAML header&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#code-chunks&#34;&gt;Code chunks&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#text&#34;&gt;Text&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#images&#34;&gt;Images&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#tables&#34;&gt;Tables&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#additional-notes-and-useful-resources&#34;&gt;Additional notes and useful resources&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -29,15 +38,269 @@
 &lt;img src=&#34;/blog/getting-started-in-r-markdown_files/getting-started-in-r-markdown.jpeg&#34; alt=&#34;Photo by Jon Tyson&#34; style=&#34;width:100.0%&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Photo by Jon Tyson&lt;/p&gt;
 &lt;/div&gt;
-&lt;p&gt;If you have spent some time writing code in R, you probably have heard of generating dynamic reports incorporating R code, R outputs and text. In this article, I will explain how it works and give you the basic elements you need to get started easily in the production of these dynamic reports.&lt;/p&gt;
-&lt;div id=&#34;r-markdown-what-and-why&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;R Markdown: what and why?&lt;/h1&gt;
-&lt;p&gt;R Markdown allows to generate a dynamic report that is automatically generated from a file written within RStudio. The first main advantage of using R Markdown over R is that, in a R Markdown document, you can combine three important parts of any statistical analysis:&lt;/p&gt;
+&lt;p&gt;If you have spent some time writing code in R, you probably have heard of generating dynamic reports incorporating R code, R outputs and text or comments. In this article, I will explain how R Markdown works and give you the basic elements you need to get started easily in the production of these dynamic reports.&lt;/p&gt;
+&lt;div id=&#34;r-markdown-what-why-and-how&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;R Markdown: what, why and how?&lt;/h1&gt;
+&lt;p&gt;R Markdown allows to generate a report (most of the time in PDF, HTML, Word or as a beamer presentation) that is automatically generated from a file written within RStudio. The generated documents can serve as a neat record of your analysis that can be shared and published in a detailed and complete report. Even if you never expect to present the results to someone else, it can also be used as a notebook to look back so you can see what you did at that time. A R Markdown file has the extension &lt;code&gt;.Rmd&lt;/code&gt;, while a R script file has the extension &lt;code&gt;.R&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The first main advantage of using R Markdown over R is that, in a R Markdown document, you can combine three important parts of any statistical analysis:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;R code to show how the analyses have been done. For instance, the data and the functions you used. This allows readers to follow your code and to check that the analyses were correctly peformed.&lt;/li&gt;
+&lt;li&gt;R code to show how the analyses have been done. For instance, the data and the functions you used. This allows readers to follow your code and to check that the analyses were correctly performed.&lt;/li&gt;
 &lt;li&gt;Results of the code, that is, the output of your analyses. For example, the output of your linear model, the plots, or the results of the test you just coded. This allows readers to see the results of your analyses.&lt;/li&gt;
-&lt;li&gt;Text, comments and interpretations of the results. For instance, after computing the main descriptive statistics and plotting some graphs, you can interpret them in the context of the analyses, or highlight important findings. This allows readers to understand your results thanks to your interpretations and your comments.&lt;/li&gt;
+&lt;li&gt;Text, comments and interpretations of the results. For instance, after computing the main &lt;a href=&#34;/blog/descriptive-statistics-in-r/&#34;&gt;descriptive statistics&lt;/a&gt; and plotting some graphs, you can interpret them in the context of your problem and highlight important findings. This enables readers to understand your results thanks to your interpretations and your comments, delivered as if you wrote a document explaining your work.&lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;Another advantage of R Markdown is that the reports are dynamic and reproducible by anyone who has acces to the &lt;code&gt;.Rmd&lt;/code&gt; file (and the data if external data are used of course), making it perfectly suited to colloboration and dissemination of results. By dynamic, we mean that if your data changes, your results and your interpretations will change accordingly, without any work from your side.&lt;/p&gt;
+&lt;p&gt;The production of the reports is done in two stages:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;The &lt;code&gt;.Rmd&lt;/code&gt; file which contains blocks of R code (called chunk) and text is provided to the &lt;code&gt;{knitr}&lt;/code&gt; package which will execute the R codes to get the output, and create a document in markdown (&lt;code&gt;.md&lt;/code&gt;) format. This document then contains the R codes, the results (or outputs), and the text.
+This &lt;code&gt;.md&lt;/code&gt; file is then converted to the desired format (HTML, PDF or Word), by the &lt;code&gt;markdown&lt;/code&gt; package based on pandoc (i.e., a document conversion tool).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;before-you-start&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Before you start&lt;/h1&gt;
+&lt;p&gt;To create a new R Markdown document (&lt;code&gt;.Rmd&lt;/code&gt;), you first need to install and load the following packages:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;install.packages(c(&amp;quot;knitr&amp;quot;, &amp;quot;rmarkdown&amp;quot;, &amp;quot;markdown&amp;quot;))
+
+library(knitr)
+library(rmarkdown)
+library(markdown)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then click on File -&amp;gt; New File -&amp;gt; R Markdown or click on the small white sheet with a green cross in the top left corner and select &lt;code&gt;R Markdown&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/getting-started-in-r-markdown_files/Screenshot%202020-02-17%20at%2020.15.02.png&#34; alt=&#34;Create a new R Markdown document&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Create a new R Markdown document&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;A window will open, choose the title and the author and click on OK. The default output format is HTML. It can be changed later to PDF or Word.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/getting-started-in-r-markdown_files/Screenshot%202020-02-17%20at%2020.39.46.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;After you have clicked on OK, a new &lt;code&gt;.Rmd&lt;/code&gt; file which serves as example has been created. We are going to use this file as starting point to our more complex and more personalized file.&lt;/p&gt;
+&lt;p&gt;To compile your R Markdown document into a HTML document, click on the &lt;code&gt;Knit&lt;/code&gt; button located at the top:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/getting-started-in-r-markdown_files/Screenshot%202020-02-17%20at%2020.49.02.png&#34; alt=&#34;Knit a R Markdown document&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Knit a R Markdown document&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;A preview of the HTML report appears and it also saved in your working directory (see a reminder of what is a &lt;a href=&#34;/blog/how-to-import-an-excel-file-in-rstudio/&#34;&gt;working directory&lt;/a&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;components-of-a-.rmd-file&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Components of a &lt;code&gt;.Rmd&lt;/code&gt; file&lt;/h1&gt;
+&lt;div id=&#34;yaml-header&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;YAML header&lt;/h2&gt;
+&lt;p&gt;A &lt;code&gt;.Rmd&lt;/code&gt; file starts with the YAML header, enclosed by two series of &lt;code&gt;---&lt;/code&gt;. By default, this includes the title, author, date and the format of the report. If you want to generate the report in a PDF document, replace &lt;code&gt;output: html_document&lt;/code&gt; by&lt;code&gt;output: pdf_document&lt;/code&gt;. These information from the YAML header will appear at the top of the generated report after you compile it.&lt;/p&gt;
+&lt;p&gt;To add a table of contents to your documents, replace &lt;code&gt;output: html_document&lt;/code&gt; by&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;output:
+  html_document:
+    toc: true&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here are my usual settings regarding the format of the HTML document:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;output:
+  html_document:
+    toc: true
+    toc_depth: 6
+    number_sections: true
+    toc_float: true&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In addition to adding a table of contents, it sets the depth of the table of contents, it adds a section numbering and the table of contents is floating when scrolling down the document.&lt;/p&gt;
+&lt;p&gt;You can visualize your table of contents even before knitting the document, or go directly to a specific section by clicking on the small icon in the top right corner. Your table of content will appear, click on a section to go to this section in your &lt;code&gt;.Rmd&lt;/code&gt; document:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/getting-started-in-r-markdown_files/Screenshot%202020-02-17%20at%2022.15.21.png&#34; alt=&#34;Visualize your table of contents&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Visualize your table of contents&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;In addition to this enhanced table of contents, I usually set the following date in the YAML header:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;date: &amp;quot;17 February, 2020&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This piece of code allows to write the current date, without having to change it myself. This is very convenient for jobs that last several weeks or months to always have an updated date.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;code-chunks&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Code chunks&lt;/h2&gt;
+&lt;p&gt;Below the YAML header, there is a first code chunks which is used for the setup options of your document. It is best to leave it like this at the moment, we can change it later if needed.&lt;/p&gt;
+&lt;p&gt;Code chunks in R Markdown documents are used to write R code. Every time you want to include R code, you will need to enclose it by three backwards apostrophes. For instance, we want to compute the mean of the values 1, 7 and 11:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/getting-started-in-r-markdown_files/Screenshot%202020-02-17%20at%2021.04.54.png&#34; alt=&#34;Code chunk in R Markdown&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Code chunk in R Markdown&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;In the example file, you can see that the firs R code chunk includes the function &lt;code&gt;summary()&lt;/code&gt; of the preloaded dataset &lt;code&gt;cars&lt;/code&gt;: &lt;code&gt;summary(cars)&lt;/code&gt;. If you look at the HTML document that is generated from this example file, you will see that the summary measures are displayed just after the code chunk.&lt;/p&gt;
+&lt;p&gt;The next code chunk in this example file is &lt;code&gt;plot(pressure)&lt;/code&gt;, which will produce a plot. Try writing other R codes and knit (i.e., compile the document by clicking on the knit button) the document to see if your code is generated correctly.&lt;/p&gt;
+&lt;p&gt;If you already wrote code in a R script, you can simply copy paste your code inside code chunks.&lt;/p&gt;
+&lt;p&gt;As you can see, there are two additional arguments in the code chunk of the plot compared to my code chunk of the mean presented above. The first argument following the letter &lt;code&gt;r&lt;/code&gt; (without comma between the two) is used to set the name of the chunk. In general, do not bother with this, it is mainly used to refer to a specific code chunk. You can remove the name of the chunk, but do not remove the letter &lt;code&gt;r&lt;/code&gt; between the &lt;code&gt;{}&lt;/code&gt; as it tells R that the code that follows corresponds to R code.&lt;/p&gt;
+&lt;p&gt;After the name of the chunk (after &lt;code&gt;pressure&lt;/code&gt; in the example file), you can see that there is an additional argument: &lt;code&gt;echo=FALSE&lt;/code&gt;. This argument, called an option, indicates that you want to hide the code, and display only the output of the code. Try removing it (or change it to &lt;code&gt;echo=TRUE&lt;/code&gt;), and you will see that after knitting the document, both the code AND the output will appear.&lt;/p&gt;
+&lt;p&gt;You can specify if you want to hide or display the code alongside the output of the code for each code chunk manually, or if you want to always hide/display the code with the output, you can specify it in the setup code chunk located just after the YAML header. The options passed to this setup code chunk will determine the option for all code chunks, except for those that have been specifically modified. By default, the setup option is &lt;code&gt;knitr::opts_chunk$set(echo = TRUE)&lt;/code&gt;, meaning that all outputs will be accompanied by its code. If you want to display only the results without the code, replace it by &lt;code&gt;knitr::opts_chunk$set(echo = FALSE)&lt;/code&gt;. Another option often used is &lt;code&gt;warning = FALSE&lt;/code&gt; and &lt;code&gt;message = FALSE&lt;/code&gt; to prevent warnings and messages to be displayed on the report. If you want to pass several options, do not forget to separate them with a comma:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/getting-started-in-r-markdown_files/Screenshot%202020-02-17%20at%2022.05.12.png&#34; alt=&#34;Several options for a code chunk&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Several options for a code chunk&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;You can also choose to display the code, but not the result. For this, pass the option &lt;code&gt;results = &amp;quot;hide&amp;quot;&lt;/code&gt;. Alternatively, you can prevent code and results from appearing in the finished file while R still runs the code in order to use it at a later stage with the option &lt;code&gt;include = FALSE&lt;/code&gt;. If you want to prevent the code and the results to appear, and do not want R to run the code, use &lt;code&gt;eval = FALSE&lt;/code&gt;. To edit the widht and height of figures, use the options &lt;code&gt;fig.width&lt;/code&gt; and &lt;code&gt;fig.height&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Tip&lt;/strong&gt;: to insert a new code chunk in a R Markdown document, press &lt;code&gt;CTRL + ALT + I&lt;/code&gt; on Windows or &lt;code&gt;command + option + I&lt;/code&gt; on Mac. If you are interested in such shortcuts, see other &lt;a href=&#34;/blog/tips-and-tricks-in-rstudio-and-r-markdown/&#34;&gt;tips and tricks in R Markdown&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Note that a code chunk can be run without the need to compile the entire document (if you want to check the results of your code chunk for instance). In order to run a specific code chunk, select the code and run it as you would do in a R script (&lt;code&gt;.R&lt;/code&gt;), by clicking on run or by pressing &lt;code&gt;CTRL + Enter&lt;/code&gt; on Windows or &lt;code&gt;command + Enter&lt;/code&gt; on Mac. Results of this code chunk will be displayed directly in the R Markdown document, just below the code chunk.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;text&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Text&lt;/h2&gt;
+&lt;p&gt;Text can be added everywhere oustide code chunks. R Markdown document uses the Markdown syntax for the text. In our example file just below the setup code chunk, some text has been inserted. To insert text, you simply write text without any enclosing. Try adding some sentences and knit the document to see how it appears in the HTML document.&lt;/p&gt;
+&lt;p&gt;Markdown syntax can be used to change the formatting of your text appearing in the output file, for example to format some text in &lt;em&gt;italics&lt;/em&gt;, in &lt;strong&gt;bold&lt;/strong&gt;, etc. Below some common formatting commands. See &lt;a href=&#34;/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#remedy&#34;&gt;here&lt;/a&gt; for more formatting commands.&lt;/p&gt;
+&lt;p&gt;Title: &lt;code&gt;# Title&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Subtitle: &lt;code&gt;## Subtitle&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Subtitle: &lt;code&gt;### Subsubtitle&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;These headings will automatically be included in the table of contents if you included one.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;italics&lt;/em&gt;: &lt;code&gt;*italics*&lt;/code&gt; or &lt;code&gt;_italics_&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;bold&lt;/strong&gt;: &lt;code&gt;**bold**&lt;/code&gt; or &lt;code&gt;__bold__&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;www.statsandr.com&#34;&gt;Link&lt;/a&gt;: &lt;code&gt;[link](www.statsandr.com)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Equation: &lt;code&gt;$A = \pi*r^{2}$&lt;/code&gt;. Enclose your equation (written in LaTeX) inside &lt;code&gt;$$&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Undordered list, item 1: &lt;code&gt;* Undordered list, item 1&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Undordered list, item 2: &lt;code&gt;* Undordered list, item 2&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Ordered list, item 1: &lt;code&gt;1. Ordered list, item 1&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Ordered list, item 2: &lt;code&gt;2. Ordered list, item 2&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;images&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Images&lt;/h2&gt;
+&lt;p&gt;In addition to code, results and text, you can also insert images in your final document. To insert an image, place it in the working directory and outside a code chunk, write:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;![](path_to_your_image.jpg)&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;tables&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Tables&lt;/h2&gt;
+&lt;p&gt;There are two options to insert tables in R Markdown documents:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;the &lt;code&gt;kable()&lt;/code&gt; function from the &lt;code&gt;{knitr}&lt;/code&gt; package&lt;/li&gt;
+&lt;li&gt;the &lt;code&gt;pander()&lt;/code&gt; function from the &lt;code&gt;{pander}&lt;/code&gt; package&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Here are an example without any formatting, then the same code with the two functions, applied on the dataset &lt;code&gt;iris&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# without formatting
+head(iris)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# with kable()
+library(knitr)
+kable(head(iris))&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;right&#34;&gt;Sepal.Length&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;Sepal.Width&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;Petal.Length&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;Petal.Width&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;Species&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;5.1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.5&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.4&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;4.9&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.4&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;4.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;4.6&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.5&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;5.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.6&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.4&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;5.4&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.9&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.4&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# with pander()
+library(pander)
+pander(head(iris))&lt;/code&gt;&lt;/pre&gt;
+&lt;table style=&#34;width:94%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;20%&#34; /&gt;
+&lt;col width=&#34;19%&#34; /&gt;
+&lt;col width=&#34;20%&#34; /&gt;
+&lt;col width=&#34;19%&#34; /&gt;
+&lt;col width=&#34;13%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;Sepal.Length&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Sepal.Width&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Petal.Length&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Petal.Width&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Species&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;5.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.5&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;4.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;4.7&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.3&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;4.6&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.5&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.6&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;5.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1.7&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;setosa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The advantage of &lt;code&gt;pander()&lt;/code&gt; is that it can be used for many more outputs than table. Try on your own code, with results of a linear regression or a simple vector.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;additional-notes-and-useful-resources&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Additional notes and useful resources&lt;/h1&gt;
+&lt;p&gt;For more advanced users, R Markdown files can also be used to create &lt;a href=&#34;/tags/shiny/&#34;&gt;Shiny apps&lt;/a&gt;, a website (this website is created thanks to R Markdown), or to write a book (with the &lt;code&gt;{bookdown}&lt;/code&gt; package).&lt;/p&gt;
+&lt;p&gt;To continue learning about R Markdown, see two complete cheat sheet from the R Studio team: &lt;a href=&#34;https://rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;https://rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Related articles:&lt;/strong&gt;&lt;/p&gt;
+&lt;script src=&#34;//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&amp;detail=-1&amp;limit=5&amp;showtitle=false&amp;type=js&#34;&gt;&lt;/script&gt;
 &lt;/div&gt;
 </description>
     </item>
