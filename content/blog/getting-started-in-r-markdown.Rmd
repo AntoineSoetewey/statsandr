@@ -1,7 +1,7 @@
 ---
 title: Getting started in R markdown
 author: Antoine Soetewey
-date: '2020-02-17'
+date: '2020-02-18'
 slug: getting-started-in-r-markdown
 categories: []
 tags:
@@ -17,24 +17,24 @@ draft: true
 
 ![Photo by Jon Tyson](/blog/getting-started-in-r-markdown_files/getting-started-in-r-markdown.jpeg){width=100%}
 
-If you have spent some time writing code in R, you probably have heard of generating dynamic reports incorporating R code, R outputs and text or comments. In this article, I will explain how R Markdown works and give you the basic elements you need to get started easily in the production of these dynamic reports.
+If you have spent some time writing code in R, you probably have heard of generating dynamic reports incorporating R code, R outputs (results) and text or comments. In this article, I will explain how R Markdown works and give you the basic elements you need to get started easily in the production of these dynamic reports.
 
 # R Markdown: what, why and how?
 
-R Markdown allows to generate a report (most of the time in PDF, HTML, Word or as a beamer presentation) that is automatically generated from a file written within RStudio. The generated documents can serve as a neat record of your analysis that can be shared and published in a detailed and complete report. Even if you never expect to present the results to someone else, it can also be used as a notebook to look back so you can see what you did at that time. A R Markdown file has the extension `.Rmd`, while a R script file has the extension `.R`.
+R Markdown allows to generate a report (most of the time in PDF, HTML, Word or as a beamer presentation) that is automatically generated from a file written within RStudio. The generated documents can serve as a neat record of your analysis that can be shared and published in a detailed and complete report. Even if you never expect to present the results to someone else, it can also be used as a personal notebook to look back so you can see what you did at that time. A R Markdown file has the extension `.Rmd`, while a R script file has the extension `.R`.
 
 The first main advantage of using R Markdown over R is that, in a R Markdown document, you can combine three important parts of any statistical analysis:
 
 * R code to show how the analyses have been done. For instance, the data and the functions you used. This allows readers to follow your code and to check that the analyses were correctly performed.
-* Results of the code, that is, the output of your analyses. For example, the output of your linear model, the plots, or the results of the test you just coded. This allows readers to see the results of your analyses.
+* Results of the code, that is, the output of your analyses. For example, the output of your linear model, plots, or results of the hypothesis test you just coded. This allows readers to see the results of your analyses.
 * Text, comments and interpretations of the results. For instance, after computing the main [descriptive statistics](/blog/descriptive-statistics-in-r/) and plotting some graphs, you can interpret them in the context of your problem and highlight important findings. This enables readers to understand your results thanks to your interpretations and your comments, delivered as if you wrote a document explaining your work.
 
 Another advantage of R Markdown is that the reports are dynamic and reproducible by anyone who has acces to the `.Rmd` file (and the data if external data are used of course), making it perfectly suited to colloboration and dissemination of results. By dynamic, we mean that if your data changes, your results and your interpretations will change accordingly, without any work from your side.
 
 The production of the reports is done in two stages:
 
-1. The `.Rmd` file which contains blocks of R code (called chunk) and text is provided to the `{knitr}` package which will execute the R codes to get the output, and create a document in markdown (`.md`) format. This document then contains the R codes, the results (or outputs), and the text.
-This `.md` file is then converted to the desired format (HTML, PDF or Word), by the `markdown` package based on pandoc (i.e., a document conversion tool).
+1. The `.Rmd` file which contains blocks of R code (called chunks) and text is provided to the `{knitr}` package which will execute the R code to get the output, and create a document in markdown (`.md`) format. This document then contains the R code, the results (or outputs), and the text.
+1. This `.md` file is then converted to the desired format (HTML, PDF or Word), by the `markdown` package based on pandoc (i.e., a document conversion tool).
 
 # Before you start
 
@@ -54,7 +54,7 @@ Then click on File -> New File -> R Markdown or click on the small white sheet w
 
 A window will open, choose the title and the author and click on OK. The default output format is HTML. It can be changed later to PDF or Word.
 
-![](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-17 at 20.39.46.png)
+![](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-17 at 20.39.46.png){width=100%}
 
 After you have clicked on OK, a new `.Rmd` file which serves as example has been created. We are going to use this file as starting point to our more complex and more personalized file.
 
@@ -62,13 +62,13 @@ To compile your R Markdown document into a HTML document, click on the `Knit` bu
 
 ![Knit a R Markdown document](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-17 at 20.49.02.png)
 
-A preview of the HTML report appears and it also saved in your working directory (see a reminder of what is a [working directory](/blog/how-to-import-an-excel-file-in-rstudio/)).
+A preview of the HTML report appears and it is also saved in your working directory (see a reminder of what is a [working directory](/blog/how-to-import-an-excel-file-in-rstudio/)).
 
 # Components of a `.Rmd` file
 
 ## YAML header
 
-A `.Rmd` file starts with the YAML header, enclosed by two series of `---`. By default, this includes the title, author, date and the format of the report. If you want to generate the report in a PDF document, replace `output: html_document` by`output: pdf_document`. These information from the YAML header will appear at the top of the generated report after you compile it.
+A `.Rmd` file starts with the YAML header, enclosed by two series of `---`. By default, this includes the title, author, date and the format of the report. If you want to generate the report in a PDF document, replace `output: html_document` by`output: pdf_document`. These information from the YAML header will appear at the top of the generated report after you compile it (i.e., after knitting the document).
 
 To add a table of contents to your documents, replace `output: html_document` by
 
@@ -78,7 +78,7 @@ output:
     toc: true
 ```
 
-Here are my usual settings regarding the format of the HTML document:
+Here are my usual settings regarding the format of a HTML document (remove `toc_float: true` if you render the document in PDF, as PDF documents do not accept floating tables of contents):
 
 ```
 output:
@@ -89,69 +89,83 @@ output:
     toc_float: true
 ```
 
-In addition to adding a table of contents, it sets the depth of the table of contents, it adds a section numbering and the table of contents is floating when scrolling down the document.
+In addition to adding a table of contents, it sets the depth, adds a section numbering and the table of contents is floating when scrolling down the document (only available for HTML documents).
 
-You can visualize your table of contents even before knitting the document, or go directly to a specific section by clicking on the small icon in the top right corner. Your table of content will appear, click on a section to go to this section in your `.Rmd` document:
+You can visualize your table of contents even before knitting the document, or go directly to a specific section by clicking on the small icon in the top right corner. Your table of contents will appear, click on a section to go to this section in your `.Rmd` document:
 
 ![Visualize your table of contents](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-17 at 22.15.21.png)
 
 In addition to this enhanced table of contents, I usually set the following date in the YAML header:
 
-```
-date: "`r format(Sys.time(), '%d %B, %Y')`"
-```
+![Dynamic date in R Markdown](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-18 at 14.15.33.png)
 
-This piece of code allows to write the current date, without having to change it myself. This is very convenient for jobs that last several weeks or months to always have an updated date.
+This piece of code allows to write the current date, without having to change it myself. This is very convenient for projects that last several weeks or months to always have an updated date at the top of the document.
 
 ## Code chunks
 
-Below the YAML header, there is a first code chunks which is used for the setup options of your document. It is best to leave it like this at the moment, we can change it later if needed.
+Below the YAML header, there is a first code chunk which is used for the setup options of your **entire** document. It is best to leave it like this at the moment, we can change it later if needed.
 
-Code chunks in R Markdown documents are used to write R code. Every time you want to include R code, you will need to enclose it by three backwards apostrophes. For instance, we want to compute the mean of the values 1, 7 and 11:
+Code chunks in R Markdown documents are used to write R code. Every time you want to include R code, you will need to enclose it with three backwards apostrophes. For instance, to compute the mean of the values 1, 7 and 11, we first need to insert a R chode chunk by clicking on the `Insert` button located at the top and select R (see below a picture), then we need to write the corresponding code inside the code chunk we just inserted:
 
-![Code chunk in R Markdown](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-17 at 21.04.54.png)
+![Insert R code chunk in R Markdown](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-18 at 14.42.48.png)
 
-In the example file, you can see that the firs R code chunk includes the function `summary()` of the preloaded dataset `cars`: `summary(cars)`. If you look at the HTML document that is generated from this example file, you will see that the summary measures are displayed just after the code chunk.
+![Example of code chunk](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-17 at 21.04.54.png)
+
+In the example file, you can see that the firs R code chunk (except the setup code chunk) includes the function `summary()` of the preloaded dataset `cars`: `summary(cars)`. If you look at the HTML document that is generated from this example file, you will see that the summary measures are displayed just after the code chunk.
 
 The next code chunk in this example file is `plot(pressure)`, which will produce a plot. Try writing other R codes and knit (i.e., compile the document by clicking on the knit button) the document to see if your code is generated correctly.
 
-If you already wrote code in a R script, you can simply copy paste your code inside code chunks.
+If you already wrote code in a R script and want to reuse it in your R Markdown document, you can simply copy paste your code inside code chunks. Do not forget to always include your code inside code chunks or R will throw an error when compiling your document.
 
-As you can see, there are two additional arguments in the code chunk of the plot compared to my code chunk of the mean presented above. The first argument following the letter `r` (without comma between the two) is used to set the name of the chunk. In general, do not bother with this, it is mainly used to refer to a specific code chunk. You can remove the name of the chunk, but do not remove the letter `r` between the `{}` as it tells R that the code that follows corresponds to R code.
+As you can see, there are two additional arguments in the code chunk of the plot compared to my code chunk of the mean presented above. The first argument following the letter `r` (without comma between the two) is used to set the name of the chunk. In general, do not bother with this, it is mainly used to refer to a specific code chunk. You can remove the name of the chunk, but do not remove the letter `r` between the `{}` as it tells R that the code that follows corresponds to R code (yes you read it well, that also means you can include code from another programming language, e.g., Python, SQL, etc.).
 
-After the name of the chunk (after `pressure` in the example file), you can see that there is an additional argument: `echo=FALSE`. This argument, called an option, indicates that you want to hide the code, and display only the output of the code. Try removing it (or change it to `echo=TRUE`), and you will see that after knitting the document, both the code AND the output will appear.
+After the name of the chunk (after `pressure` in the example file), you can see that there is an additional argument: `echo=FALSE`. This argument, called an option, indicates that you want to hide the code, and display only the output of the code. Try removing it (or change it to `echo=TRUE`), and you will see that after knitting the document, both the code AND the output will appear, while only the results appeared previously.
 
-You can specify if you want to hide or display the code alongside the output of the code for each code chunk manually, or if you want to always hide/display the code with the output, you can specify it in the setup code chunk located just after the YAML header. The options passed to this setup code chunk will determine the option for all code chunks, except for those that have been specifically modified. By default, the setup option is `knitr::opts_chunk$set(echo = TRUE)`, meaning that all outputs will be accompanied by its code. If you want to display only the results without the code, replace it by `knitr::opts_chunk$set(echo = FALSE)`. Another option often used is `warning = FALSE` and `message = FALSE` to prevent warnings and messages to be displayed on the report. If you want to pass several options, do not forget to separate them with a comma:
+You can specify if you want to hide or display the code alongside the output of that code for each code chunk separately, for instance if you want to show the code for some code chunks, but not for others. Alternatively, if you want to always hide/display the code together with the output for the entire document, you can specify it in the setup code chunk located just after the YAML header. The options passed to this setup code chunk will determine the options for all code chunks, except for those that have been specifically modified. By default, the only setup option when you open a new R Markdown file is `knitr::opts_chunk$set(echo = TRUE)`, meaning that by default, all outputs will be accompanied by its corresponding code. If you want to display only the results without the code for the whole document, replace it by `knitr::opts_chunk$set(echo = FALSE)`. Two other options often passed to this setup code chunk are `warning = FALSE` and `message = FALSE` to prevent warnings and messages to be displayed on the report. If you want to pass several options, do not forget to separate them with a comma:
 
 ![Several options for a code chunk](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-17 at 22.05.12.png)
 
-You can also choose to display the code, but not the result. For this, pass the option `results = "hide"`. Alternatively, you can prevent code and results from appearing in the finished file while R still runs the code in order to use it at a later stage with the option `include = FALSE`. If you want to prevent the code and the results to appear, and do not want R to run the code, use `eval = FALSE`. To edit the widht and height of figures, use the options `fig.width` and `fig.height`.
+You can also choose to display the code, but not the result. For this, pass the option `results = "hide"`. Alternatively, with the option `include = FALSE`, you can prevent code and results from appearing in the finished file while R still runs the code in order to use it at a later stage. If you want to prevent the code and the results to appear, and do not want R to run the code, use `eval = FALSE`. To edit the widht and height of figures, use the options `fig.width` and `fig.height`.
 
-**Tip**: to insert a new code chunk in a R Markdown document, press `CTRL + ALT + I` on Windows or `command + option + I` on Mac. If you are interested in such shortcuts, see other [tips and tricks in R Markdown](/blog/tips-and-tricks-in-rstudio-and-r-markdown/).
+**Tip**: When writing in R Markdown, you will very often need to insert new R code chunks. To insert a new R code chunk more rapidly, press `CTRL + ALT + I` on Windows or `command + option + I` on Mac. If you are interested in such shortcuts making you more efficient, see other [tips and tricks in R Markdown](/blog/tips-and-tricks-in-rstudio-and-r-markdown/).
 
-Note that a code chunk can be run without the need to compile the entire document (if you want to check the results of your code chunk for instance). In order to run a specific code chunk, select the code and run it as you would do in a R script (`.R`), by clicking on run or by pressing `CTRL + Enter` on Windows or `command + Enter` on Mac. Results of this code chunk will be displayed directly in the R Markdown document, just below the code chunk.
+Note that a code chunk can be run without the need to compile the entire document, if you want to check the results of a specific code chunk for instance. In order to run a specific code chunk, select the code and run it as you would do in a R script (`.R`), by clicking on run or by pressing `CTRL + Enter` on Windows or `command + Enter` on Mac. Results of this code chunk will be displayed directly in the R Markdown document, just below the code chunk.
 
 ## Text
 
-Text can be added everywhere oustide code chunks. R Markdown document uses the Markdown syntax for the text. In our example file just below the setup code chunk, some text has been inserted. To insert text, you simply write text without any enclosing. Try adding some sentences and knit the document to see how it appears in the HTML document.
+Text can be added everywhere outside code chunks. R Markdown documents use the Markdown syntax for the formatting of the text. In our example file just below the setup code chunk, some text has been inserted. To insert text, you simply write text without any enclosing. Try adding some sentences and knit the document to see how it appears in the HTML document.
 
-Markdown syntax can be used to change the formatting of your text appearing in the output file, for example to format some text in *italics*, in **bold**, etc. Below some common formatting commands. See [here](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#remedy) for more formatting commands. 
+![Example of text below an example of R code chunk](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-18 at 14.49.47.png)
 
-Title: `# Title`
+Markdown syntax can be used to change the formatting of your text appearing in the output file, for example to format some text in *italics*, in **bold**, etc. Below some common formatting commands:
 
-Subtitle: `## Subtitle`
+* Title: `# Title`
+* Subtitle: `## Subtitle`
+* Subsubtitle: `### Subsubtitle`. These headings will automatically be included in the table of contents if you included one.
+* *italics*: `*italics*` or `_italics_`
+* **bold**: `**bold**` or `__bold__`
+* [Link](https://www.statsandr.com/): `[link](https://www.statsandr.com/)` (do not forget `https://` if it is an external URL)
+* Equations:
 
-Subtitle: `### Subsubtitle`
+Enclose your equation (written in LaTeX) with one `$` to have it in the text:
 
-These headings will automatically be included in the table of contents if you included one.
+```
+$A = \pi*r^{2}$
+```
 
-*italics*: `*italics*` or `_italics_`
+This is a well-know equation $A = \pi*r^{2}$.
 
-**bold**: `**bold**` or `__bold__`
+Enclose your LaTeX equation with two `$$` to have it centered on a new line:
 
-[Link](www.statsandr.com): `[link](www.statsandr.com)`
+```
+$$A = \pi*r^{2}$$
+```
 
-Equation: `$A = \pi*r^{2}$`. Enclose your equation (written in LaTeX) inside `$$`
+This is another well-known equation:
+
+$$E = mc^2$$
+
+Lists:
 
 * Undordered list, item 1: `* Undordered list, item 1`
 * Undordered list, item 2: `* Undordered list, item 2`
@@ -161,27 +175,31 @@ Equation: `$A = \pi*r^{2}$`. Enclose your equation (written in LaTeX) inside `$$
 
 ### Code inside text
 
-Before going further, I would like to introduce an important feature of R Markdown. It is often the case that, when writing interpretations or detailing an analysis, we would like to refer to a results directly in our text. For instance, suppose we work on the `iris` dataset (preloaded in R). We may want to explain in words, that the mean of the length of the petal is a certain value, while the median is another value.
+Before going further, I would like to introduce an important feature of R Markdown. It is often the case that, when writing interpretations or detailing an analysis, we would like to refer to a result directly in our text. For instance, suppose we work on the `iris` dataset (preloaded in R). We may want to explain in words, that the mean of the length of the petal is a certain value, while the median is another value.
 
-Without R Markdown, the user would need to compute the mean and median, and then report it manually. Thanks to R Markdown, it is possible to report these two [descriptive statistics](/blog/descriptive-statistics-by-hand/) directly in the text, without manually encoding it. Even better, if the dataset happens to change because we removed some observations, the mean and median reported in the text will change automatically, without any change in the text.
+Without R Markdown, the user would need to compute the mean and median, and then report it manually. Thanks to R Markdown, it is possible to report these two [descriptive statistics](/blog/descriptive-statistics-by-hand/) directly in the text, without manually encoding it. Even better, if the dataset happens to change because we removed some observations, the mean and median reported in the generated document will change automatically, without any change in the text from our side.
 
-Here is an illustration with the mean and median of the length of the sepal for the `iris` dataset. We can insert results directly in the interpretations, in the text by enclosing the code as follows:
+Here is an illustration with the mean and median of the length of the sepal for the `iris` dataset. We can insert results directly in the interpretations (i.e., in the text) by placing a backward apostrophe followed by the letter `r` before the code, and close it with another backward apostrophe:
 
 ![Inline code in R Markdown](/blog/getting-started-in-r-markdown_files/Screenshot 2020-02-17 at 23.10.07.png)
 
 This combination of text and code will give the following output in the generated report:
 
-The mean of the length of the sepal is `r mean(iris$Sepal.Length)` and the standard deviation is `r sd(iris$Sepal.Length)`.
+> The mean of the length of the sepal is `r mean(iris$Sepal.Length)` and the standard deviation is `r sd(iris$Sepal.Length)`.
 
-This technique, referred as *inline code* allows you to insert results directly into the text of a R Markdown document. And as mentioned, if the dataset changes, the mean and standard deviation will automatically be adjusted to the new dataset.
+This technique, referred as *inline code*, allows you to insert results directly into the text of a R Markdown document. And as mentioned, if the dataset changes, the results incorporated inside the text (the mean and standard deviation in our case) will automatically be adjusted to the new dataset, exactly like the output of a code chunk is dynamically updated if the dataset changes.
 
-This technique of inline code and the fact that it is possible to combine code, outputs of code, and text to comment the outputs makes R Markdown my favorite tools when it comes to statistical analyses. Since I discovered the power of R Markdown (and I am still learning as it has a huge amount of possibilites and features), I almost never write R script anymore, every R code I write is supplemented by text and inline code in a R Markdown document. If you are unfamiliar to this type of document, I invite you to learn more about it and to try it for on your next analysis, you will most likely not go back to R script anymore.
+This technique of inline code and the fact that it is possible to combine code, outputs of code, and text to comment the outputs makes R Markdown my favorite tool when it comes to statistical analyses. Since I discovered the power of R Markdown (and I am still learning as it has a huge amount of possibilites and features), I almost never write R code in scripts anymore. Every R code I write is supplemented by text and inline code in a R Markdown document, resulting in a professional and complete final document ready to be shared, published, or stored for future usage. If you are unfamiliar to this type of document, I invite you to learn more about it and to try it with your next analysis, you will most likely not go back to R scripts anymore.
 
 ## Images
 
 In addition to code, results and text, you can also insert images in your final document. To insert an image, place it in the working directory and outside a code chunk, write:
 
 `![](path_to_your_image.jpg)`
+
+To add an alt text to your image, add it between the square brackets `[]`:
+
+`![alt text here](path_to_your_image.jpg)`
 
 ## Tables
 
@@ -190,30 +208,30 @@ There are two options to insert tables in R Markdown documents:
 1. the `kable()` function from the `{knitr}` package
 2. the `pander()` function from the `{pander}` package
 
-Here are an example without any formatting, then the same code with the two functions, applied on the dataset `iris`:
+Here are an example of a table without any formatting, and the same code with the two functions applied on the `iris` dataset:
 
 ```{r}
 # without formatting
-head(iris)
+summary(iris)
 ```
 
 ```{r}
 # with kable()
 library(knitr)
-kable(head(iris))
+kable(summary(iris))
 ```
 
 ```{r}
 # with pander()
 library(pander)
-pander(head(iris))
+pander(summary(iris))
 ```
 
 The advantage of `pander()` is that it can be used for many more outputs than table. Try on your own code, with results of a linear regression or a simple vector.
 
 # Additional notes and useful resources
 
-For more advanced users, R Markdown files can also be used to create [Shiny apps](/tags/shiny/), a website (this website is created thanks to R Markdown), or to write a book (with the `{bookdown}` package).
+For more advanced users, R Markdown files can also be used to create [Shiny apps](/tags/shiny/), websites (this website is built thanks to R Markdown), write scientific papers based on templates from several international journals (with the `{rticles}` package), or even to write books (with the `{bookdown}` package).
 
 To continue learning about R Markdown, see two complete cheat sheets from the R Studio team [here](https://rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf) and [here](https://rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf), and a more complete guide [here](https://bookdown.org/yihui/rmarkdown/).
 
