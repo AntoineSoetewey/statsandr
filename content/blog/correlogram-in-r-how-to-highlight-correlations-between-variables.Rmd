@@ -13,15 +13,20 @@ output:
   blogdown::html_page:
     toc: true
     toc_depth: 6
-draft: true
-# allowscripts: true
+# draft: true
 ---
 
 ![Photo by Pritesh Sudra](/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/correlogram-in-r-how-to-highlight-correlations-between-variables.jpeg){width=100%}
 
+# Introduction
+
 Correlation, often computed as part of [descriptive statistics](/blog/descriptive-statistics-in-r), is a statistical tool used to study the relationship between two variables, that is, whether and how strongly couples of variables are associated.
 
-Correlations are measured between only 2 variables at a time. Therefore, for datasets with many variables, computing correlations can become quite cumbersome and time consuming. A solution to this problem is to compute correlations and display them in a correlation matrix, which shows correlation coefficients for all possible combinations of two variables in the dataset.
+Correlations are measured between only 2 variables at a time. Therefore, for datasets with many variables, computing correlations can become quite cumbersome and time consuming.
+
+# Correlation matrix
+
+A solution to this problem is to compute correlations and display them in a correlation matrix, which shows correlation coefficients for all possible combinations of two variables in the dataset.
 
 For example, below is the correlation matrix for the dataset `mtcars` (which, as described by the help documentation of R, comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles):^[The dataset `mtcars` is preloaded in R by default, so there is no need to import it into R. Check the article "[How to import an Excel file in R](/blog/how-to-import-an-excel-file-in-rstudio)" if you need help in importing your own dataset.]
 
@@ -32,7 +37,9 @@ round(cor(mtcars), 2)
 
 Even after rounding the correlation coefficients to 2 digits, you will conceive that this correlation matrix is not easily and quickly interpretable.
 
-If you are using [R Markdown](/blog/getting-started-in-r-markdown), you can use the `pander()` function to make it slightly more readable, but still, we must admit that this table is not optimal when it comes to visualizing correlations between several variables of a dataset, especially for large datasets.
+If you are using [R Markdown](/blog/getting-started-in-r-markdown), you can use the `pander()` function from the `{pander}` package to make it slightly more readable, but still, we must admit that this table is not optimal when it comes to visualizing correlations between several variables of a dataset, especially for large datasets.
+
+# Correlogram
 
 To tackle this issue and make it much more insightful, let's transform the correlation matrix into a correlation plot. A correlation plot, also referred as a correlogram, allows to highlight the variables that are most (positively and negatively) correlated. Below an example with the same dataset presented above:
 
@@ -93,22 +100,26 @@ corrplot2(
 
 The correlogram represents the correlations for all pairs of variables. Positive correlations are displayed in blue and negative correlations in red. The intensity of the color is proportional to the correlation coefficient so the stronger the correlation (i.e., the closer to -1 or 1), the darker the boxes. The color legend on the right hand side of the correlogram shows the correlation coefficients and the corresponding colors.
 
-As a reminder, a negative correlation implies that the two variables under consideration vary in opposite directions, that is, if one variable increases the other decreases and vice versa. A positive correlation implies that the two variables under consideration vary in the same direction, that is, if one variable increases the other increases and if one variable decreases the other decreases as well.
+As a reminder, a negative correlation implies that the two variables under consideration vary in opposite directions, that is, if one variable increases the other decreases and vice versa. A positive correlation implies that the two variables under consideration vary in the same direction, that is, if one variable increases the other increases and if one variable decreases the other decreases as well. Furthermore, the stronger the correlation, the stronger the association between the two variables.
 
-Finally, a white box indicates that the correlation is not significantly different from 0 at the specified significance level (in this example, at $\alpha = 5$%) for the couple of variables. A correlation not significantly different from 0 means that there is **no linear** relationship between the two variables considered.
+# Correlation test
+
+Finally, a white box in the correlogram indicates that the correlation is not significantly different from 0 at the specified significance level (in this example, at $\alpha = 5$%) for the couple of variables. A correlation not significantly different from 0 means that there is **no linear** relationship between the two variables considered (there could be another kind of association, but other than linear).
 
 To determine whether a specific correlation coefficient is significantly different from 0, a correlation test has been performed. Remind that the null and alternative hypotheses of this test are:
 
 * $H_0$: $\rho = 0$
 * $H_1$: $\rho \ne 0$
 
-where $\rho$ is the correlation coefficient. The correlation test is based on two factors: the number of observations and the correlation coefficient. The more observations and the stronger the correlation, the more likely it is to reject the null hypothesis of no correlation.
+where $\rho$ is the correlation coefficient. The correlation test is based on two factors: the number of observations and the correlation coefficient. The more observations and the stronger the correlation between 2 variables, the more likely it is to reject the null hypothesis of no correlation between these 2 variables.
 
-In the context of our example, the correlograms above shows that the variables `cyl` (the number of cylinders) and `hp` (horsepower) are positively correlated, while the variables `mpg` (miles per gallon) and `wt` (weight) are negatively correlated. Furthermore, the variables `gear` and `carb` are not correlated. Even if the correlation coefficient is 0.27 between the 2 variables, the correlation test has shown that we cannot reject the hypothesis of no correlation. This is the reason the box for these two variable is white.
+In the context of our example, the correlograms above shows that the variables `cyl` (the number of cylinders) and `hp` (horsepower) are positively correlated, while the variables `mpg` (miles per gallon) and `wt` (weight) are negatively correlated (both correlations make sense if we think about it). Furthermore, the variables `gear` and `carb` are not correlated. Even if the correlation coefficient is 0.27 between the 2 variables, the correlation test has shown that we cannot reject the hypothesis of no correlation. This is the reason the box for these two variable is white.
 
 Althought this correlogram presents exactly the same information than the correlation matrix, the correlogram presents a visual representation of the correlation matrix, allowing to quickly scan through it to see which variables are correlated and which are not.
 
-For those interested to draw this correlogram with their own data, here is the function I adapted based on the `corrplot()` function from the `{corrplot}` package (thanks again to all contributors of this package):
+# Code
+
+For those interested to draw this correlogram with their own data, here is the code of the function I adapted based on the `corrplot()` function from the `{corrplot}` package (thanks again to all contributors of this package):
 
 <script src="https://gist.github.com/AntoineSoetewey/1fc0fe939336a8b8085e1872e045b48f.js"></script>
 
@@ -118,13 +129,12 @@ The main arguments in the `corrplot2()` function are the following:
 * `method`: the correlation method to be computed, one of "pearson" (default), "kendall", or "spearman". As a rule of thumb, if your dataset contains quantitative continuous variables, you can keep the Pearson method, if you have [qualitative ordinal](/blog/variable-types-and-examples) variables, the Spearman method is more appropriate
 * `sig.level`: the significance level for the correlation test, default is 0.05
 * `order`: order of the variables, one of "original" (default), "AOE" (angular order of the eigenvectors), "FPC" (first principal component order), "hclust" (hierarchical clustering order), "alphabet" (alphabetical order)
-* `diag`: display the correlation coefficients on the diagonal? `FALSE` is the default
+* `diag`: display the correlation coefficients on the diagonal? The default is `FALSE`
 * `type`: display the entire correlation matrix or simply the upper/lower part, one of "upper" (default), "lower", "full"
 * `tl.srt`: rotation of the variable labels
+* (note that missing values in the dataset are automatically removed)
 
-Note that missing values in the dataset are automatically removed.
-
-Thanks for reading. I hope this article helped you to make a visualization of correlations between variables in a dataset to make correlation matrix more insightful.
+Thanks for reading. I hope this article will help you to visualize correlations between variables in a dataset and to make correlation matrices more insightful.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me [here](/contact/).
 
