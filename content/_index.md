@@ -15,7 +15,7 @@ If you are new to this blog, I invite you to:
 * Learn more [about me](/about/)
 * Follow me on [towardsdatascience.com](https://towardsdatascience.com/@ant.soetewey) or [medium.com](https://medium.com/@ant.soetewey)
 * [Subscribe to this blog](/subscribe/) to receive updates every time a new article is published
-* [Contribute](/contribute/) by submitting your article
+<!--- * [Contribute](/contribute/) by submitting your article --->
 * See the [most recent comments](/recent-comments/) so you can follow the discussion
 
 If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me](/contact/).
