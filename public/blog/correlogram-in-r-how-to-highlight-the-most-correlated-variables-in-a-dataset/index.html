@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title> Correlogram in R: how to highlight the most correlated variables in a dataset - Stats and R </title>
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="A blog on statistics and R aiming at helping academics and professionals working with data to grasp important concepts in statistics and to apply them in R." />
+    <meta property="og:site_name" content="Stats and R" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/" />
+    <meta property="og:title" content="Correlogram in R: how to highlight the most correlated variables in a dataset" />
+    <meta property="og:image" content="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/correlogram-in-r-how-to-highlight-correlations-between-variables.jpeg" />
+    <meta property="og:description" content="A blog on statistics and R aiming at helping academics and professionals working with data to grasp important concepts in statistics and to apply them in R." />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:title" content="Correlogram in R: how to highlight the most correlated variables in a dataset" />
+    <meta name="twitter:description" content="A blog on statistics and R aiming at helping academics and professionals working with data to grasp important concepts in statistics and to apply them in R." />
+    <meta name="twitter:image" content="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/correlogram-in-r-how-to-highlight-correlations-between-variables.jpeg" />
+
+    <link rel="canonical" href="/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="/css/custom.css" />
+
+    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/tomorrow.min.css" integrity="sha256-0QU8ry64q+N6YBIEF/6XF6vUeF15gbNO4tLS6ikk0FI=" crossorigin="anonymous" />
+    
+
+    
+
+    <link rel="shortcut icon"
+        href="/image/favicon.png">
+
+    
+        <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Stats and R" />
+    
+</head>
+
+<body>
+    
+    <div class="my-4 my-md-5 header">
+    <div class="container">
+        <div class="row">
+            <div class="col-auto offset-md-1 d-none d-md-block">
+                
+                    <a href="/">
+                        <img class="ml-md-4 logo img-fluid d-block rounded-circle" src="/image/avatar.png" alt="logo">
+                    </a>
+                
+            </div>
+            <div class="col-auto align-self-center mr-auto">
+                <a href="/">
+                    <h1 class="name">Stats and R</h1>
+                </a>
+
+                <ul class="nav nav-primary">
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-Posts" href="/blog/">
+                                
+                                Posts
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-tags" href="/tags/">
+                                
+                                Tags
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-about" href="/about/">
+                                
+                                About
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-contact" href="/contact/">
+                                
+                                Contact
+                            </a>
+                        </li>
+                    
+
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-12 col-md-10">
+                    <h1 class="mx-0 mx-md-4 blog-post-title">Correlogram in R: how to highlight the most correlated variables in a dataset</h1>
+
+                    <div class="mb-md-4 meta">
+                        
+                            
+                                <span class="author" title="Antoine Soetewey">
+                                    Antoine Soetewey
+                                </span>
+                            
+                        
+
+                        <span class="date middot" title='Sat Feb 22 2020 00:00:00 UTC'>
+                            2020-02-22
+                        </span>
+
+                        <span class="reading-time middot">
+                            4 minute read
+                        </span>
+
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/r">R</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/statistics">Statistics</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="markdown">
+                        
+    
+
+
+<div class="figure">
+<img src="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/correlogram-in-r-how-to-highlight-correlations-between-variables.jpeg" alt="Photo by Pritesh Sudra" style="width:100.0%" />
+<p class="caption">Photo by Pritesh Sudra</p>
+</div>
+<p>Correlations are used to study the relationship between two variables and are often computed as part of <a href="/blog/descriptive-statistics-in-r">descriptive statistics</a>.</p>
+<p>Correlations are measured between only 2 variables at a time. Therefore, for datasets with many variables, computing correlations can become quite cumbersome and time consuming. A solution to this problem is to compute correlations and display them in a correlation matrix, which shows correlation coefficients for all possible combinations of two variables in the dataset.</p>
+<p>For example, below is the correlation matrix for the dataset <code>mtcars</code> (which, as described by the help documentation of R, comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles):<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<pre class="r"><code>dat &lt;- mtcars
+round(cor(mtcars), 2)</code></pre>
+<pre><code>##        mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+## mpg   1.00 -0.85 -0.85 -0.78  0.68 -0.87  0.42  0.66  0.60  0.48 -0.55
+## cyl  -0.85  1.00  0.90  0.83 -0.70  0.78 -0.59 -0.81 -0.52 -0.49  0.53
+## disp -0.85  0.90  1.00  0.79 -0.71  0.89 -0.43 -0.71 -0.59 -0.56  0.39
+## hp   -0.78  0.83  0.79  1.00 -0.45  0.66 -0.71 -0.72 -0.24 -0.13  0.75
+## drat  0.68 -0.70 -0.71 -0.45  1.00 -0.71  0.09  0.44  0.71  0.70 -0.09
+## wt   -0.87  0.78  0.89  0.66 -0.71  1.00 -0.17 -0.55 -0.69 -0.58  0.43
+## qsec  0.42 -0.59 -0.43 -0.71  0.09 -0.17  1.00  0.74 -0.23 -0.21 -0.66
+## vs    0.66 -0.81 -0.71 -0.72  0.44 -0.55  0.74  1.00  0.17  0.21 -0.57
+## am    0.60 -0.52 -0.59 -0.24  0.71 -0.69 -0.23  0.17  1.00  0.79  0.06
+## gear  0.48 -0.49 -0.56 -0.13  0.70 -0.58 -0.21  0.21  0.79  1.00  0.27
+## carb -0.55  0.53  0.39  0.75 -0.09  0.43 -0.66 -0.57  0.06  0.27  1.00</code></pre>
+<p>Even after rounding the correlation coefficients to 2 digits, you will conceive that this correlation matrix is not easily and quickly interpretable.</p>
+<p>If you are using <a href="/blog/getting-started-in-r-markdown">R Markdown</a>, you can use the <code>pander()</code> function to make it slightly more readable, but still, we must admit that this table is not optimal when it comes to visualizing correlations between several variables of a dataset, especially for large datasets.</p>
+<p>To tackle this issue and make it much more insightful, let’s transform the correlation matrix into a correlation plot. A correlation plot, also referred as a correlogram, allows to highlight the variables that are most (positively and negatively) correlated. Below an example with the same dataset presented above:</p>
+<p><img src="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/figure-html/unnamed-chunk-2-1.png" width="576" /></p>
+<p>The correlogram represents the correlations for all pairs of variables. Positive correlations are displayed in blue and negative correlations in red. The intensity of the color is proportional to the correlation coefficient so the stronger the correlation, the darker the boxes. The color legend on the right hand side of the correlogram shows the correlation coefficients and the corresponding colors.</p>
+<p>As a reminder, a negative correlation implies that the two variables under consideration vary in opposite directions, that is, if one variable increases the other decreases and vice versa. A positive correlation implies that the two variables under consideration vary in the same direction, that is, if one variable increases the other increases and if one variable decreases the other decreases as well.</p>
+<p>Finally, the white boxes indicate that the correlation is not significantly different from 0 at the specified significance level (in this example, at <span class="math inline">\(\alpha = 5\)</span>%), which means that there is no <strong>linear</strong> relationship between the two variables considered.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>In this article, we present the Pearson correlations (because we study the relationship between <strong>continuous quantitative</strong> variables) between all the variables considered via a correlogram (graph representing the matrix of correlations). The correlogram makes it possible to highlight the most correlated variables :</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>The dataset <code>mtcars</code> is preloaded in R by default, so there is no need to import it into R. Check the article “<a href="/blog/how-to-import-an-excel-file-in-rstudio">How to import an Excel file in R</a>” if you need help in importing your own dataset.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>A correlation test is performed in order to test whether the correlation is significantly different from 0. Remind that the null and alternative hypotheses of this test are: <span class="math inline">\(H_0\)</span>: <span class="math inline">\(\rho = 0\)</span> and <span class="math inline">\(H_1\)</span>: <span class="math inline">\(\rho \ne 0\)</span>, where <span class="math inline">\(\rho\)</span> is the correlation coefficient.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
+
+
+
+                    </div>
+
+                    
+                        <div class="navigation">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    
+                                        <div class="mx-0 mx-md-4 mt-4 text-left">
+                                            <a href="/blog/getting-started-in-r-markdown/">« Getting started in R markdown</a>
+                                        </div>
+                                    
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="comments">
+
+      <div class="py-3 content">
+            <div class="container">
+                  <div class="row justify-content-center">
+                        <div class="col-sm-12 col-md-10">
+                              <div class="comments">
+                                    <div id="disqus_thread"></div>
+                              </div>
+                        </div>
+                  </div>
+            </div>
+      </div>
+
+      <script type="text/javascript">
+            (function () {
+                  
+                  
+                  if (window.location.hostname == "localhost")
+                        return;
+
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'statsandr';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+      </script>
+      <noscript>
+            Please enable JavaScript to view the
+            <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+</section>
+    <div class="my-4 footer">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-5">
+                
+                    <div class="mx-0 mx-md-4 text-left">
+                        
+                            <p>
+                              <a href="/subscribe/">Subscribe</a>
+                              <a href="/support/">Support</a>
+                              <a href="/sitemap/">Sitemap</a>
+                              <a href="/terms/">Terms</a>
+                              <a href="/links/">Links</a>
+                              
+                              
+
+
+
+
+  
+
+
+
+<a href='https://github.com/AntoineSoetewey/statsandr/edit/master/content/blog/correlogram-in-r-how-to-highlight-correlations-between-variables.Rmd' target="_blank">Edit</a>
+
+
+
+                              
+                            </p>
+                            <p>
+                              <a href="/">&copy; <script>document.write(new Date().getFullYear())</script> Antoine Soetewey</a>
+                            </p>
+                        
+                    </div>
+                
+            </div>
+            <div class="col-sm-12 col-md-5">
+                <div class="mx-0 mx-md-4 text-right">
+                  
+                    
+                    <a href="https://medium.com/@ant.soetewey" target="_blank">
+                        <img class="icon" src="/img/medium.svg" alt="Medium" />
+                    </a>
+                    
+                    
+                    
+                        <a href="https://github.com/AntoineSoetewey" target="_blank">
+                            <img class="icon" src="/img/github.svg" alt="GitHub" />
+                        </a>
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+                    
+                    
+                    <a href="/contact/">
+                        <img class="icon" src="/img/email.svg" alt="Contact" />
+                    </a>
+                    
+
+                    
+                        <a href="/index.xml" class="mr-0">
+                            <img class="icon" src="/img/rss.svg" alt="RSS" />
+                        </a>
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js" integrity="sha256-sNPiigbfSkqUzMc5rgrdztLnneCMAp6W9wetJUZu9Zw=" crossorigin="anonymous"></script>
+        
+        <script>
+            window.addEventListener('load', function() {
+                hljs.initHighlighting();
+            }, true);
+        </script>
+    
+
+    
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-86997981-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
+        
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+</body>
+
+</html>

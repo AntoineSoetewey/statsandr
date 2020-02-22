@@ -6,10 +6,58 @@
     <description>Recent content in R on Stats and R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Tue, 18 Feb 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 22 Feb 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Correlogram in R: how to highlight the most correlated variables in a dataset</title>
+      <link>/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/</link>
+      <pubDate>Sat, 22 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/</guid>
+      <description>
+
+
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/correlogram-in-r-how-to-highlight-correlations-between-variables.jpeg&#34; alt=&#34;Photo by Pritesh Sudra&#34; style=&#34;width:100.0%&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Photo by Pritesh Sudra&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Correlations are used to study the relationship between two variables and are often computed as part of &lt;a href=&#34;/blog/descriptive-statistics-in-r&#34;&gt;descriptive statistics&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Correlations are measured between only 2 variables at a time. Therefore, for datasets with many variables, computing correlations can become quite cumbersome and time consuming. A solution to this problem is to compute correlations and display them in a correlation matrix, which shows correlation coefficients for all possible combinations of two variables in the dataset.&lt;/p&gt;
+&lt;p&gt;For example, below is the correlation matrix for the dataset &lt;code&gt;mtcars&lt;/code&gt; (which, as described by the help documentation of R, comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles):&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat &amp;lt;- mtcars
+round(cor(mtcars), 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##        mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+## mpg   1.00 -0.85 -0.85 -0.78  0.68 -0.87  0.42  0.66  0.60  0.48 -0.55
+## cyl  -0.85  1.00  0.90  0.83 -0.70  0.78 -0.59 -0.81 -0.52 -0.49  0.53
+## disp -0.85  0.90  1.00  0.79 -0.71  0.89 -0.43 -0.71 -0.59 -0.56  0.39
+## hp   -0.78  0.83  0.79  1.00 -0.45  0.66 -0.71 -0.72 -0.24 -0.13  0.75
+## drat  0.68 -0.70 -0.71 -0.45  1.00 -0.71  0.09  0.44  0.71  0.70 -0.09
+## wt   -0.87  0.78  0.89  0.66 -0.71  1.00 -0.17 -0.55 -0.69 -0.58  0.43
+## qsec  0.42 -0.59 -0.43 -0.71  0.09 -0.17  1.00  0.74 -0.23 -0.21 -0.66
+## vs    0.66 -0.81 -0.71 -0.72  0.44 -0.55  0.74  1.00  0.17  0.21 -0.57
+## am    0.60 -0.52 -0.59 -0.24  0.71 -0.69 -0.23  0.17  1.00  0.79  0.06
+## gear  0.48 -0.49 -0.56 -0.13  0.70 -0.58 -0.21  0.21  0.79  1.00  0.27
+## carb -0.55  0.53  0.39  0.75 -0.09  0.43 -0.66 -0.57  0.06  0.27  1.00&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Even after rounding the correlation coefficients to 2 digits, you will conceive that this correlation matrix is not easily and quickly interpretable.&lt;/p&gt;
+&lt;p&gt;If you are using &lt;a href=&#34;/blog/getting-started-in-r-markdown&#34;&gt;R Markdown&lt;/a&gt;, you can use the &lt;code&gt;pander()&lt;/code&gt; function to make it slightly more readable, but still, we must admit that this table is not optimal when it comes to visualizing correlations between several variables of a dataset, especially for large datasets.&lt;/p&gt;
+&lt;p&gt;To tackle this issue and make it much more insightful, let’s transform the correlation matrix into a correlation plot. A correlation plot, also referred as a correlogram, allows to highlight the variables that are most (positively and negatively) correlated. Below an example with the same dataset presented above:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;576&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The correlogram represents the correlations for all pairs of variables. Positive correlations are displayed in blue and negative correlations in red. The intensity of the color is proportional to the correlation coefficient so the stronger the correlation, the darker the boxes. The color legend on the right hand side of the correlogram shows the correlation coefficients and the corresponding colors.&lt;/p&gt;
+&lt;p&gt;As a reminder, a negative correlation implies that the two variables under consideration vary in opposite directions, that is, if one variable increases the other decreases and vice versa. A positive correlation implies that the two variables under consideration vary in the same direction, that is, if one variable increases the other increases and if one variable decreases the other decreases as well.&lt;/p&gt;
+&lt;p&gt;Finally, the white boxes indicate that the correlation is not significantly different from 0 at the specified significance level (in this example, at &lt;span class=&#34;math inline&#34;&gt;\(\alpha = 5\)&lt;/span&gt;%), which means that there is no &lt;strong&gt;linear&lt;/strong&gt; relationship between the two variables considered.&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;In this article, we present the Pearson correlations (because we study the relationship between &lt;strong&gt;continuous quantitative&lt;/strong&gt; variables) between all the variables considered via a correlogram (graph representing the matrix of correlations). The correlogram makes it possible to highlight the most correlated variables :&lt;/p&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;The dataset &lt;code&gt;mtcars&lt;/code&gt; is preloaded in R by default, so there is no need to import it into R. Check the article “&lt;a href=&#34;/blog/how-to-import-an-excel-file-in-rstudio&#34;&gt;How to import an Excel file in R&lt;/a&gt;” if you need help in importing your own dataset.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;A correlation test is performed in order to test whether the correlation is significantly different from 0. Remind that the null and alternative hypotheses of this test are: &lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;: &lt;span class=&#34;math inline&#34;&gt;\(\rho = 0\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt;: &lt;span class=&#34;math inline&#34;&gt;\(\rho \ne 0\)&lt;/span&gt;, where &lt;span class=&#34;math inline&#34;&gt;\(\rho\)&lt;/span&gt; is the correlation coefficient.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Getting started in R markdown</title>
