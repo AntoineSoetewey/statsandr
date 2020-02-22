@@ -1,0 +1,1 @@
+<script type="text/javascript" src="http://gist.github.com/{{ .Get 0 }}.js"></script>
