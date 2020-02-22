@@ -19,7 +19,7 @@ draft: true
 
 ![Photo by Pritesh Sudra](/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/correlogram-in-r-how-to-highlight-correlations-between-variables.jpeg){width=100%}
 
-Correlations are used to study the relationship between two variables and are often computed as part of [descriptive statistics](/blog/descriptive-statistics-in-r).
+Correlation, often computed as part of [descriptive statistics](/blog/descriptive-statistics-in-r), is a statistical tool used to study the relationship between two variables, that is, whether and how strongly couples of variables are associated.
 
 Correlations are measured between only 2 variables at a time. Therefore, for datasets with many variables, computing correlations can become quite cumbersome and time consuming. A solution to this problem is to compute correlations and display them in a correlation matrix, which shows correlation coefficients for all possible combinations of two variables in the dataset.
 
@@ -37,7 +37,7 @@ If you are using [R Markdown](/blog/getting-started-in-r-markdown), you can use 
 To tackle this issue and make it much more insightful, let's transform the correlation matrix into a correlation plot. A correlation plot, also referred as a correlogram, allows to highlight the variables that are most (positively and negatively) correlated. Below an example with the same dataset presented above:
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
-create_corrplot <- function(data,
+corrplot2 <- function(data,
                             method = "pearson",
                             sig.level = 0.05,
                             order = "original",
@@ -80,7 +80,7 @@ create_corrplot <- function(data,
   )
 }
 
-create_corrplot(
+corrplot2(
   data = mtcars,
   method = "pearson",
   sig.level = 0.05,
@@ -108,11 +108,28 @@ In the context of our example, the correlograms above shows that the variables `
 
 Althought this correlogram presents exactly the same information than the correlation matrix, the correlogram presents a visual representation of the correlation matrix, allowing to quickly scan through it to see which variables are correlated and which are not.
 
-For those interested to draw this correlogram with their own data, here is the function I adapted based on the `corrplot()` function from the `{corrplot}` package (thanks to all contributors of this package):
+For those interested to draw this correlogram with their own data, here is the function I adapted based on the `corrplot()` function from the `{corrplot}` package (thanks again to all contributors of this package):
 
-<script type="text/javascript" src="http://gist.github.com/AntoineSoetewey/1fc0fe939336a8b8085e1872e045b48f.js"></script>
+<script src="https://gist.github.com/AntoineSoetewey/1fc0fe939336a8b8085e1872e045b48f.js"></script>
 
-If you would like to draw the same kind of correlogram to your own data, see the code 
+The main arguments in the `corrplot2()` function are the following:
 
-In this article,  we present the Pearson correlations (because we study the relationship between **continuous quantitative** variables) between all the variables considered via a correlogram (graph representing the matrix of correlations). The correlogram makes it possible to highlight the most correlated variables :
+* `data`: name of your dataset
+* `method`: the correlation method to be computed, one of "pearson" (default), "kendall", or "spearman". As a rule of thumb, if your dataset contains quantitative continuous variables, you can keep the Pearson method, if you have [qualitative ordinal](/blog/variable-types-and-examples) variables, the Spearman method is more appropriate
+* `sig.level`: the significance level for the correlation test, default is 0.05
+* `order`: order of the variables, one of "original" (default), "AOE" (angular order of the eigenvectors), "FPC" (first principal component order), "hclust" (hierarchical clustering order), "alphabet" (alphabetical order)
+* `diag`: display the correlation coefficients on the diagonal? `FALSE` is the default
+* `type`: display the entire correlation matrix or simply the upper/lower part, one of "upper" (default), "lower", "full"
+* `tl.srt`: rotation of the variable labels
 
+Note that missing values in the dataset are automatically removed.
+
+Thanks for reading. I hope this article helped you to make a visualization of correlations between variables in a dataset to make correlation matrix more insightful.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me [here](/contact/).
+
+Get updates every time a new article is published by [subscribing to this blog](/subscribe/).
+
+**Related articles:**
+
+<script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>

@@ -120,7 +120,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            5 minute read
+                            6 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -154,7 +154,7 @@
 <img src="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/correlogram-in-r-how-to-highlight-correlations-between-variables.jpeg" alt="Photo by Pritesh Sudra" style="width:100.0%" />
 <p class="caption">Photo by Pritesh Sudra</p>
 </div>
-<p>Correlations are used to study the relationship between two variables and are often computed as part of <a href="/blog/descriptive-statistics-in-r">descriptive statistics</a>.</p>
+<p>Correlation, often computed as part of <a href="/blog/descriptive-statistics-in-r">descriptive statistics</a>, is a statistical tool used to study the relationship between two variables, that is, whether and how strongly couples of variables are associated.</p>
 <p>Correlations are measured between only 2 variables at a time. Therefore, for datasets with many variables, computing correlations can become quite cumbersome and time consuming. A solution to this problem is to compute correlations and display them in a correlation matrix, which shows correlation coefficients for all possible combinations of two variables in the dataset.</p>
 <p>For example, below is the correlation matrix for the dataset <code>mtcars</code> (which, as described by the help documentation of R, comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles):<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <pre class="r"><code>dat &lt;- mtcars
@@ -186,10 +186,24 @@ round(cor(mtcars), 2)</code></pre>
 <p>where <span class="math inline">\(\rho\)</span> is the correlation coefficient. The correlation test is based on two factors: the number of observations and the correlation coefficient. The more observations and the stronger the correlation, the more likely it is to reject the null hypothesis of no correlation.</p>
 <p>In the context of our example, the correlograms above shows that the variables <code>cyl</code> (the number of cylinders) and <code>hp</code> (horsepower) are positively correlated, while the variables <code>mpg</code> (miles per gallon) and <code>wt</code> (weight) are negatively correlated. Furthermore, the variables <code>gear</code> and <code>carb</code> are not correlated. Even if the correlation coefficient is 0.27 between the 2 variables, the correlation test has shown that we cannot reject the hypothesis of no correlation. This is the reason the box for these two variable is white.</p>
 <p>Althought this correlogram presents exactly the same information than the correlation matrix, the correlogram presents a visual representation of the correlation matrix, allowing to quickly scan through it to see which variables are correlated and which are not.</p>
-<p>For those interested to draw this correlogram with their own data, here is the function I adapted based on the <code>corrplot()</code> function from the <code>{corrplot}</code> package (thanks to all contributors of this package):</p>
-<script type="text/javascript" src="http://gist.github.com/AntoineSoetewey/1fc0fe939336a8b8085e1872e045b48f.js"></script>
-<p>If you would like to draw the same kind of correlogram to your own data, see the code</p>
-<p>In this article, we present the Pearson correlations (because we study the relationship between <strong>continuous quantitative</strong> variables) between all the variables considered via a correlogram (graph representing the matrix of correlations). The correlogram makes it possible to highlight the most correlated variables :</p>
+<p>For those interested to draw this correlogram with their own data, here is the function I adapted based on the <code>corrplot()</code> function from the <code>{corrplot}</code> package (thanks again to all contributors of this package):</p>
+<script src="https://gist.github.com/AntoineSoetewey/1fc0fe939336a8b8085e1872e045b48f.js"></script>
+<p>The main arguments in the <code>corrplot2()</code> function are the following:</p>
+<ul>
+<li><code>data</code>: name of your dataset</li>
+<li><code>method</code>: the correlation method to be computed, one of “pearson” (default), “kendall”, or “spearman”. As a rule of thumb, if your dataset contains quantitative continuous variables, you can keep the Pearson method, if you have <a href="/blog/variable-types-and-examples">qualitative ordinal</a> variables, the Spearman method is more appropriate</li>
+<li><code>sig.level</code>: the significance level for the correlation test, default is 0.05</li>
+<li><code>order</code>: order of the variables, one of “original” (default), “AOE” (angular order of the eigenvectors), “FPC” (first principal component order), “hclust” (hierarchical clustering order), “alphabet” (alphabetical order)</li>
+<li><code>diag</code>: display the correlation coefficients on the diagonal? <code>FALSE</code> is the default</li>
+<li><code>type</code>: display the entire correlation matrix or simply the upper/lower part, one of “upper” (default), “lower”, “full”</li>
+<li><code>tl.srt</code>: rotation of the variable labels</li>
+</ul>
+<p>Note that missing values in the dataset are automatically removed.</p>
+<p>Thanks for reading. I hope this article helped you to make a visualization of correlations between variables in a dataset to make correlation matrix more insightful.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me <a href="/contact/">here</a>.</p>
+<p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
+<p><strong>Related articles:</strong></p>
+<script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
 <div class="footnotes">
 <hr />
 <ol>
