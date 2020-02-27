@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Books on Stats and R</title>
+    <link>/tags/books/</link>
+    <description>Recent content in Books on Stats and R</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Thu, 26 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/books/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>How to create an interactive booklist with automatic Amazon affiliate links in R</title>
+      <link>/blog/how-to-create-an-interactive-booklist-with-automatic-amazon-affiliate-links-in-r/</link>
+      <pubDate>Thu, 26 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/how-to-create-an-interactive-booklist-with-automatic-amazon-affiliate-links-in-r/</guid>
+      <description>
+&lt;script src=&#34;/rmarkdown-libs/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/jquery/jquery.min.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/datatables-css/datatables-crosstalk.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/datatables-binding/datatables.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/dt-core/css/jquery.dataTables.min.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;link href=&#34;/rmarkdown-libs/dt-core/css/jquery.dataTables.extra.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/dt-core/js/jquery.dataTables.min.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/crosstalk/css/crosstalk.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/crosstalk/js/crosstalk.min.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/jszip/jszip.min.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/pdfmake/pdfmake.min.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/pdfmake/vfs_fonts.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/dt-ext-buttons/css/buttons.dataTables.min.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/dt-ext-buttons/js/dataTables.buttons.min.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/dt-ext-buttons/js/buttons.flash.min.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/dt-ext-buttons/js/buttons.html5.min.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/dt-ext-buttons/js/buttons.colVis.min.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/dt-ext-buttons/js/buttons.print.min.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/nouislider/jquery.nouislider.min.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/nouislider/jquery.nouislider.min.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/selectize/selectize.bootstrap3.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/selectize/selectize.min.js&#34;&gt;&lt;/script&gt;
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#requirements&#34;&gt;Requirements&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#create-a-booklist&#34;&gt;Create a booklist&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#create-it-in-excel-then-import-it&#34;&gt;Create it in Excel then import it&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#create-it-directly-in-r&#34;&gt;Create it directly in R&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#make-it-interactive&#34;&gt;Make it interactive&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#add-urls-with-your-affiliate-link-to-the-table&#34;&gt;Add URLs with your affiliate link to the table&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#extract-affiliate-link&#34;&gt;Extract affiliate link&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#append-the-book-title-and-author-to-make-it-automatic&#34;&gt;Append the book title and author to make it automatic&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#add-links-to-the-interactive-table&#34;&gt;Add links to the interactive table&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#final-result&#34;&gt;Final result&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/how-to-create-an-interactive-booklist-with-automatic-affiliate-links-in-r_files/booklist-with-amazon-affiliate-links.jpeg&#34; alt=&#34;Photo by Piotr Cichosz&#34; style=&#34;width:100.0%&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Photo by Piotr Cichosz&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Booklists are a useful way to share the books you have read and which you recommend to other readers and/or to promote the books you have written. It can be as simple as a list of book titles displayed on your personal website or blog. You may however wish to present this list of books in a more sophisticated way, such as in a table with titles, authors and links to buy it for instance. In this blog post I show you how to create an interactive booklist with automatic Amazon affiliate links in R. By interactive, I mean a booklist which allows users to search for books by title or author. Moreover, by automatic Amazon affiliate links, I mean URLs (with your affiliate link of course) that redirect directly to the book in question on the Amazon webstore, without manually creating a link for each book. This technique is especially helpful for those of you who have hundreds of books in their list as you will need to create the URL only once and it will adapt automatically to all books. If this is not clear, see a &lt;a href=&#34;https://www.antoinesoetewey.com/files/booklist.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;live example here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;requirements&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Requirements&lt;/h1&gt;
+&lt;p&gt;In order to build this augmented booklist with your affiliate link, you need:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;an Amazon associates account. Register &lt;a href=&#34;https://affiliate-program.amazon.com&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt; if you do not have an account yet&lt;/li&gt;
+&lt;li&gt;a list of books (which you recommend and/or written by you)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;create-a-booklist&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Create a booklist&lt;/h1&gt;
+&lt;p&gt;You have two options:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;create it in Excel then import it into R&lt;/li&gt;
+&lt;li&gt;create it directly in R&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div id=&#34;create-it-in-excel-then-import-it&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Create it in Excel then import it&lt;/h2&gt;
+&lt;p&gt;The easiest way is to follow these steps:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;open an Excel file and fill it in with two columns: (i) one with the titles and (ii) a second with the authors (see figure below)&lt;/li&gt;
+&lt;li&gt;save it in a .csv format (in Excel, File &amp;gt; Save As… &amp;gt; choose the CSV file format and save it)&lt;/li&gt;
+&lt;li&gt;import it into R (see &lt;a href=&#34;/blog/how-to-import-an-excel-file-in-rstudio/&#34;&gt;how to import a .csv file&lt;/a&gt; if you struggle with the importation)&lt;/li&gt;
+&lt;li&gt;(if you need to edit the list in the future, edit it directly in the .csv file and not in the Excel file)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Here is how you booklist created in Excel should look like (with I suppose more books in yours):&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/how-to-create-an-interactive-booklist-with-automatic-affiliate-links-in-r_files/booklist-csv.png&#34; alt=&#34;Step 1: Booklist created in Excel&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Step 1: Booklist created in Excel&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;We now import it into RStudio and rename the dataset as &lt;code&gt;dat&lt;/code&gt; (see &lt;a href=&#34;/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way&#34;&gt;here&lt;/a&gt; why I always use a generic name instead of more specific names):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat &amp;lt;- read.csv(&amp;quot;booklist.csv&amp;quot;, # name of your file with .csv extension
+  header = TRUE, # names of variables are present
+  sep = &amp;quot;,&amp;quot;
+) # values are separated by a comma&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You can always check that your booklist is correctly imported by running &lt;code&gt;head(name_of_dataset)&lt;/code&gt; or &lt;code&gt;View(name_of_dataset)&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;create-it-directly-in-r&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Create it directly in R&lt;/h2&gt;
+&lt;p&gt;You can create your booklist directly in R with the command &lt;code&gt;data.frame()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Create the data frame named dat
+dat &amp;lt;- data.frame(
+  &amp;quot;Title&amp;quot; = c(
+    &amp;quot;A Random Walk Down Wall Street&amp;quot;,
+    &amp;quot;Naked Statistics&amp;quot;,
+    &amp;quot;Freakonomics&amp;quot;
+  ),
+  &amp;quot;Author&amp;quot; = c(
+    &amp;quot;Burton G. Malkiel&amp;quot;,
+    &amp;quot;Charles Wheelan&amp;quot;,
+    &amp;quot;Steven D. Levitt and Stephen J. Dubner&amp;quot;
+  ),
+  stringsAsFactors = FALSE
+)
+# Print the data frame
+dat&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                            Title                                 Author
+## 1 A Random Walk Down Wall Street                      Burton G. Malkiel
+## 2               Naked Statistics                        Charles Wheelan
+## 3                   Freakonomics Steven D. Levitt and Stephen J. Dubner&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;make-it-interactive&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Make it interactive&lt;/h1&gt;
+&lt;p&gt;In order to be able to search for books by author or title, we use the &lt;code&gt;datatable()&lt;/code&gt; command from the DT package. Below the table with the default options:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(DT)
+datatable(dat)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;htmlwidget-1&#34; style=&#34;width:100%;height:auto;&#34; class=&#34;datatables html-widget&#34;&gt;&lt;/div&gt;
+&lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-1&#34;&gt;{&#34;x&#34;:{&#34;filter&#34;:&#34;none&#34;,&#34;data&#34;:[[&#34;1&#34;,&#34;2&#34;,&#34;3&#34;],[&#34;A Random Walk Down Wall Street&#34;,&#34;Naked Statistics&#34;,&#34;Freakonomics&#34;],[&#34;Burton G. Malkiel&#34;,&#34;Charles Wheelan&#34;,&#34;Steven D. Levitt and Stephen J. Dubner&#34;]],&#34;container&#34;:&#34;&lt;table class=\&#34;display\&#34;&gt;\n  &lt;thead&gt;\n    &lt;tr&gt;\n      &lt;th&gt; &lt;\/th&gt;\n      &lt;th&gt;Title&lt;\/th&gt;\n      &lt;th&gt;Author&lt;\/th&gt;\n    &lt;\/tr&gt;\n  &lt;\/thead&gt;\n&lt;\/table&gt;&#34;,&#34;options&#34;:{&#34;order&#34;:[],&#34;autoWidth&#34;:false,&#34;orderClasses&#34;:false,&#34;columnDefs&#34;:[{&#34;orderable&#34;:false,&#34;targets&#34;:0}]}},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
+&lt;p&gt;Let’s improve this table by:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;removing row numbers&lt;/li&gt;
+&lt;li&gt;adding a filter on top of “Title” and “Author” columns&lt;/li&gt;
+&lt;li&gt;adding the possibility to copy or download the table&lt;/li&gt;
+&lt;li&gt;show only first 5 entries instead of 10&lt;/li&gt;
+&lt;li&gt;order books by title in ascending order&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datatable(dat,
+  rownames = FALSE, # remove row numbers
+  filter = &amp;quot;top&amp;quot;, # add filter on top of columns
+  extensions = &amp;quot;Buttons&amp;quot;, # add download buttons
+  options = list(
+    autoWidth = TRUE,
+    dom = &amp;quot;Blfrtip&amp;quot;, # location of the download buttons
+    buttons = c(&amp;quot;copy&amp;quot;, &amp;quot;csv&amp;quot;, &amp;quot;excel&amp;quot;, &amp;quot;pdf&amp;quot;, &amp;quot;print&amp;quot;), # download buttons
+    pageLength = 5, # show first 5 entries, default is 10
+    order = list(0, &amp;quot;asc&amp;quot;) # order the title column by ascending order
+  )
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;htmlwidget-2&#34; style=&#34;width:100%;height:auto;&#34; class=&#34;datatables html-widget&#34;&gt;&lt;/div&gt;
+&lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-2&#34;&gt;{&#34;x&#34;:{&#34;filter&#34;:&#34;top&#34;,&#34;filterHTML&#34;:&#34;&lt;tr&gt;\n  &lt;td data-type=\&#34;character\&#34; style=\&#34;vertical-align: top;\&#34;&gt;\n    &lt;div class=\&#34;form-group has-feedback\&#34; style=\&#34;margin-bottom: auto;\&#34;&gt;\n      &lt;input type=\&#34;search\&#34; placeholder=\&#34;All\&#34; class=\&#34;form-control\&#34; style=\&#34;width: 100%;\&#34;/&gt;\n      &lt;span class=\&#34;glyphicon glyphicon-remove-circle form-control-feedback\&#34;&gt;&lt;\/span&gt;\n    &lt;\/div&gt;\n  &lt;\/td&gt;\n  &lt;td data-type=\&#34;character\&#34; style=\&#34;vertical-align: top;\&#34;&gt;\n    &lt;div class=\&#34;form-group has-feedback\&#34; style=\&#34;margin-bottom: auto;\&#34;&gt;\n      &lt;input type=\&#34;search\&#34; placeholder=\&#34;All\&#34; class=\&#34;form-control\&#34; style=\&#34;width: 100%;\&#34;/&gt;\n      &lt;span class=\&#34;glyphicon glyphicon-remove-circle form-control-feedback\&#34;&gt;&lt;\/span&gt;\n    &lt;\/div&gt;\n  &lt;\/td&gt;\n&lt;\/tr&gt;&#34;,&#34;extensions&#34;:[&#34;Buttons&#34;],&#34;data&#34;:[[&#34;A Random Walk Down Wall Street&#34;,&#34;Naked Statistics&#34;,&#34;Freakonomics&#34;],[&#34;Burton G. Malkiel&#34;,&#34;Charles Wheelan&#34;,&#34;Steven D. Levitt and Stephen J. Dubner&#34;]],&#34;container&#34;:&#34;&lt;table class=\&#34;display\&#34;&gt;\n  &lt;thead&gt;\n    &lt;tr&gt;\n      &lt;th&gt;Title&lt;\/th&gt;\n      &lt;th&gt;Author&lt;\/th&gt;\n    &lt;\/tr&gt;\n  &lt;\/thead&gt;\n&lt;\/table&gt;&#34;,&#34;options&#34;:{&#34;autoWidth&#34;:true,&#34;dom&#34;:&#34;Blfrtip&#34;,&#34;buttons&#34;:[&#34;copy&#34;,&#34;csv&#34;,&#34;excel&#34;,&#34;pdf&#34;,&#34;print&#34;],&#34;pageLength&#34;:5,&#34;order&#34;:[0,&#34;asc&#34;],&#34;orderClasses&#34;:false,&#34;orderCellsTop&#34;:true,&#34;lengthMenu&#34;:[5,10,25,50,100]}},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
+&lt;/div&gt;
+&lt;div id=&#34;add-urls-with-your-affiliate-link-to-the-table&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Add URLs with your affiliate link to the table&lt;/h1&gt;
+&lt;p&gt;We are now going to add URLs (with your affiliate link) which depend on the title and author of the book in the interactive table presented above. For this, we first need to extract the affiliate link which will serve as the base of the URL, then add the title and author of the book at then end of the URL. The fact that we add the title and author of the book at the end of the URL makes it automatic. Indeed, the final URL will redirect to the search page of the book (thanks to the title and author of the book as keywords) and with your affiliate link included (as we use the affiliate link as the base URL).&lt;/p&gt;
+&lt;div id=&#34;extract-affiliate-link&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Extract affiliate link&lt;/h2&gt;
+&lt;p&gt;To extract the affiliate link, follow these steps (see figures below for help):&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Go to your Amazon associates account&lt;/li&gt;
+&lt;li&gt;Click on Product Linking &amp;gt; Link to Any Page&lt;/li&gt;
+&lt;li&gt;Click on the tab “Link to Search Results”&lt;/li&gt;
+&lt;li&gt;Choose “Books &amp;amp; Textbooks” for the product line&lt;/li&gt;
+&lt;li&gt;Enter any keywords you want and a name for your link (the two will be change later so it does not matter what you type)&lt;/li&gt;
+&lt;li&gt;Click on the button “Get HTML”&lt;/li&gt;
+&lt;li&gt;Copy in your clipboard (CTRL+c on Windows or cmd+c on Mac) the code displayed in the Preview (right pane)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/how-to-create-an-interactive-booklist-with-automatic-affiliate-links-in-r_files/get-amazon-affiliate-link.png&#34; alt=&#34;Step 2: Link to Any Page on Amazon associates account&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Step 2: Link to Any Page on Amazon associates account&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/how-to-create-an-interactive-booklist-with-automatic-affiliate-links-in-r_files/create-amazon-affiliate-link.png&#34; alt=&#34;Step 3 to 7: Create Amazon affiliate link for a search page&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Step 3 to 7: Create Amazon affiliate link for a search page&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;The code you just copied should look like this (not exactly the same though as it includes your personal affiliate link):&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&amp;lt;a target=&amp;quot;_blank&amp;quot; href=&amp;quot;https://www.amazon.com/gp/search?ie=UTF8&amp;amp;tag=antoinesoetew-20&amp;amp;linkCode=ur2&amp;amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;index=books&amp;amp;keywords=BOOK TITLE&amp;quot;&amp;gt;BOOK TITLE&amp;lt;/a&amp;gt;&amp;lt;img src=&amp;quot;//ir-na.amazon-adsystem.com/e/ir?t=antoinesoetew-20&amp;amp;l=ur2&amp;amp;o=1&amp;quot; width=&amp;quot;1&amp;quot; height=&amp;quot;1&amp;quot; border=&amp;quot;0&amp;quot; alt=&amp;quot;&amp;quot; style=&amp;quot;border:none !important; margin:0px !important;&amp;quot; /&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;From this long code, remove everything which follows &lt;code&gt;keywords=&lt;/code&gt; but keep &lt;code&gt;keywords=&lt;/code&gt; (that is why it does not matter what you typed in step 5 above). Following our example, we are left with this piece of code:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&amp;lt;a target=&amp;quot;_blank&amp;quot; href=&amp;quot;https://www.amazon.com/gp/search?ie=UTF8&amp;amp;tag=antoinesoetew-20&amp;amp;linkCode=ur2&amp;amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;index=books&amp;amp;keywords=&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Copy this shortened code.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;append-the-book-title-and-author-to-make-it-automatic&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Append the book title and author to make it automatic&lt;/h2&gt;
+&lt;p&gt;We are now going to concatenate (i.e., append several character strings together) the Amazon affiliate link (the code we just copied), the title and author of the book and then a closing HTML tag with the &lt;code&gt;paste0()&lt;/code&gt; command. The result will be a URL which takes the affiliate link as the base and the title and author of the book as keywords, making it automatic and adapted for every book in your booklist. To do this, run the following command in R:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Do not mix &amp;quot; and &amp;#39;, they are different in this case!
+link &amp;lt;- paste0(
+  &amp;#39;&amp;lt;a target=&amp;quot;_blank&amp;quot; href=&amp;quot;https://www.amazon.com/gp/search?ie=UTF8&amp;amp;tag=antoinesoetew-20&amp;amp;linkCode=ur2&amp;amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;index=books&amp;amp;keywords=&amp;#39;, # affiliate link
+  dat$Title, &amp;quot; + &amp;quot;, dat$Author, # book title and author
+  &amp;#39;&amp;quot;&amp;gt;Amazon&amp;lt;/a&amp;gt;&amp;#39; # closing HTML tag
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Your links should look something like this, with same affiliate links and closing tags for all books but with different keywords, corresponding to book titles and authors:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(link)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;&amp;lt;a target=\&amp;quot;_blank\&amp;quot; href=\&amp;quot;https://www.amazon.com/gp/search?ie=UTF8&amp;amp;tag=antoinesoetew-20&amp;amp;linkCode=ur2&amp;amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;index=books&amp;amp;keywords=A Random Walk Down Wall Street + Burton G. Malkiel\&amp;quot;&amp;gt;Amazon&amp;lt;/a&amp;gt;&amp;quot;   
+## [2] &amp;quot;&amp;lt;a target=\&amp;quot;_blank\&amp;quot; href=\&amp;quot;https://www.amazon.com/gp/search?ie=UTF8&amp;amp;tag=antoinesoetew-20&amp;amp;linkCode=ur2&amp;amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;index=books&amp;amp;keywords=Naked Statistics + Charles Wheelan\&amp;quot;&amp;gt;Amazon&amp;lt;/a&amp;gt;&amp;quot;                   
+## [3] &amp;quot;&amp;lt;a target=\&amp;quot;_blank\&amp;quot; href=\&amp;quot;https://www.amazon.com/gp/search?ie=UTF8&amp;amp;tag=antoinesoetew-20&amp;amp;linkCode=ur2&amp;amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;index=books&amp;amp;keywords=Freakonomics + Steven D. Levitt and Stephen J. Dubner\&amp;quot;&amp;gt;Amazon&amp;lt;/a&amp;gt;&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;add-links-to-the-interactive-table&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Add links to the interactive table&lt;/h2&gt;
+&lt;p&gt;Now that the URLs are specific to each book, we can add them to the interactive table built earlier:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat$Link &amp;lt;- link&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Finally, we can display the interactive table with titles, authors and their URLs:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datatable(dat,
+  rownames = FALSE, # remove row numbers
+  filter = &amp;quot;top&amp;quot;, # add filter on top of columns
+  extensions = &amp;quot;Buttons&amp;quot;, # add download buttons
+  options = list(
+    autoWidth = TRUE,
+    dom = &amp;quot;Blfrtip&amp;quot;, # location of the download buttons
+    buttons = c(&amp;quot;copy&amp;quot;, &amp;quot;csv&amp;quot;, &amp;quot;excel&amp;quot;, &amp;quot;pdf&amp;quot;, &amp;quot;print&amp;quot;), # download buttons
+    pageLength = 5, # show first 5 entries, default is 10
+    order = list(0, &amp;quot;asc&amp;quot;) # order the title column by ascending order
+  ),
+  escape = FALSE # to make URLs clickable
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is exactly the same code than before except that we need to add &lt;code&gt;escape = FALSE&lt;/code&gt; to make URLs clickable.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;final-result&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Final result&lt;/h1&gt;
+&lt;div id=&#34;htmlwidget-3&#34; style=&#34;width:100%;height:auto;&#34; class=&#34;datatables html-widget&#34;&gt;&lt;/div&gt;
+&lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-3&#34;&gt;{&#34;x&#34;:{&#34;filter&#34;:&#34;top&#34;,&#34;filterHTML&#34;:&#34;&lt;tr&gt;\n  &lt;td data-type=\&#34;character\&#34; style=\&#34;vertical-align: top;\&#34;&gt;\n    &lt;div class=\&#34;form-group has-feedback\&#34; style=\&#34;margin-bottom: auto;\&#34;&gt;\n      &lt;input type=\&#34;search\&#34; placeholder=\&#34;All\&#34; class=\&#34;form-control\&#34; style=\&#34;width: 100%;\&#34;/&gt;\n      &lt;span class=\&#34;glyphicon glyphicon-remove-circle form-control-feedback\&#34;&gt;&lt;\/span&gt;\n    &lt;\/div&gt;\n  &lt;\/td&gt;\n  &lt;td data-type=\&#34;character\&#34; style=\&#34;vertical-align: top;\&#34;&gt;\n    &lt;div class=\&#34;form-group has-feedback\&#34; style=\&#34;margin-bottom: auto;\&#34;&gt;\n      &lt;input type=\&#34;search\&#34; placeholder=\&#34;All\&#34; class=\&#34;form-control\&#34; style=\&#34;width: 100%;\&#34;/&gt;\n      &lt;span class=\&#34;glyphicon glyphicon-remove-circle form-control-feedback\&#34;&gt;&lt;\/span&gt;\n    &lt;\/div&gt;\n  &lt;\/td&gt;\n  &lt;td data-type=\&#34;character\&#34; style=\&#34;vertical-align: top;\&#34;&gt;\n    &lt;div class=\&#34;form-group has-feedback\&#34; style=\&#34;margin-bottom: auto;\&#34;&gt;\n      &lt;input type=\&#34;search\&#34; placeholder=\&#34;All\&#34; class=\&#34;form-control\&#34; style=\&#34;width: 100%;\&#34;/&gt;\n      &lt;span class=\&#34;glyphicon glyphicon-remove-circle form-control-feedback\&#34;&gt;&lt;\/span&gt;\n    &lt;\/div&gt;\n  &lt;\/td&gt;\n&lt;\/tr&gt;&#34;,&#34;extensions&#34;:[&#34;Buttons&#34;],&#34;data&#34;:[[&#34;A Random Walk Down Wall Street&#34;,&#34;Naked Statistics&#34;,&#34;Freakonomics&#34;],[&#34;Burton G. Malkiel&#34;,&#34;Charles Wheelan&#34;,&#34;Steven D. Levitt and Stephen J. Dubner&#34;],[&#34;&lt;a target=\&#34;_blank\&#34; href=\&#34;https://www.amazon.com/gp/search?ie=UTF8&amp;tag=antoinesoetew-20&amp;linkCode=ur2&amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;camp=1789&amp;creative=9325&amp;index=books&amp;keywords=A Random Walk Down Wall Street + Burton G. Malkiel\&#34;&gt;Amazon&lt;\/a&gt;&#34;,&#34;&lt;a target=\&#34;_blank\&#34; href=\&#34;https://www.amazon.com/gp/search?ie=UTF8&amp;tag=antoinesoetew-20&amp;linkCode=ur2&amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;camp=1789&amp;creative=9325&amp;index=books&amp;keywords=Naked Statistics + Charles Wheelan\&#34;&gt;Amazon&lt;\/a&gt;&#34;,&#34;&lt;a target=\&#34;_blank\&#34; href=\&#34;https://www.amazon.com/gp/search?ie=UTF8&amp;tag=antoinesoetew-20&amp;linkCode=ur2&amp;linkId=a587bdd780cbbfb6d3f4569f7fb358fc&amp;camp=1789&amp;creative=9325&amp;index=books&amp;keywords=Freakonomics + Steven D. Levitt and Stephen J. Dubner\&#34;&gt;Amazon&lt;\/a&gt;&#34;]],&#34;container&#34;:&#34;&lt;table class=\&#34;display\&#34;&gt;\n  &lt;thead&gt;\n    &lt;tr&gt;\n      &lt;th&gt;Title&lt;\/th&gt;\n      &lt;th&gt;Author&lt;\/th&gt;\n      &lt;th&gt;Link&lt;\/th&gt;\n    &lt;\/tr&gt;\n  &lt;\/thead&gt;\n&lt;\/table&gt;&#34;,&#34;options&#34;:{&#34;autoWidth&#34;:true,&#34;dom&#34;:&#34;Blfrtip&#34;,&#34;buttons&#34;:[&#34;copy&#34;,&#34;csv&#34;,&#34;excel&#34;,&#34;pdf&#34;,&#34;print&#34;],&#34;pageLength&#34;:5,&#34;order&#34;:[0,&#34;asc&#34;],&#34;orderClasses&#34;:false,&#34;orderCellsTop&#34;:true,&#34;lengthMenu&#34;:[5,10,25,50,100]}},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
+&lt;p&gt;Check that everything works properly by clicking on different links. If you did not miss any steps, it should redirect you to the Amazon store with the title and author of the book in the search bar and thus the book in question appearing in the search results.&lt;/p&gt;
+&lt;p&gt;Thanks for reading. I hope this article helped you to build an interactive booklist with an automated affiliate link to each of the book in your list. If you would like to see a live example, see &lt;a href=&#34;https://www.antoinesoetewey.com/files/booklist.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;my personal booklist&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Related articles:&lt;/strong&gt;&lt;/p&gt;
+&lt;script src=&#34;//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&amp;detail=-1&amp;limit=5&amp;showtitle=false&amp;type=js&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
