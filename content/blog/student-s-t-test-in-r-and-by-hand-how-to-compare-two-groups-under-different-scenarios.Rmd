@@ -15,7 +15,7 @@ output:
   blogdown::html_page:
     toc: true
     toc_depth: 6
-draft: true
+# draft: true
 bibliography: bibliography.bib
 ---
 
@@ -23,7 +23,7 @@ bibliography: bibliography.bib
 
 # Introduction
 
-One of the most important test within the branch of inferential statistics is the **Student's t-test**.^[Remind that inferential statistics is a branch of statistics defined as the science of drawing conclusions about a population from observations made on a representative sample of that population. See the [difference between population and sample](/blog/what-is-the-difference-between-population-and-sample).] The Student's t-test for two samples is used to **test whether two groups (two populations) are different** in terms of a quantitative variable, **based on the comparison of two samples** drawn from these two groups. In other words, a Student's t-test for two samples allows to determine whether the two populations from which your two samples are drawn are different (with the two samples being measured on a [quantitative continuous](/blog/variable-types-and-examples/#continuous) variable).^[For the rest of the present article, when we write Student's t-test, we refer to the case of 2 samples. Student's t-test for one sample will be the topic of another article.]
+One of the most important test within the branch of inferential statistics is the **Student's t-test**.^[Remind that inferential statistics, as opposed to [descriptive statistics](/blog/descriptive-statistics-by-hand), is a branch of statistics defined as the science of drawing conclusions about a population from observations made on a representative sample of that population. See the [difference between population and sample](/blog/what-is-the-difference-between-population-and-sample).] The Student's t-test for two samples is used to **test whether two groups (two populations) are different** in terms of a quantitative variable, **based on the comparison of two samples** drawn from these two groups. In other words, a Student's t-test for two samples allows to determine whether the two populations from which your two samples are drawn are different (with the two samples being measured on a [quantitative continuous](/blog/variable-types-and-examples/#continuous) variable).^[For the rest of the present article, when we write Student's t-test, we refer to the case of 2 samples. Student's t-test for one sample will be the topic of another article.]
 <!-- xxx add links to one sample t-test and put this footnote in the text. -->
 
 The reasoning behind this statistical test is that if your two samples are markedly different from each other, it can be assumed that the two populations from which the samples are drawn are different. On the contrary, if the two samples are rather similar, we cannot reject the hypothesis that the two populations are similar, so there is no sufficient evidence in the data at hand to conclude that the two populations from which the samples are drawn are different. Note that this statistical tool belongs to the branch of inferential statistics because conclusions drawn from the study of the samples are generalized to the population, even though we do not have the data on the entire population.
@@ -78,7 +78,7 @@ In statistics, many statistical tests is in the form of hypothesis tests. Hypoth
 
 # Different versions of the Student's t-test
 
-There exists several versions of the Student's t-test depending on the data at hand:
+There are several versions of the Student's t-test for two samples, depending on whether the samples are independent or paired and depending on the variances of the populations:
 
 ```{r, echo = FALSE}
 library(data.tree)
@@ -101,15 +101,15 @@ SetGraphStyle(acme, rankdir = "LR")
 plot(acme)
 ```
 
-On the one hand, **independent** samples means that the two samples are collected on **different** experimental units or different individuals, for instance when we are working on women and men separately, or working on patients who have been randomly assigned to a control and a treatment group (and a patient belongs to only one group). On the other hand, we face **paired** samples when measurements are collected on the **same** experimental units, same individuals. This is often the case, for example in medical studies, when testing the effect of a drug before and after a treatment. The same patients are measured twice, before and after treatment, and the dependency between the two samples must be taken into account in the computation of the test statistic by working on the **differences** of measurements for each subject. Paired samples are usually the result of measurements at two different times, but not exclusively. Suppose we want to test the difference in vision between the left and right eyes of 50 athletes. Although the measurements are not made at two different time (before/after), it is clear that both eyes are dependent. Therefore, the Student's t-test for paired samples should be used to account for the dependence between the two samples instead of the standard Student's t-test.
+On the one hand, **independent** samples means that the two samples are collected on **different** experimental units or different individuals, for instance when we are working on women and men separately, or working on patients who have been randomly assigned to a control and a treatment group (and a patient belongs to only one group). On the other hand, we face **paired** samples when measurements are collected on the **same** experimental units, same individuals. This is often the case, for example in medical studies, when testing the efficiency of a treatment at two different times. The same patients are measured twice, before and after the treatment, and the dependency between the two samples must be taken into account in the computation of the test statistic by working on the **differences** of measurements for each subject. Paired samples are usually the result of measurements at two different times, but not exclusively. Suppose we want to test the difference in vision between the left and right eyes of 50 athletes. Although the measurements are not made at two different time (before-after), it is clear that both eyes are dependent within each subject. Therefore, the Student's t-test for paired samples should be used to account for the dependency between the two samples instead of the standard Student's t-test for independent samples.
 
-Another criteria for choosing the appropriate version of the Student's t-test is whether the variances of the populations (not the variances of the samples!) are known or unknown. This criteria is rather straightforward, we either know the variances of the populations or we don't. The variances of the populations cannot be computed because if you can compute the variance of a population, it means you have the data for the whole population, then there is no need to do a hypothesis test anymore... So the variances of the populations are either given in the statement such that you can use them, or there is no information about these variances and in this case, it is assumed that the variances are unknown. In practice, the variances of the populations are most of the time unknown, but we still illustrate how to do the test by hand for all versions of the test in the next sections following the 4 steps of hypothesis testing.
+Another criteria for choosing the appropriate version of the Student's t-test is whether the variances of the populations (not the variances of the samples!) are known or unknown and equal or unequal. This criteria is rather straightforward, we either know the variances of the populations or we do not. The variances of the populations cannot be computed because if you can compute the variance of a population, it means you have the data for the whole population, then there is no need to do a hypothesis test anymore... So the variances of the populations are either given in the statement (use them in that case), or there is no information about these variances and in this case, it is assumed that the variances are unknown. In practice, the variances of the populations are most of the time unknown and the only thing to do in order to choose the appropriate version of the test is to check whether the variances are equal or not. However, we still illustrate how to do all versions of this test by hand and in R in the next sections following the 4 steps of hypothesis testing.
 
 # How to compute Student's t-test by hand?
 
 Note that the data are artificial and do not represent any real variable. Furthermore, remind that the assumptions may or may not be met. The point of the article is to detail how to compute the different versions of the test by hand and in R, so all assumptions are assumed to be met. Moreover, assume that the significance level $\alpha = 5$% for all tests.
 
-If you are interested in applying these tests by hand without having to do the computions yourself, here is a [Shiny app](/blog/a-shiny-app-for-inferential-statistics-by-hand) which does it for you. You just need to enter the data and choose the appropriate version of the test thanks to the sidebar menu. There is also a graphical representation that helps you to visualize the test statistc and the rejection region. Hope you will find it useful!
+If you are interested in applying these tests by hand without having to do the computions yourself, here is a [Shiny app](/blog/a-shiny-app-for-inferential-statistics-by-hand) which does it for you. You just need to enter the data and choose the appropriate version of the test thanks to the sidebar menu. There is also a graphical representation that helps you to visualize the test statistc and the rejection region. I hope you will find it useful!
 
 ## Scenario 1: Independent samples with 2 known variances
 
@@ -135,7 +135,7 @@ Following the 4 steps of hypothesis testing we have:
 
 1. $H_0: \mu_1 = \mu_2$ and $H_1: \mu_1 - \mu_2 \ne 0$. ($\ne$ because we want to test whether the two means are different, we do not impose a direction in the test.)
 2. Test statistic: $$z_{obs} = \frac{(\bar{x}_1 - \bar{x}_2) - (\mu_1 - \mu_2)}{\sqrt{\frac{\sigma^2_1}{n_1} + \frac{\sigma^2_2}{n_2}}} = \frac{0.02-0.06-0}{0.632} = -0.063$$
-3. Critical value: $\pm z_{\alpha / 2} = \pm z_{0.025} = \pm 1.96$ (see [how to read statistical tables](/blog/a-guide-on-how-to-read-statistical-tables) if you struggle to find the critical value)
+3. Critical value: $\pm z_{\alpha / 2} = \pm z_{0.025} = \pm 1.96$ (see a guide on [how to read statistical tables](/blog/a-guide-on-how-to-read-statistical-tables) if you struggle to find the critical value)
 4. Conclusion: The rejection regions are thus from $-\infty$ to -1.96 and from 1.96 to $+\infty$. The test statistic is outside the rejection regions so we do not reject the null hypothesis $H_0$. In terms of the initial question: At the 5% significance level, we do not reject the hypothesis that the two populations are the same, or there is no sufficient evidence in the data to conclude that the two populations considered are different.
 
 ## Scenario 2: Independent samples with 2 equal but unknown variances
@@ -163,8 +163,9 @@ Following the 4 steps of hypothesis testing we have:
 
 1. $H_0: \mu_1 = \mu_2$ and $H_1: \mu_1 - \mu_2 > 0$. (> because we want to test if the mean of the first population is larger than the mean of the second population.)
 2. Test statistic: $$t_{obs} = \frac{(\bar{x}_1 - \bar{x}_2) - (\mu_1 - \mu_2)}{s_p\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}$$ where $$s_p = \sqrt{\frac{(n_1-1)s^2_1+ (n_2 - 1)s^2_2}{n_1 + n_2 - 2}} = 0.555$$ so $$t_{obs} = \frac{1.247-0.1-0}{0.555 * 0.606} = 3.411$$
+(Note that as it is assumed the variances of the two populations are equal, a pooled (common) variance, denoted $s_p$, is computed.)
 3. Critical value: $t_{\alpha, n_1 + n_2 - 2} = t_{0.05, 9} = 1.833$
-4. Conclusion: The rejection regions are thus from 1.833 to $+\infty$. The test statistic lies within the rejection region so we reject the null hypothesis $H_0$. In terms of the initial question: At the 5% significance level, we conclude that the population 1 is larger than the population 2.
+4. Conclusion: The rejection region is thus from 1.833 to $+\infty$ (there is only one rejection region because it is a one-sided test). The test statistic lies within the rejection region so we reject the null hypothesis $H_0$. In terms of the initial question: At the 5% significance level, we conclude that the population 1 is larger than the population 2.
 
 ## Scenario 3: Independent samples with 2 unequal and unknown variances
 
@@ -191,14 +192,16 @@ Following the 4 steps of hypothesis testing we have:
 
 1. $H_0: \mu_1 = \mu_2$ and $H_1: \mu_1 - \mu_2 < 0$. (< because we want to test if the mean of the first population is smaller than the mean of the second population.)
 2. Test statistic: $$t_{obs} = \frac{(\bar{x}_1 - \bar{x}_2) - (\mu_1 - \mu_2)}{\sqrt{\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2}}} = \frac{0.42-1.247-0}{0.268} = -3.084$$
-3. Critical value: $-t_{\alpha, \upsilon}$ where $$\upsilon = \frac{\bigg(\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2} \bigg)^2}{\frac{\bigg(\frac{s^2_1}{n_1}\bigg)^2}{n_1 - 1} + \frac{\bigg(\frac{s^2_2}{n_2}\bigg)^2}{n_2 - 1}} = 8.28$$ so $$-t_{0.08, 8.28} = -1.851$$ The degrees of freedom 8.28 does not exist in the Student distribution table, so simply take 8, or compute it in R with `qt(p = 0.05, df = 8.28)`.
-4. Conclusion: The rejection regions are thus from $-\infty$ to -1.851. The test statistic lies within the rejection region so we reject the null hypothesis $H_0$. In terms of the initial question: At the 5% significance level, we conclude that the population 1 is smaller than the population 2.
+3. Critical value: $-t_{\alpha, \upsilon}$ where $$\upsilon = \frac{\bigg(\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2} \bigg)^2}{\frac{\bigg(\frac{s^2_1}{n_1}\bigg)^2}{n_1 - 1} + \frac{\bigg(\frac{s^2_2}{n_2}\bigg)^2}{n_2 - 1}} = 8.28$$ so $$-t_{0.05, 8.28} = -1.851$$ The degrees of freedom 8.28 does not exist in the standard Student distribution table, so simply take 8, or compute it in R with `qt(p = 0.05, df = 8.28)`.
+4. Conclusion: The rejection region is thus from $-\infty$ to -1.851. The test statistic lies within the rejection region so we reject the null hypothesis $H_0$. In terms of the initial question: At the 5% significance level, we conclude that the population 1 is smaller than the population 2.
 
 ## Scenario 4: Paired samples where the variance of the differences is known
 
-Student's t-test with paired samples are a bit different than with independent samples. For paired samples, we actually compute the difference between the two samples for each pair of observations, and we then compute the test statistic on these differences.
+Student's t-test with paired samples are a bit different than with independent samples, they are actually more similar to one sample Student's t-test.
+<!-- xxx add link to one sample t-test -->
+Here is how it works. We actually compute the difference between the two samples for each pair of observations, and then we work on these differences as if we were doing a one sample Student's t-test by computing the test statistic on these differences.
 
-For the fourth scenario, suppose the data below. Moreover, suppose that the two samples are dependent (matched), that the variance of the differences in the population is known and equal to 1 ($\sigma^2_D = 1$) and that we would like to test whether the difference in the population is different than 0.
+In case it is not clear, here is the fourth scenario as an illustration. Suppose the data below. Moreover, suppose that the two samples are dependent (matched), that the variance of the differences in the population is known and equal to 1 ($\sigma^2_D = 1$) and that we would like to test whether the difference in the population is different than 0.
 
 ```{r, echo = FALSE}
 dat4 <- data.frame(
@@ -210,7 +213,7 @@ pander(dat4)
 
 The first thing to do is to compute the differences for all pairs of observations:
 
-```{r}
+```{r, echo = FALSE}
 dat4$difference <- dat4$after - dat4$before
 pander(dat4)
 ```
@@ -226,6 +229,7 @@ Following the 4 steps of hypothesis testing we have:
 
 1. $H_0: \mu_D = 0$ and $H_1: \mu_D \ne 0$
 2. Test statistic: $$z_{obs} = \frac{\bar{D} - \mu_0}{\frac{\sigma_D}{\sqrt{n}}} = \frac{0.04-0}{0.447} = 0.089$$
+(This formula is exactly the same than for one sample Student's t-test with a known variance, except that we work on the mean of the differences.)
 3. Critical value: $\pm z_{\alpha/2} = \pm z_{0.025} = \pm 1.96$
 4. Conclusion: The rejection regions are thus from $-\infty$ to -1.96 and from 1.96 to $+\infty$. The test statistic is outside the rejection regions so we do not reject the null hypothesis $H_0$. In terms of the initial question: At the 5% significance level, we do not reject the hypothesis that the difference in the two populations is equal to 0.
 
@@ -243,7 +247,7 @@ pander(dat5)
 
 The first thing to do is to compute the differences for all pairs of observations:
 
-```{r}
+```{r, echo = FALSE}
 dat5$difference <- dat5$after - dat5$before
 pander(dat5)
 ```
@@ -252,25 +256,26 @@ So we have:
 
 * number of pairs: $n = 5$
 * mean of the difference: $\bar{D} = 8$
-* variance of the difference in the population: $\sigma^2_D = 16$
-* standard deviation of the difference in the population: $\sigma_D = 4$
+* variance of the difference in the sample: $s^2_D = 16$
+* standard deviation of the difference in the sample: $s_D = 4$
 
 Following the 4 steps of hypothesis testing we have:
 
 1. $H_0: \mu_D = 0$ and $H_1: \mu_D > 0$ (> because we would like to test whether the treatment is effective, so whether the treatment has a positive impact on the running capabilities.)
 2. Test statistic: $$t_{obs} = \frac{\bar{D} - \mu_0}{\frac{s_D}{\sqrt{n}}} = \frac{8-0}{1.789} = 4.472$$
+(This formula is exactly the same than for one sample Student's t-test with a unknown variance, except that we work on the mean of the differences.)
 3. Critical value: $t_{\alpha, n-1} = t_{0.05, 4} = 2.132$ (*n* is the number of pairs, not the number of observations!)
 4. Conclusion: The rejection regions are thus from 2.132 to $+\infty$. The test statistic lies within the rejection region so we reject the null hypothesis $H_0$. In terms of the initial question: At the 5% significance level, we conclude that the treatment has a positive impact on the running capabilities.
 
-This concludes how to perform the different version of the Student's t-test by hand. In the next sections, we detail how to perform the exact same tests in R.
+This concludes how to perform the different versions of the Student's t-test for two samples by hand. In the next sections, we detail how to perform the exact same tests in R.
 
 # How to compute Student's t-test in R?
 
-A good practice before doing t-test in R is to visualize the data by group thanks to a boxplot (or eventually a [density plot](/blog/descriptive-statistics-in-r/#density-plot), or both). A boxplot with the two boxes overlapping each other gives a first indication that the two samples are similar, and thus, that the null hypothesis may not be rejected. On the contrary, if the two boxes are not overalapping, it indicates that the two samples are not similar, and thus, that the populations may be different. However, even if boxplots or density plots are great in showing a comparison between the two groups, only a sound statistical test will confirm our first impression.
+A good practice before doing t-tests in R is to visualize the data by group thanks to a boxplot (or a [density plot](/blog/descriptive-statistics-in-r/#density-plot), or eventually both). A boxplot with the two boxes overlapping each other gives a first indication that the two samples are similar, and thus, that the null hypothesis of equal means may not be rejected. On the contrary, if the two boxes are not overlapping, it indicates that the two samples are not similar, and thus, that the populations may be different. However, even if boxplots or density plots are great in showing a comparison between the two groups, only a sound statistical test will confirm our first impression.
 
 After a visualization of the data by group, we replicate in R the results found by hand. We will see that for some versions of the t-test, there is no default function built in R (at least to my knowledge, do not hesitate to let me know if I'm mistaken). In these cases, a function is written to replicate the results by hand.
 
-Note that we use the same data, the same assumptions and the same question for all scenarios.
+Note that we use the same data, the same assumptions and the same question for all 5 scenarios to facilitate the comparison between the tests performed by hand and in R.
 
 ## Scenario 1: Independent samples with 2 known variances
 
@@ -298,9 +303,15 @@ ggplot(dat_ggplot) +
   theme_minimal()
 ```
 
-(You can use the [`{esquisse}` RStudio addin](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier) if you want to draw a boxplot with the package `{ggplot2}` without coding the function yourself.)
+Note that you can use the [`{esquisse}` RStudio addin](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse) if you want to draw a boxplot with the package `{ggplot2}` without writing the code yourself. If you prefer the default graphics, use the `boxplot()` function:
 
-The two boxes seem to overlap which illustrate that the two samples are quite similar, so we tend to believe that we will not be able to reject the null hypothesis that the two populations are similar. However, only a formal statistical test will confirm these beliefs.
+```{r}
+boxplot(value ~ sample,
+  data = dat_ggplot
+)
+```
+
+The two boxes seem to overlap which illustrate that the two samples are quite similar, so we tend to believe that we will not be able to reject the null hypothesis that the two populations are similar. However, only a formal statistical test will confirm this belief.
 
 Since there is no function in R to perform a t-test with known variances, here is one with arguments accepting the two samples (`x` and `y`), the two variances of the populations (`V1` and `V2`), the difference in means under the null hypothesis (`m0`, default is `0`), the significance level (`alpha`, default is `0.05`) and the alternative (`alternative`, one of `"two.sided"` (default), `"less"` or `"greater"`):
 
@@ -332,11 +343,13 @@ t.test_knownvar <- function(x, y, V1, V2, m0 = 0, alpha = 0.05, alternative = "t
   return(value)
 }
 
-test <- t.test_knownvar(dat1$sample1, dat1$sample2, V1 = 1, V2 = 1)
+test <- t.test_knownvar(dat1$sample1, dat1$sample2,
+  V1 = 1, V2 = 1
+)
 test
 ```
 
-The output above recaps all the information needed to perform the test (compare these results found in R with the results found by hand).
+The output above recaps all the information needed to perform the test: the test statistic, the *p*-value, the alternative used, the two sample means and the two variances of the populations (compare these results found in R with the results found by hand).
 
 The *p*-value can be extracted as usual:
 
@@ -352,16 +365,20 @@ For those unfamiliar with the concept of *p*-value, the *p*-value is a probabili
 
 In our example above, the observations are not really extreme and the difference between the two means is not extreme, so the test statistic is not extreme (since the test statistic is partially based on the difference of the means of the two samples). Having a test statistic which is not extreme is not unlikely and that is the reason why the *p*-value is quite high. The *p*-value of 0.95 actually tells us that the probability of having two samples with a difference in means of -0.04 (= 0.02 - 0.06), given that the difference in means in the populations is 0 (the null hypothesis), equals 95%. A probability of 95% is definitely considered as plausible, so we do not reject the null hypothesis of equal means in the populations.
 
-One may then wonder, "What is too extreme for a test statistic?" Most of the time, we consider that a test statistic is too extreme to happen just by chance when the probability of having such an extreme test statistic given that the null hypothesis is true is below 5%. The threshold of 5% ($\alpha = 0.05$) that you very often see in statistic courses or textbooks is the threshold used in many fields. Under that threshold we consider that the observations (and thus the test statistic) is **too unlikely** to happen just by chance if the null hypothesis was true, so the null hypothesis is rejected. Above that threshold of 5%, we consider that it is not really implausible to face the observations we have via the samples if the null hypothesis was true, and we therefore cannot reject the null hypothesis.
+One may then wonder, "What is too extreme for a test statistic?" Most of the time, we consider that a test statistic is too extreme to happen just by chance when the probability of having such an extreme test statistic given that the null hypothesis is true is below 5%. The threshold of 5% ($\alpha = 0.05$) that you very often see in statistic courses or textbooks is the threshold used in many fields. With a *p*-value under that threshold of 5%, we consider that the observations (and thus the test statistic) is **too unlikely** to happen just by chance if the null hypothesis was true, so the null hypothesis is rejected. With a *p*-value above that threshold of 5%, we consider that it is not really implausible to face the observations we have if the null hypothesis was true, and we therefore do not reject the null hypothesis.
 
-Note that I wrote "we cannot reject the null hypothesis", and not "we accept the null hypothesis". This is because it may be the case that the null hypothesis is in fact false, but we failed to prove it with the samples. Suppose the analogy of a suspect charged with murder. On the one hand, if we have collected enough evidence that the suspect committed the murder, he is considered guilty: we reject the null hypothesis that he is innocent. On the other hand, if we have *not* collected enough evidence against the suspect, he is presumed to be innocent although he may in fact have committed the crime. We are never sure that he did not committed the crime even if he is released, we just did not find sufficient evidence against the null hypothesis of the suspect being innocent. This is the reason why we do not reject the null hypothesis instead of accepting it, and why you will often read things like "there is no sufficient evidence in the data to reject the null hypothesis" or "based on the samples we fail to reject the null hypothesis".
+Note that I wrote "we do not reject the null hypothesis", and not "we accept the null hypothesis". This is because it may be the case that the null hypothesis is in fact false, but we failed to prove it with the samples. Suppose the analogy of a suspect accused of murder and we do not know the truth. On the one hand, if we have collected enough evidence that the suspect committed the murder, he is considered guilty: we reject the null hypothesis that he is innocent. On the other hand, if we have *not* collected enough evidence against the suspect, he is presumed to be innocent although he may in fact have committed the crime: we failed to reject the null hypothesis of him being innocent. We are never sure that he did not committed the crime even if he is released, we just did not find sufficient evidence against the null hypothesis of the suspect being innocent. This is the reason why we do not reject the null hypothesis instead of accepting it, and why you will often read things like "there is no sufficient evidence in the data to reject the null hypothesis" or "based on the samples we fail to reject the null hypothesis".
 
-The **significance level $\alpha$**, derived from this threshold of 5%, **is the probability of rejecting the null hypothesis when it is in fact true**. In this sense, it is an error (of 5%) that we accept to deal with, in order to be able to draw conclusions. If we would accept no error (an error of 0%), we would not be able to draw any conclusion about the population(s) since we only have access to a limited portion of the population(s) via the sample(s). As a consequence, we will never be 100% sure when interpreting the result of a hypothesis test unless we have access to the data for the entire population, but then there is no reason to do a hypothesis test anymore since we can simply compare the two populations. We usually allow this error (called Type I error) to be 5%, but in order to be a bit more certain when concluding that we reject the null hypothesis, the alpha level can also be set to 1% (or even to 0.1% in some rare cases).
+The **significance level $\alpha$**, derived from the threshold of 5% mentioned earlier, **is the probability of rejecting the null hypothesis when it is in fact true**. In this sense, it is an error (of 5%) that we accept to deal with, in order to be able to draw conclusions. If we would accept no error (an error of 0%), we would not be able to draw any conclusion about the population(s) since we only have access to a limited portion of the population(s) via the sample(s). As a consequence, we will never be 100% sure when interpreting the result of a hypothesis test unless we have access to the data for the entire population, but then there is no reason to do a hypothesis test anymore since we can simply compare the two populations. We usually allow this error (called Type I error) to be 5%, but in order to be a bit more certain when concluding that we reject the null hypothesis, the alpha level can also be set to 1% (or even to 0.1% in some rare cases).
 
 **To sum up** what you need to remember about *p*-value and significance level $\alpha$:
 
 * If the *p*-value is smaller than the predetermined significance level $\alpha$ (usually 5%) so if *p*-value < 0.05, we reject the null hypothesis
 * If the *p*-value is greater than or equal to the predetermined significance level $\alpha$ (usually 5%) so if *p*-value $\ge$ 0.05, we do **not reject** the null hypothesis
+
+This applies to all statistical tests without exception. Of course, the null and alternative hypotheses change depending on the test.
+
+A rule of thumb is that, for most hypothesis tests, the alternative hypothesis is what you want to test and the null hypothesis is the status quo. Take this with extreme caution (!) because, even if it works for all versions of the Student's t-test it does not apply to ALL statistical tests. For example, when testing for normality, you usually want to test whether your distribution follows a normal distribution. Following this piece of advice, you would write the alternative hypothesis $H_1:$ the distribution follows a normal distribution. Nonetheless, for [normality tests](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test) such as the Shapiro-Wilk or Kolmogorov-Smirnov test, it is the opposite; the alternative hypothesis is $H_1:$ the distribution does not follow a normal distribution. So for every test, make sure to use the correct hypotheses, otherwise the conclusion and interpretation of your test will be wrong. 
 
 ## Scenario 2: Independent samples with 2 equal but unknown variances
 
@@ -389,10 +406,12 @@ ggplot(dat_ggplot) +
 
 Unlike the previous scenario, the two boxes do not overlap which illustrates that the two samples are different from each other. From this boxplot, we can expect the test to reject the null hypothesis of equal means in the populations. Nonetheless, only a formal statistical test will confirm this expectation.
 
-There is a function in R, and it is simply the `t.test()` function (this version of the test is actually the "standard" Student's t-test). Note that it is assumed that the variances of the two populations are equal so we need to specify it in the function with the argument `var.equal = TRUE` and the alternative hypothesis is $H_1: \mu_1 - \mu_2 > 0$ so we need to add the argument `alternative = "greater"` as well:
+There is a function in R, and it is simply the `t.test()` function. This version of the test is actually the "standard" Student's t-test for two samples. Note that it is assumed that the variances of the two populations are equal so we need to specify it in the function with the argument `var.equal = TRUE` (the default is `FALSE`) and the alternative hypothesis is $H_1: \mu_1 - \mu_2 > 0$ so we need to add the argument `alternative = "greater"` as well:
 
 ```{r}
-test <- t.test(dat2$sample1, dat2$sample2, var.equal = TRUE, alternative = "greater")
+test <- t.test(dat2$sample1, dat2$sample2,
+  var.equal = TRUE, alternative = "greater"
+)
 test
 ```
 
@@ -421,7 +440,11 @@ dat2bis
 Here is how to perform the Student's t-test in R with long data:
 
 ```{r}
-test <- t.test(value ~ sample, data = dat2bis, var.equal = TRUE, alternative = "greater")
+test <- t.test(value ~ sample,
+  data = dat2bis,
+  var.equal = TRUE,
+  alternative = "greater"
+)
 test
 test$p.value
 ```
@@ -437,7 +460,7 @@ dat3 <- data.frame(
   value = c(0.8, 0.7, 0.1, 0.4, 0.1, 1.78, 1.5, 0.9, 0.6, 0.8, 1.9),
   sample = c(rep("1", 5), rep("2", 6))
 )
-pander(dat3)
+dat3
 ```
 
 ```{r, echo = TRUE}
@@ -447,10 +470,14 @@ ggplot(dat3) +
   theme_minimal()
 ```
 
-There is a function in R for this version of the test as well, and it is simply the `t.test()` function with the `var.equal = FALSE` argument. `FALSE` is the default option for the `var.equal` argument so you actually do not need to specify it. This version of the test is actually the Welch test, used when the variances of the population are unknown and unequal. To test if two variances are equal, you can use the Levene's test (`leveneTest(dat3$value, dat3$sample)` from the `{car}` package). Note that the alternative hypothesis is $H_1: \mu_1 - \mu_2 < 0$ so we need to add the argument `alternative = "less"` as well:
+There is a function in R for this version of the test as well, and it is simply the `t.test()` function with the `var.equal = FALSE` argument. `FALSE` is the default option for the `var.equal` argument so you actually do not need to specify it. This version of the test is actually the Welch test, used when the variances of the populations are unknown and unequal. To test if two variances are equal, you can use the Levene's test (`leveneTest(dat3$value, dat3$sample)` from the `{car}` package). Note that the alternative hypothesis is $H_1: \mu_1 - \mu_2 < 0$ so we need to add the argument `alternative = "less"` as well:
 
 ```{r}
-test <- t.test(value ~ sample, data = dat3, var.equal = FALSE, alternative = "less")
+test <- t.test(value ~ sample,
+  data = dat3,
+  var.equal = FALSE,
+  alternative = "less"
+)
 test
 ```
 
@@ -512,7 +539,9 @@ t.test_pairedknownvar <- function(x, V, m0 = 0, alpha = 0.05, alternative = "two
   return(value)
 }
 
-test <- t.test_pairedknownvar(dat4$after - dat4$before, V = 1)
+test <- t.test_pairedknownvar(dat4$after - dat4$before,
+  V = 1
+)
 test
 ```
 
@@ -524,7 +553,7 @@ The *p*-value can be extracted as usual:
 test$p.value
 ```
 
-The *p*-value is `r round(test$p.value, 3)` so at the 5% significance level we `r ifelse(test$p.value < 0.05, "reject the null hypothesis of equal means", "do not reject the null hypothesis of equal means")`. There is no sufficient evidence in the data to reject the hypothesis that the difference in the two populations is equal to 0. This result confirms what we found by hand.
+The *p*-value is `r round(test$p.value, 3)` so at the 5% significance level we `r ifelse(test$p.value < 0.05, "reject the null hypothesis of the mean of the differences being equal to 0", "do not reject the null hypothesis of the mean of the differences being equal to 0")`. There is no sufficient evidence in the data to reject the hypothesis that the difference in the two populations is equal to 0. This result confirms what we found by hand.
 
 ## Scenario 5: Paired samples where the variance of the differences is unknown
 
@@ -550,11 +579,14 @@ ggplot(dat5) +
 There is a function in R for this version of the test, and it is simply the `t.test()` function with the `paired = TRUE` argument. This version of the test is actually the standard version of the Student's t-test with paired samples. Note that the alternative hypothesis is $H_1: \mu_D > 0$ so we need to add the argument `alternative = "greater"` as well:
 
 ```{r}
-test <- t.test(dat5$after, dat5$before, alternative = "greater", paired = TRUE)
+test <- t.test(dat5$after, dat5$before,
+  alternative = "greater",
+  paired = TRUE
+)
 test
 ```
 
-Note that we put `after` and then `before`, if you write `before` and then `after`, make sure to change the alternative to `alternative = "less"`.
+Note that we wrote `after` and then `before` in this order. If you write `before` and then `after`, make sure to change the alternative to `alternative = "less"`.
 
 If your data is in the long format, use the `~`:
 
@@ -565,7 +597,11 @@ dat5 <- data.frame(
 )
 dat5
 
-test <- t.test(value ~ time, data = dat5, alternative = "greater", paired = TRUE)
+test <- t.test(value ~ time,
+  data = dat5,
+  alternative = "greater",
+  paired = TRUE
+)
 test
 ```
 
@@ -577,19 +613,20 @@ The *p*-value can be extracted as usual:
 test$p.value
 ```
 
-The *p*-value is `r round(test$p.value, 3)` so at the 5% significance level we `r ifelse(test$p.value < 0.05, "reject the null hypothesis of equal means", "do not reject the null hypothesis of equal means")`, meaning that we can conclude that the treatment is effective in increasing the running capabilities. This result confirms what we found by hand.
+The *p*-value is `r round(test$p.value, 3)` so at the 5% significance level we `r ifelse(test$p.value < 0.05, "reject the null hypothesis of the mean of the differences being equal to 0", "do not reject the null hypothesis of the mean of the differences being equal to 0")`, meaning that we can conclude that the treatment is effective in increasing the running capabilities. This result confirms what we found by hand.
 
 # Assumptions
 
-As for many statistical tests, there are some assumptions that need to be met in order to be able to interpret the results. When one or several assumptions are not met, although it is technically possible to perform these tests, it would be incorrect to interpret the results. Below are the assumptions of the Student's t-test, how to test them and which other tests exist if an assumption is not met:
+As for many statistical tests, there are some assumptions that need to be met in order to be able to interpret the results. When one or several assumptions are not met, although it is technically possible to perform these tests, it would be incorrect to interpret the results. Below are the assumptions of the Student's t-test for two samples, how to test them and which other tests exist if an assumption is not met:
 
 * The data, collected from a representative and randomly selected portion of the total population, should be independent. If observations between the two samples are dependent (for example if two measurements have been collected on the **same individual** as it is often the case in medical studies when measuring a value after and before a treatment), the paired version of the Student's t-test, called the Student's t-test for paired samples, should be preferred in order to take into account the dependency between the two groups to be compared. 
-* When the two samples are independent, observations in **both samples** should follow a [**normal distribution**](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r). When using the Student's t-test for paired samples, it is the difference between the observations of the two samples that should follow a normal distribution. The normality assumption can be tested visually thanks to a histogram and a QQ-plot, and/or formally via a normality test such as the Shapiro-Wilk or Kolmogorov-Smirnov test. If, even after a transformation (logarithmic transformation, etc.) the data still do not follow a distribution, the Wilcoxon test (`wilcox.test(variable1 ~ variable2, data = dat` in R). This test, robust to non normal distributions, compares the medians instead of the means in order to compare the two populations.
-* When the two samples are independent, the variances of the two groups should be equal in the population (an assumption called homogeneity of the variances, or even sometimes referred as homoscedasticity). This assumption can be tested thanks to the Levene's test (`leveneTest(variable ~ group)` from the `{car}` package) or a F test (`var.test(variable ~ group)`). If the hypothesis of equal variances is rejected, another version of the Student's t-test can be used: the Welch test.
+* When the two samples are independent, observations in **both samples** should follow a [**normal distribution**](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r). When using the Student's t-test for paired samples, it is the difference between the observations of the two samples that should follow a normal distribution. The normality assumption can be tested visually thanks to a histogram and a QQ-plot, and/or formally via a normality test such as the Shapiro-Wilk or Kolmogorov-Smirnov test (see more information about the normality assumption and how to test it [here](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r)). If, even after a transformation (logarithmic transformation, etc.), your data still do not follow a normal distribution, the Wilcoxon test (`wilcox.test(variable1 ~ variable2, data = dat` in R) can be applied. This test, robust to non normal distributions, compares the medians instead of the means in order to compare the two populations.
+* When the two samples are independent, the variances of the two groups should be equal in the populations (an assumption called homogeneity of the variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity). This assumption can be tested thanks to the Levene's test (`leveneTest(variable ~ group)` from the `{car}` package) or via a F test (`var.test(variable ~ group)`). If the hypothesis of equal variances is rejected, another version of the Student's t-test can be used: the Welch test (`t.test(variable ~ group, var.equal = FALSE)`).
 
-This is a relatively long article so thanks for reading it. I hope this article helped you to understand how the different versions of the Student's t-test work and how to perform them by hand and in R. If you are interested here is a [Shiny app](/blog/a-shiny-app-for-inferential-statistics-by-hand) to perform these tests by hand easily.
+This concludes a relatively long article. Thanks for reading it. I hope this article helped you to understand how the different versions of the Student's t-test for two samples work and how to perform them by hand and in R. If you are interested, here is a [Shiny app](/blog/a-shiny-app-for-inferential-statistics-by-hand) to perform these tests by hand easily (you just need to enter your data and select the appropriate version of the test thanks to the sidebar menu).
+<!-- Moreover, read [this article](/blog/xxx) if you would like to know how to compute the Student's t-test but this time, for one sample. -->
 
-As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me [here](/contact/).
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug (which is quite likely in this article given all the computations), you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me [here](/contact/).
 
 Get updates every time a new article is published by [subscribing to this blog](/subscribe/).
 
