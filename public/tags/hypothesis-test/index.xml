@@ -6,10 +6,997 @@
     <description>Recent content in Hypothesis test on Stats and R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Sat, 01 Feb 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 28 Feb 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/hypothesis-test/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Student&#39;s t-test in R and by hand: how to compare two groups under different scenarios</title>
+      <link>/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/</link>
+      <pubDate>Fri, 28 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/</guid>
+      <description>
+&lt;script src=&#34;/rmarkdown-libs/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/viz/viz.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/DiagrammeR-styles/styles.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/grViz-binding/grViz.js&#34;&gt;&lt;/script&gt;
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#null-and-alternative-hypothesis&#34;&gt;Null and alternative hypothesis&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#hypothesis-testing&#34;&gt;Hypothesis testing&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#different-versions-of-the-students-t-test&#34;&gt;Different versions of the Student’s t-test&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#how-to-compute-students-t-test-by-hand&#34;&gt;How to compute Student’s t-test by hand?&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#scenario-1-independent-samples-with-2-known-variances&#34;&gt;Scenario 1: Independent samples with 2 known variances&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#scenario-2-independent-samples-with-2-equal-but-unknown-variances&#34;&gt;Scenario 2: Independent samples with 2 equal but unknown variances&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#scenario-3-independent-samples-with-2-unequal-and-unknown-variances&#34;&gt;Scenario 3: Independent samples with 2 unequal and unknown variances&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#scenario-4-paired-samples-where-the-variance-of-the-differences-is-known&#34;&gt;Scenario 4: Paired samples where the variance of the differences is known&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown&#34;&gt;Scenario 5: Paired samples where the variance of the differences is unknown&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#how-to-compute-students-t-test-in-r&#34;&gt;How to compute Student’s t-test in R?&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#scenario-1-independent-samples-with-2-known-variances-1&#34;&gt;Scenario 1: Independent samples with 2 known variances&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#a-note-on-p-value-and-significance-level-alpha&#34;&gt;A note on &lt;em&gt;p&lt;/em&gt;-value and significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#scenario-2-independent-samples-with-2-equal-but-unknown-variances-1&#34;&gt;Scenario 2: Independent samples with 2 equal but unknown variances&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#scenario-3-independent-samples-with-2-unequal-and-unknown-variances-1&#34;&gt;Scenario 3: Independent samples with 2 unequal and unknown variances&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#scenario-4-paired-samples-where-the-variance-of-the-differences-is-known-1&#34;&gt;Scenario 4: Paired samples where the variance of the differences is known&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown-1&#34;&gt;Scenario 5: Paired samples where the variance of the differences is unknown&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#assumptions&#34;&gt;Assumptions&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/Student-t-test-in-R-and-by-hand-how-to-compare-two-groups-under-different-scenarios.jpeg&#34; alt=&#34;Photo by Jason Dent&#34; style=&#34;width:100.0%&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Photo by Jason Dent&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;One of the most important test within the branch of inferential statistics is the &lt;strong&gt;Student’s t-test&lt;/strong&gt;.&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt; The Student’s t-test for two samples is used to &lt;strong&gt;test whether two groups (two populations) are different&lt;/strong&gt; in terms of a quantitative variable, &lt;strong&gt;based on the comparison of two samples&lt;/strong&gt; drawn from these two groups. In other words, a Student’s t-test for two samples allows to determine whether the two populations from which your two samples are drawn are different (with the two samples being measured on a &lt;a href=&#34;/blog/variable-types-and-examples/#continuous&#34;&gt;quantitative continuous&lt;/a&gt; variable).&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;
+&lt;!-- xxx add links to one sample t-test and put this footnote in the text. --&gt;&lt;/p&gt;
+&lt;p&gt;The reasoning behind this statistical test is that if your two samples are markedly different from each other, it can be assumed that the two populations from which the samples are drawn are different. On the contrary, if the two samples are rather similar, we cannot reject the hypothesis that the two populations are similar, so there is no sufficient evidence in the data at hand to conclude that the two populations from which the samples are drawn are different. Note that this statistical tool belongs to the branch of inferential statistics because conclusions drawn from the study of the samples are generalized to the population, even though we do not have the data on the entire population.&lt;/p&gt;
+&lt;p&gt;To compare two samples, it is usual to compare a measure of central tendency computed for each sample. In the case of the Student’s t-test, the &lt;a href=&#34;/blog/descriptive-statistics-by-hand/#mean&#34;&gt;mean&lt;/a&gt; is used to compare the two samples. However, in some cases, the mean is not appropriate to compare two samples so the &lt;a href=&#34;/blog/descriptive-statistics-by-hand/#median&#34;&gt;median&lt;/a&gt; is used to compare them via the Wilcoxon test. This article being already quite long and complete, the Wilcoxon test will be covered in a separate article, toghether with some illustrations on when to use one test or the other.&lt;/p&gt;
+&lt;p&gt;These two tests (Student’s t-test and Wilcoxon test) have the same final goal, that is, compare two samples in order to determine whether the two populations from which they were drawn are different or not. Note that the Student’s t-test is more powerful than the Wilcoxon test (it more often detects a significant difference if there is a true difference, so a smaller difference can be detected with the Student’s t-test) but the Student’s t-test is sensitive to outliers and data asymmetry. Furthermore, within each of these two tests, several versions exist, with each version using different formulas to arrive at the final result. It is thus necessary to understand the difference between the two tests and which version to use in order to carry out the appropriate analyses depending on the question and the data at hand.&lt;/p&gt;
+&lt;p&gt;In this article, I will first detail step by step how to perform all versions of the Student’s t-test for independent and paired samples by hand. The analyses will be done on a small set of observations for the sake of illustration and easiness. I will then show how to perform this test in R with the exact same data in order to verify the results found by hand. Reminders about the reasoning behind hypothesis testing, interpretations of the the &lt;em&gt;p&lt;/em&gt;-value and the results, and assumptions of this test will also be presented.&lt;/p&gt;
+&lt;p&gt;Note that the aim of this article is to show how to compute the Student’s t-test by hand and in R, so we refrain from testing the assumptions and we assume all assumptions are met for this exercise. For completeness, we still mention the assumptions, how to test them and what other tests exist if an assumption is not met. Interested readers are invited to have a look at the &lt;a href=&#34;/blog/xxx/&#34;&gt;end of the article&lt;/a&gt;xxx for more information about these assumptions.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;null-and-alternative-hypothesis&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Null and alternative hypothesis&lt;/h1&gt;
+&lt;p&gt;Before diving into the computations of the Student’s t-test by hand, let’s recap the null and alternative hypotheses of the Student’s t-test:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;: &lt;span class=&#34;math inline&#34;&gt;\(\mu_1 = \mu_2\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt;: &lt;span class=&#34;math inline&#34;&gt;\(\mu_1 \ne \mu_2\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\mu_1\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\mu_2\)&lt;/span&gt; are the means of the two populations from which the samples were drawn.&lt;/p&gt;
+&lt;p&gt;As mentioned in the introduction, although technically the Student’s t-test is based on the comparison of the means of the two samples, the final goal of this test is actually to test the following hypotheses:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;: the two populations are similar&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt;: the two populations are different&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This is in the general case where we simply want to determine whether the two populations are &lt;strong&gt;different&lt;/strong&gt; or not (in terms of the dependent variable). In this sense, we have no prior belief about a particular population being larger or smaller than the other. This type of test is referred as a &lt;strong&gt;two-sided&lt;/strong&gt; or bilateral test.&lt;/p&gt;
+&lt;p&gt;If we have some prior beliefs about one population being larger or smaller than the other, the Student’s t-test also allows to test the following hypotheses:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;: &lt;span class=&#34;math inline&#34;&gt;\(\mu_1 = \mu_2\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt;: &lt;span class=&#34;math inline&#34;&gt;\(\mu_1 &amp;gt; \mu_2\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;or&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;: &lt;span class=&#34;math inline&#34;&gt;\(\mu_1 = \mu_2\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt;: &lt;span class=&#34;math inline&#34;&gt;\(\mu_1 &amp;lt; \mu_2\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In the first case, we want to test if the first population is significantly larger than the second, while in the latter case, we want to test if the first population is significantly smaller than the second. This type of test is referred as a &lt;strong&gt;one-sided&lt;/strong&gt; or unilateral test.&lt;a href=&#34;#fn3&#34; class=&#34;footnote-ref&#34; id=&#34;fnref3&#34;&gt;&lt;sup&gt;3&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;hypothesis-testing&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Hypothesis testing&lt;/h1&gt;
+&lt;p&gt;In statistics, most hypothesis tests boil down to the following 4 steps:&lt;a href=&#34;#fn4&#34; class=&#34;footnote-ref&#34; id=&#34;fnref4&#34;&gt;&lt;sup&gt;4&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;State the null and alternative hypothesis.&lt;/li&gt;
+&lt;li&gt;Compute the test statistic, denoted t-stat. Formulas to compute the test statistic differ among the different version of the Student’s t-test but they have the same structure. See the scenarios 1 to 4 below.&lt;/li&gt;
+&lt;li&gt;Find the critical value given the theoretical statistical distribution of the test, the parameters of the distribution and the significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt;. For a Student’s t-test and its extended version, it is either the normal or the Student distribution (&lt;em&gt;t&lt;/em&gt; denoting the Student distribution and &lt;em&gt;z&lt;/em&gt; denoting the normal distribution).&lt;/li&gt;
+&lt;li&gt;Conclude by comparing the t-stat (found in step 2.) with the critical value (found in step. 3). If the t-stat lies in the rejection region (determined thanks to the critical value and the direction of the test), we reject the null hypothesis, otherwise we do not reject the null hypothesis. These two alternatives (reject or do not reject the null hypothesis) are the only two possible solutions, we never “accept” an hypothesis. It is also a good practice to always interpret the decision in the terms of the initial question.
+&lt;!-- See why we do not accept an hypothesis in this article covering the reasoning behind [hypothesis tests](/blog/xxx). --&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;different-versions-of-the-students-t-test&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Different versions of the Student’s t-test&lt;/h1&gt;
+&lt;p&gt;There exists several versions of the Student’s t-test depending on the data at hand:&lt;/p&gt;
+&lt;div id=&#34;htmlwidget-1&#34; style=&#34;width:672px;height:480px;&#34; class=&#34;grViz html-widget&#34;&gt;&lt;/div&gt;
+&lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-1&#34;&gt;{&#34;x&#34;:{&#34;diagram&#34;:&#34;digraph {\n\ngraph [rankdir = \&#34;LR\&#34;]\n\n\n\n  \&#34;1\&#34; [label = \&#34;Test on 2 means\&#34;, style = \&#34;filled,rounded\&#34;, shape = \&#34;box\&#34;, fontname = \&#34;helvetica\&#34;, tooltip = \&#34;- name: Test on 2 means\&#34;, fillcolor = \&#34;LightGray\&#34;, fontcolor = \&#34;#000000\&#34;] \n  \&#34;2\&#34; [label = \&#34;2 independepent samples\&#34;, style = \&#34;filled,rounded\&#34;, shape = \&#34;box\&#34;, fontname = \&#34;helvetica\&#34;, tooltip = \&#34;- name: 2 independepent samples\&#34;, fillcolor = \&#34;LightGray\&#34;, fontcolor = \&#34;#000000\&#34;] \n  \&#34;3\&#34; [label = \&#34;2 variances are known (scenario 1)\&#34;, style = \&#34;filled,rounded\&#34;, shape = \&#34;box\&#34;, fontname = \&#34;helvetica\&#34;, tooltip = \&#34;- name: 2 variances are known (scenario 1)\&#34;, fillcolor = \&#34;LightGray\&#34;, fontcolor = \&#34;#000000\&#34;] \n  \&#34;4\&#34; [label = \&#34;2 variances are equal but unknown (scenario 2)\&#34;, style = \&#34;filled,rounded\&#34;, shape = \&#34;box\&#34;, fontname = \&#34;helvetica\&#34;, tooltip = \&#34;- name: 2 variances are equal but unknown (scenario 2)\&#34;, fillcolor = \&#34;LightGray\&#34;, fontcolor = \&#34;#000000\&#34;] \n  \&#34;5\&#34; [label = \&#34;2 variances are unequal and unknown (scenario 3)\&#34;, style = \&#34;filled,rounded\&#34;, shape = \&#34;box\&#34;, fontname = \&#34;helvetica\&#34;, tooltip = \&#34;- name: 2 variances are unequal and unknown (scenario 3)\&#34;, fillcolor = \&#34;LightGray\&#34;, fontcolor = \&#34;#000000\&#34;] \n  \&#34;6\&#34; [label = \&#34;2 paired samples\&#34;, style = \&#34;filled,rounded\&#34;, shape = \&#34;box\&#34;, fontname = \&#34;helvetica\&#34;, tooltip = \&#34;- name: 2 paired samples\&#34;, fillcolor = \&#34;LightGray\&#34;, fontcolor = \&#34;#000000\&#34;] \n  \&#34;7\&#34; [label = \&#34;Variance of the differences is known (scenario 4)\&#34;, style = \&#34;filled,rounded\&#34;, shape = \&#34;box\&#34;, fontname = \&#34;helvetica\&#34;, tooltip = \&#34;- name: Variance of the differences is known (scenario 4)\&#34;, fillcolor = \&#34;LightGray\&#34;, fontcolor = \&#34;#000000\&#34;] \n  \&#34;8\&#34; [label = \&#34;Variance of the differences is unknown (scenario 5)\&#34;, style = \&#34;filled,rounded\&#34;, shape = \&#34;box\&#34;, fontname = \&#34;helvetica\&#34;, tooltip = \&#34;- name: Variance of the differences is unknown (scenario 5)\&#34;, fillcolor = \&#34;LightGray\&#34;, fontcolor = \&#34;#000000\&#34;] \n  \&#34;1\&#34;-&gt;\&#34;2\&#34; \n  \&#34;1\&#34;-&gt;\&#34;6\&#34; \n  \&#34;2\&#34;-&gt;\&#34;3\&#34; \n  \&#34;2\&#34;-&gt;\&#34;4\&#34; \n  \&#34;2\&#34;-&gt;\&#34;5\&#34; \n  \&#34;6\&#34;-&gt;\&#34;7\&#34; \n  \&#34;6\&#34;-&gt;\&#34;8\&#34; \n}&#34;,&#34;config&#34;:{&#34;engine&#34;:&#34;dot&#34;,&#34;options&#34;:null}},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
+&lt;p&gt;On the one hand, &lt;strong&gt;independent&lt;/strong&gt; samples means that the two samples are collected on &lt;strong&gt;different&lt;/strong&gt; experimental units or different individuals, for instance when we are working on women and men separately, or working on patients who have been randomly assigned to a control and a treatment group (and a patient belongs to only one group). On the other hand, we face &lt;strong&gt;paired&lt;/strong&gt; samples when measurements are collected on the &lt;strong&gt;same&lt;/strong&gt; experimental units, same individuals. This is often the case, for example in medical studies, when testing the effect of a drug before and after a treatment. The same patients are measured twice, before and after treatment, and the dependency between the two samples must be taken into account in the computation of the test statistic by working on the &lt;strong&gt;differences&lt;/strong&gt; of measurements for each subject. Paired samples are usually the result of measurements at two different times, but not exclusively. Suppose we want to test the difference in vision between the left and right eyes of 50 athletes. Although the measurements are not made at two different time (before/after), it is clear that both eyes are dependent. Therefore, the Student’s t-test for paired samples should be used to account for the dependence between the two samples instead of the standard Student’s t-test.&lt;/p&gt;
+&lt;p&gt;Another criteria for choosing the appropriate version of the Student’s t-test is whether the variances of the populations (not the variances of the samples!) are known or unknown. This criteria is rather straightforward, we either know the variances of the populations or we don’t. The variances of the populations cannot be computed because if you can compute the variance of a population, it means you have the data for the whole population, then there is no need to do a hypothesis test anymore… So the variances of the populations are either given in the statement such that you can use them, or there is no information about these variances and in this case, it is assumed that the variances are unknown. In practice, the variances of the populations are most of the time unknown, but we still illustrate how to do the test by hand for all versions of the test in the next sections following the 4 steps of hypothesis testing.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;how-to-compute-students-t-test-by-hand&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;How to compute Student’s t-test by hand?&lt;/h1&gt;
+&lt;p&gt;Note that the data are artificial and do not represent any real variable. Furthermore, remind that the assumptions may or may not be met. The point of the article is to detail how to compute the different versions of the test by hand and in R, so all assumptions are assumed to be met. Moreover, assume that the significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha = 5\)&lt;/span&gt;% for all tests.&lt;/p&gt;
+&lt;p&gt;If you are interested in applying these tests by hand without having to do the computions yourself, here is a &lt;a href=&#34;/blog/a-shiny-app-for-inferential-statistics-by-hand&#34;&gt;Shiny app&lt;/a&gt; which does it for you. You just need to enter the data and choose the appropriate version of the test thanks to the sidebar menu. There is also a graphical representation that helps you to visualize the test statistc and the rejection region. Hope you will find it useful!&lt;/p&gt;
+&lt;div id=&#34;scenario-1-independent-samples-with-2-known-variances&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scenario 1: Independent samples with 2 known variances&lt;/h2&gt;
+&lt;p&gt;For the first scenario, suppose the data below. Moreover, suppose that the two samples are independent, that the variances &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2 = 1\)&lt;/span&gt; in both populations and that we would like to test whether the two populations are different.&lt;/p&gt;
+&lt;table style=&#34;width:24%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;11%&#34; /&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;value&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;sample&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;-0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;-0.3&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;-0.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;-0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;So we have:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;5 observations in each sample: &lt;span class=&#34;math inline&#34;&gt;\(n_1 = n_2 = 5\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;mean of sample 1: &lt;span class=&#34;math inline&#34;&gt;\(\bar{x}_1 = 0.02\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;mean of sample 2: &lt;span class=&#34;math inline&#34;&gt;\(\bar{x}_2 = 0.06\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;variances of both populations: &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_1 = \sigma^2_2 = 1\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Following the 4 steps of hypothesis testing we have:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0: \mu_1 = \mu_2\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(H_1: \mu_1 - \mu_2 \ne 0\)&lt;/span&gt;. (&lt;span class=&#34;math inline&#34;&gt;\(\ne\)&lt;/span&gt; because we want to test whether the two means are different, we do not impose a direction in the test.)&lt;/li&gt;
+&lt;li&gt;Test statistic: &lt;span class=&#34;math display&#34;&gt;\[z_{obs} = \frac{(\bar{x}_1 - \bar{x}_2) - (\mu_1 - \mu_2)}{\sqrt{\frac{\sigma^2_1}{n_1} + \frac{\sigma^2_2}{n_2}}} = \frac{0.02-0.06-0}{0.632} = -0.063\]&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Critical value: &lt;span class=&#34;math inline&#34;&gt;\(\pm z_{\alpha / 2} = \pm z_{0.025} = \pm 1.96\)&lt;/span&gt; (see &lt;a href=&#34;/blog/a-guide-on-how-to-read-statistical-tables&#34;&gt;how to read statistical tables&lt;/a&gt; if you struggle to find the critical value)&lt;/li&gt;
+&lt;li&gt;Conclusion: The rejection regions are thus from &lt;span class=&#34;math inline&#34;&gt;\(-\infty\)&lt;/span&gt; to -1.96 and from 1.96 to &lt;span class=&#34;math inline&#34;&gt;\(+\infty\)&lt;/span&gt;. The test statistic is outside the rejection regions so we do not reject the null hypothesis &lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;. In terms of the initial question: At the 5% significance level, we do not reject the hypothesis that the two populations are the same, or there is no sufficient evidence in the data to conclude that the two populations considered are different.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;scenario-2-independent-samples-with-2-equal-but-unknown-variances&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scenario 2: Independent samples with 2 equal but unknown variances&lt;/h2&gt;
+&lt;p&gt;For the second scenario, suppose the data below. Moreover, suppose that the two samples are independent, that the variances in both populations are unknown but equal (&lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_1 = \sigma^2_1\)&lt;/span&gt;) and that we would like to test whether population 1 is larger than population 2.&lt;/p&gt;
+&lt;table style=&#34;width:24%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;11%&#34; /&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;value&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;sample&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1.78&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1.5&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.6&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;-0.7&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;-0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;So we have:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;6 observations in sample 1: &lt;span class=&#34;math inline&#34;&gt;\(n_1 = 6\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;5 observations in sample 2: &lt;span class=&#34;math inline&#34;&gt;\(n_2 = 5\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;mean of sample 1: &lt;span class=&#34;math inline&#34;&gt;\(\bar{x}_1 = 1.247\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;mean of sample 2: &lt;span class=&#34;math inline&#34;&gt;\(\bar{x}_2 = 0.1\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;variance of sample 1: &lt;span class=&#34;math inline&#34;&gt;\(s^2_1 = 0.303\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;variance of sample 2: &lt;span class=&#34;math inline&#34;&gt;\(s^2_1 = 0.315\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Following the 4 steps of hypothesis testing we have:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0: \mu_1 = \mu_2\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(H_1: \mu_1 - \mu_2 &amp;gt; 0\)&lt;/span&gt;. (&amp;gt; because we want to test if the mean of the first population is larger than the mean of the second population.)&lt;/li&gt;
+&lt;li&gt;Test statistic: &lt;span class=&#34;math display&#34;&gt;\[t_{obs} = \frac{(\bar{x}_1 - \bar{x}_2) - (\mu_1 - \mu_2)}{s_p\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}\]&lt;/span&gt; where &lt;span class=&#34;math display&#34;&gt;\[s_p = \sqrt{\frac{(n_1-1)s^2_1+ (n_2 - 1)s^2_2}{n_1 + n_2 - 2}} = 0.555\]&lt;/span&gt; so &lt;span class=&#34;math display&#34;&gt;\[t_{obs} = \frac{1.247-0.1-0}{0.555 * 0.606} = 3.411\]&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Critical value: &lt;span class=&#34;math inline&#34;&gt;\(t_{\alpha, n_1 + n_2 - 2} = t_{0.05, 9} = 1.833\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Conclusion: The rejection regions are thus from 1.833 to &lt;span class=&#34;math inline&#34;&gt;\(+\infty\)&lt;/span&gt;. The test statistic lies within the rejection region so we reject the null hypothesis &lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;. In terms of the initial question: At the 5% significance level, we conclude that the population 1 is larger than the population 2.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;scenario-3-independent-samples-with-2-unequal-and-unknown-variances&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scenario 3: Independent samples with 2 unequal and unknown variances&lt;/h2&gt;
+&lt;p&gt;For the third scenario, suppose the data below. Moreover, suppose that the two samples are independent, that the variances in both populations are unknown and unequal (&lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_1 \ne \sigma^2_1\)&lt;/span&gt;) and that we would like to test whether population 1 is smaller than population 2.&lt;/p&gt;
+&lt;table style=&#34;width:24%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;11%&#34; /&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;value&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;sample&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.7&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1.78&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1.5&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.6&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;So we have:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;5 observations in sample 1: &lt;span class=&#34;math inline&#34;&gt;\(n_1 = 5\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;6 observations in sample 2: &lt;span class=&#34;math inline&#34;&gt;\(n_2 = 6\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;mean of sample 1: &lt;span class=&#34;math inline&#34;&gt;\(\bar{x}_1 = 0.42\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;mean of sample 2: &lt;span class=&#34;math inline&#34;&gt;\(\bar{x}_2 = 1.247\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;variance of sample 1: &lt;span class=&#34;math inline&#34;&gt;\(s^2_1 = 0.107\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;variance of sample 2: &lt;span class=&#34;math inline&#34;&gt;\(s^2_1 = 0.303\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Following the 4 steps of hypothesis testing we have:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0: \mu_1 = \mu_2\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(H_1: \mu_1 - \mu_2 &amp;lt; 0\)&lt;/span&gt;. (&amp;lt; because we want to test if the mean of the first population is smaller than the mean of the second population.)&lt;/li&gt;
+&lt;li&gt;Test statistic: &lt;span class=&#34;math display&#34;&gt;\[t_{obs} = \frac{(\bar{x}_1 - \bar{x}_2) - (\mu_1 - \mu_2)}{\sqrt{\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2}}} = \frac{0.42-1.247-0}{0.268} = -3.084\]&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Critical value: &lt;span class=&#34;math inline&#34;&gt;\(-t_{\alpha, \upsilon}\)&lt;/span&gt; where &lt;span class=&#34;math display&#34;&gt;\[\upsilon = \frac{\bigg(\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2} \bigg)^2}{\frac{\bigg(\frac{s^2_1}{n_1}\bigg)^2}{n_1 - 1} + \frac{\bigg(\frac{s^2_2}{n_2}\bigg)^2}{n_2 - 1}} = 8.28\]&lt;/span&gt; so &lt;span class=&#34;math display&#34;&gt;\[-t_{0.08, 8.28} = -1.851\]&lt;/span&gt; The degrees of freedom 8.28 does not exist in the Student distribution table, so simply take 8, or compute it in R with &lt;code&gt;qt(p = 0.05, df = 8.28)&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Conclusion: The rejection regions are thus from &lt;span class=&#34;math inline&#34;&gt;\(-\infty\)&lt;/span&gt; to -1.851. The test statistic lies within the rejection region so we reject the null hypothesis &lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;. In terms of the initial question: At the 5% significance level, we conclude that the population 1 is smaller than the population 2.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;scenario-4-paired-samples-where-the-variance-of-the-differences-is-known&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scenario 4: Paired samples where the variance of the differences is known&lt;/h2&gt;
+&lt;p&gt;Student’s t-test with paired samples are a bit different than with independent samples. For paired samples, we actually compute the difference between the two samples for each pair of observations, and we then compute the test statistic on these differences.&lt;/p&gt;
+&lt;p&gt;For the fourth scenario, suppose the data below. Moreover, suppose that the two samples are dependent (matched), that the variance of the differences in the population is known and equal to 1 (&lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_D = 1\)&lt;/span&gt;) and that we would like to test whether the difference in the population is different than 0.&lt;/p&gt;
+&lt;table style=&#34;width:25%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;before&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;after&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.8&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;-0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-0.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-0.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;-0.3&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The first thing to do is to compute the differences for all pairs of observations:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat4$difference &amp;lt;- dat4$after - dat4$before
+pander(dat4)&lt;/code&gt;&lt;/pre&gt;
+&lt;table style=&#34;width:42%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;col width=&#34;11%&#34; /&gt;
+&lt;col width=&#34;18%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;before&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;after&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;difference&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-0.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;-0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-0.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-0.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-0.2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;-0.3&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;-0.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;So we have:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;number of pairs: &lt;span class=&#34;math inline&#34;&gt;\(n = 5\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;mean of the difference: &lt;span class=&#34;math inline&#34;&gt;\(\bar{D} = 0.04\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;variance of the difference in the population: &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_D = 1\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;standard deviation of the difference in the population: &lt;span class=&#34;math inline&#34;&gt;\(\sigma_D = 1\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Following the 4 steps of hypothesis testing we have:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0: \mu_D = 0\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(H_1: \mu_D \ne 0\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Test statistic: &lt;span class=&#34;math display&#34;&gt;\[z_{obs} = \frac{\bar{D} - \mu_0}{\frac{\sigma_D}{\sqrt{n}}} = \frac{0.04-0}{0.447} = 0.089\]&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Critical value: &lt;span class=&#34;math inline&#34;&gt;\(\pm z_{\alpha/2} = \pm z_{0.025} = \pm 1.96\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Conclusion: The rejection regions are thus from &lt;span class=&#34;math inline&#34;&gt;\(-\infty\)&lt;/span&gt; to -1.96 and from 1.96 to &lt;span class=&#34;math inline&#34;&gt;\(+\infty\)&lt;/span&gt;. The test statistic is outside the rejection regions so we do not reject the null hypothesis &lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;. In terms of the initial question: At the 5% significance level, we do not reject the hypothesis that the difference in the two populations is equal to 0.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scenario 5: Paired samples where the variance of the differences is unknown&lt;/h2&gt;
+&lt;p&gt;For the fifth and final scenario, suppose the data below. Moreover, suppose that the two samples are dependent (matched), that the variance of the differences in the population is unknown and that we would like to test whether a treatment is effective in increasing running capabilities (the higher the value, the better in terms of running capabilities).&lt;/p&gt;
+&lt;table style=&#34;width:25%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;before&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;after&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;16&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;11&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;15&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;12&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The first thing to do is to compute the differences for all pairs of observations:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat5$difference &amp;lt;- dat5$after - dat5$before
+pander(dat5)&lt;/code&gt;&lt;/pre&gt;
+&lt;table style=&#34;width:42%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;col width=&#34;11%&#34; /&gt;
+&lt;col width=&#34;18%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;before&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;after&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;difference&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;16&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;11&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;15&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;14&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;12&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;So we have:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;number of pairs: &lt;span class=&#34;math inline&#34;&gt;\(n = 5\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;mean of the difference: &lt;span class=&#34;math inline&#34;&gt;\(\bar{D} = 8\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;variance of the difference in the population: &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_D = 16\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;standard deviation of the difference in the population: &lt;span class=&#34;math inline&#34;&gt;\(\sigma_D = 4\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Following the 4 steps of hypothesis testing we have:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0: \mu_D = 0\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(H_1: \mu_D &amp;gt; 0\)&lt;/span&gt; (&amp;gt; because we would like to test whether the treatment is effective, so whether the treatment has a positive impact on the running capabilities.)&lt;/li&gt;
+&lt;li&gt;Test statistic: &lt;span class=&#34;math display&#34;&gt;\[t_{obs} = \frac{\bar{D} - \mu_0}{\frac{s_D}{\sqrt{n}}} = \frac{8-0}{1.789} = 4.472\]&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Critical value: &lt;span class=&#34;math inline&#34;&gt;\(t_{\alpha, n-1} = t_{0.05, 4} = 2.132\)&lt;/span&gt; (&lt;em&gt;n&lt;/em&gt; is the number of pairs, not the number of observations!)&lt;/li&gt;
+&lt;li&gt;Conclusion: The rejection regions are thus from 2.132 to &lt;span class=&#34;math inline&#34;&gt;\(+\infty\)&lt;/span&gt;. The test statistic lies within the rejection region so we reject the null hypothesis &lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;. In terms of the initial question: At the 5% significance level, we conclude that the treatment has a positive impact on the running capabilities.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This concludes how to perform the different version of the Student’s t-test by hand. In the next sections, we detail how to perform the exact same tests in R.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;how-to-compute-students-t-test-in-r&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;How to compute Student’s t-test in R?&lt;/h1&gt;
+&lt;p&gt;A good practice before doing t-test in R is to visualize the data by group thanks to a boxplot (or eventually a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#density-plot&#34;&gt;density plot&lt;/a&gt;, or both). A boxplot with the two boxes overlapping each other gives a first indication that the two samples are similar, and thus, that the null hypothesis may not be rejected. On the contrary, if the two boxes are not overalapping, it indicates that the two samples are not similar, and thus, that the populations may be different. However, even if boxplots or density plots are great in showing a comparison between the two groups, only a sound statistical test will confirm our first impression.&lt;/p&gt;
+&lt;p&gt;After a visualization of the data by group, we replicate in R the results found by hand. We will see that for some versions of the t-test, there is no default function built in R (at least to my knowledge, do not hesitate to let me know if I’m mistaken). In these cases, a function is written to replicate the results by hand.&lt;/p&gt;
+&lt;p&gt;Note that we use the same data, the same assumptions and the same question for all scenarios.&lt;/p&gt;
+&lt;div id=&#34;scenario-1-independent-samples-with-2-known-variances-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scenario 1: Independent samples with 2 known variances&lt;/h2&gt;
+&lt;p&gt;For the first scenario, suppose the data below. Moreover, suppose that the two samples are independent, that the variances &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2 = 1\)&lt;/span&gt; in both populations and that we would like to test whether the two populations are different.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat1 &amp;lt;- data.frame(
+  sample1 = c(0.9, -0.8, 0.1, -0.3, 0.2),
+  sample2 = c(0.8, -0.9, -0.1, 0.4, 0.1)
+)
+dat1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   sample1 sample2
+## 1     0.9     0.8
+## 2    -0.8    -0.9
+## 3     0.1    -0.1
+## 4    -0.3     0.4
+## 5     0.2     0.1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat_ggplot &amp;lt;- data.frame(
+  value = c(0.9, -0.8, 0.1, -0.3, 0.2, 0.8, -0.9, -0.1, 0.4, 0.1),
+  sample = c(rep(&amp;quot;1&amp;quot;, 5), rep(&amp;quot;2&amp;quot;, 5))
+)
+
+library(ggplot2)
+
+ggplot(dat_ggplot) +
+  aes(x = sample, y = value) +
+  geom_boxplot() +
+  theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;(You can use the &lt;a href=&#34;/blog/rstudio-addins-or-how-to-make-your-coding-life-easier&#34;&gt;&lt;code&gt;{esquisse}&lt;/code&gt; RStudio addin&lt;/a&gt; if you want to draw a boxplot with the package &lt;code&gt;{ggplot2}&lt;/code&gt; without coding the function yourself.)&lt;/p&gt;
+&lt;p&gt;The two boxes seem to overlap which illustrate that the two samples are quite similar, so we tend to believe that we will not be able to reject the null hypothesis that the two populations are similar. However, only a formal statistical test will confirm these beliefs.&lt;/p&gt;
+&lt;p&gt;Since there is no function in R to perform a t-test with known variances, here is one with arguments accepting the two samples (&lt;code&gt;x&lt;/code&gt; and &lt;code&gt;y&lt;/code&gt;), the two variances of the populations (&lt;code&gt;V1&lt;/code&gt; and &lt;code&gt;V2&lt;/code&gt;), the difference in means under the null hypothesis (&lt;code&gt;m0&lt;/code&gt;, default is &lt;code&gt;0&lt;/code&gt;), the significance level (&lt;code&gt;alpha&lt;/code&gt;, default is &lt;code&gt;0.05&lt;/code&gt;) and the alternative (&lt;code&gt;alternative&lt;/code&gt;, one of &lt;code&gt;&amp;quot;two.sided&amp;quot;&lt;/code&gt; (default), &lt;code&gt;&amp;quot;less&amp;quot;&lt;/code&gt; or &lt;code&gt;&amp;quot;greater&amp;quot;&lt;/code&gt;):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;t.test_knownvar &amp;lt;- function(x, y, V1, V2, m0 = 0, alpha = 0.05, alternative = &amp;quot;two.sided&amp;quot;) {
+  M1 &amp;lt;- mean(x)
+  M2 &amp;lt;- mean(y)
+  n1 &amp;lt;- length(x)
+  n2 &amp;lt;- length(y)
+  sigma1 &amp;lt;- sqrt(V1)
+  sigma2 &amp;lt;- sqrt(V2)
+  S &amp;lt;- sqrt((V1 / n1) + (V2 / n2))
+  statistic &amp;lt;- (M1 - M2 - m0) / S
+  p &amp;lt;- if (alternative == &amp;quot;two.sided&amp;quot;) {
+    2 * pnorm(abs(statistic), lower.tail = FALSE)
+  } else if (alternative == &amp;quot;less&amp;quot;) {
+    pnorm(statistic, lower.tail = TRUE)
+  } else {
+    pnorm(statistic, lower.tail = FALSE)
+  }
+  LCL &amp;lt;- (M1 - M2 - S * qnorm(1 - alpha / 2))
+  UCL &amp;lt;- (M1 - M2 + S * qnorm(1 - alpha / 2))
+  value &amp;lt;- list(mean1 = M1, mean2 = M2, m0 = m0, sigma1 = sigma1, sigma2 = sigma2, S = S, statistic = statistic, p.value = p, LCL = LCL, UCL = UCL, alternative = alternative)
+  # print(sprintf(&amp;quot;P-value = %g&amp;quot;,p))
+  # print(sprintf(&amp;quot;Lower %.2f%% Confidence Limit = %g&amp;quot;,
+  #               alpha, LCL))
+  # print(sprintf(&amp;quot;Upper %.2f%% Confidence Limit = %g&amp;quot;,
+  #               alpha, UCL))
+  return(value)
+}
+
+test &amp;lt;- t.test_knownvar(dat1$sample1, dat1$sample2, V1 = 1, V2 = 1)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $mean1
+## [1] 0.02
+## 
+## $mean2
+## [1] 0.06
+## 
+## $m0
+## [1] 0
+## 
+## $sigma1
+## [1] 1
+## 
+## $sigma2
+## [1] 1
+## 
+## $S
+## [1] 0.6324555
+## 
+## $statistic
+## [1] -0.06324555
+## 
+## $p.value
+## [1] 0.949571
+## 
+## $LCL
+## [1] -1.27959
+## 
+## $UCL
+## [1] 1.19959
+## 
+## $alternative
+## [1] &amp;quot;two.sided&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The output above recaps all the information needed to perform the test (compare these results found in R with the results found by hand).&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value can be extracted as usual:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$p.value&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.949571&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.95 so at the 5% significance level we do not reject the null hypothesis of equal means. There is no sufficient evidence in the data to reject the hypothesis that the two means in the populations are similar. This result confirms what we found by hand.&lt;/p&gt;
+&lt;div id=&#34;a-note-on-p-value-and-significance-level-alpha&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;A note on &lt;em&gt;p&lt;/em&gt;-value and significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt;&lt;/h3&gt;
+&lt;p&gt;For those unfamiliar with the concept of &lt;em&gt;p&lt;/em&gt;-value, the &lt;em&gt;p&lt;/em&gt;-value is a probability and as any probability it goes from 0 to 1. The &lt;strong&gt;&lt;em&gt;p&lt;/em&gt;-value is the probability of having observations as extreme as what we measured (via the samples) if the null hypothesis was true&lt;/strong&gt;. In other words, it is the probability of having a test statistic as extreme as what we computed, given that the null hypothesis is true. If the observations are not so extreme, i.e., not unlikely to occur if the null hypothesis was true, we do not reject this null hypothesis because it is deemed plausible to be true. And if the observations are considered too extreme, i.e., too unlikely to happen under the null hypothesis, we reject the null hypothesis because it is deemed too implausible to be true. Note that it does not mean that we are 100% sure that it is too unlikely, it happens sometimes that the null hypothesis is rejected altough it is true (see the significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; later on).&lt;/p&gt;
+&lt;p&gt;In our example above, the observations are not really extreme and the difference between the two means is not extreme, so the test statistic is not extreme (since the test statistic is partially based on the difference of the means of the two samples). Having a test statistic which is not extreme is not unlikely and that is the reason why the &lt;em&gt;p&lt;/em&gt;-value is quite high. The &lt;em&gt;p&lt;/em&gt;-value of 0.95 actually tells us that the probability of having two samples with a difference in means of -0.04 (= 0.02 - 0.06), given that the difference in means in the populations is 0 (the null hypothesis), equals 95%. A probability of 95% is definitely considered as plausible, so we do not reject the null hypothesis of equal means in the populations.&lt;/p&gt;
+&lt;p&gt;One may then wonder, “What is too extreme for a test statistic?” Most of the time, we consider that a test statistic is too extreme to happen just by chance when the probability of having such an extreme test statistic given that the null hypothesis is true is below 5%. The threshold of 5% (&lt;span class=&#34;math inline&#34;&gt;\(\alpha = 0.05\)&lt;/span&gt;) that you very often see in statistic courses or textbooks is the threshold used in many fields. Under that threshold we consider that the observations (and thus the test statistic) is &lt;strong&gt;too unlikely&lt;/strong&gt; to happen just by chance if the null hypothesis was true, so the null hypothesis is rejected. Above that threshold of 5%, we consider that it is not really implausible to face the observations we have via the samples if the null hypothesis was true, and we therefore cannot reject the null hypothesis.&lt;/p&gt;
+&lt;p&gt;Note that I wrote “we cannot reject the null hypothesis”, and not “we accept the null hypothesis”. This is because it may be the case that the null hypothesis is in fact false, but we failed to prove it with the samples. Suppose the analogy of a suspect charged with murder. On the one hand, if we have collected enough evidence that the suspect committed the murder, he is considered guilty: we reject the null hypothesis that he is innocent. On the other hand, if we have &lt;em&gt;not&lt;/em&gt; collected enough evidence against the suspect, he is presumed to be innocent although he may in fact have committed the crime. We are never sure that he did not committed the crime even if he is released, we just did not find sufficient evidence against the null hypothesis of the suspect being innocent. This is the reason why we do not reject the null hypothesis instead of accepting it, and why you will often read things like “there is no sufficient evidence in the data to reject the null hypothesis” or “based on the samples we fail to reject the null hypothesis”.&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt;&lt;/strong&gt;, derived from this threshold of 5%, &lt;strong&gt;is the probability of rejecting the null hypothesis when it is in fact true&lt;/strong&gt;. In this sense, it is an error (of 5%) that we accept to deal with, in order to be able to draw conclusions. If we would accept no error (an error of 0%), we would not be able to draw any conclusion about the population(s) since we only have access to a limited portion of the population(s) via the sample(s). As a consequence, we will never be 100% sure when interpreting the result of a hypothesis test unless we have access to the data for the entire population, but then there is no reason to do a hypothesis test anymore since we can simply compare the two populations. We usually allow this error (called Type I error) to be 5%, but in order to be a bit more certain when concluding that we reject the null hypothesis, the alpha level can also be set to 1% (or even to 0.1% in some rare cases).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;To sum up&lt;/strong&gt; what you need to remember about &lt;em&gt;p&lt;/em&gt;-value and significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;If the &lt;em&gt;p&lt;/em&gt;-value is smaller than the predetermined significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; (usually 5%) so if &lt;em&gt;p&lt;/em&gt;-value &amp;lt; 0.05, we reject the null hypothesis&lt;/li&gt;
+&lt;li&gt;If the &lt;em&gt;p&lt;/em&gt;-value is greater than or equal to the predetermined significance level &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; (usually 5%) so if &lt;em&gt;p&lt;/em&gt;-value &lt;span class=&#34;math inline&#34;&gt;\(\ge\)&lt;/span&gt; 0.05, we do &lt;strong&gt;not reject&lt;/strong&gt; the null hypothesis&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;scenario-2-independent-samples-with-2-equal-but-unknown-variances-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scenario 2: Independent samples with 2 equal but unknown variances&lt;/h2&gt;
+&lt;p&gt;For the second scenario, suppose the data below. Moreover, suppose that the two samples are independent, that the variances in both populations are unknown but equal (&lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_1 = \sigma^2_1\)&lt;/span&gt;) and that we would like to test whether population 1 is larger than population 2.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat2 &amp;lt;- data.frame(
+  sample1 = c(1.78, 1.5, 0.9, 0.6, 0.8, 1.9),
+  sample2 = c(0.8, -0.7, -0.1, 0.4, 0.1, NA)
+)
+dat2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   sample1 sample2
+## 1    1.78     0.8
+## 2    1.50    -0.7
+## 3    0.90    -0.1
+## 4    0.60     0.4
+## 5    0.80     0.1
+## 6    1.90      NA&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat_ggplot &amp;lt;- data.frame(
+  value = c(1.78, 1.5, 0.9, 0.6, 0.8, 1.9, 0.8, -0.7, -0.1, 0.4, 0.1),
+  sample = c(rep(&amp;quot;1&amp;quot;, 6), rep(&amp;quot;2&amp;quot;, 5))
+)
+
+ggplot(dat_ggplot) +
+  aes(x = sample, y = value) +
+  geom_boxplot() +
+  theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-14-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Unlike the previous scenario, the two boxes do not overlap which illustrates that the two samples are different from each other. From this boxplot, we can expect the test to reject the null hypothesis of equal means in the populations. Nonetheless, only a formal statistical test will confirm this expectation.&lt;/p&gt;
+&lt;p&gt;There is a function in R, and it is simply the &lt;code&gt;t.test()&lt;/code&gt; function (this version of the test is actually the “standard” Student’s t-test). Note that it is assumed that the variances of the two populations are equal so we need to specify it in the function with the argument &lt;code&gt;var.equal = TRUE&lt;/code&gt; and the alternative hypothesis is &lt;span class=&#34;math inline&#34;&gt;\(H_1: \mu_1 - \mu_2 &amp;gt; 0\)&lt;/span&gt; so we need to add the argument &lt;code&gt;alternative = &amp;quot;greater&amp;quot;&lt;/code&gt; as well:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- t.test(dat2$sample1, dat2$sample2, var.equal = TRUE, alternative = &amp;quot;greater&amp;quot;)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Two Sample t-test
+## 
+## data:  dat2$sample1 and dat2$sample2
+## t = 3.4113, df = 9, p-value = 0.003867
+## alternative hypothesis: true difference in means is greater than 0
+## 95 percent confidence interval:
+##  0.5304908       Inf
+## sample estimates:
+## mean of x mean of y 
+##  1.246667  0.100000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The output above recaps all the information needed to perform the test: the name of the test, the test statistic, the degrees of freedom, the &lt;em&gt;p&lt;/em&gt;-value, the alternative used and the two sample means (compare these results found in R with the results found by hand).&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value can be extracted as usual:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$p.value&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.003866756&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.004 so at the 5% significance level we reject the null hypothesis of equal means. This result confirms what we found by hand.&lt;/p&gt;
+&lt;p&gt;Unlike the first scenario, the &lt;em&gt;p&lt;/em&gt;-value in this scenario is below 5% so we reject the null hypothesis. At the 5% significance level, we can conclude that the population 1 is larger than the population 2.&lt;/p&gt;
+&lt;p&gt;If your data is formatted in the long format (which is even better), simply use the &lt;code&gt;~&lt;/code&gt;. For instance, imagine the exact same data presented like this:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat2bis &amp;lt;- data.frame(
+  value = c(1.78, 1.5, 0.9, 0.6, 0.8, 1.9, 0.8, -0.7, -0.1, 0.4, 0.1),
+  sample = c(rep(&amp;quot;1&amp;quot;, 6), rep(&amp;quot;2&amp;quot;, 5))
+)
+dat2bis&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##    value sample
+## 1   1.78      1
+## 2   1.50      1
+## 3   0.90      1
+## 4   0.60      1
+## 5   0.80      1
+## 6   1.90      1
+## 7   0.80      2
+## 8  -0.70      2
+## 9  -0.10      2
+## 10  0.40      2
+## 11  0.10      2&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here is how to perform the Student’s t-test in R with long data:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- t.test(value ~ sample, data = dat2bis, var.equal = TRUE, alternative = &amp;quot;greater&amp;quot;)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Two Sample t-test
+## 
+## data:  value by sample
+## t = 3.4113, df = 9, p-value = 0.003867
+## alternative hypothesis: true difference in means is greater than 0
+## 95 percent confidence interval:
+##  0.5304908       Inf
+## sample estimates:
+## mean in group 1 mean in group 2 
+##        1.246667        0.100000&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$p.value&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.003866756&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The results are exactly the same.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;scenario-3-independent-samples-with-2-unequal-and-unknown-variances-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scenario 3: Independent samples with 2 unequal and unknown variances&lt;/h2&gt;
+&lt;p&gt;For the third scenario, suppose the data below. Moreover, suppose that the two samples are independent, that the variances in both populations are unknown and unequal (&lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_1 \ne \sigma^2_1\)&lt;/span&gt;) and that we would like to test whether population 1 is smaller than population 2.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat3 &amp;lt;- data.frame(
+  value = c(0.8, 0.7, 0.1, 0.4, 0.1, 1.78, 1.5, 0.9, 0.6, 0.8, 1.9),
+  sample = c(rep(&amp;quot;1&amp;quot;, 5), rep(&amp;quot;2&amp;quot;, 6))
+)
+pander(dat3)&lt;/code&gt;&lt;/pre&gt;
+&lt;table style=&#34;width:24%;&#34;&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;11%&#34; /&gt;
+&lt;col width=&#34;12%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;value&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;sample&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.7&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.4&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1.78&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1.5&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.6&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;0.8&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;1.9&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat3) +
+  aes(x = sample, y = value) +
+  geom_boxplot() +
+  theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;There is a function in R for this version of the test as well, and it is simply the &lt;code&gt;t.test()&lt;/code&gt; function with the &lt;code&gt;var.equal = FALSE&lt;/code&gt; argument. &lt;code&gt;FALSE&lt;/code&gt; is the default option for the &lt;code&gt;var.equal&lt;/code&gt; argument so you actually do not need to specify it. This version of the test is actually the Welch test, used when the variances of the population are unknown and unequal. To test if two variances are equal, you can use the Levene’s test (&lt;code&gt;leveneTest(dat3$value, dat3$sample)&lt;/code&gt; from the &lt;code&gt;{car}&lt;/code&gt; package). Note that the alternative hypothesis is &lt;span class=&#34;math inline&#34;&gt;\(H_1: \mu_1 - \mu_2 &amp;lt; 0\)&lt;/span&gt; so we need to add the argument &lt;code&gt;alternative = &amp;quot;less&amp;quot;&lt;/code&gt; as well:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- t.test(value ~ sample, data = dat3, var.equal = FALSE, alternative = &amp;quot;less&amp;quot;)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Welch Two Sample t-test
+## 
+## data:  value by sample
+## t = -3.0841, df = 8.2796, p-value = 0.007206
+## alternative hypothesis: true difference in means is less than 0
+## 95 percent confidence interval:
+##        -Inf -0.3304098
+## sample estimates:
+## mean in group 1 mean in group 2 
+##        0.420000        1.246667&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The output above recaps all the information needed to perform the test (compare these results found in R with the results found by hand).&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value can be extracted as usual:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$p.value&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.00720603&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.007 so at the 5% significance level we reject the null hypothesis of equal means, meaning that we can conclude that the population 1 is smaller than the population 2. This result confirms what we found by hand.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;scenario-4-paired-samples-where-the-variance-of-the-differences-is-known-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scenario 4: Paired samples where the variance of the differences is known&lt;/h2&gt;
+&lt;p&gt;For the fourth scenario, suppose the data below. Moreover, suppose that the two samples are dependent (matched), that the variance of the differences in the population is known and equal to 1 (&lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_D = 1\)&lt;/span&gt;) and that we would like to test whether the difference in the population is different than 0.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat4 &amp;lt;- data.frame(
+  before = c(0.9, -0.8, 0.1, -0.3, 0.2),
+  after = c(0.8, -0.9, -0.1, 0.4, 0.1)
+)
+dat4&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   before after
+## 1    0.9   0.8
+## 2   -0.8  -0.9
+## 3    0.1  -0.1
+## 4   -0.3   0.4
+## 5    0.2   0.1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat4$difference &amp;lt;- dat4$after - dat4$before
+
+ggplot(dat4) +
+  aes(y = difference) +
+  geom_boxplot() +
+  theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Since there is no function in R to perform a t-test with paired samples where the variance of the differences is known, here is one with arguments accepting the differences between the two samples (&lt;code&gt;x&lt;/code&gt;), the variance of the differences in the population (&lt;code&gt;V&lt;/code&gt;), the mean of the differences under the null hypothesis (&lt;code&gt;m0&lt;/code&gt;, default is &lt;code&gt;0&lt;/code&gt;), the significance level (&lt;code&gt;alpha&lt;/code&gt;, default is &lt;code&gt;0.05&lt;/code&gt;) and the alternative (&lt;code&gt;alternative&lt;/code&gt;, one of &lt;code&gt;&amp;quot;two.sided&amp;quot;&lt;/code&gt; (default), &lt;code&gt;&amp;quot;less&amp;quot;&lt;/code&gt; or &lt;code&gt;&amp;quot;greater&amp;quot;&lt;/code&gt;):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;t.test_pairedknownvar &amp;lt;- function(x, V, m0 = 0, alpha = 0.05, alternative = &amp;quot;two.sided&amp;quot;) {
+  M &amp;lt;- mean(x)
+  n &amp;lt;- length(x)
+  sigma &amp;lt;- sqrt(V)
+  S &amp;lt;- sqrt(V / n)
+  statistic &amp;lt;- (M - m0) / S
+  p &amp;lt;- if (alternative == &amp;quot;two.sided&amp;quot;) {
+    2 * pnorm(abs(statistic), lower.tail = FALSE)
+  } else if (alternative == &amp;quot;less&amp;quot;) {
+    pnorm(statistic, lower.tail = TRUE)
+  } else {
+    pnorm(statistic, lower.tail = FALSE)
+  }
+  LCL &amp;lt;- (M - S * qnorm(1 - alpha / 2))
+  UCL &amp;lt;- (M + S * qnorm(1 - alpha / 2))
+  value &amp;lt;- list(mean = M, m0 = m0, sigma = sigma, statistic = statistic, p.value = p, LCL = LCL, UCL = UCL, alternative = alternative)
+  # print(sprintf(&amp;quot;P-value = %g&amp;quot;,p))
+  # print(sprintf(&amp;quot;Lower %.2f%% Confidence Limit = %g&amp;quot;,
+  #               alpha, LCL))
+  # print(sprintf(&amp;quot;Upper %.2f%% Confidence Limit = %g&amp;quot;,
+  #               alpha, UCL))
+  return(value)
+}
+
+test &amp;lt;- t.test_pairedknownvar(dat4$after - dat4$before, V = 1)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $mean
+## [1] 0.04
+## 
+## $m0
+## [1] 0
+## 
+## $sigma
+## [1] 1
+## 
+## $statistic
+## [1] 0.08944272
+## 
+## $p.value
+## [1] 0.9287301
+## 
+## $LCL
+## [1] -0.8365225
+## 
+## $UCL
+## [1] 0.9165225
+## 
+## $alternative
+## [1] &amp;quot;two.sided&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The output above recaps all the information needed to perform the test (compare these results found in R with the results found by hand).&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value can be extracted as usual:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$p.value&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.9287301&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.929 so at the 5% significance level we do not reject the null hypothesis of equal means. There is no sufficient evidence in the data to reject the hypothesis that the difference in the two populations is equal to 0. This result confirms what we found by hand.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scenario 5: Paired samples where the variance of the differences is unknown&lt;/h2&gt;
+&lt;p&gt;For the fifth and final scenario, suppose the data below. Moreover, suppose that the two samples are dependent (matched), that the variance of the differences in the population is unknown and that we would like to test whether a treatment is effective in increasing running capabilities (the higher the value, the better in terms of running capabilities).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat5 &amp;lt;- data.frame(
+  before = c(9, 8, 1, 3, 2),
+  after = c(16, 11, 15, 12, 9)
+)
+dat5&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   before after
+## 1      9    16
+## 2      8    11
+## 3      1    15
+## 4      3    12
+## 5      2     9&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat5$difference &amp;lt;- dat5$after - dat5$before
+
+ggplot(dat5) +
+  aes(y = difference) +
+  geom_boxplot() +
+  theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;There is a function in R for this version of the test, and it is simply the &lt;code&gt;t.test()&lt;/code&gt; function with the &lt;code&gt;paired = TRUE&lt;/code&gt; argument. This version of the test is actually the standard version of the Student’s t-test with paired samples. Note that the alternative hypothesis is &lt;span class=&#34;math inline&#34;&gt;\(H_1: \mu_D &amp;gt; 0\)&lt;/span&gt; so we need to add the argument &lt;code&gt;alternative = &amp;quot;greater&amp;quot;&lt;/code&gt; as well:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- t.test(dat5$after, dat5$before, alternative = &amp;quot;greater&amp;quot;, paired = TRUE)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Paired t-test
+## 
+## data:  dat5$after and dat5$before
+## t = 4.4721, df = 4, p-value = 0.005528
+## alternative hypothesis: true difference in means is greater than 0
+## 95 percent confidence interval:
+##  4.186437      Inf
+## sample estimates:
+## mean of the differences 
+##                       8&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note that we put &lt;code&gt;after&lt;/code&gt; and then &lt;code&gt;before&lt;/code&gt;, if you write &lt;code&gt;before&lt;/code&gt; and then &lt;code&gt;after&lt;/code&gt;, make sure to change the alternative to &lt;code&gt;alternative = &amp;quot;less&amp;quot;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;If your data is in the long format, use the &lt;code&gt;~&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat5 &amp;lt;- data.frame(
+  value = c(9, 8, 1, 3, 2, 16, 11, 15, 12, 9),
+  time = c(rep(&amp;quot;before&amp;quot;, 5), rep(&amp;quot;after&amp;quot;, 5))
+)
+dat5&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##    value   time
+## 1      9 before
+## 2      8 before
+## 3      1 before
+## 4      3 before
+## 5      2 before
+## 6     16  after
+## 7     11  after
+## 8     15  after
+## 9     12  after
+## 10     9  after&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- t.test(value ~ time, data = dat5, alternative = &amp;quot;greater&amp;quot;, paired = TRUE)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Paired t-test
+## 
+## data:  value by time
+## t = 4.4721, df = 4, p-value = 0.005528
+## alternative hypothesis: true difference in means is greater than 0
+## 95 percent confidence interval:
+##  4.186437      Inf
+## sample estimates:
+## mean of the differences 
+##                       8&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The output above recaps all the information needed to perform the test (compare these results found in R with the results found by hand).&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value can be extracted as usual:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test$p.value&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.005528247&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.006 so at the 5% significance level we reject the null hypothesis of equal means, meaning that we can conclude that the treatment is effective in increasing the running capabilities. This result confirms what we found by hand.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;assumptions&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Assumptions&lt;/h1&gt;
+&lt;p&gt;As for many statistical tests, there are some assumptions that need to be met in order to be able to interpret the results. When one or several assumptions are not met, although it is technically possible to perform these tests, it would be incorrect to interpret the results. Below are the assumptions of the Student’s t-test, how to test them and which other tests exist if an assumption is not met:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The data, collected from a representative and randomly selected portion of the total population, should be independent. If observations between the two samples are dependent (for example if two measurements have been collected on the &lt;strong&gt;same individual&lt;/strong&gt; as it is often the case in medical studies when measuring a value after and before a treatment), the paired version of the Student’s t-test, called the Student’s t-test for paired samples, should be preferred in order to take into account the dependency between the two groups to be compared.&lt;/li&gt;
+&lt;li&gt;When the two samples are independent, observations in &lt;strong&gt;both samples&lt;/strong&gt; should follow a &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r&#34;&gt;&lt;strong&gt;normal distribution&lt;/strong&gt;&lt;/a&gt;. When using the Student’s t-test for paired samples, it is the difference between the observations of the two samples that should follow a normal distribution. The normality assumption can be tested visually thanks to a histogram and a QQ-plot, and/or formally via a normality test such as the Shapiro-Wilk or Kolmogorov-Smirnov test. If, even after a transformation (logarithmic transformation, etc.) the data still do not follow a distribution, the Wilcoxon test (&lt;code&gt;wilcox.test(variable1 ~ variable2, data = dat&lt;/code&gt; in R). This test, robust to non normal distributions, compares the medians instead of the means in order to compare the two populations.&lt;/li&gt;
+&lt;li&gt;When the two samples are independent, the variances of the two groups should be equal in the population (an assumption called homogeneity of the variances, or even sometimes referred as homoscedasticity). This assumption can be tested thanks to the Levene’s test (&lt;code&gt;leveneTest(variable ~ group)&lt;/code&gt; from the &lt;code&gt;{car}&lt;/code&gt; package) or a F test (&lt;code&gt;var.test(variable ~ group)&lt;/code&gt;). If the hypothesis of equal variances is rejected, another version of the Student’s t-test can be used: the Welch test.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This is a relatively long article so thanks for reading it. I hope this article helped you to understand how the different versions of the Student’s t-test work and how to perform them by hand and in R. If you are interested here is a &lt;a href=&#34;/blog/a-shiny-app-for-inferential-statistics-by-hand&#34;&gt;Shiny app&lt;/a&gt; to perform these tests by hand easily.&lt;/p&gt;
+&lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Related articles:&lt;/strong&gt;&lt;/p&gt;
+&lt;script src=&#34;//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&amp;detail=-1&amp;limit=5&amp;showtitle=false&amp;type=js&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Remind that inferential statistics is a branch of statistics defined as the science of drawing conclusions about a population from observations made on a representative sample of that population. See the &lt;a href=&#34;/blog/what-is-the-difference-between-population-and-sample&#34;&gt;difference between population and sample&lt;/a&gt;.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;For the rest of the present article, when we write Student’s t-test, we refer to the case of 2 samples. Student’s t-test for one sample will be the topic of another article.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;Some authors argue that one-sided tests should not be used in practice for the simple reason that, if a researcher is so sure that one population is larger (smaller) than the other and would never be smaller (larger) than the other, why would she needs to test it? This a rather philosophical question and it is beyond the scope of this article.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn4&#34;&gt;&lt;p&gt;It is a least the case for parametric hypothesis tests. A parametric test means that it is based on a theoretical statistical distribution, which depends on some defined parameters. In the case of the Student’s t-test, it is based on the Student’s t distribution with a single parameter, the degrees of freedom (&lt;span class=&#34;math inline&#34;&gt;\(df = n_1 + n_2 - 2\)&lt;/span&gt; where &lt;span class=&#34;math inline&#34;&gt;\(n_1\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(n_2\)&lt;/span&gt; are the two sample sizes).&lt;a href=&#34;#fnref4&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Inferential statistics: confidence intervals and hypothesis tests explained in 4 easy steps</title>
