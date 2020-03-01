@@ -23,3 +23,4 @@ If you need help in performing statistical data analyses for your thesis or acad
 ## Latest posts
 
 <script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
+
