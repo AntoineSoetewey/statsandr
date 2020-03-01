@@ -19,8 +19,3 @@ If you are new to this blog, I invite you to:
 <!--- * [Contribute](/contribute/) by submitting your article --->
 
 If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me](/contact/).
-
-## Latest posts
-
-  <script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
-
