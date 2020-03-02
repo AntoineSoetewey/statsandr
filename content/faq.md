@@ -1,7 +1,7 @@
 ---
-title: 'Frequently asked questions'
+title: 'FAQ - Frequently asked questions'
 date: "2020-03-02"
-description: "Frequently asked questions. Feel free to contact me if you have other questions."
+description: "Frequently asked questions. Feel free to contact me if you have any other questions."
 ---
 
 1. [What technology do you use to write this blog and the articles?](#technology)
