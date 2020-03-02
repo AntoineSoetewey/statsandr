@@ -15,7 +15,7 @@ description: "Frequently asked questions. Feel free to contact me if you have an
 This FAQ may be updated with new questions. Feel free to [contact me](/contact/) if you have any other questions.
 
 <a name="technology"></a>
-# What technology do you use to write this blog and the articles?
+## What technology do you use to write this blog and the articles?
 
 This blog is written in R using Hugo, and deployed and hosted via Netlify.
 
@@ -32,17 +32,17 @@ You can start with the following articles:
 Alternatively, you can check all article with the tag "[Basics](/tags/basics/)".
 
 <a name="code"></a>
-# I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?
+## I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?
 
 You can see the entire code of all articles on [GitHub](https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog).
 
 <a name="bug"></a>
-# I believe there is mistake/bug, what is the best way to report it?
+## I believe there is mistake/bug, what is the best way to report it?
 
 If you find a mistake or bug, you can [raise an issue on Github](https://github.com/AntoineSoetewey/statsandr/issues). Thanks in advance for your feedback!
 
 <a name="contact"></a>
-# I have a question or I would like to collaborate with you, how can I contact you?
+## I have a question or I would like to collaborate with you, how can I contact you?
 
 In order for me to answer you as soon as possible, here are the best communication methods:
 
@@ -53,11 +53,11 @@ In order for me to answer you as soon as possible, here are the best communicati
 </ul>
 
 <a name="contribute"></a>
-# Is it possible to contribute to this blog?
+## Is it possible to contribute to this blog?
 
 Absolutely! To share your post on this blog, please send it via the [contribution page](/contribute/).
 
 <a name="support"></a>
-# How can I support you and support this blog?
+## How can I support you and support this blog?
 
 You can support the development of this blog via the [support page](/support/). Thanks in advance for your support, any help is greatly appreciated!
