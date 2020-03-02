@@ -20,16 +20,16 @@ This FAQ may be updated with new questions. Feel free to [contact me](/contact/)
 This blog is written in R using Hugo, and deployed and hosted via Netlify.
 
 <a name="start"></a>
-I am new to this blog, to R or to statistics, from where can I start?
+## I am new to this blog, to R or to statistics, from where can I start?
 
-You can start with the following articles:
+If you are new to this blog, you can start with the following articles:
  
 * [How to install R and RStudio](/blog/how-to-install-r-and-rstudio)
 * [How to import an Excel file in RStudio](/blog/how-to-import-an-excel-file-in-rstudio)
 * [Data manipulation in R](/blog/data-manipulation-in-r)
 * [Descriptive statistics by hand](/blog/descriptive-statistics-by-hand) and [in R](/blog/descriptive-statistics-in-r)
 
-Alternatively, you can check all article with the tag "[Basics](/tags/basics/)".
+Alternatively, you can check all articles with the tag "[Basics](/tags/basics/)".
 
 <a name="code"></a>
 ## I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?
@@ -39,7 +39,7 @@ You can see the entire code of all articles on [GitHub](https://github.com/Antoi
 <a name="bug"></a>
 ## I believe there is mistake/bug, what is the best way to report it?
 
-If you find a mistake or bug, you can [raise an issue on Github](https://github.com/AntoineSoetewey/statsandr/issues). Thanks in advance for your feedback!
+If you find a mistake or a bug, you can [raise an issue on Github](https://github.com/AntoineSoetewey/statsandr/issues). Thanks in advance for your feedback!
 
 <a name="contact"></a>
 ## I have a question or I would like to collaborate with you, how can I contact you?
@@ -47,8 +47,8 @@ If you find a mistake or bug, you can [raise an issue on Github](https://github.
 In order for me to answer you as soon as possible, here are the best communication methods:
 
 <ul>
-  <li>If you have a question or a suggestion related to an article, please add it as a comment so other readers can benefit from the discussion</li>
-  <li>For mistakes or bugs, please inform me about it by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. Note that the code for all articles and pages of this blog can be found on <a href="https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog" target="_blank" rel="noopener">GitHub</a></li>
+  <li>If you have a question or a suggestion related to a specific article, please add it as a comment so other readers can benefit from the discussion</li>
+  <li>For mistakes or bugs, please inform me about them by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. Note that the code for all articles and pages of this blog can be found on <a href="https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog" target="_blank" rel="noopener">GitHub</a></li>
   <li>For all other requests, please use the contact form on the <a href="/contact/">contact page</a></li>
 </ul>
 
