@@ -1,7 +1,7 @@
 ---
 title: Thanks
 date: "2019-12-17"
-description: Thanks for submitting your form.
+description: Thanks for submitting your form. 
 ---
 
 Your form has been successfully submitted !

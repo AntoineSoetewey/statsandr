@@ -1,7 +1,7 @@
 ---
 title: "About"
 date: "2019-12-16"
-description: "Learn more about the author of the blog."
+description: "Antoine Soetewey. Learn more about the author of the blog."
 menu: "main"
 ---
 

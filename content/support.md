@@ -1,7 +1,7 @@
 ---
 title: 'Support this blog'
 date: "2020-01-21"
-description: "See the different ways you can support this blog so I can continue to provide free content. Any help is greatly appreciated."
+description: "See the different ways you can support this blog so I can continue to provide free content. Any help is greatly appreciated. Thanks in advance!"
 ---
 
 1. [Donation](#donation)
