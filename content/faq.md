@@ -4,7 +4,7 @@ date: "2020-03-02"
 description: "Frequently asked questions. Feel free to contact me if you have any other questions."
 ---
 
-1. [What technology do you use to write this blog and the articles?](#technology)
+1. [What technology do you use to write this blog and the articles?](/faq/#technology)
 1. [I am new to this blog, to R or to statistics, from where can I start?](#start)
 1. [I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?](#code)
 1. [I believe there is mistake/bug, what is the best way to report it?](#bug)
