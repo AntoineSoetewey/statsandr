@@ -41,11 +41,9 @@ If you find a mistake or a bug, you can [raise an issue on Github](https://githu
 
 In order for me to answer you as soon as possible, here are the best communication methods:
 
-<ul>
-  <li>If you have a question or a suggestion related to a specific article, please add it as a comment so other readers can benefit from the discussion</li>
-  <li>For mistakes or bugs, please inform me about them by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. Note that the code for all articles and pages of this blog can be found on <a href="https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog" target="_blank" rel="noopener">GitHub</a></li>
-  <li>For all other requests, please use the contact form on the <a href="/contact/">contact page</a></li>
-</ul>
+* If you have a question or a suggestion related to a specific article, please add it as a comment so other readers can benefit from the discussion
+* For mistakes or bugs, please inform me about them by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. Note that the code for all articles and pages of this blog can be found on <a href="https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog" target="_blank" rel="noopener">GitHub</a>
+* For all other requests, please use the contact form on the <a href="/contact/">contact page</a>
 
 ## Is it possible to contribute to this blog?
 
