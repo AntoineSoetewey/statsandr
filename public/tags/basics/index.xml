@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>The 7 concepts and formulas in probability that every data scientist should know</title>
-      <link>/blog/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/</link>
+      <title>The 9 concepts and formulas in probability that every data scientist should know</title>
+      <link>/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/</link>
       <pubDate>Tue, 03 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>/blog/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/</guid>
+      <guid>/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;
@@ -40,7 +40,23 @@
 &lt;li&gt;&lt;a href=&#34;#positive-predictive-value&#34;&gt;Positive predictive value&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#negative-predictive-value&#34;&gt;Negative predictive value&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#counting-techniques&#34;&gt;9. Counting techniques&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#counting-techniques&#34;&gt;9. Counting techniques&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#multiplication&#34;&gt;Multiplication&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#example-1&#34;&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#permutation&#34;&gt;Permutation&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#example-2&#34;&gt;Example&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#by-hand&#34;&gt;By hand&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#in-r&#34;&gt;In R&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#combination&#34;&gt;Combination&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#example-3&#34;&gt;Example&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#by-hand-1&#34;&gt;By hand&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#in-r-1&#34;&gt;In R&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -117,7 +133,7 @@ Note that &lt;span class=&#34;math inline&#34;&gt;\(P(A \cap B) = P(B \cap A)\)&
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(T_1 \cap T_2) = P(T_1) \cdot P(T_2) = \frac{1}{4}\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;The two events are thus independent, denoted &lt;span class=&#34;math inline&#34;&gt;\(T_1{\perp\!\!\!\perp}T_2\)&lt;/span&gt;.&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;In the example of the fire breaking out in two houses (see &lt;a href=&#34;/blog/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#union-of-two-events&#34;&gt;section 4&lt;/a&gt;):&lt;/li&gt;
+&lt;li&gt;In the example of the fire breaking out in two houses (see &lt;a href=&#34;/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#union-of-two-events&#34;&gt;section 4&lt;/a&gt;):&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(A \cap B) = 0.25\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;and&lt;/p&gt;
@@ -245,7 +261,107 @@ Equations 2 and 3 mean that knowing that one event occured does not influence th
 &lt;/div&gt;
 &lt;div id=&#34;counting-techniques&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;9. Counting techniques&lt;/h1&gt;
-&lt;p&gt;In order to use the formula in &lt;a href=&#34;/blog/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#computing-a-probability&#34;&gt;section 2&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In order to use the formula in &lt;a href=&#34;/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#computing-a-probability&#34;&gt;section 2&lt;/a&gt;, one must know how to count the number of possible elements.&lt;/p&gt;
+&lt;p&gt;There are 3 main counting techniques in probability:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Multiplication&lt;/li&gt;
+&lt;li&gt;Permutation&lt;/li&gt;
+&lt;li&gt;Combination&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;See below how to count the number of possible elements in case of equiprobable results.&lt;/p&gt;
+&lt;div id=&#34;multiplication&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Multiplication&lt;/h2&gt;
+&lt;p&gt;The multiplication rule is as follows:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\#(A \times B) = (\#A) \times (\#B)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\#\)&lt;/span&gt; is the number of elements.&lt;/p&gt;
+&lt;div id=&#34;example-1&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;In a restaurant, a customer has to choose a starter, a main course and a dessert. The restaurant offers 2 starters, 3 main courses and 2 desserts. How many different choices are possible?&lt;/p&gt;
+&lt;p&gt;There are 12 different possible choices (i.e., &lt;span class=&#34;math inline&#34;&gt;\(2 \cdot 3 \cdot 2\)&lt;/span&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;permutation&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Permutation&lt;/h2&gt;
+&lt;p&gt;The number of permutations is as follows:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P^r_n = n \times (n - 1) \times \cdots \times (n - r + 1) = \frac{n !}{(n - r)!}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;with &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt; the length, &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; the number of elements and &lt;span class=&#34;math inline&#34;&gt;\(r \le n\)&lt;/span&gt;. Note that &lt;span class=&#34;math inline&#34;&gt;\(0! = 1\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(k! = k \times (k - 1) \times (k - 2) \times \cdots \times 2 \times 1\)&lt;/span&gt; if &lt;span class=&#34;math inline&#34;&gt;\(k = 1, 2, \dots\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The order is important in permutations!&lt;/p&gt;
+&lt;div id=&#34;example-2&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;Count the permutations of length 2 of the set &lt;span class=&#34;math inline&#34;&gt;\(A = \{a, b, c, d\}\)&lt;/span&gt;, without a letter being repeated. How many permutations do you find?&lt;/p&gt;
+&lt;div id=&#34;by-hand&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;By hand&lt;/h4&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P^4_2 = \frac{4!}{(4-2)!} = \frac{4\cdot3\cdot2\cdot1}{2\cdot1} = 12\]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;in-r&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;In R&lt;/h4&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(gtools)
+
+x &amp;lt;- c(&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;, &amp;quot;d&amp;quot;)
+
+# See all different permutations
+perms &amp;lt;- permutations(
+  n = 4, r = 2, v = x,
+  repeats.allowed = FALSE
+)
+perms&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##       [,1] [,2]
+##  [1,] &amp;quot;a&amp;quot;  &amp;quot;b&amp;quot; 
+##  [2,] &amp;quot;a&amp;quot;  &amp;quot;c&amp;quot; 
+##  [3,] &amp;quot;a&amp;quot;  &amp;quot;d&amp;quot; 
+##  [4,] &amp;quot;b&amp;quot;  &amp;quot;a&amp;quot; 
+##  [5,] &amp;quot;b&amp;quot;  &amp;quot;c&amp;quot; 
+##  [6,] &amp;quot;b&amp;quot;  &amp;quot;d&amp;quot; 
+##  [7,] &amp;quot;c&amp;quot;  &amp;quot;a&amp;quot; 
+##  [8,] &amp;quot;c&amp;quot;  &amp;quot;b&amp;quot; 
+##  [9,] &amp;quot;c&amp;quot;  &amp;quot;d&amp;quot; 
+## [10,] &amp;quot;d&amp;quot;  &amp;quot;a&amp;quot; 
+## [11,] &amp;quot;d&amp;quot;  &amp;quot;b&amp;quot; 
+## [12,] &amp;quot;d&amp;quot;  &amp;quot;c&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Count the number of permutations
+nrow(perms)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 12&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;combination&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Combination&lt;/h2&gt;
+&lt;p&gt;The number of combinations is as follows:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[C^r_n = \frac{P^r_n}{r!} = \frac{n !}{r!(n - r)!} = {n \choose r} = \frac{n}{r} \times \frac{n - 1}{r - 1} \times \dots \times \frac{n - r + 1}{1}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;with &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt; the length, &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; the number of elements and &lt;span class=&#34;math inline&#34;&gt;\(r \le n\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The order is &lt;strong&gt;not&lt;/strong&gt; important in combinations!&lt;/p&gt;
+&lt;div id=&#34;example-3&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;In a family of 5 children, what is the probability that there are 3 girls and 2 boys? Assume that the probabilities of giving birth to a girl and a boy are equal.&lt;/p&gt;
+&lt;div id=&#34;by-hand-1&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;By hand&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Count of 3 girls and 2 boys: &lt;span class=&#34;math inline&#34;&gt;\(C^3_5 = {5 \choose 3} = \frac{5!}{3!(5-3)!} = 10\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Count of possible cases: &lt;span class=&#34;math inline&#34;&gt;\(2^5 = 32\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;span class=&#34;math inline&#34;&gt;\(\Rightarrow P(3 \text{ girls and 2 boys}) = \frac{10}{32} = 0.3125\)&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;in-r-1&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;In R&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Count of 3 girls and 2 boys:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;choose(n = 5, k = 3)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 10&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;Count of possible cases:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;2^5&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 32&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Probability of 3 girls and 2 boys:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;choose(n = 5, k = 3) / 2^5&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.3125&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Thanks for reading. I hope this article helped you to install and load R packages in a more efficient way.&lt;/p&gt;
+&lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 </description>
     </item>

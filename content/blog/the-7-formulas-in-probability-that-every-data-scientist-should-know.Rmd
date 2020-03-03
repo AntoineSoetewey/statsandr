@@ -1,8 +1,8 @@
 ---
-title: The 7 concepts and formulas in probability that every data scientist should know
+title: The 9 concepts and formulas in probability that every data scientist should know
 author: Antoine Soetewey
 date: '2020-03-03'
-slug: the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know
+slug: the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know
 categories: []
 tags:
   - Basics
@@ -73,9 +73,13 @@ Graphically we have
 # install.packages('VennDiagram')
 library(VennDiagram)
 
-venn.plot <- draw.pairwise.venn(0.6, 0.45, 0.25, category = c("House A", "House B"), lty = rep("blank", 
-    2), fill = c("light blue", "pink"), alpha = rep(0.5, 2), cat.pos = c(0, 
-    0), cat.dist = rep(0.025, 2))
+venn.plot <- draw.pairwise.venn(0.6, 0.45, 0.25, category = c("House A", "House B"), lty = rep(
+  "blank",
+  2
+), fill = c("light blue", "pink"), alpha = rep(0.5, 2), cat.pos = c(
+  0,
+  0
+), cat.dist = rep(0.025, 2))
 grid.draw(venn.plot)
 ```
 
@@ -128,7 +132,7 @@ $$P(T_1 \cap T_2) = P(T_1) \cdot P(T_2) = \frac{1}{4}$$
 
 The two events are thus independent, denoted $T_1{\perp\!\!\!\perp}T_2$.
 
-* In the example of the fire breaking out in two houses (see [section 4](/blog/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#union-of-two-events)):
+* In the example of the fire breaking out in two houses (see [section 4](/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#union-of-two-events)):
 
 $$P(A \cap B) = 0.25$$
 
@@ -300,4 +304,109 @@ $$NPV = \frac{TN}{TN + FN} = P(\bar{D} | \bar{P}) = \frac{P(\bar{D} \cap \bar{P}
 
 # 9. Counting techniques
 
-In order to use the formula in [section 2](/blog/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#computing-a-probability).
+In order to use the formula in [section 2](/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#computing-a-probability), one must know how to count the number of possible elements.
+
+There are 3 main counting techniques in probability:
+
+1. Multiplication
+1. Permutation
+1. Combination
+
+See below how to count the number of possible elements in case of equiprobable results.
+
+## Multiplication
+
+The multiplication rule is as follows:
+
+$$\#(A \times B) = (\#A) \times (\#B)$$
+
+where $\#$ is the number of elements.
+
+### Example
+
+In a restaurant, a customer has to choose a starter, a main course and a dessert. The restaurant offers 2 starters, 3 main courses and 2 desserts. How many different choices are possible?
+
+There are 12 different possible choices (i.e., $2 \cdot 3 \cdot 2$).
+
+## Permutation
+
+The number of permutations is as follows:
+
+$$P^r_n = n \times (n - 1) \times \cdots \times (n - r + 1) = \frac{n !}{(n - r)!}$$
+
+with $r$ the length, $n$ the number of elements and $r \le n$. Note that $0! = 1$ and $k! = k \times (k - 1) \times (k - 2) \times \cdots \times 2 \times 1$ if $k = 1, 2, \dots$
+
+The order is important in permutations!
+
+### Example
+
+Count the permutations of length 2 of the set $A = \{a, b, c, d\}$, without a letter being repeated. How many permutations do you find?
+
+#### By hand
+
+$$P^4_2 = \frac{4!}{(4-2)!} = \frac{4\cdot3\cdot2\cdot1}{2\cdot1} = 12$$
+
+#### In R
+
+```{r, message = FALSE, warning = FALSE}
+library(gtools)
+
+x <- c("a", "b", "c", "d")
+
+# See all different permutations
+perms <- permutations(
+  n = 4, r = 2, v = x,
+  repeats.allowed = FALSE
+)
+perms
+
+# Count the number of permutations
+nrow(perms)
+```
+
+## Combination
+
+The number of combinations is as follows:
+
+$$C^r_n = \frac{P^r_n}{r!} = \frac{n !}{r!(n - r)!} = {n \choose r} = \frac{n}{r} \times \frac{n - 1}{r - 1} \times \dots \times \frac{n - r + 1}{1}$$
+
+with $r$ the length, $n$ the number of elements and $r \le n$.
+
+The order is **not** important in combinations!
+
+### Example
+
+In a family of 5 children, what is the probability that there are 3 girls and 2 boys? Assume that the probabilities of giving birth to a girl and a boy are equal.
+
+#### By hand
+
+* Count of 3 girls and 2 boys: $C^3_5 = {5 \choose 3} = \frac{5!}{3!(5-3)!} = 10$
+* Count of possible cases: $2^5 = 32$
+
+$\Rightarrow P(3 \text{ girls and 2 boys}) = \frac{10}{32} = 0.3125$ 
+
+#### In R
+
+* Count of 3 girls and 2 boys:
+
+```{r}
+choose(n = 5, k = 3)
+```
+
+* Count of possible cases:
+
+```{r}
+2^5
+```
+
+Probability of 3 girls and 2 boys:
+
+```{r}
+choose(n = 5, k = 3) / 2^5
+```
+
+Thanks for reading. I hope this article helped you to install and load R packages in a more efficient way.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me [here](/contact/).
+
+Get updates every time a new article is published by [subscribing to this blog](/subscribe/).
