@@ -33,8 +33,14 @@ draft: true
 <li><a href="#example">Example</a></li>
 </ul></li>
 <li><a href="#accuracy-measures">8. Accuracy measures</a><ul>
-<li><a href="#sensibility">Sensibility</a></li>
+<li><a href="#false-negatives">False negatives</a></li>
+<li><a href="#false-positives">False positives</a></li>
+<li><a href="#sensitivity">Sensitivity</a></li>
+<li><a href="#specificity">Specificity</a></li>
+<li><a href="#positive-predictive-value">Positive predictive value</a></li>
+<li><a href="#negative-predictive-value">Negative predictive value</a></li>
 </ul></li>
+<li><a href="#counting-techniques">9. Counting techniques</a></li>
 </ul>
 </div>
 
@@ -179,17 +185,65 @@ Equations 2 and 3 mean that knowing that one event occured does not influence th
 </div>
 <div id="accuracy-measures" class="section level1">
 <h1>8. Accuracy measures</h1>
-<p>Following the example of the disease and the diagnostic test, we present the most common accuracy measures:</p>
+<p>Based on the example of the disease and the diagnostic test presented above, we explain the most common accuracy measures:</p>
 <ul>
-<li>Sensibility of a test</li>
-<li>Specificity of a test</li>
-<li>False negative</li>
-<li>False positive</li>
+<li>False negatives</li>
+<li>False positives</li>
+<li>Sensitivity</li>
+<li>Specificity</li>
 <li>Positive predictive value</li>
 <li>Negative predictive value</li>
 </ul>
-<p>Before diving into the details of these accurary measures, here in an overview of the possible scenarios:</p>
-<div id="sensibility" class="section level2">
-<h2>Sensibility</h2>
+<p>Before diving into the details of these accurary measures, here is an overview ofhthe measures and the tree diagram with the labels for each of the 4 scenarios:</p>
+<div class="figure">
+<img src="/blog/the-7-formulas-in-probability-that-every-data-scientist-should-know_files/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know.png" alt="Adapted from Wikipedia" style="width:100.0%" />
+<p class="caption">Adapted from Wikipedia</p>
 </div>
+<p><img src="/blog/the-7-formulas-in-probability-that-every-data-scientist-should-know_files/Screenshot%202020-03-03%20at%2015.53.19.png" style="width:100.0%" /></p>
+<div id="false-negatives" class="section level2">
+<h2>False negatives</h2>
+<p>The false negatives (FN) are the number of people incorrectly labeled as <strong>not</strong> having the disease or the condition, when in reality it is present. It is like telling a women who is 7 months pregnant that she is not pregnant.</p>
+<p>From the tree diagram, we have:</p>
+<p><span class="math display">\[FN = P(D \cap \bar{P}) = 0.02\]</span></p>
+</div>
+<div id="false-positives" class="section level2">
+<h2>False positives</h2>
+<p>The false positives (FP) are the number of people incorrectly labeled as having the disease or the condition, when in reality it is <strong>not</strong> present. It is like telling a man he is pregnant.</p>
+<p>From the tree diagram, we have:</p>
+<p><span class="math display">\[FP = P(\bar{D} \cap P) = 0.09\]</span></p>
+</div>
+<div id="sensitivity" class="section level2">
+<h2>Sensitivity</h2>
+<p>The sensitivity of a test, also referred as the recall, measures the ability of a test to detect the condition when the condition is present (the percentage of sick people who are correctly identified as having the disease):</p>
+<p><span class="math display">\[ Sensitivity = \frac{TP}{TP + FN}\]</span></p>
+<p>where <em>TP</em> is the true positives and <em>FN</em> is the false negatives.</p>
+<p>From the tree diagram, we have:</p>
+<p><span class="math display">\[ Sensitivity = \frac{TP}{TP + FN} = P(P|D) = 0.8\]</span></p>
+</div>
+<div id="specificity" class="section level2">
+<h2>Specificity</h2>
+<p>The specificity of a test measures the ability of a test to correctly exclude the condition when the condition is absent (the percentage of healthy people who are correctly identified as not having the disease):</p>
+<p><span class="math display">\[Specificity = \frac{TN}{TN + FP}\]</span></p>
+<p>where <em>TN</em> is the true negative and <em>FP</em> is the false positives.</p>
+<p>From the tree diagram, we have:</p>
+<p><span class="math display">\[Specificity = \frac{TN}{TN + FP} = P(\bar{P} | \bar{D}) = 0.9\]</span></p>
+</div>
+<div id="positive-predictive-value" class="section level2">
+<h2>Positive predictive value</h2>
+<p>The positive predictive value, also referred as the precision, is the proportion of positives that correspond to the presence of the condition, so the proportions of positive results that are true positive results:</p>
+<p><span class="math display">\[PPV = \frac{TP}{TP+FP}\]</span></p>
+<p>From the tree diagram, we have:</p>
+<p><span class="math display">\[PPV = \frac{TP}{TP+FP} = P(D | P) = \frac{P(D \cap P)}{P(P)} = \frac{0.08}{0.08+0.09} = 0.4706\]</span></p>
+</div>
+<div id="negative-predictive-value" class="section level2">
+<h2>Negative predictive value</h2>
+<p>The negative predictive value is the proportion of negatives that correspond to the absence of the condition, so the proportions of negative results that are true negative results:</p>
+<p><span class="math display">\[NPV = \frac{TN}{TN + FN}\]</span></p>
+<p>From the tree diagram, we have:</p>
+<p><span class="math display">\[NPV = \frac{TN}{TN + FN} = P(\bar{D} | \bar{P}) = \frac{P(\bar{D} \cap \bar{P})}{P(\bar{P})} = \frac{0.81}{0.81+0.02} = 0.9759\]</span></p>
+</div>
+</div>
+<div id="counting-techniques" class="section level1">
+<h1>9. Counting techniques</h1>
+<p>In order to use the formula in <a href="/blog/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#computing-a-probability">section 2</a>.</p>
 </div>
