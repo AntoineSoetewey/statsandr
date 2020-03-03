@@ -39,11 +39,11 @@ For example, throwing a 7 with a standard dice (with faces from 1 to 6) is impos
 
 # 2. Compute a probability
 
-The probability of an event occurring is equal to the number of favourable cases (number of ways it can happen) divided by the number of possible cases (total number of outcomes):
+If the elements of a sample space (the set of all possible results of a randomized experiment) are equiprobable (= all elements have the same probability), then the probability of an event occurring is equal to the number of favourable cases (number of ways it can happen) divided by the number of possible cases (total number of outcomes):
 
 $$P(A) = \frac{\text{number of favourable cases}}{\text{number of possible cases}}$$
 
-For example, the probability of rolling a 3 with a dice is
+For example, all numbers of a six-sided dice are equiprobable since they all have the same probability of occuring. The probability of rolling a 3 with a dice is thus
 
 $$P(3) = \frac{\text{number of favourable cases}}{\text{number of possible cases}} = \frac{1}{6}$$
 
@@ -89,7 +89,7 @@ If two events are mutually exclusive (i.e., two events that cannot occur at the 
 
 $$P(A \cup B) = P(A) + P(B)$$
 
-For example, the probability of rolling a 3 or 6 on a six-sided dice is
+For example, rolling a 3 or a 6 on a six-sided dice are two mutually exclusive events since they cannot both occur at the same time. Since their joint probability is equal to 0, the probability of rolling a 3 or 6 on a six-sided dice is
 
 $$P(3 \cup 6) = P(3) + P(6) = \frac{1}{6} + \frac{1}{6} = \frac{1}{3}$$
 
@@ -97,15 +97,22 @@ $$P(3 \cup 6) = P(3) + P(6) = \frac{1}{6} + \frac{1}{6} = \frac{1}{3}$$
 
 If two events are independent, the probability of the intersection of two events (i.e., the joint probability) is the probability of the two events occuring:
 
-$$P(\text{A and B)} = P(A \cap B) = P(A) * P(B)$$
+$$P(\text{A and B)} = P(A \cap B) = P(A) \cdot P(B)$$
 
 For instance, if two coins are flipped, the probability of both being tails is
 
-$$P(T_1 \cap T_2) = P(T_1) * P(T_2) = \frac{1}{2} * \frac{1}{2} = \frac{1}{4}$$
+$$P(T_1 \cap T_2) = P(T_1) \cdot P(T_2) = \frac{1}{2} \cdot \frac{1}{2} = \frac{1}{4}$$
+Note that $P(A \cap B) = P(B \cap A)$.
+
+If two events are mutually exclusive, their joint probability is equal to 0:
+
+$$P(A \cap B) = 0$$
 
 # 6. Independence of two events
 
-The independence of two events can be verified thanks to the above formula. If the equality holds, the two events are said to be independent, otherwise the two events are said to be dependent.
+The independence of two events can be verified thanks to the above formula. If the equality holds, the two events are said to be independent, otherwise the two events are said to be dependent. Formally, the events A and B are independent if and only if
+
+$$P(A \cap B) = P(A) \cdot P(B)$$
 
 * In the example of the two coins:
 
@@ -113,29 +120,62 @@ $$P(T_1 \cap T_2) = \frac{1}{4}$$
 
 and
 
-$$P(T_1) * P(T_2) = \frac{1}{2} * \frac{1}{2} = \frac{1}{4}$$
+$$P(T_1) \cdot P(T_2) = \frac{1}{2} \cdot \frac{1}{2} = \frac{1}{4}$$
 
 so the following equality holds
 
-$$P(T_1 \cap T_2) = P(T_1) * P(T_2) = \frac{1}{4}$$
+$$P(T_1 \cap T_2) = P(T_1) \cdot P(T_2) = \frac{1}{4}$$
 
 The two events are thus independent, denoted $T_1{\perp\!\!\!\perp}T_2$.
 
-* In the example of the fire breaking out in two houses (see [section 4](/blog/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#)):
+* In the example of the fire breaking out in two houses (see [section 4](/blog/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#union-of-two-events)):
 
 $$P(A \cap B) = 0.25$$
 
 and
 
-$$P(A) * P(B) = 0.6 \cdot 0.45 = 0.27$$
+$$P(A) \cdot P(B) = 0.6 \cdot 0.45 = 0.27$$
 
 so the following equality does not hold
 
-$$P(A \cap B) \ne P(A) * P(B)$$
+$$P(A \cap B) \ne P(A) \cdot P(B)$$
 
-The two events are thus dependent, denoted $A \not\!\perp\!\!\!\perp B$.
+The two events are thus dependent (or not independent), denoted $A \not\!\perp\!\!\!\perp B$.
 
-# 6. Conditional probability
+# 7. Conditional probability
 
+Suppose two events A and B and P(B) > 0. The conditional probability of A given (knowing) B is the likelihood of event A occurring given that event B has occured:
 
+$$P(A | B) = \frac{P(A \cap B)}{P(B)} = \frac{P(B \cap A)}{P(B)} \text{ (since } P(A \cap B) = P(B \cap A))$$
 
+Note that, in general, the probability of A given B is not equal to the probability of B given A, that is, $P(A | B) \ne P(B | A)$.
+
+From the formula of the conditional probability, we can derive the multiplicative law:
+
+$$P(A | B) = \frac{P(A \cap B)}{P(B)}$$
+$$P(A | B) \cdot P(B) = \frac{P(A \cap B)}{P(B)} \cdot P(B)$$
+$$P(A | B) \cdot P(B) = P(A \cap B) \text{ (multiplicative law)}$$
+
+If two events are independent, $P(A \cap B) = P(A) \cdot P(B)$, and:
+
+* P(B) > 0, the conditional probability becomes
+
+$$P(A | B) = \frac{P(A \cap B)}{P(B)}$$
+$$P(A | B) = \frac{P(A) \cdot P(B)}{P(B)}$$
+$$P(A | B) = P(A)$$
+
+* P(A) > 0, the conditional probability becomes
+
+$$P(B | A) = \frac{P(B \cap A)}{P(A)}$$
+$$P(B | A) = \frac{P(B) \cdot P(A)}{P(A)}$$
+$$P(B | A) = P(B)$$
+
+From the formulas of the conditional probability and the multiplicative law, we can derive the Bayes' theorem:
+
+$$P(B | A) = \frac{P(B \cap A)}{P(A)} \text{ (from the conditional probability)}$$
+$$P(B | A) = \frac{P(A \cap B)}{P(A)} \text{ (since } P(A \cap B) = P(B \cap A))$$
+$$P(B | A) = \frac{P(A | B) \cdot P(B)}{P(A)} \text{ (from the multiplicative law)}$$
+
+which is equivalent to
+
+$$P(A | B) = \frac{P(B | A) \cdot P(A)}{P(B)} \text{ (Bayes' theorem)}$$
