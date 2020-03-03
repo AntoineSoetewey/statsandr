@@ -85,7 +85,7 @@ $$P(A \cup B) = P(A) + P(B) - P(A \cap B) = 0.6 + 0.45 - 0.25 = 0.8$$
 
 By summing P(A) and P(B), the intersection of A and B is counted twice. This is the reason we subtract it to count it only once.
 
-If two events are mutually exclusive (i.e., two events that cannot occur at the same time), the probability of both events occuring is equal to 0, so the above formula becomes
+If two events are mutually exclusive (i.e., two events that cannot occur simultaneously), the probability of both events occuring is equal to 0, so the above formula becomes
 
 $$P(A \cup B) = P(A) + P(B)$$
 
@@ -152,7 +152,7 @@ Note that, in general, the probability of A given B is not equal to the probabil
 
 From the formula of the conditional probability, we can derive the multiplicative law:
 
-$$P(A | B) = \frac{P(A \cap B)}{P(B)}$$
+$$P(A | B) = \frac{P(A \cap B)}{P(B)} \text{ (Eq. 1)}$$
 $$P(A | B) \cdot P(B) = \frac{P(A \cap B)}{P(B)} \cdot P(B)$$
 $$P(A | B) \cdot P(B) = P(A \cap B) \text{ (multiplicative law)}$$
 
@@ -162,13 +162,16 @@ If two events are independent, $P(A \cap B) = P(A) \cdot P(B)$, and:
 
 $$P(A | B) = \frac{P(A \cap B)}{P(B)}$$
 $$P(A | B) = \frac{P(A) \cdot P(B)}{P(B)}$$
-$$P(A | B) = P(A)$$
+$$P(A | B) = P(A) \text{ (Eq. 2)}$$
 
 * P(A) > 0, the conditional probability becomes
 
 $$P(B | A) = \frac{P(B \cap A)}{P(A)}$$
 $$P(B | A) = \frac{P(B) \cdot P(A)}{P(A)}$$
-$$P(B | A) = P(B)$$
+$$P(B | A) = P(B) \text{ (Eq. 3)}$$
+Equations 2 and 3 mean that knowing that one event occured does not influence the probability of the outcome of the other event. This is in fact the definition of the independence: if knowing that one event occured does not help to predict (does not influence) the outcome of the other event, the two events are by essence independent.
+
+## Bayes' theorem
 
 From the formulas of the conditional probability and the multiplicative law, we can derive the Bayes' theorem:
 
@@ -179,3 +182,45 @@ $$P(B | A) = \frac{P(A | B) \cdot P(B)}{P(A)} \text{ (from the multiplicative la
 which is equivalent to
 
 $$P(A | B) = \frac{P(B | A) \cdot P(A)}{P(B)} \text{ (Bayes' theorem)}$$
+
+## Example
+
+In order to illustrate the conditional probability and the Bayes' theorem, suppose the following problem:
+
+In order to determine the presence of a disease in a person, a blood test is performed. When a person has the disease, the test can reveal the disease in 80% of cases. When the disease is not present, the test is negative in 90% of cases. Experience has shown that the probability of the disease being present is 10%. A researcher would like to know the probability that an individual has the disease given that the result of the test is positive.
+
+To answer this question, the following events are defined:
+
+* P: the test result is positive
+* D: the person has the disease
+
+Moreover, we use a tree diagram to illustrate the statement:
+
+![](/blog/the-7-formulas-in-probability-that-every-data-scientist-should-know_files/Screenshot 2020-03-03 at 13.54.24.png){width=100%}
+
+(The sum of all 4 scenarios must be equal to 1 since these 4 scenarios include all possible cases.)
+
+We are looking for the probability that an individual has the disease given that the result of the test is positive, $P(D | P)$. Following the formula of the conditional probability (Eq. 1) we have:
+
+$$P(A | B) = \frac{P(A \cap B)}{P(B)}$$
+
+In terms of our problem:
+
+$$P(D | P) = \frac{P(D \cap P)}{P(P)}$$
+$$P(D | P) = \frac{0.08}{P(P)} \text{ (Eq. 4)}$$
+
+From the tree diagram, we can see that a positive test result is possible under two scenarios: (i) when a person has the disease, or (ii) when the person does not actually have the disease. In order to find the probability of a positive test result, $P(P)$, we need to sum up those two scenarios:
+
+$$P(P) = P(D \cap P) + P(\bar{D} \cap P) = 0.08+0.09=0.17$$
+
+Eq. 4 then becomes
+
+$$P(D | P) = \frac{0.08}{0.17} = 0.4706$$
+
+The probability of having the disease given that the result of the test is positive is only 47.06%. This means that in this specific case (with the same percentages), an individual has less than 1 chance out of 2 of having the disease knowing that his test is positive!
+
+This relatively small percentage is due to the facts that the disease is quite rare (only 10% of the population is affected) and that the test is not always correct (sometimes it detects the disease although it is not present, and sometimes it does not detect it although it is present). As a consequence, a higher percentage of healthy people have a positive result (9%) compared to the percentage of people who have a positive result and who actually have the disease (8%). This explains why several diagnostic tests are often performed before announcing the result of the test, especially for rare diseases.
+
+# 8. Accuracy measures
+
+Following the example of the disease and the diagnostic test, we present the most common accuracy measures
