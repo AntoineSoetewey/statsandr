@@ -5,8 +5,8 @@ description: "See the different ways you can support this blog so I can continue
 ---
 
 1. [Donation](#donation)
-1. [Spread the word](#word)
-1. [Follow me](#follow)
+1. [Share](#share)
+1. [Follow](#follow)
 1. [Recommendations](#recommendations)
 1. [Amazon](#amazon)
 
@@ -17,13 +17,13 @@ Running and maintaining a blog is not free unfortunately ([Shiny app](/tags/shin
 
 If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can send me a donation via [PayPal](https://www.paypal.me/AntoineSoetewey).
 
-<a name="word"></a>
-## Spread the word
+<a name="share"></a>
+## Share
 
 If you have found any of the content on this blog useful please consider linking to [https://www.statsandr.com/](/).
 
 <a name="follow"></a>
-## Follow me
+## Follow
 
 You can follow me via the following channels:
 
