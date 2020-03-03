@@ -125,7 +125,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            1 minute read
+                            4 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -166,6 +166,13 @@
 <div id="TOC">
 <ul>
 <li><a href="#what-is-probability">What is probability?</a></li>
+<li><a href="#a-probability-is-always-between-0-and-1">1. A probability is always between 0 and 1</a></li>
+<li><a href="#compute-a-probability">2. Compute a probability</a></li>
+<li><a href="#complement-of-an-event">3. Complement of an event</a></li>
+<li><a href="#union-of-two-events">4. Union of two events</a></li>
+<li><a href="#intersection-of-two-events">5. Intersection of two events</a></li>
+<li><a href="#independence-of-two-events">6. Independence of two events</a></li>
+<li><a href="#conditional-probability">6. Conditional probability</a></li>
 </ul>
 </div>
 
@@ -174,11 +181,81 @@
 <h1>What is probability?</h1>
 <p>Probability is the likelihood of an event occurring; it is a mathematical model to describe random phenomena. In other words, probability is a branch of mathematics that provides models to describe random processes. These mathematical tools allow to establish theoretical models for random phenomena and to use them to make predictions. Like every model, the probabilistic model is a simplification of the world. However, the model is useful as soon as it captures the essential features.</p>
 <p>In this article, we present xxx fundamental formulas and conceps in probability to get you started in data science.</p>
-<ol style="list-style-type: decimal">
-<li>A probability is always between 0 and 1</li>
-</ol>
-<p>A probability of an event is always between 0 and 1,</p>
+</div>
+<div id="a-probability-is-always-between-0-and-1" class="section level1">
+<h1>1. A probability is always between 0 and 1</h1>
+<p>The probability of an event is always between 0 and 1,</p>
 <p><span class="math display">\[0 \le P(A) \le 1\]</span></p>
+<ul>
+<li>If an event is impossible: <em>P(A) = 0</em></li>
+<li>If an event is certain: <em>P(A) = 1</em></li>
+</ul>
+<p>For example, throwing a 7 with a standard dice (with faces from 1 to 6) is impossible so its probability is equal to 0. Throwing any number from 1 to 6 with a dice is certain, so its probability is equal to 1.</p>
+</div>
+<div id="compute-a-probability" class="section level1">
+<h1>2. Compute a probability</h1>
+<p>The probability of an event occurring is equal to the number of favourable cases (number of ways it can happen) divided by the number of possible cases (total number of outcomes):</p>
+<p><span class="math display">\[P(A) = \frac{\text{number of favourable cases}}{\text{number of possible cases}}\]</span></p>
+<p>For example, the probability of rolling a 3 with a dice is</p>
+<p><span class="math display">\[P(3) = \frac{\text{number of favourable cases}}{\text{number of possible cases}} = \frac{1}{6}\]</span></p>
+<p>because there is only one favourable case (there is only one face with a 3 on it), and there are 6 possible cases (because there are 6 faces altogether).</p>
+</div>
+<div id="complement-of-an-event" class="section level1">
+<h1>3. Complement of an event</h1>
+<p>The probability of the complement (or opposite) of an event is:</p>
+<p><span class="math display">\[P(\text{not A}) = P(\bar{A}) = 1 - P(A)\]</span></p>
+</div>
+<div id="union-of-two-events" class="section level1">
+<h1>4. Union of two events</h1>
+<p>The probability of the union of two events is the probability of either occurring:</p>
+<p><span class="math display">\[P(\text{A or B)} = P(A \cup B) = P(A) + P(B) - P(A \cap B)\]</span></p>
+<p>Suppose that the probability of a fire breaking out in two houses in a given year is:</p>
+<ul>
+<li>in house A: 60%</li>
+<li>in house B: 45%</li>
+<li>in at least one of the two houses: 80%</li>
+</ul>
+<p>Graphically we have</p>
+<p><img src="/blog/the-7-formulas-in-probability-that-every-data-scientist-should-know_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>The probability of a fire breaking out in house A <strong>or</strong> house B is</p>
+<p><span class="math display">\[P(A \cup B) = P(A) + P(B) - P(A \cap B) = 0.6 + 0.45 - 0.25 = 0.8\]</span></p>
+<p>By summing P(A) and P(B), the intersection of A and B is counted twice. This is the reason we subtract it to count it only once.</p>
+<p>If two events are mutually exclusive (i.e., two events that cannot occur at the same time), the probability of both events occuring is equal to 0, so the above formula becomes</p>
+<p><span class="math display">\[P(A \cup B) = P(A) + P(B)\]</span></p>
+<p>For example, the probability of rolling a 3 or 6 on a six-sided dice is</p>
+<p><span class="math display">\[P(3 \cup 6) = P(3) + P(6) = \frac{1}{6} + \frac{1}{6} = \frac{1}{3}\]</span></p>
+</div>
+<div id="intersection-of-two-events" class="section level1">
+<h1>5. Intersection of two events</h1>
+<p>If two events are independent, the probability of the intersection of two events (i.e., the joint probability) is the probability of the two events occuring:</p>
+<p><span class="math display">\[P(\text{A and B)} = P(A \cap B) = P(A) * P(B)\]</span></p>
+<p>For instance, if two coins are flipped, the probability of both being tails is</p>
+<p><span class="math display">\[P(T_1 \cap T_2) = P(T_1) * P(T_2) = \frac{1}{2} * \frac{1}{2} = \frac{1}{4}\]</span></p>
+</div>
+<div id="independence-of-two-events" class="section level1">
+<h1>6. Independence of two events</h1>
+<p>The independence of two events can be verified thanks to the above formula. If the equality holds, the two events are said to be independent, otherwise the two events are said to be dependent.</p>
+<ul>
+<li>In the example of the two coins:</li>
+</ul>
+<p><span class="math display">\[P(T_1 \cap T_2) = \frac{1}{4}\]</span></p>
+<p>and</p>
+<p><span class="math display">\[P(T_1) * P(T_2) = \frac{1}{2} * \frac{1}{2} = \frac{1}{4}\]</span></p>
+<p>so the following equality holds</p>
+<p><span class="math display">\[P(T_1 \cap T_2) = P(T_1) * P(T_2) = \frac{1}{4}\]</span></p>
+<p>The two events are thus independent, denoted <span class="math inline">\(T_1{\perp\!\!\!\perp}T_2\)</span>.</p>
+<ul>
+<li>In the example of the fire breaking out in two houses (see <a href="/blog/the-7-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#">section 4</a>):</li>
+</ul>
+<p><span class="math display">\[P(A \cap B) = 0.25\]</span></p>
+<p>and</p>
+<p><span class="math display">\[P(A) * P(B) = 0.6 \cdot 0.45 = 0.27\]</span></p>
+<p>so the following equality does not hold</p>
+<p><span class="math display">\[P(A \cap B) \ne P(A) * P(B)\]</span></p>
+<p>The two events are thus dependent, denoted <span class="math inline">\(A \not\!\perp\!\!\!\perp B\)</span>.</p>
+</div>
+<div id="conditional-probability" class="section level1">
+<h1>6. Conditional probability</h1>
 </div>
 
 
