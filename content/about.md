@@ -11,6 +11,6 @@ In parallel with my doctoral thesis, I am teaching assistant for several courses
 
 For more information about myself please visit [www.antoinesoetewey.com](https://www.antoinesoetewey.com/). All opinions and views are my own and do not represent my employer.
 
-This blog was launched to help academics and professionals to grasp important statistical concepts, using examples and plain English.
+This blog was launched to help academics and professionals to grasp important statistical concepts, using examples and plain English. From time to time, I will also present some work related to data science.
 
 If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me](/contact/).
