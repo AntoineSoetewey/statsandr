@@ -169,6 +169,7 @@
 
 <div id="TOC">
 <ul>
+<li><a href="#introduction">Introduction</a></li>
 <li><a href="#null-and-alternative-hypothesis">Null and alternative hypothesis</a></li>
 <li><a href="#hypothesis-testing">Hypothesis testing</a></li>
 <li><a href="#two-versions-of-the-one-sample-t-test">Two versions of the one sample t-test</a></li>
@@ -176,9 +177,11 @@
 <li><a href="#scenario-1-variance-of-the-population-is-known">Scenario 1: variance of the population is known</a></li>
 <li><a href="#scenario-2-variance-of-the-population-is-unknown">Scenario 2: variance of the population is unknown</a></li>
 </ul></li>
-<li><a href="#how-to-compute-one-sample-t-test-in-r">How to compute one sample t-test in R?</a><ul>
+<li><a href="#how-to-compute-the-one-sample-t-test-in-r">How to compute the one sample t-test in R?</a><ul>
 <li><a href="#scenario-1-variance-of-the-population-is-known-1">Scenario 1: variance of the population is known</a></li>
-<li><a href="#scenario-2-variance-of-the-population-is-unknown-1">Scenario 2: variance of the population is unknown</a></li>
+<li><a href="#scenario-2-variance-of-the-population-is-unknown-1">Scenario 2: variance of the population is unknown</a><ul>
+<li><a href="#confidence-interval">Confidence interval</a></li>
+</ul></li>
 </ul></li>
 <li><a href="#assumptions">Assumptions</a></li>
 </ul>
@@ -188,12 +191,15 @@
 <figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/how-to-perform-a-one-sample-t-test-by-hand-and-in-r.jpeg" src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/low/how-to-perform-a-one-sample-t-test-by-hand-and-in-r.jpeg" alt="Photo by Helloquence" style="width:100.0%" /></figure>
 <p class="caption">Photo by Helloquence</p>
 </div>
-<p>After having written an article on the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test for two samples</a> (independent and paired samples), I believe it is time to explain in details how to perform one sample t-tests.</p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>After having written an article on the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test for two samples</a> (independent and paired samples), I believe it is time to explain in details how to perform one sample t-tests by hand and in R.</p>
 <p>One sample t-test is an important part of inferential statistics (probably one of the first statistical test that students learn). Remind that, unlike <a href="/blog/descriptive-statistics-by-hand/">descriptive statistics</a>, inferential statistics is a branch of statistics aiming at drawing conclusions about one or two <a href="/blog/what-is-the-difference-between-population-and-sample/">populations</a>, based on a subset (or two) of that population (called samples). In other words, we first collect a random set of observations from a population, and then some measurements are calculated in order to generalize to the population the information found through the sample.</p>
-<p>In this context, the <strong>one sample t-test is used to determine whether the mean of a measurement variable is different from a specified value</strong> (a belief or a theoritical expectation for example). It works as follows: if the mean of the sample is too distant from the specified value (under the null hypothesis), it is considered that the mean of the population is different from what was expected. On the contrary, if the mean of the sample is close to the specified value, we cannot reject the hypothesis that the population mean is equal to what was expected.</p>
+<p>In this context, the <strong>one sample t-test is used to determine whether the mean of a measurement variable is different from a specified value</strong> (a belief or a theoritical expectation for example). It works as follows: if the mean of the sample is too distant from the specified value (the value under the null hypothesis), it is considered that the mean of the population is different from what is expected. On the contrary, if the mean of the sample is close to the specified value, we cannot reject the hypothesis that the population mean is equal to what is expected.</p>
 <p>Like the Student’s t-test for two samples, there are also different versions of the one sample t-test. Luckily, there are only two different versions for this test (the Student’s t-test for two samples has 5 versions!). The difference between the two versions of the one sample t-test lies in the fact that one version is used when the variance of the population (not the variance of the sample!) is known, the other version being used when the variance of the population is unknown.</p>
-<p>In this article, I will first detail step by step how to perform both versions of the one sample t-test by hand. The analyses will be done on a small set of observations for the sake of illustration and easiness. I will then show how to perform this test in R with the exact same data in order to verify the results found by hand. Reminders about the reasoning behind hypothesis testing, interpretations of the the p-value and the results, and assumptions of this test will also be presented.</p>
-<p>Note that the aim of this article is to show how to compute the one sample t-test by hand and in R, so we refrain from testing the assumptions and we assume all assumptions are met for this exercise. For completeness, we still mention the assumptions, how to test them and what other tests exist if an assumption is not met. Interested readers are invited to have a look at the <a href="/blog/xxx/#assumptions">end of the article</a> for more information about these assumptions.</p>
+<p>In this article, I will first detail step by step how to perform both versions of the one sample t-test by hand. The analyses will be done on a small set of observations for the sake of illustration and easiness. I will then show how to perform this test in R with the exact same data in order to verify the results found by hand. Reminders about the reasoning behind hypothesis testing, interpretations of the <em>p</em>-value and the results, and assumptions of this test will also be presented.</p>
+<p>Note that the aim of this article is to show how to compute the one sample t-test by hand and in R, so we refrain from testing the assumptions and we assume all assumptions are met for this exercise. For completeness, we still mention the assumptions and how to test them. Interested readers are invited to have a look at the <a href="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/#assumptions">end of the article</a> for more information about these assumptions.</p>
+</div>
 <div id="null-and-alternative-hypothesis" class="section level1">
 <h1>Null and alternative hypothesis</h1>
 <p>Before diving into the computations of the one sample t-test by hand, let’s recap the null and alternative hypotheses of this test:</p>
@@ -228,7 +234,8 @@
 </div>
 <div id="two-versions-of-the-one-sample-t-test" class="section level1">
 <h1>Two versions of the one sample t-test</h1>
-<p>There are two versions of the one sample t-test, depending on whether the variance of the population (not the variance of the sample!) is known or unknown. This criteria is rather straightforward, we either know the variance of the population or we do not. The variance of the population cannot be computed because if you can compute the variance of a population, it means you have the data for the whole population, then there is no need to do a hypothesis test anymore… So the variance of the population is either given in the statement (use them in that case), or there is no information about the variance and in that case, it is assumed that the variance is unknown. In practice, the variance of the population is most of the time unknown. However, we still illustrate how to do both versions of this test by hand and in R in the next sections following the 4 steps of hypothesis testing.</p>
+<p>There are two versions of the one sample t-test, depending on whether the variance of the population (not the variance of the sample!) is known or unknown. This criteria is rather straightforward, we either know the variance of the population or we do not. The variance of the population cannot be computed because if you can compute the variance of a population, it means you have the data for the whole population, then there is no need to do a hypothesis test anymore…</p>
+<p>So the variance of the population is either given in the statement (use them in that case), or there is no information about the variance and in that case, it is assumed that the variance is unknown. In practice, the variance of the population is most of the time unknown. However, we still illustrate how to do both versions of this test by hand and in R in the next sections following the 4 steps of hypothesis testing.</p>
 </div>
 <div id="how-to-compute-the-one-sample-t-test-by-hand" class="section level1">
 <h1>How to compute the one sample t-test by hand?</h1>
@@ -321,52 +328,30 @@
 <li><span class="math inline">\(H_0: \mu = 5\)</span> and <span class="math inline">\(H_1: \mu &gt; 5\)</span>. (&gt; because we want to test whether the population mean is larger than 5.)</li>
 <li>Test statistic: <span class="math display">\[t_{obs} = \frac{\bar{x} - \mu_0}{\frac{s}{\sqrt{n}}} = \frac{6.8-5}{0.369} = 4.881\]</span></li>
 <li>Critical value: <span class="math inline">\(t_{\alpha, n - 1} = t_{0.05, 4} = 2.132\)</span> (see a guide on <a href="/blog/a-guide-on-how-to-read-statistical-tables">how to read statistical tables</a> if you struggle to find the critical value)</li>
-<li>Conclusion: The rejection region is thus from 2.132 to <span class="math inline">\(+\infty\)</span>. The test statistic lies within the rejection regions so we reject the null hypothesis <span class="math inline">\(H_0\)</span>. In terms of the initial question: At the 5% significance level, we conclude that the population mean is larger than 5.</li>
+<li>Conclusion: The rejection region is thus from 2.132 to <span class="math inline">\(+\infty\)</span>. The test statistic lies within the rejection region so we reject the null hypothesis <span class="math inline">\(H_0\)</span>. In terms of the initial question: At the 5% significance level, we conclude that the population mean is larger than 5.</li>
 </ol>
 <p>This concludes how to perform the two versions of the one sample t-test by hand. In the next sections, we detail how to perform the exact same tests in R.</p>
 </div>
 </div>
-<div id="how-to-compute-one-sample-t-test-in-r" class="section level1">
-<h1>How to compute one sample t-test in R?</h1>
-<p>A good practice before doing t-tests in R is to visualize the data thanks to a boxplot (or a <a href="/blog/descriptive-statistics-in-r/#density-plot">density plot</a>, or eventually both). A boxplot gives a first indication on the location of the sample, and thus, a first indication on whether the null hypothesis is likely to be rejected or not. However, even if a boxplot or a density plot is great in showing the distribution of a sample, only a sound statistical test will confirm our first impression.</p>
-<p>After a visualization of the data, we replicate in R the results found by hand. We will see that for the version of the t-test with known population variance, there is no default function built in R (at least to my knowledge, do not hesitate to let me know if I’m mistaken). In this case, a function is written to replicate the results by hand.</p>
+<div id="how-to-compute-the-one-sample-t-test-in-r" class="section level1">
+<h1>How to compute the one sample t-test in R?</h1>
+<p>A good practice before doing t-tests in R is to visualize the data thanks to a <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> (or a <a href="/blog/descriptive-statistics-in-r/#density-plot">density plot</a>, or eventually both). A boxplot gives a first indication on the location of the sample, and thus, a first indication on whether the null hypothesis is likely to be rejected or not. However, even if a boxplot or a density plot is great in showing the distribution of a sample, only a sound statistical test will confirm our first impression.</p>
+<p>After a visualization of the data, we replicate in R the results found by hand. We will see that for the version of the t-test with a known population variance, there is no default function built in R (at least to my knowledge, do not hesitate to let me know if I’m mistaken). In this case, a function is written to replicate the results by hand.</p>
 <p>Note that we use the same data, the same assumptions and the same question for both scenarios to facilitate the comparison between the tests performed by hand and in R.</p>
 <div id="scenario-1-variance-of-the-population-is-known-1" class="section level2">
 <h2>Scenario 1: variance of the population is known</h2>
 <p>For the first scenario, suppose the data below. Moreover, suppose that the population variance <span class="math inline">\(\sigma^2 = 1\)</span> and that we would like to test whether the population mean is different from 0.</p>
 <pre class="r"><code>dat1 &lt;- data.frame(
   value = c(0.9, -0.8, 1.3, -0.3, 1.7)
-  )
+)
 
-library(pander)
-pander(dat1)</code></pre>
-<table style="width:11%;">
-<colgroup>
-<col width="11%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">0.9</td>
-</tr>
-<tr class="even">
-<td align="center">-0.8</td>
-</tr>
-<tr class="odd">
-<td align="center">1.3</td>
-</tr>
-<tr class="even">
-<td align="center">-0.3</td>
-</tr>
-<tr class="odd">
-<td align="center">1.7</td>
-</tr>
-</tbody>
-</table>
+dat1</code></pre>
+<pre><code>##   value
+## 1   0.9
+## 2  -0.8
+## 3   1.3
+## 4  -0.3
+## 5   1.7</code></pre>
 <pre class="r"><code>library(ggplot2)
 
 ggplot(dat1) +
@@ -377,30 +362,30 @@ ggplot(dat1) +
 <p>Note that you can use the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse"><code>{esquisse}</code> RStudio addin</a> if you want to draw a boxplot with the package <code>{ggplot2}</code> without writing the code yourself. If you prefer the default graphics, use the <code>boxplot()</code> function:</p>
 <pre class="r"><code>boxplot(dat1$value)</code></pre>
 <p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p>The boxplot shows that the distribution of the sample is not distant from 0 (the hypothesized value), so we tend to believe that we will not be able to reject the null hypothesis the the population mean is equal to 0. However, only a formal statistical test will confirm this belief.</p>
-<p>Since there is no function in R to perform a t-test with known variances, here is one with arguments accepting the sample (<code>x</code>), the variance of the population (<code>V</code>), the mean under the null hypothesis (<code>m0</code>, default is <code>0</code>), the significance level (<code>alpha</code>, default is <code>0.05</code>) and the alternative (<code>alternative</code>, one of <code>&quot;two.sided&quot;</code> (default), <code>&quot;less&quot;</code> or <code>&quot;greater&quot;</code>):</p>
+<p>The boxplot shows that the distribution of the sample is not distant from 0 (the hypothesized value), so we tend to believe that we will not be able to reject the null hypothesis that the population mean is equal to 0. However, only a formal statistical test will confirm this belief.</p>
+<p>Since there is no function in R to perform a t-test with a known population variance, here is one with arguments accepting the sample (<code>x</code>), the variance of the population (<code>V</code>), the mean under the null hypothesis (<code>m0</code>, default is <code>0</code>), the significance level (<code>alpha</code>, default is <code>0.05</code>) and the alternative (<code>alternative</code>, one of <code>&quot;two.sided&quot;</code> (default), <code>&quot;less&quot;</code> or <code>&quot;greater&quot;</code>):</p>
 <pre class="r"><code>t.test2 &lt;- function(x, V, m0 = 0, alpha = 0.05, alternative = &quot;two.sided&quot;) {
-    M &lt;- mean(x)
-    n &lt;- length(x)
-    sigma &lt;- sqrt(V)
-    S &lt;- sqrt(V / n)
-    statistic &lt;- (M - m0) / S
-    p &lt;- if (alternative == &quot;two.sided&quot;) {
-      2 * pnorm(abs(statistic), lower.tail = FALSE)
-    } else if (alternative == &quot;less&quot;) {
-      pnorm(statistic, lower.tail = TRUE)
-    } else {
-      pnorm(statistic, lower.tail = FALSE)
-    }
-    LCL &lt;- (M - S * qnorm(1 - alpha / 2))
-    UCL &lt;- (M + S * qnorm(1 - alpha / 2))
-    value &lt;- list(mean = M, m0 = m0, sigma = sigma, statistic = statistic, p.value = p, LCL = LCL, UCL = UCL, alternative = alternative)
-    # print(sprintf(&quot;P-value = %g&quot;,p))
-    # print(sprintf(&quot;Lower %.2f%% Confidence Limit = %g&quot;,
-    #               alpha, LCL))
-    # print(sprintf(&quot;Upper %.2f%% Confidence Limit = %g&quot;,
-    #               alpha, UCL))
-    return(value)
+  M &lt;- mean(x)
+  n &lt;- length(x)
+  sigma &lt;- sqrt(V)
+  S &lt;- sqrt(V / n)
+  statistic &lt;- (M - m0) / S
+  p &lt;- if (alternative == &quot;two.sided&quot;) {
+    2 * pnorm(abs(statistic), lower.tail = FALSE)
+  } else if (alternative == &quot;less&quot;) {
+    pnorm(statistic, lower.tail = TRUE)
+  } else {
+    pnorm(statistic, lower.tail = FALSE)
+  }
+  LCL &lt;- (M - S * qnorm(1 - alpha / 2))
+  UCL &lt;- (M + S * qnorm(1 - alpha / 2))
+  value &lt;- list(mean = M, m0 = m0, sigma = sigma, statistic = statistic, p.value = p, LCL = LCL, UCL = UCL, alternative = alternative)
+  # print(sprintf(&quot;P-value = %g&quot;,p))
+  # print(sprintf(&quot;Lower %.2f%% Confidence Limit = %g&quot;,
+  #               alpha, LCL))
+  # print(sprintf(&quot;Upper %.2f%% Confidence Limit = %g&quot;,
+  #               alpha, UCL))
+  return(value)
 }
 
 test &lt;- t.test2(dat1$value,
@@ -435,7 +420,7 @@ test</code></pre>
 <pre class="r"><code>test$p.value</code></pre>
 <pre><code>## [1] 0.2104977</code></pre>
 <p>The <em>p</em>-value is 0.21 so at the 5% significance level we do not reject the null hypothesis. There is no sufficient evidence in the data to reject the hypothesis that the population mean is equal to 0. This result confirms what we found by hand.</p>
-<p>If you are unfamiliar with the concept of <em>p</em>-value, I invite you to read my <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios">note on <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span></a>.</p>
+<p>If you are unfamiliar with the concept of <em>p</em>-value, I invite you to read my <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha">note on <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span></a>.</p>
 <p><strong>To sum up</strong> what have been said in that article about <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span>:</p>
 <ul>
 <li>If the <em>p</em>-value is smaller than the predetermined significance level <span class="math inline">\(\alpha\)</span> (usually 5%) so if <em>p</em>-value &lt; 0.05, we reject the null hypothesis</li>
@@ -450,34 +435,13 @@ test</code></pre>
   value = c(7.9, 5.8, 6.3, 7.3, 6.7)
 )
 
-pander(dat2)</code></pre>
-<table style="width:11%;">
-<colgroup>
-<col width="11%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">7.9</td>
-</tr>
-<tr class="even">
-<td align="center">5.8</td>
-</tr>
-<tr class="odd">
-<td align="center">6.3</td>
-</tr>
-<tr class="even">
-<td align="center">7.3</td>
-</tr>
-<tr class="odd">
-<td align="center">6.7</td>
-</tr>
-</tbody>
-</table>
+dat2</code></pre>
+<pre><code>##   value
+## 1   7.9
+## 2   5.8
+## 3   6.3
+## 4   7.3
+## 5   6.7</code></pre>
 <pre class="r"><code>ggplot(dat2) +
   aes(y = value) +
   geom_boxplot() +
@@ -486,8 +450,8 @@ pander(dat2)</code></pre>
 <p>Unlike the previous scenario, the box is quite distant from the hypothesized value of 5. From this boxplot, we can expect the test to reject the null hypothesis of the population mean being equal to 5. Nonetheless, only a formal statistical test will confirm this expectation.</p>
 <p>There is a function in R, and it is simply the <code>t.test()</code> function. This version of the test is actually the “standard” t-test for one sample. Note that in our case the alternative hypothesis is <span class="math inline">\(H_1: \mu &gt; 5\)</span> so we need to add the arguments <code>mu = 5</code> and <code>alternative = &quot;greater&quot;</code> to the function because the default arguments are <code>mu = 0</code> and the two-sided test:</p>
 <pre class="r"><code>test &lt;- t.test(dat2$value,
-               mu = 5,
-               alternative = &quot;greater&quot;
+  mu = 5,
+  alternative = &quot;greater&quot;
 )
 
 test</code></pre>
@@ -508,11 +472,15 @@ test</code></pre>
 <pre><code>## [1] 0.004077555</code></pre>
 <p>The <em>p</em>-value is 0.004 so at the 5% significance level we reject the null hypothesis.</p>
 <p>Unlike the first scenario, the <em>p</em>-value in this scenario is below 5% so we reject the null hypothesis. At the 5% significance level, we can conclude that the population mean is significantly larger than 5. This result confirms what we found by hand.</p>
+<div id="confidence-interval" class="section level3">
+<h3>Confidence interval</h3>
 <p>Note that the confidence interval can be extracted with <code>$conf.int</code>:</p>
 <pre class="r"><code>test$conf.int</code></pre>
 <pre><code>## [1] 6.013814      Inf
 ## attr(,&quot;conf.level&quot;)
 ## [1] 0.95</code></pre>
+<p>You can see that the 95% confidence interval for the population mean is <span class="math inline">\([6.01; \infty]\)</span>, meaning that, at the significance level <span class="math inline">\(\alpha = 5\)</span>%, we reject the null hypothesis as long as the hypothesized value <span class="math inline">\(\mu_0\)</span> is below 6.01, otherwise the null hypothesis cannot be rejected.</p>
+</div>
 </div>
 </div>
 <div id="assumptions" class="section level1">
@@ -521,7 +489,7 @@ test</code></pre>
 <ul>
 <li>The data, collected from a representative and randomly selected portion of the total population, should be independent of one another.</li>
 <li>The dependent variable (i.e., the measured variable) must be continuous.</li>
-<li>Observations should follow a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r"><strong>normal distribution</strong></a>. The normality assumption can be tested visually thanks to a histogram and a QQ-plot, and/or formally via a normality test such as the Shapiro-Wilk or Kolmogorov-Smirnov test (see more information about the normality assumption and how to test it <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r">here</a>). Some transformations, such as, among others, taking the logarithm, the square root or the Box-Cox transformation can be applied on the observations to transform you data to better fit the normal distribution.</li>
+<li>Observations should follow a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r"><strong>normal distribution</strong></a>. The normality assumption can be tested visually thanks to a histogram and a QQ-plot, and/or formally via a normality test such as the Shapiro-Wilk or Kolmogorov-Smirnov test (see more information about the normality assumption and how to test it <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#how-to-test-the-normality-assumption">here</a>). Some transformations, such as, among others, taking the logarithm, the square root or the Box-Cox transformation can be applied on the observations to transform you data to better fit the normal distribution.</li>
 </ul>
 <p>Thanks for reading. I hope this article helped you to understand how the different versions of the one sample t-test work and how to perform them by hand and in R. If you are interested, here is a <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand">Shiny app</a> to perform these tests by hand easily (you just need to enter your data and select the appropriate version of the test thanks to the sidebar menu). Moreover, read <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios">this article</a> if you would like to know how to compute the Student’s t-test but this time, for two samples, in order to compare two dependent or independent groups.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me <a href="/contact/">here</a>.</p>
@@ -532,7 +500,7 @@ test</code></pre>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>It is a least the case for parametric hypothesis tests. A parametric test means that it is based on a theoretical statistical distribution, which depends on some defined parameters. In the case of the one sample t-test, it is based on the Student’s t distribution with a single parameter, the degrees of freedom (<span class="math inline">\(df = n - 1\)</span> where <span class="math inline">\(n\)</span> is the sample size), or the normal distribution.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>It is a least the case regarding parametric hypothesis tests. A parametric test means that it is based on a theoretical statistical distribution, which depends on some defined parameters. In the case of the one sample t-test, it is based on the Student’s t distribution with a single parameter, the degrees of freedom (<span class="math inline">\(df = n - 1\)</span> where <span class="math inline">\(n\)</span> is the sample size), or the normal distribution.<a href="#fnref1" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 
