@@ -125,7 +125,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            9 minute read
+                            10 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -177,6 +177,7 @@
 <li><a href="#remedy">Remedy</a></li>
 <li><a href="#styler">Styler</a></li>
 <li><a href="#snakecaser">Snakecaser</a></li>
+<li><a href="#viewpipesteps">ViewPipeSteps</a></li>
 <li><a href="#blogdown">Blogdown</a></li>
 </ul></li>
 </ul>
@@ -351,6 +352,36 @@ for (i in 1:10) {
 <p>will be transformed to:</p>
 <pre><code>this_is_the_test_1</code></pre>
 <p>The snake case styling is particularly useful (and even recommended by many R users) for variables, functions and file names, etc.</p>
+</div>
+<div id="viewpipesteps" class="section level2">
+<h2>ViewPipeSteps</h2>
+<p>Thanks to a reader of this article, I discovered the <code>ViewPipeSteps</code> addin. This addin allows to print or view the output of your pipe chain after each step.</p>
+<p>For instance, here is a chain with the dataset <code>diamonds</code>:</p>
+<pre class="r"><code>library(tidyverse)
+
+diamonds %&gt;%
+  select(carat, cut, color, clarity, price) %&gt;%
+  group_by(color) %&gt;%
+  summarise(n = n(), price = mean(price)) %&gt;%
+  arrange(desc(color))</code></pre>
+<pre><code>## # A tibble: 7 x 3
+##   color     n price
+##   &lt;ord&gt; &lt;int&gt; &lt;dbl&gt;
+## 1 J      2808 5324.
+## 2 I      5422 5092.
+## 3 H      8304 4487.
+## 4 G     11292 3999.
+## 5 F      9542 3725.
+## 6 E      9797 3077.
+## 7 D      6775 3170.</code></pre>
+<p>If you are unsure about your pipe chain or want to debug it, you can view the output after each step by highlighting your entire chain then clicking on “View Pipe Chain Steps” from the addins menu:</p>
+<p><img src="/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier_files/Screenshot%202020-03-11%20at%2018.06.01.png" /></p>
+<p>From the addins menu, you can choose to either print the result to the console, or view the result in a new pane (as if you called the function <code>View()</code> after each step of the pipe). Clicking on View Pipe Chain Steps will open a new window with the output of each step:</p>
+<p><img src="/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier_files/Screenshot%202020-03-11%20at%2018.09.59.png" /></p>
+<p>Note that you have to use the following command to install the <code>ViewPipeSteps</code> addin:</p>
+<pre class="r"><code>devtools::install_github(&quot;daranzolin/ViewPipeSteps&quot;)
+library(ViewPipeSteps)</code></pre>
+<p>Now, you have no more excuses to use this pipe operator!</p>
 </div>
 <div id="blogdown" class="section level2">
 <h2>Blogdown</h2>

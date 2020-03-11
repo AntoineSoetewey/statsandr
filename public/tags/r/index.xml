@@ -1668,7 +1668,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;ul&gt;
 &lt;li&gt;The data, collected from a representative and randomly selected portion of the total population, should be independent. If observations between the two samples are dependent (for example if two measurements have been collected on the &lt;strong&gt;same individual&lt;/strong&gt; as it is often the case in medical studies when measuring a value after and before a treatment), the paired version of the Student’s t-test, called the Student’s t-test for paired samples, should be preferred in order to take into account the dependency between the two groups to be compared.&lt;/li&gt;
 &lt;li&gt;When the two samples are independent, observations in &lt;strong&gt;both samples&lt;/strong&gt; should follow a &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r&#34;&gt;&lt;strong&gt;normal distribution&lt;/strong&gt;&lt;/a&gt;. When using the Student’s t-test for paired samples, it is the difference between the observations of the two samples that should follow a normal distribution. The normality assumption can be tested visually thanks to a histogram and a QQ-plot, and/or formally via a normality test such as the Shapiro-Wilk or Kolmogorov-Smirnov test (see more information about the normality assumption and how to test it &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#how-to-test-the-normality-assumption&#34;&gt;here&lt;/a&gt;). If, even after a transformation (logarithmic transformation, etc.), your data still do not follow a normal distribution, the Wilcoxon test (&lt;code&gt;wilcox.test(variable1 ~ variable2, data = dat&lt;/code&gt; in R) can be applied. This test, robust to non normal distributions, compares the medians instead of the means in order to compare the two populations.&lt;/li&gt;
-&lt;li&gt;When the two samples are independent, the variances of the two groups should be equal in the populations (an assumption called homogeneity of the variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity). This assumption can be tested thanks to the Levene’s test (&lt;code&gt;leveneTest(variable ~ group)&lt;/code&gt; from the &lt;code&gt;{car}&lt;/code&gt; package) or via a F test (&lt;code&gt;var.test(variable ~ group)&lt;/code&gt;). If the hypothesis of equal variances is rejected, another version of the Student’s t-test can be used: the Welch test (&lt;code&gt;t.test(variable ~ group, var.equal = FALSE)&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;When the two samples are independent, the variances of the two groups should be equal in the populations (an assumption called homogeneity of the variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity). This assumption can be tested thanks to the Levene’s test (&lt;code&gt;leveneTest(variable ~ group)&lt;/code&gt; from the &lt;code&gt;{car}&lt;/code&gt; package) or via a F test (&lt;code&gt;var.test(variable ~ group)&lt;/code&gt;). If the hypothesis of equal variances is rejected, another version of the Student’s t-test can be used: the Welch test (&lt;code&gt;t.test(variable ~ group, var.equal = FALSE)&lt;/code&gt;). Note that the Welch test does not require homogeneity of the variances, but the distributions should still follow a normal distribution. If your distributions are not normally distributed and the variances are unequal, the Wilcoxon test should be used. This test does not require normality or homoscedasticity of the variances.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;This concludes a relatively long article. Thanks for reading it. I hope this article helped you to understand how the different versions of the Student’s t-test for two samples work and how to perform them by hand and in R. If you are interested, here is a &lt;a href=&#34;/blog/a-shiny-app-for-inferential-statistics-by-hand&#34;&gt;Shiny app&lt;/a&gt; to perform these tests by hand easily (you just need to enter your data and select the appropriate version of the test thanks to the sidebar menu). Moreover, read &lt;a href=&#34;/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/&#34;&gt;this article&lt;/a&gt; if you would like to know how to compute the Student’s t-test but this time, for one sample.&lt;/p&gt;
 &lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug (which is quite likely in this article given all the computations), you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can contact me &lt;a href=&#34;/contact/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
@@ -4626,6 +4626,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;&lt;a href=&#34;#remedy&#34;&gt;Remedy&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#styler&#34;&gt;Styler&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#snakecaser&#34;&gt;Snakecaser&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#viewpipesteps&#34;&gt;ViewPipeSteps&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#blogdown&#34;&gt;Blogdown&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -4800,6 +4801,36 @@ for (i in 1:10) {
 &lt;p&gt;will be transformed to:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;this_is_the_test_1&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The snake case styling is particularly useful (and even recommended by many R users) for variables, functions and file names, etc.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;viewpipesteps&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;ViewPipeSteps&lt;/h2&gt;
+&lt;p&gt;Thanks to a reader of this article, I discovered the &lt;code&gt;ViewPipeSteps&lt;/code&gt; addin. This addin allows to print or view the output of your pipe chain after each step.&lt;/p&gt;
+&lt;p&gt;For instance, here is a chain with the dataset &lt;code&gt;diamonds&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+
+diamonds %&amp;gt;%
+  select(carat, cut, color, clarity, price) %&amp;gt;%
+  group_by(color) %&amp;gt;%
+  summarise(n = n(), price = mean(price)) %&amp;gt;%
+  arrange(desc(color))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 7 x 3
+##   color     n price
+##   &amp;lt;ord&amp;gt; &amp;lt;int&amp;gt; &amp;lt;dbl&amp;gt;
+## 1 J      2808 5324.
+## 2 I      5422 5092.
+## 3 H      8304 4487.
+## 4 G     11292 3999.
+## 5 F      9542 3725.
+## 6 E      9797 3077.
+## 7 D      6775 3170.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you are unsure about your pipe chain or want to debug it, you can view the output after each step by highlighting your entire chain then clicking on “View Pipe Chain Steps” from the addins menu:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier_files/Screenshot%202020-03-11%20at%2018.06.01.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;From the addins menu, you can choose to either print the result to the console, or view the result in a new pane (as if you called the function &lt;code&gt;View()&lt;/code&gt; after each step of the pipe). Clicking on View Pipe Chain Steps will open a new window with the output of each step:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier_files/Screenshot%202020-03-11%20at%2018.09.59.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Note that you have to use the following command to install the &lt;code&gt;ViewPipeSteps&lt;/code&gt; addin:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;devtools::install_github(&amp;quot;daranzolin/ViewPipeSteps&amp;quot;)
+library(ViewPipeSteps)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, you have no more excuses to use this pipe operator!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;blogdown&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Blogdown&lt;/h2&gt;
