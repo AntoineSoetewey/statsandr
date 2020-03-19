@@ -13,7 +13,7 @@ If you are new to this blog, I invite you to:
 
 * See [all articles](/blog/) or [articles by categories](/tags/)
 * Learn more [about me](/about/)
-* Follow me on [medium.com](https://medium.com/@ant.soetewey)
+* Follow me on [Medium](https://medium.com/@ant.soetewey) or [Twitter](https://twitter.com/statsandr)
 * [Subscribe to this blog](/subscribe/) to receive updates every time a new article is published
 * See the [most recent comments](/recent-comments/) so you can follow the discussion
 <!--- * [Contribute](/contribute/) by submitting your article --->
