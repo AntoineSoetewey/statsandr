@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title> How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way - Stats and R </title>
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="Learn how to compare samples for multiple variables at once in R thanks to a Student t-test or ANOVA and see how you can share the results to nonscientists." />
+    <meta property="og:site_name" content="Stats and R" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/" />
+    <meta property="og:title" content="How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way" />
+    <meta property="og:image" content="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way.jpeg" />
+    <meta property="og:description" content="Learn how to compare samples for multiple variables at once in R thanks to a Student t-test or ANOVA and see how you can share the results to nonscientists." />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:site" content="@statsandr">
+    <meta name="twitter:creator" content="@statsandr">
+    
+    <meta name="twitter:title" content="How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way" />
+    <meta name="twitter:description" content="Learn how to compare samples for multiple variables at once in R thanks to a Student t-test or ANOVA and see how you can share the results to nonscientists." />
+    <meta name="twitter:image" content="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way.jpeg" />
+
+    <link rel="canonical" href="/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="/css/custom.css" />
+
+    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/tomorrow.min.css" integrity="sha256-0QU8ry64q+N6YBIEF/6XF6vUeF15gbNO4tLS6ikk0FI=" crossorigin="anonymous" />
+    
+
+    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/progressively/1.2.5/progressively.min.css" integrity="sha256-xbqLYBMsjpuCihs+3Fgp/MFMtPdo2SWKoOjEWOqR4X0=" crossorigin="anonymous" />
+    
+
+    <link rel="shortcut icon"
+        href="/image/favicon.png">
+
+    
+        <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Stats and R" />
+    
+</head>
+
+<body>
+    
+    <div class="my-4 my-md-5 header">
+    <div class="container">
+        <div class="row">
+            <div class="col-auto offset-md-1 d-none d-md-block">
+                
+                    <a href="/">
+                        <img class="ml-md-4 logo img-fluid d-block rounded-circle" src="/image/avatar.png" alt="logo">
+                    </a>
+                
+            </div>
+            <div class="col-auto align-self-center mr-auto">
+                <a href="/">
+                    <h1 class="name">Stats and R</h1>
+                </a>
+
+                <ul class="nav nav-primary">
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-Posts" href="/blog/">
+                                
+                                Posts
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-tags" href="/tags/">
+                                
+                                Tags
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-about" href="/about/">
+                                
+                                About
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-contact" href="/contact/">
+                                
+                                Contact
+                            </a>
+                        </li>
+                    
+
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-12 col-md-10">
+                    <h1 class="mx-0 mx-md-4 blog-post-title">How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way</h1>
+
+                    <div class="mb-md-4 meta">
+                        
+                            
+                                <span class="author" title="Antoine Soetewey">
+                                    Antoine Soetewey
+                                </span>
+                            
+                        
+
+                        <span class="date middot" title='Thu Mar 19 2020 00:00:00 UTC'>
+                            2020-03-19
+                        </span>
+
+                        <span class="reading-time middot">
+                            13 minute read
+                        </span>
+
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/r">R</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/statistics">Statistics</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/hypothesis-test">Hypothesis test</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/inferential-statistics">Inferential statistics</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/professional">Professional</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/tips">Tips</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="markdown">
+                        
+    
+    
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#perform-multiple-tests-at-once">Perform multiple tests at once</a></li>
+<li><a href="#concise-and-easily-interpretable-results">Concise and easily interpretable results</a><ul>
+<li><a href="#t-test">T-test</a></li>
+<li><a href="#anova">ANOVA</a></li>
+</ul></li>
+<li><a href="#to-go-even-further">To go even further</a></li>
+</ul>
+</div>
+
+<div class="figure">
+<figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/How%20to%20do%20a%20t-test%20or%20ANOVA%20for%20many%20variables%20at%20once%20in%20R%20and%20communicate%20the%20results%20in%20a%20better%20way.jpeg" src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/low/How%20to%20do%20a%20t-test%20or%20ANOVA%20for%20many%20variables%20at%20once%20in%20R%20and%20communicate%20the%20results%20in%20a%20better%20way.jpeg" alt="Photo by Teemu Paananen" style="width:100.0%" /></figure>
+<p class="caption">Photo by Teemu Paananen</p>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>As part of my teaching assistant position in a Belgian university, students often ask me for some help in their statistical analyses for their master’s thesis.</p>
+<p>A frequent question is how to compare groups of patients in terms of several <a href="/blog/variable-types-and-examples/#continuous">quantitative continuous</a> variables. Most of us know that:</p>
+<ul>
+<li>To compare two groups, a <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test</a> should be used<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></li>
+<li>To compare three groups or more, an ANOVA should be performed</li>
+</ul>
+<p>These two tests are quite basic and have been extensively documented online and in statistical textbooks so the difficulty is not in how to perform these tests.</p>
+<p>In the past, I used to do the analyses by following these 3 steps:</p>
+<ol style="list-style-type: decimal">
+<li>Draw boxplots illustrating the distributions by group (with the <code>boxplot()</code> function or thanks to the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse"><code>{esquisse}</code> R Studio addin</a> if I wanted to use the <code>{ggplot2}</code> package)</li>
+<li>Perform a t-test or an ANOVA depending on the number of groups to compare (with the <code>t.test()</code> and <code>oneway.test()</code> functions for t-test and ANOVA, respectively)</li>
+<li>Repeat steps 1 and 2 for each variable</li>
+</ol>
+<p>This was feasible as long as there were only a couple of variables to test. Nonetheless, most students came to me asking to perform these kind of tests not on one or two variables, but on <strong>multiples</strong> variables (sometimes up to around 100 variables!). So when there were many variables to test, I quickly realized that I was wasting my time and that there must be a more efficient way to do the job.</p>
+</div>
+<div id="perform-multiple-tests-at-once" class="section level1">
+<h1>Perform multiple tests at once</h1>
+<p>I thus wrote a piece of code that automated the process, by drawing boxplots and performing the tests on several variables at once. Below is the code I used, illustrating the process with the <code>iris</code> dataset. The <code>Species</code> variable has 3 levels, so let’s remove one, and then draw a boxplot and apply a t-test on all 4 continuous variables at once. Note that the continuous variables that we would like to test are variables 1 to 4 in the <code>iris</code> dataset.</p>
+<pre class="r"><code>dat &lt;- iris
+
+# remove one level to have only two groups
+dat &lt;- subset(dat, Species != &quot;setosa&quot;)
+dat$Species &lt;- factor(dat$Species)
+
+# boxplots and t-tests for the 4 variables at once
+for (i in 1:4) { # variables to compare are variables 1 to 4
+  boxplot(dat[, i] ~ dat$Species, # draw boxplots by group
+    ylab = names(dat[i]), # rename y-axis with variable&#39;s name
+    xlab = &quot;Species&quot;
+  )
+  print(t.test(dat[, i] ~ dat$Species)) # print results of t-test
+}</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  dat[, i] by dat$Species
+## t = -5.6292, df = 94.025, p-value = 1.866e-07
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.8819731 -0.4220269
+## sample estimates:
+## mean in group versicolor  mean in group virginica 
+##                    5.936                    6.588</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  dat[, i] by dat$Species
+## t = -3.2058, df = 97.927, p-value = 0.001819
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.33028364 -0.07771636
+## sample estimates:
+## mean in group versicolor  mean in group virginica 
+##                    2.770                    2.974</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  dat[, i] by dat$Species
+## t = -12.604, df = 95.57, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.49549 -1.08851
+## sample estimates:
+## mean in group versicolor  mean in group virginica 
+##                    4.260                    5.552</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-1-4.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  dat[, i] by dat$Species
+## t = -14.625, df = 89.043, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.7951002 -0.6048998
+## sample estimates:
+## mean in group versicolor  mean in group virginica 
+##                    1.326                    2.026</code></pre>
+<p>As you can see, the above piece of code draws a boxplot and then prints results of the test for each continuous variable, all at once.</p>
+<p>At some point in the past, I even wrote code to:</p>
+<ol style="list-style-type: decimal">
+<li>draw a boxplot</li>
+<li>test for the equality of variances (thanks to the Levene’s test)</li>
+<li>depending on whether the variances were equal or unequal, the appropriate test was applied: the Welch test if the variances were unequal and the Student’s t-test in the case the variances were equal (see more details about the different versions of the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">t-test for two samples</a>)</li>
+<li>apply steps 1 to 3 for all continuous variables at once</li>
+</ol>
+<p>I had a similar code for ANOVA in case I needed to compare more than two groups.</p>
+<p>The code was doing the job relatively well. Indeed, thanks to this code I was able to test many variables in an automated way in the sense that it compared groups for all variables at once.</p>
+<p>The only thing I had to change from one project to another is that I needed to modify the name of the grouping variable and the numbering of the continuous variables to test (<code>Species</code> and <code>1:4</code> in the above code).</p>
+</div>
+<div id="concise-and-easily-interpretable-results" class="section level1">
+<h1>Concise and easily interpretable results</h1>
+<div id="t-test" class="section level2">
+<h2>T-test</h2>
+<p>Although it was working quite well and applicable to different projects with only minor changes, I was still unsatisfied with another point.</p>
+<p>Someone who is proficient in statistics and R can read and interpret the output of a t-test without any difficulty. However, as you may have noticed with your own statistical projects, most people do not know what to look for in the results and are sometimes a bit confused when they see so many graphs, code, output, results and numeric values in a document. They are quite easily overwhelmed by this mass of information.</p>
+<p>With my old R routine, the time I was saving by automating the process of t-tests and ANOVA was (partially) lost when I had to explain R outputs to my students so that they could interpret the results correctly. Although most of the time it simply boiled down to pointing out what to look for in the outputs (i.e., <em>p</em>-values), I was still losing quite a lot of time because these outputs were, in my opinion, too detailed for most real-life applications. In other words, too much information seemed to be confusing for many people so I was still not convinced that it was the most optimal way to share statistical results to nonscientists.</p>
+<p>Of course, they came to me for statistical advices, so they expected to have these results and I needed to give them answers to their questions and hypotheses. Nonetheless, I wanted to find a better way to communicate these results to this type of audience, with the minimum of information required to arrive at a conclusion. No more and no less than that.</p>
+<p>After a long time spent online trying to figure out a way to present results in a more concise and readable way, I discovered the <a href="https://cran.r-project.org/web/packages/ggpubr/index.html"><code>{ggpubr}</code> package</a>. This package allows to indicate the test used and the <em>p</em>-value of the test directly on a ggplot2-based graph. It also facilitates the creation of publication-ready plots for non-advanced statistical audiences.</p>
+<p>After many refinements and modifications of the initial code (available in this <a href="http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/">article</a>), I finally came up with a rather stable and robust process to perform t-tests and ANOVA for many variables at once, and more importantly, make the results concise and easily readable by anyone (statisticians or not).</p>
+<p>A graph is worth a thousand words, so here are the exact same tests than in the previous section, but this time with my new R routine:</p>
+<pre class="r"><code>library(ggpubr)
+
+# Edit from here #
+x &lt;- which(names(dat) == &quot;Species&quot;) # name of grouping variable
+y &lt;- which(names(dat) == &quot;Sepal.Length&quot; # names of variables to test
+| names(dat) == &quot;Sepal.Width&quot;
+| names(dat) == &quot;Petal.Length&quot;
+| names(dat) == &quot;Petal.Width&quot;)
+method &lt;- &quot;t.test&quot; # one of &quot;wilcox.test&quot; or &quot;t.test&quot;
+paired &lt;- FALSE # if paired make sure that in the dataframe you have first all individuals at T1, then all individuals again at T2
+# Edit until here
+
+
+# Edit at your own risk
+for (i in y) {
+  for (j in x) {
+    ifelse(paired == TRUE,
+      p &lt;- ggpaired(dat,
+        x = colnames(dat[j]), y = colnames(dat[i]),
+        color = colnames(dat[j]), line.color = &quot;gray&quot;, line.size = 0.4,
+        palette = &quot;npg&quot;,
+        legend = &quot;none&quot;,
+        xlab = colnames(dat[j]),
+        ylab = colnames(dat[i]),
+        add = &quot;jitter&quot;
+      ),
+      p &lt;- ggboxplot(dat,
+        x = colnames(dat[j]), y = colnames(dat[i]),
+        color = colnames(dat[j]),
+        palette = &quot;npg&quot;,
+        legend = &quot;none&quot;,
+        add = &quot;jitter&quot;
+      )
+    )
+    #  Add p-value
+    print(p + stat_compare_means(aes(label = paste0(..method.., &quot;, p-value = &quot;, ..p.format.., &quot; (&quot;, ifelse(..p.adj.. &gt;= 0.05, &quot;not significant&quot;, ..p.signif..), &quot;)&quot;)),
+      method = method,
+      paired = paired,
+      # group.by = NULL,
+      ref.group = NULL
+    ))
+  }
+}</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-2-1.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-2-2.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-2-3.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-2-4.png" width="672" /></p>
+<p>As you can see from the graphs above, only the most important information is presented for each variable:</p>
+<ul>
+<li>a visual comparison of the groups thanks to boxplots</li>
+<li>the name of the statistical test</li>
+<li>the <em>p</em>-value of the test</li>
+</ul>
+<p>Based on these graphs, it is easy, even for non-experts, to interpret the results and conclude that the <code>versicolor</code> and <code>virginica</code> species are significantly different in terms of all 4 variables (since <em>p</em>-values &lt; 0.05).</p>
+<p>Of course, experts may be interested in more advanced results. However, this simple yet complete graph, which includes the name of the test and the <em>p</em>-value, gives all the necessary information to answer the question: “Are the groups different?”.</p>
+<p>In my experience, I have noticed that students and professionals (especially those from a less scientific background) understand way better these results than the ones presented in the previous section.</p>
+<p>The only lines of code that need to be modified for your own project is the name of the grouping variable (<code>Species</code> in the above code), the names of the variables you want to test (<code>Sepal.Length</code>, <code>Sepal.Width</code>, etc.),<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> whether you want to apply a t-test (<code>t.test</code>) or Wilcoxon test (<code>wilcox.test</code>) and whether the samples are paired or not (<code>FALSE</code> if samples are independent, <code>TRUE</code> if they are paired).</p>
+</div>
+<div id="anova" class="section level2">
+<h2>ANOVA</h2>
+<p>Below the same process with an ANOVA. Note that we reload the dataset <code>iris</code> to include all three <code>Species</code> this time:</p>
+<pre class="r"><code>dat &lt;- iris
+
+# Edit from here
+x &lt;- which(names(dat) == &quot;Species&quot;) # name of grouping variable
+y &lt;- which(names(dat) == &quot;Sepal.Length&quot; # names of variables to test
+| names(dat) == &quot;Sepal.Width&quot;
+| names(dat) == &quot;Petal.Length&quot;
+| names(dat) == &quot;Petal.Width&quot;)
+method1 &lt;- &quot;anova&quot; # one of &quot;anova&quot; or &quot;kruskal.test&quot;
+method2 &lt;- &quot;t.test&quot; # one of &quot;wilcox.test&quot; or &quot;t.test&quot;
+my_comparisons &lt;- list(c(&quot;setosa&quot;, &quot;versicolor&quot;), c(&quot;setosa&quot;, &quot;virginica&quot;), c(&quot;versicolor&quot;, &quot;virginica&quot;)) # comparisons for post-hoc tests
+# Edit until here
+
+
+# Edit at your own risk
+for (i in y) {
+  for (j in x) {
+    p &lt;- ggboxplot(dat,
+      x = colnames(dat[j]), y = colnames(dat[i]),
+      color = colnames(dat[j]),
+      legend = &quot;none&quot;,
+      palette = &quot;npg&quot;,
+      add = &quot;jitter&quot;
+    )
+    print(
+      p + stat_compare_means(aes(label = paste0(..method.., &quot;, p-value = &quot;, ..p.format.., &quot; (&quot;, ifelse(..p.adj.. &gt; 0.05, &quot;not significant&quot;, ..p.signif..), &quot;)&quot;)),
+        method = method1, label.y = max(dat[, i], na.rm = TRUE)
+      )
+      + stat_compare_means(comparisons = my_comparisons, method = method2, label = &quot;p.format&quot;) # remove if p-value of ANOVA or Kruskal-Wallis test &gt;= 0.05
+    )
+  }
+}</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-3-1.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-3-2.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-3-3.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-3-4.png" width="672" /></p>
+<p>Like the improved routine for the t-test, I have noticed that students and non-expert professionals understand ANOVA results presented this way much more easily compared to the default R outputs.</p>
+<p>With one graph for each variable, it is easy to see that all species are different from each other in terms of all 4 variables (since all <em>p</em>-values of post-hoc tests &lt; 0.05).</p>
+<p>If you want to apply the same automated process to your data, you will need to modify the name of the grouping variable (<code>Species</code>), the names of the variables you want to test (<code>Sepal.Length</code>, etc.), whether you want to perform an ANOVA (<code>anova</code>) or Kruskal-Wallis test (<code>kruskal.test</code>) and finally specify the comparisons for the post-hoc tests.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+</div>
+</div>
+<div id="to-go-even-further" class="section level1">
+<h1>To go even further</h1>
+<p>As we have seen, these two improved R routines allow to:</p>
+<ol style="list-style-type: decimal">
+<li>Perform t-tests and ANOVA on a small or large number of variables with only minor changes to the code. I basically only have to replace the variable names and the name of the test I want to use. It takes almost the same time to test one or dozens of variables so it is quite an improvement compared to testing one variable at a time</li>
+<li>Share test results in a much proper and cleaner way. This is possible thanks to a graph showing the observations by group and the <em>p</em>-value of the appropriate test included on this graph. This is particularily important when communicating results to a wider audience or to people from diverse backgrounds.</li>
+</ol>
+<p>However, like most of my R routines, these two pieces of code are still a work in progress. Below are some additional features I have been thinking of and which could be added in the future to make the process of comparing two or more groups even more optimal:</p>
+<ul>
+<li>Add the possibility to select variables by their numbering in the dataframe. For the moment it is only possible to do it via their names. This will allow to automate the process even further because instead of typing all variable names one by one, we could simply type <code>4:100</code> (to test variables 4 to 100 for instance).</li>
+<li>When comparing more than two groups, it is only possible to apply an ANOVA or Kruskal-Wallis test at the moment. A major improvement would be to add the possibility to perform a repeated measures ANOVA (i.e., an ANOVA when the samples are dependent). It is currently already possible to do a t-test with two paired samples, but it is not yet possible to do the same with more than two groups.</li>
+<li>Another less important (yet still nice) feature when comparing more than 2 groups would be to automatically apply post-hoc tests only in the case where the null hypothesis of the ANOVA or Kruskal-Wallis test is rejected (so when there is at least one group different from the others, because if the null hypothesis of equal groups is not rejected we do not apply a post-hoc test). At the present time, I manually add or remove the code that displays the <em>p</em>-values of post-hoc tests depending on the global <em>p</em>-value of the ANOVA or Kruskal-Wallis test.</li>
+</ul>
+<p>I will try to add these features in the future, or I would be glad to help if the developer of the {ggpubr} package needs help in including these features.</p>
+<p>Thanks for reading. I hope this article will help you to perform t-tests and ANOVA for multiple variables at once and make the results more easily readable and interpretable by nonscientists. Learn more about the t-test in <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">this article</a>.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank" rel="noopener">raising an issue on GitHub</a>. For all other requests, you can contact me <a href="/contact/">here</a>.</p>
+<p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
+<p><strong>Related articles:</strong></p>
+<script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>In theory, an ANOVA can also be used to compare two groups as it will give the same results compared to a Student’s t-test, but in practice we use the Student’s t-test to compare two samples and the ANOVA to compare three samples or more.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>Do not forget to separate the variables you want to test with <code>|</code>.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>Post-hoc test is only the name used to refer to a specific type of statistical tests. Post-hoc test includes, among others, the Tukey HSD test, the Bonferroni correction, Dunnett’s test. Even if an ANOVA or a Kruskal-Wallis test can determine whether there is at least one group that is different from the others, it does not allow us to conclude <strong>which</strong> are different from each other. For this purpose, there are post-hoc tests that compare all groups two by two to determine which ones are different, after adjusting for multiple comparisons. Concretely, post-hoc tests are performed to each possible pair of groups <strong>after</strong> an ANOVA or a Kruskal-Wallis test has shown that there is at least one group which is different (hence “post” in the name of this type of test). The null and alternative hypotheses and the interpretations of these tests are similar to a Student’s t-test for two samples.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
+
+
+
+                    </div>
+
+                    
+                        <div class="navigation">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    
+                                        <div class="mx-0 mx-md-4 mt-4 text-left">
+                                            <a href="/blog/top-r-resources-on-covid-19-coronavirus/">« Top 7 R resources on COVID-19 Coronavirus</a>
+                                        </div>
+                                    
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="comments">
+
+      <div class="py-3 content">
+            <div class="container">
+                  <div class="row justify-content-center">
+                        <div class="col-sm-12 col-md-10">
+                              <div class="comments">
+                                    <div id="disqus_thread"></div>
+                              </div>
+                        </div>
+                  </div>
+            </div>
+      </div>
+
+      <script type="text/javascript">
+            (function () {
+                  
+                  
+                  if (window.location.hostname == "localhost")
+                        return;
+
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'statsandr';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+      </script>
+      <noscript>
+            Please enable JavaScript to view the
+            <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+</section>
+    <div class="my-4 footer">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-5">
+                
+                    <div class="mx-0 mx-md-4 text-left">
+                        
+                            <p>
+                              <a href="/subscribe/">Subscribe</a>
+                              <a href="/faq/">FAQ</a>
+                              <a href="/sitemap/">Sitemap</a>
+                              <a href="/support/">Support</a>
+                              <a href="/terms/">Terms</a>
+                              <a href="/links/">Links</a>
+                              
+                              
+
+
+
+
+  
+
+
+
+<a href='https://github.com/AntoineSoetewey/statsandr/edit/master/content/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way.Rmd' target="_blank">Edit</a>
+
+
+
+                              
+                            </p>
+                            <p>
+                              <a href="/">&copy; <script>document.write(new Date().getFullYear())</script> Antoine Soetewey</a>
+                            </p>
+                        
+                    </div>
+                
+            </div>
+            <div class="col-sm-12 col-md-5">
+                <div class="mx-0 mx-md-4 text-right">
+                  
+                    
+                    <a href="https://medium.com/@ant.soetewey" target="_blank">
+                        <img class="icon" src="/img/medium.svg" alt="Medium" />
+                    </a>
+                    
+                    
+                    
+                        <a href="https://github.com/AntoineSoetewey" target="_blank">
+                            <img class="icon" src="/img/github.svg" alt="GitHub" />
+                        </a>
+                    
+
+                    
+
+                    
+                    <a href="https://twitter.com/statsandr" target="_blank">
+                        <img class="icon" src="/img/twitter.svg" alt="Twitter" />
+                    </a>
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+                    
+                    
+                    <a href="/contact/">
+                        <img class="icon" src="/img/email.svg" alt="Contact" />
+                    </a>
+                    
+
+                    
+                        <a href="/index.xml" class="mr-0">
+                            <img class="icon" src="/img/rss.svg" alt="RSS" />
+                        </a>
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js" integrity="sha256-sNPiigbfSkqUzMc5rgrdztLnneCMAp6W9wetJUZu9Zw=" crossorigin="anonymous"></script>
+        
+        <script>
+            window.addEventListener('load', function() {
+                hljs.initHighlighting();
+            }, true);
+        </script>
+    
+
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/progressively/1.2.5/progressively.min.js" integrity="sha256-LvFVlLdfGI3WeEH+8Ni4kxLm02g2GlOfeGCGLXfRk/U=" crossorigin="anonymous"></script>
+        <script>
+            window.addEventListener('load', function() {
+                progressively.init({delay: 30, throttle: 50});
+            }, true);
+        </script>
+    
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-86997981-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
+        
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+</body>
+
+</html>
