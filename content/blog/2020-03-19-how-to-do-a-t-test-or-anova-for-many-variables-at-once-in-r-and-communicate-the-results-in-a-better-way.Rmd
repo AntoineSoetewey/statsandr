@@ -171,27 +171,35 @@ for (i in (1:4)) {
   )$p.value
 }
 
-df <- data.frame(Variable = names(dat[, 1:4]),
-                 raw_pvalue = round(raw_pvalue, 3))
+df <- data.frame(
+  Variable = names(dat[, 1:4]),
+  raw_pvalue = round(raw_pvalue, 3)
+)
 
-df$Bonferroni =
-      p.adjust(df$raw_pvalue,
-               method = "bonferroni")
-df$BH =
-      p.adjust(df$raw_pvalue,
-               method = "BH")
-df$Holm =
-      p.adjust(df$raw_pvalue,
-               method = "holm")
-df$Hochberg =
-      p.adjust(df$raw_pvalue,
-               method = "hochberg")
-df$Hommel =
-      p.adjust(df$raw_pvalue,
-               method = "hommel")
-df$BY =
-      p.adjust(df$raw_pvalue,
-               method = "BY")
+df$Bonferroni <-
+  p.adjust(df$raw_pvalue,
+    method = "bonferroni"
+  )
+df$BH <-
+  p.adjust(df$raw_pvalue,
+    method = "BH"
+  )
+df$Holm <-
+  p.adjust(df$raw_pvalue,
+    method = "holm"
+  )
+df$Hochberg <-
+  p.adjust(df$raw_pvalue,
+    method = "hochberg"
+  )
+df$Hommel <-
+  p.adjust(df$raw_pvalue,
+    method = "hommel"
+  )
+df$BY <-
+  p.adjust(df$raw_pvalue,
+    method = "BY"
+  )
 df
 ```
 
@@ -227,10 +235,10 @@ for (i in y) {
       add = "jitter"
     )
     print(
-      p + stat_compare_means(aes(label = paste0(..method.., ", p-value = ", ..p.format.., " (", ifelse(..p.adj.. > 0.05, "not significant", ..p.signif..), ")")),
+      p + stat_compare_means(aes(label = paste0(..method.., ", p-value = ", ..p.format..)),
         method = method1, label.y = max(dat[, i], na.rm = TRUE)
       )
-      + stat_compare_means(comparisons = my_comparisons, method = method2, label = "p.format") # remove if p-value of ANOVA or Kruskal-Wallis test >= 0.05
+      + stat_compare_means(comparisons = my_comparisons, method = method2, label = "p.format") # remove if p-value of ANOVA or Kruskal-Wallis test >= alpha
     )
   }
 }
