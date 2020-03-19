@@ -40,9 +40,11 @@ In the past, I used to do the analyses by following these 3 steps:
 1. Perform a t-test or an ANOVA depending on the number of groups to compare (with the `t.test()` and `oneway.test()` functions for t-test and ANOVA, respectively)
 1. Repeat steps 1 and 2 for each variable
 
-This was feasible as long as there were only a couple of variables to test. Nonetheless, most students came to me asking to perform these kind of tests not on one or two variables, but on **multiples** variables. So when there were many variables to test, I quickly realized that I was wasting my time and that there must be a more efficient way to do the job.
+This was feasible as long as there were only a couple of variables to test. Nonetheless, most students came to me asking to perform these kind of tests not on one or two variables, but on **multiples** variables. So when there were more than one variable to test, I quickly realized that I was wasting my time and that there must be a more efficient way to do the job.
 
-*__Note__: you must be very careful with the issue of multiple testing (also referred as multiplicity) which can arise when you perform multiple t-tests. You can tackle this problem by using the Bonferroni correction, among others. In short, the Bonferroni correction is a simple method that allows many t-tests to be made while still assuring an overall confidence level is maintained. For this, instead of using the standard threshold of $\alpha = 5$% for the significance level, you can use $\alpha = \frac{0.05}{m}$ where $m$ is the number of t-tests. For example, if you perform 20 t-tests with a desired $\alpha = 0.05$, the Bonferroni correction implies that you would reject the null hypothesis for each individual test when the p-value is smaller than $\alpha = \frac{0.05}{20} = 0.0025$.*
+*__Note__: you must be very careful with the issue of multiple testing (also referred as multiplicity) which can arise when you perform multiple t-tests. In short, when a large number of statistical tests are performed, some will have p-values less than 0.05 purely by chance, even if all null hypotheses are in fact really true. This is known as multiplicity or multiple testing. You can tackle this problem by using the Bonferroni correction, among others. The Bonferroni correction is a simple method that allows many t-tests to be made while still assuring an overall confidence level is maintained. For this, instead of using the standard threshold of $\alpha = 5$% for the significance level, you can use $\alpha = \frac{0.05}{m}$ where $m$ is the number of t-tests. For example, if you perform 20 t-tests with a desired $\alpha = 0.05$, the Bonferroni correction implies that you would reject the null hypothesis for each individual test when the p-value is smaller than $\alpha = \frac{0.05}{20} = 0.0025$.*
+
+Note also that there is no universally accepted approach for dealing with the problem of multiple comparisons. Usually, you should choose a p-value adjustment measure familiar to your audience or in your field of study. The Bonferroni correction is the most common way to take this into account and is simple to implement. A more powerful method is also to adjust the false discovery rate using the Benjamini-Hochberg procedure. Discussion on which adjustment method to use is beyond the scope of this article. This article aims at presenting.
 
 # Perform multiple tests at once
 
@@ -76,7 +78,7 @@ At some point in the past, I even wrote code to:
 
 I had a similar code for ANOVA in case I needed to compare more than two groups.
 
-The code was doing the job relatively well. Indeed, thanks to this code I was able to test many variables in an automated way in the sense that it compared groups for all variables at once.
+The code was doing the job relatively well. Indeed, thanks to this code I was able to test several variables in an automated way in the sense that it compared groups for all variables at once.
 
 The only thing I had to change from one project to another is that I needed to modify the name of the grouping variable and the numbering of the continuous variables to test (`Species` and `1:4` in the above code).
 
@@ -94,7 +96,7 @@ Of course, they came to me for statistical advices, so they expected to have the
 
 After a long time spent online trying to figure out a way to present results in a more concise and readable way, I discovered the [`{ggpubr}` package](https://cran.r-project.org/web/packages/ggpubr/index.html). This package allows to indicate the test used and the *p*-value of the test directly on a ggplot2-based graph. It also facilitates the creation of publication-ready plots for non-advanced statistical audiences.
 
-After many refinements and modifications of the initial code (available in this [article](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/)), I finally came up with a rather stable and robust process to perform t-tests and ANOVA for many variables at once, and more importantly, make the results concise and easily readable by anyone (statisticians or not).
+After many refinements and modifications of the initial code (available in this [article](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/)), I finally came up with a rather stable and robust process to perform t-tests and ANOVA for more than one variable at once, and more importantly, make the results concise and easily readable by anyone (statisticians or not).
 
 A graph is worth a thousand words, so here are the exact same tests than in the previous section, but this time with my new R routine:
 
