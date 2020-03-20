@@ -31,18 +31,18 @@ Alternatively, you can check all articles with the tag "[Basics](/tags/basics/)"
 
 ## I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?
 
-You can see the entire code of all articles on [GitHub](https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog){target="_blank"}.
+You can see the entire code of all articles on [GitHub](https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog).
 
 ## I believe there is mistake/bug, what is the best way to report it?
 
-If you find a mistake or a bug, you can [raise an issue on Github](https://github.com/AntoineSoetewey/statsandr/issues){target="_blank"}. Thanks in advance for your feedback!
+If you find a mistake or a bug, you can [raise an issue on Github](https://github.com/AntoineSoetewey/statsandr/issues). Thanks in advance for your feedback!
 
 ## I have a question or I would like to collaborate with you, how can I contact you?
 
 In order for me to answer you as soon as possible, here are the best communication methods:
 
 * If you have a question or a suggestion related to a specific article, please add it as a comment so other readers can benefit from the discussion
-* For mistakes or bugs, please inform me about them by [raising an issue on GitHub](https://github.com/AntoineSoetewey/statsandr/issues){target="_blank"}. Note that the code for all articles and pages of this blog can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog){target="_blank"}
+* For mistakes or bugs, please inform me about them by [raising an issue on GitHub](https://github.com/AntoineSoetewey/statsandr/issues). Note that the code for all articles and pages of this blog can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog)
 * For all other requests, please use the contact form on the [contact page](/contact/)
 
 ## Is it possible to contribute to this blog?
