@@ -23,7 +23,7 @@ Before submitting your article, please bear in mind the following points:
 * You can edit and remove your article from the blog at any time, without any justification needed.
 * This blog is written in R and deployed thanks to the {blogdown} package. Therefore, it is much easier for me to publish articles written in R Markdown (.Rmd) or Markdown (.md). However, if your article is in another format, feel free to submit it as well.
 * If you are having an issue with the online form, you can send a link to your article via the [contact page](/contact/). (But please do not send your article via the contact page if you already submitted it via the contribution form.)
-* All articles that are accepted on the blog will be published on [Medium](https://medium.com/@ant.soetewey) and on the [Towards Data Science](https://towardsdatascience.com/@ant.soetewey) publication. Moreover, it will also be published on [R Weekly](https://rweekly.org/live) and, if it is related to R, on [R-Bloggers](https://www.r-bloggers.com/author/r-on-stats-and-r/) as well.
+* All articles that are accepted on the blog will be published on [Medium](https://medium.com/@ant.soetewey) via the [Towards Data Science](https://towardsdatascience.com/@ant.soetewey) publication. Moreover, it will also be published on [R Weekly](https://rweekly.org/live) and, if it is related to R, on [R-Bloggers](https://www.r-bloggers.com/author/r-on-stats-and-r/) as well.
 * A link to the original post will be added at the end of the article.
 
 Thanks in advance for your interest! Do not hesitate to [contact me](/contact/) if you have any question.
