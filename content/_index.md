@@ -18,4 +18,6 @@ If you are new to this blog, I invite you to:
 * See the [most recent comments](/recent-comments/) so you can follow the discussion
 <!--- * [Contribute](/contribute/) by submitting your article --->
 
+## Contact
+
 If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me](/contact/).
