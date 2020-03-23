@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title> How to create a simple Coronavirus dashboard specific to your country in R - Stats and R </title>
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="This article will help you to build a visually appealing dashboard about the spread of COVID-19 Coronavirus specific to a country in R using flexdashboard." />
+    <meta property="og:site_name" content="Stats and R" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="/blog/how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r/" />
+    <meta property="og:title" content="How to create a simple Coronavirus dashboard specific to your country in R" />
+    <meta property="og:image" content="/blog/2020-03-23-how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r_files/coronavirus-dashboard-the-case-of-belgium.png" />
+    <meta property="og:description" content="This article will help you to build a visually appealing dashboard about the spread of COVID-19 Coronavirus specific to a country in R using flexdashboard." />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:site" content="@statsandr">
+    <meta name="twitter:creator" content="@statsandr">
+    
+    <meta name="twitter:title" content="How to create a simple Coronavirus dashboard specific to your country in R" />
+    <meta name="twitter:description" content="This article will help you to build a visually appealing dashboard about the spread of COVID-19 Coronavirus specific to a country in R using flexdashboard." />
+    <meta name="twitter:image" content="/blog/2020-03-23-how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r_files/coronavirus-dashboard-the-case-of-belgium.png" />
+
+    <link rel="canonical" href="/blog/how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r/">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="/css/custom.css" />
+
+    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/tomorrow.min.css" integrity="sha256-0QU8ry64q+N6YBIEF/6XF6vUeF15gbNO4tLS6ikk0FI=" crossorigin="anonymous" />
+    
+
+    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/progressively/1.2.5/progressively.min.css" integrity="sha256-xbqLYBMsjpuCihs+3Fgp/MFMtPdo2SWKoOjEWOqR4X0=" crossorigin="anonymous" />
+    
+
+    <link rel="shortcut icon"
+        href="/image/favicon.png">
+
+    
+        <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Stats and R" />
+    
+</head>
+
+<body>
+    
+    <div class="my-4 my-md-5 header">
+    <div class="container">
+        <div class="row">
+            <div class="col-auto offset-md-1 d-none d-md-block">
+                
+                    <a href="/">
+                        <img class="ml-md-4 logo img-fluid d-block rounded-circle" src="/image/avatar.png" alt="logo">
+                    </a>
+                
+            </div>
+            <div class="col-auto align-self-center mr-auto">
+                <a href="/">
+                    <h1 class="name">Stats and R</h1>
+                </a>
+
+                <ul class="nav nav-primary">
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-Posts" href="/blog/">
+                                
+                                Posts
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-tags" href="/tags/">
+                                
+                                Tags
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-about" href="/about/">
+                                
+                                About
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-contact" href="/contact/">
+                                
+                                Contact
+                            </a>
+                        </li>
+                    
+
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-12 col-md-10">
+                    <h1 class="mx-0 mx-md-4 blog-post-title">How to create a simple Coronavirus dashboard specific to your country in R</h1>
+
+                    <div class="mb-md-4 meta">
+                        
+                            
+                                <span class="author" title="Antoine Soetewey">
+                                    Antoine Soetewey
+                                </span>
+                            
+                        
+
+                        <span class="date middot" title='Mon Mar 23 2020 00:00:00 UTC'>
+                            2020-03-23
+                        </span>
+
+                        <span class="reading-time middot">
+                            4 minute read
+                        </span>
+
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/basics">Basics</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/r">R</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/visualization">Visualization</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="markdown">
+                        
+    
+    
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#top-r-resources-on-coronavirus">Top R resources on Coronavirus</a></li>
+<li><a href="#how-to-create-a-dashboard-specific-to-your-country">How to create a dashboard specific to your country</a></li>
+</ul>
+</div>
+
+<div class="figure">
+<figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="/blog/2020-03-23-how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r_files/coronavirus-dashboard-the-case-of-belgium.png" src="/blog/2020-03-23-how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r_files/low/coronavirus-dashboard-the-case-of-belgium.png" alt="Coronavirus dashboard: the case of Belgium" style="width:100.0%" /></figure>
+<p class="caption">Coronavirus dashboard: the case of Belgium</p>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The Novel COVID-19 Coronavirus is the hottest topic right now. Every day, the media and newspapers share the number of new cases and deaths in several countries, try to measure the impacts of the virus on citizens and remind us to stay home in order to stay safe. The Coronavirus is on everyone’s lips.</p>
+<p>In addition to governments, media and companies discussing about it, data scientists and data professionals in general are putting their knowledge and time at the service of the virus. This leads to a proliferation of applications, dashboards, blog posts, videos, datasets and code analyzing, in one way or another, the expension of the COVID-19 and how it spreads in the population.</p>
+</div>
+<div id="top-r-resources-on-coronavirus" class="section level1">
+<h1>Top R resources on Coronavirus</h1>
+<p>As a data lover myself, I discovered a multitude of great resources about the Coronavirus. However, these resources were spread all over the internet and were often hidden by the mass of information of another type (e.g., alarming headlines, names of infected celebrities, companies showing off how they helped health care agencies, etc.). To tackle this issue, I collected and then shared in an article <a href="/blog/https://www.statsandr.com/blog/top-r-resources-on-covid-19-coronavirus/">the best R resources on the Coronavirus</a> I came across.</p>
+<p>Note that only resources on R are shared in this article as R is my favorite statistical program and the one I am most familiar with. The fact that I use this program almost daily makes it easier for me to realize the complexity and time put behind a resource, and appreciate its quality and its potential. I am sure that there are other very interesting resources online (see for example the probably <a href="https://coronavirus.jhu.edu/map.html" target="_blank">most popular dashboard</a> by the Johns Hopkins Coronavirus Resource Center).<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> Nonetheless, a lot of people are in a better position than I am to judge the quality of resources made with programming languages for which I am not competent.</p>
+<p>This <a href="/blog/top-r-resources-on-covid-19-coronavirus/">article</a> made me discover so many great resources about the Coronavirus and I keep receiving data visualizations and data analyses from scientists all over the world so that I include them in the collection. Thanks for that, it continuously improves the quality and completeness of the collection.</p>
+</div>
+<div id="how-to-create-a-dashboard-specific-to-your-country" class="section level1">
+<h1>How to create a dashboard specific to your country</h1>
+<p>In addition to R resources, a question often asked by readers was “How can I create a dashboard myself?” or “How can I build a dashboard specific to my country?”. I therefore thought it would serve some people if I created a dashboard specific to my country (Belgium) and detailed the steps on how to build it.</p>
+<p>Questions on how to develop such dashboards came mostly from R beginners as advanced R users most probably know how to do one, or at least can easily use these resources as inspirations for their own work. This led me to create a simple (yet powerful and visually appealing) dashboard. Furthermore, in response to the craze about the Coronavirus, interested users were quite in a hurry. For the sake of easiness, I thus decided to adapt an already existing <a href="https://ramikrispin.github.io/coronavirus_dashboard/" target="_blank">dashboard</a> (with a license that allows to be freely adapted and shared) instead of building one from scratch.</p>
+<p>Before reading further, here is the <a href="https://www.antoinesoetewey.com/files/coronavirus-dashboard.html" target="_blank">link to the dashboard</a> in question and a preview of it below:</p>
+<div class="figure">
+<figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="/blog/2020-03-23-how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r_files/coronavirus-dashboard-the-case-of-belgium.png" src="/blog/2020-03-23-how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r_files/low/coronavirus-dashboard-the-case-of-belgium.png" alt="Coronavirus dashboard: the case of Belgium" style="width:100.0%" /></figure>
+<p class="caption">Coronavirus dashboard: the case of Belgium</p>
+</div>
+<p>If you want to build your own dashboard specific to a country, follow these steps:</p>
+<ol style="list-style-type: decimal">
+<li>Click on the button “Source code” located in the top right corner. Copy that code.</li>
+<li>Open a new R Markdown file (<code>.Rmd</code>), choose a title, select HTML as output format and click on OK:</li>
+</ol>
+<p><img src="/blog/2020-03-23-how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r_files/Screenshot%202020-03-23%20at%2015.38.45.png" style="width:100.0%" /></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Remove all the template code already present and paste the code you copied in step 1.</li>
+<li>Make sure to install the required packages:</li>
+</ol>
+<pre><code>install.packages(&quot;devtools&quot;)
+devtools::install_github(&quot;RamiKrispin/coronavirus&quot;)</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>Knit the document. If you followed these steps correctly, your dashboard should appear in HTML format.</li>
+<li>In the code, replace <code>Belgium</code> with your country.</li>
+</ol>
+<p>Following these 6 basic steps, you should already have a simple dashboard specific to your country. I have intentionnally kept it simple so that everyone could copy it and have their own dashboard in a limited amount of time. If you are familiar with the <code>{flexdashboard}(https://rmarkdown.rstudio.com/flexdashboard/){target=&quot;_blank&quot;}</code>, <code>{plotly}(https://plot.ly/r/){target=&quot;_blank&quot;}</code> and <code>{leaflet}(https://rstudio.github.io/leaflet/){target=&quot;_blank&quot;}</code> packages for the dashboard interface and the visualizations, and the <code>{dplyr}(https://dplyr.tidyverse.org/){target=&quot;_blank&quot;}</code> and <code>{tidyr}(https://tidyr.tidyverse.org/){target=&quot;_blank&quot;}</code> packages for the data manipulation, feel free to edit the code according to your needs.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>I would be glad to mention a collection of Python resources if someone is willing to create a collection of resources about the Coronavirus made with this programming language. Feel free to <a href="/contact/">contact me</a> if this is the case.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
+
+
+
+                    </div>
+
+                    
+                        <div class="navigation">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    
+                                        <div class="mx-0 mx-md-4 mt-4 text-left">
+                                            <a href="/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/">« How to do a t-test or ANOVA for more than one variable at once in R and communicate the results in a better way</a>
+                                        </div>
+                                    
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="comments">
+
+      <div class="py-3 content">
+            <div class="container">
+                  <div class="row justify-content-center">
+                        <div class="col-sm-12 col-md-10">
+                              <div class="comments">
+                                    <div id="disqus_thread"></div>
+                              </div>
+                        </div>
+                  </div>
+            </div>
+      </div>
+
+      <script type="text/javascript">
+            (function () {
+                  
+                  
+                  if (window.location.hostname == "localhost")
+                        return;
+
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'statsandr';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+      </script>
+      <noscript>
+            Please enable JavaScript to view the
+            <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+</section>
+    <div class="my-4 footer">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-5">
+                
+                    <div class="mx-0 mx-md-4 text-left">
+                        
+                            <p>
+                              <a href="/subscribe/">Subscribe</a>
+                              <a href="/faq/">FAQ</a>
+                              <a href="/sitemap/">Sitemap</a>
+                              <a href="/support/">Support</a>
+                              <a href="/terms/">Terms</a>
+                              <a href="/links/">Links</a>
+                              
+                              
+
+
+
+
+  
+
+
+
+<a href='https://github.com/AntoineSoetewey/statsandr/edit/master/content/blog/2020-03-23-how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r.Rmd' target="_blank">Edit</a>
+
+
+
+                              
+                            </p>
+                            <p>
+                              <a href="/">&copy; <script>document.write(new Date().getFullYear())</script> Antoine Soetewey</a>
+                            </p>
+                        
+                    </div>
+                
+            </div>
+            <div class="col-sm-12 col-md-5">
+                <div class="mx-0 mx-md-4 text-right">
+                  
+                    
+                    <a href="https://medium.com/@ant.soetewey" target="_blank">
+                        <img class="icon" src="/img/medium.svg" alt="Medium" />
+                    </a>
+                    
+                    
+                    
+                        <a href="https://github.com/AntoineSoetewey" target="_blank">
+                            <img class="icon" src="/img/github.svg" alt="GitHub" />
+                        </a>
+                    
+
+                    
+
+                    
+                    <a href="https://twitter.com/statsandr" target="_blank">
+                        <img class="icon" src="/img/twitter.svg" alt="Twitter" />
+                    </a>
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+                    
+                    
+                    <a href="/contact/">
+                        <img class="icon" src="/img/email.svg" alt="Contact" />
+                    </a>
+                    
+
+                    
+                        <a href="/index.xml" class="mr-0">
+                            <img class="icon" src="/img/rss.svg" alt="RSS" />
+                        </a>
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js" integrity="sha256-sNPiigbfSkqUzMc5rgrdztLnneCMAp6W9wetJUZu9Zw=" crossorigin="anonymous"></script>
+        
+        <script>
+            window.addEventListener('load', function() {
+                hljs.initHighlighting();
+            }, true);
+        </script>
+    
+
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/progressively/1.2.5/progressively.min.js" integrity="sha256-LvFVlLdfGI3WeEH+8Ni4kxLm02g2GlOfeGCGLXfRk/U=" crossorigin="anonymous"></script>
+        <script>
+            window.addEventListener('load', function() {
+                progressively.init({delay: 30, throttle: 50});
+            }, true);
+        </script>
+    
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-86997981-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
+        
+
+    
+</body>
+
+</html>
