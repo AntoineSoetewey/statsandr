@@ -78,7 +78,32 @@ install.packages(c("devtools", "flexdashboard"))
 devtools::install_github("RamiKrispin/coronavirus")
 ```
 
-6. In the code, replace `Belgium` with your country. Change also the title and the author at the top of the document, and edit the about section at the bottom of the document.
+6. In the code, replace `Belgium` with your country. Here is the list of all available countries in the dataset:
+
+```{r}
+library(coronavirus)
+library(pander)
+pander(unique(coronavirus$Country.Region))
+```
+
+Note that if your country is spelled in more than two words, you will need to surround it by a backtick (but only at one specific line in the code, see an example with Costa Rica):
+
+```
+#----------------------------------------
+# Plotting the data
+
+daily_confirmed %>%
+  plotly::plot_ly() %>%
+  plotly::add_trace(
+    x = ~date,
+    y = ~`Costa Rica`,
+    type = "scatter",
+    mode = "lines+markers",
+    name = "Costa Rica"
+  ) %>%
+```
+
+Do not add backticks in the rest of the code as everywhere else the country's name is surrounded by double quotes `"`. Do not forget to also change the title and the author at the top of the document, and edit the about section at the bottom of the document.
 6. Knit the document (see this [article](/blog/getting-started-in-r-markdown) if you are unfamiliar with R Markdown). Your dashboard should appear in HTML format.
 
 Following these 7 steps, you should already have a simple dashboard specific to your country. I have intentionally kept it simple so that everyone could copy it and have their own dashboard in a limited amount of time.
