@@ -26,10 +26,12 @@
 &lt;li&gt;&lt;a href=&#34;#coronavirus-dashboard-for-your-own-country&#34;&gt;Coronavirus dashboard for your own country&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#motivations-limitations-and-structure-of-the-article&#34;&gt;Motivations, limitations and structure of the article&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#analysis-of-coronavirus-in-belgium&#34;&gt;Analysis of Coronavirus in Belgium&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#a-classic-epidemiological-model-the-sir-model&#34;&gt;A classic epidemiological model: the SIR model&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#a-classic-epidemiological-model-the-sir-model&#34;&gt;A classic epidemiological model: the &lt;em&gt;SIR&lt;/em&gt; model&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#fitting-a-sir-model-to-the-belgium-data&#34;&gt;Fitting a &lt;em&gt;SIR&lt;/em&gt; model to the Belgium data&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#reproduction-number-r_0&#34;&gt;Reproduction number &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#using-our-model-to-analyze-the-outbreak-if-there-was-no-intervention&#34;&gt;Using our model to analyze the outbreak if there was no intervention&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#using-our-model-to-analyze-the-outbreak-if-there-was-no-intervention&#34;&gt;Using our model to analyze the outbreak if there was no intervention&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#more-summary-statistics&#34;&gt;More summary statistics&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#additional-considerations&#34;&gt;Additional considerations&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#ascertainment-rates&#34;&gt;Ascertainment rates&lt;/a&gt;&lt;/li&gt;
@@ -68,12 +70,12 @@
 &lt;p&gt;I usually write articles only about things I consider myself familiar with, mainly &lt;a href=&#34;/tags/statistics/&#34;&gt;statistics&lt;/a&gt; and its applications in &lt;a href=&#34;/tags/r/&#34;&gt;R&lt;/a&gt;. At the time of writing this article, I was however curious where Belgium stands regarding the spread of this virus, I wanted to play with this kind of data in R (which is new to me) and see what comes out.&lt;/p&gt;
 &lt;p&gt;In order to satisfy my curiosity while not being an expert, in this article I am going to replicate analyses done by more knowledgeable people and apply them to my country, that is, Belgium. From all the analyses I have read so far, I decided to replicate the analyses done by Tim Churches and Prof. Dr. Holger K. von Jouanne-Diedrich. This article is based on a mix of their articles which can be found &lt;a href=&#34;https://timchurches.github.io/blog/posts/2020-02-18-analysing-covid-19-2019-ncov-outbreak-data-with-r-part-1/&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;https://blog.ephorie.de/epidemiology-how-contagious-is-novel-coronavirus-2019-ncov&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;. They both present a very informative analysis on how to model the outbreak of the Coronavirus and show how contagious it is. Their articles also allowed me to gain an understanding of the topic and in particular an understanding of the most common epidemiological model. I strongly advise interested readers to also read their &lt;a href=&#34;/blog/top-r-resources-on-covid-19-coronavirus/#analyzing-covid-19-outbreak-data-with-r&#34;&gt;more recent articles&lt;/a&gt; for more advanced analyses and for an even deeper understanding of the spread of the COVID-19 pandemic.&lt;/p&gt;
 &lt;p&gt;Other more &lt;a href=&#34;/blog/covid-19-in-belgium/#additional-considerations&#34;&gt;complex analyses&lt;/a&gt; are possible and even preferable, but I leave this to experts in this field. Note also that the following analyses take into account only the data until the date of publication of this article, so the results should not be viewed, by default, as current findings.&lt;/p&gt;
-&lt;p&gt;In the remaining of the article, we first introduce the model which will be used to analyze the Coronavirus outbreak in Belgium. We also briefly discuss and show how to compute an important epidemiological measure, the reproduction number. We then use our model to analyze the outbreak of the disease in the case where there would be no public health intervention. We conclude the article by summarizing more advanced tools and techniques that could be used to model COVID-19 in Belgium.&lt;/p&gt;
+&lt;p&gt;In the remaining of the article, we first introduce the model which will be used to analyze the Coronavirus outbreak in Belgium. We also briefly discuss and show how to compute an important epidemiological measure, the reproduction number. We then use our model to analyze the outbreak of the disease in the case where there would be no public health intervention. We conclude the article by summarizing more advanced tools and techniques that could be used to further model COVID-19 in Belgium.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;analysis-of-coronavirus-in-belgium&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Analysis of Coronavirus in Belgium&lt;/h1&gt;
 &lt;div id=&#34;a-classic-epidemiological-model-the-sir-model&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;A classic epidemiological model: the SIR model&lt;/h2&gt;
+&lt;h2&gt;A classic epidemiological model: the &lt;em&gt;SIR&lt;/em&gt; model&lt;/h2&gt;
 &lt;p&gt;Before diving into the real-life application, we first introduce the model that will be used.&lt;/p&gt;
 &lt;p&gt;There are many epidemiological models but we will use one of the simplest, the &lt;strong&gt;&lt;em&gt;SIR&lt;/em&gt; model&lt;/strong&gt;. Tim Churches’ explanation of this model and how to fit it using R is so nice, I will reproduce it here with a few minor changes.&lt;/p&gt;
 &lt;p&gt;The basic idea behind the &lt;em&gt;SIR&lt;/em&gt; model (&lt;strong&gt;S&lt;/strong&gt;usceptible - &lt;strong&gt;I&lt;/strong&gt;nfectious - &lt;strong&gt;R&lt;/strong&gt;ecovered) of communicable disease outbreaks is that there are three groups (also called compartments) of people:&lt;/p&gt;
@@ -227,8 +229,8 @@ fitted_cumulative_incidence %&amp;gt;%
   ) +
   theme_minimal()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;From the above graph we see that the number of observed confirmed cases follows the number of confirmed cases expected by our model. The fact that both trends are overlapping indicates that the pandemic is clearly in an exponential phase in Belgium. More data would be needed to see whether this trend is confirmed in the long term.&lt;/p&gt;
-&lt;p&gt;The following graph is similar than the previous one, except that the &lt;em&gt;y&lt;/em&gt;-axis is measured on a log scale. This kind of plot is called a semi-log plot or more precisely a log-linear plot because only the &lt;em&gt;y&lt;/em&gt;-axis is transformed with a logarithm scale. Transforming the scale in log has the advantage that it is more easily readable in terms of difference between the observed and expected number of confirmed cases and it also shows how the observed confirmed cases differ from an exponential trend.&lt;/p&gt;
+&lt;p&gt;From the above graph we see that the number of observed confirmed cases follows, unfortunately, the number of confirmed cases expected by our model. The fact that both trends are overlapping indicates that the pandemic is clearly in an exponential phase in Belgium. More data would be needed to see whether this trend is confirmed in the long term.&lt;/p&gt;
+&lt;p&gt;The following graph is similar than the previous one, except that the &lt;em&gt;y&lt;/em&gt;-axis is measured on a log scale. This kind of plot is called a semi-log plot or more precisely a log-linear plot because only the &lt;em&gt;y&lt;/em&gt;-axis is transformed with a logarithm scale. Transforming the scale in log has the advantage that it is more easily readable in terms of difference between the observed and expected number of confirmed cases and it also shows how the number of observed confirmed cases differs from an exponential trend.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;fitted_cumulative_incidence %&amp;gt;%
   ggplot(aes(x = Date)) +
   geom_line(aes(y = I), colour = &amp;quot;red&amp;quot;) +
@@ -241,12 +243,14 @@ fitted_cumulative_incidence %&amp;gt;%
   theme_minimal() +
   scale_y_log10()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;The plot indicates that, at the beginning of the pandemic and until March 6, the number of confirmed cases stayed below what would be expected in an exponential phase. In particular, the number of confirmed cases stayed constant at 1 case from February 4 to February 29. From March 7 and until March 30, the number of confirmed cases kept increasing at an exponential rate.&lt;/p&gt;
-&lt;p&gt;We also notice a small jump between March 12 and March 13, which may potentially indicate an error in the data collection or a change in the testing/screening methods.&lt;/p&gt;
+&lt;p&gt;The plot indicates that, at the beginning of the pandemic and until March 12, the number of confirmed cases stayed below what would be expected in an exponential phase. In particular, the number of confirmed cases stayed constant at 1 case from February 4 to February 29. From March 13 and until March 30, the number of confirmed cases kept increasing at a rate close to an exponential rate.&lt;/p&gt;
+&lt;p&gt;We also notice a small jump between March 12 and March 13, which may potentially indicate an error in the data collection, or a change in the testing/screening methods.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;reproduction-number-r_0&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Reproduction number &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt;&lt;/h2&gt;
-&lt;p&gt;The fit to the observed cumulative incidence data is far from perfect but it is still reasonable, so we can now use our fitted model to calculate the basic reproduction number &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt;. The reproduction number gives the average number of susceptible people who are infected by each infectious person. In other words, the reproduction number refers to the number of healthy people that get infected per number of infected people. Formally, we have:&lt;/p&gt;
+&lt;p&gt;Our &lt;em&gt;SIR&lt;/em&gt; model looks like a good fit to the observed cumulative incidence data in Belgium, so we can now use our fitted model to calculate the basic reproduction number &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt;, also referred as basic reproduction ratio.&lt;/p&gt;
+&lt;p&gt;The reproduction number gives the average number of susceptible people who are infected by each infectious person. In other words, the reproduction number refers to the number of healthy people that get infected per number of sick people. When &lt;span class=&#34;math inline&#34;&gt;\(R_0 &amp;gt; 1\)&lt;/span&gt; the disease start spreading in a population, but not if &lt;span class=&#34;math inline&#34;&gt;\(R_0 &amp;lt; 1\)&lt;/span&gt;. Usually, the larger the value of &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt;, the harder it is to control the epidemic.&lt;/p&gt;
+&lt;p&gt;Formally, we have:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[R_0 = \frac{\beta}{\gamma}\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;We can compute it in R:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Opt_par&lt;/code&gt;&lt;/pre&gt;
@@ -255,14 +259,14 @@ fitted_cumulative_incidence %&amp;gt;%
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;R0 &amp;lt;- as.numeric(Opt_par[1] / Opt_par[2])
 R0&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 1.401429&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;An &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt; of 1.4 is consistent with the values calculated by others for COVID-19, and is also consistent with the &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt; for SARS and MERS, which are similar diseases also cause by coronavirus.&lt;/p&gt;
-&lt;p&gt;A &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt; of 1.4 means that, on average in Belgium, 1.4 persons are infected by each infected person.&lt;/p&gt;
+&lt;p&gt;An &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt; of 1.4 is slightly below the values calculated by others for COVID-19 and the &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt; for SARS and MERS, which are similar diseases also caused by coronavirus. This is mainly due to the fact that the number of confirmed cases stayed constant and equal to 1 at the beginning of the pandemic.&lt;/p&gt;
+&lt;p&gt;A &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt; of 1.4 means that, on average in Belgium, 1.4 persons are infected for each infected person.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;using-our-model-to-analyze-the-outbreak-if-there-was-no-intervention&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Using our model to analyze the outbreak if there was no intervention&lt;/h2&gt;
-&lt;p&gt;It is instructive to use our model fitted to the first 31 days of available data on confirmed cases in Belgium, to see what would happen if the outbreak were left to run its course, without public health interventions.&lt;/p&gt;
+&lt;p&gt;It is instructive to use our model fitted to the first 56 days of available data on confirmed cases in Belgium, to see what would happen if the outbreak were left to run its course, without public health intervention.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# time in days for predictions
-t &amp;lt;- 1:70
+t &amp;lt;- 1:120
 
 # get the fitted values from our SIR model
 fitted_cumulative_incidence &amp;lt;- data.frame(ode(
@@ -308,18 +312,46 @@ fitted_cumulative_incidence %&amp;gt;% ggplot(aes(x = Date)) + geom_line(aes(y =
         blue = &amp;quot;blue&amp;quot;), labels = c(&amp;quot;Susceptible&amp;quot;, &amp;quot;Observed incidence&amp;quot;, &amp;quot;Recovered&amp;quot;, 
         &amp;quot;Infectious&amp;quot;)) + theme_minimal()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;Given this prediction, with the exact same setting and no intervention at all to limit the spread of the pandemic, the peak would happen on April 19, 2020, with around 1.65 million infected persons. With a mortality rate of 2%, this would mean that our model predicts that more than 30,000 people would die. At this point, we understand why such strict containment measures and regulations are taken within Belgium!&lt;/p&gt;
-&lt;p&gt;Note that those predictions should be taken with a lot of caution. As mentioned above, they are based on rather unrealistic assumptions (for examle, no publich health interventions, fixed reproduction number &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt;, etc.). More advanced projections are possible with the &lt;code&gt;{projections}&lt;/code&gt; package, among others (see this &lt;a href=&#34;/blog/covid-19-in-belgium/#more-sophisticated-projections&#34;&gt;section&lt;/a&gt; for more information on this matter).&lt;/p&gt;
+&lt;div id=&#34;more-summary-statistics&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;More summary statistics&lt;/h3&gt;
+&lt;p&gt;Other interesting statistics can be computed from the fit of our model. For example:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the date of the peak of the pandemic&lt;/li&gt;
+&lt;li&gt;the number of severe cases&lt;/li&gt;
+&lt;li&gt;the number of people in need of intensive care&lt;/li&gt;
+&lt;li&gt;the number of deaths&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;fit &amp;lt;- fitted_cumulative_incidence
+
+# peak of pandemic
+fit[fit$I == max(fit$I), c(&amp;quot;Date&amp;quot;, &amp;quot;I&amp;quot;)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##          Date        I
+## 87 2020-04-30 525315.7&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# severe cases
+max_infected &amp;lt;- max(fit$I)
+max_infected / 5 &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 105063.1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# cases with need for intensive care
+max_infected * 0.06&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 31518.94&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# deaths with supposed 0.7% fatality rate
+max_infected * 0.007&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 3677.21&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Given these predictions, with the exact same settings and no intervention at all to limit the spread of the pandemic, the peak in Belgium is expected to be reached by the end of April. About 525,000 people would be infected by then, which translates to about 105,000 severe cases, about 32,000 persons in need of intensive care and up to 3,700 deaths (assuming a 0.7% fatality rate, as suggested by this &lt;a href=&#34;https://www.newscientist.com/article/mg24532733-700-why-is-it-so-hard-to-calculate-how-many-people-will-die-from-covid-19/&#34; target=&#34;_blank&#34;&gt;source&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;At this point, we understand why such strict containment measures and regulations are taken in Belgium!&lt;/p&gt;
+&lt;p&gt;Note that those predictions should be taken with a lot of caution. On the one hand, as mentioned above, they are based on rather unrealistic assumptions (for example, no public health interventions, fixed reproduction number &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt;, etc.). More advanced projections are possible with the &lt;code&gt;{projections}&lt;/code&gt; package, among others (see this &lt;a href=&#34;/blog/covid-19-in-belgium/#more-sophisticated-projections&#34;&gt;section&lt;/a&gt; for more information on this matter). On the other hand, we still have to be careful and strictly follow public health interventions because previous pandemics such as H1N1 and Spanish flu have shown that incredibly high numbers are not impossible!&lt;/p&gt;
+&lt;p&gt;The purpose of this article was to give an illustration of how such analyses are done in R with a simple epidemiological model. Those are the numbers our simple model produces and we hope they are wrong.&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;additional-considerations&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Additional considerations&lt;/h1&gt;
-&lt;p&gt;As previously mentioned, the &lt;em&gt;SIR&lt;/em&gt; model and the analyses done above are rather simplistic and may not give a true representation of the reality. In the following sections, we highlight five improvements that could be done to enhance theses analyses and lead to a better overview of the reality.&lt;/p&gt;
+&lt;p&gt;As previously mentioned, the &lt;em&gt;SIR&lt;/em&gt; model and the analyses done above are rather simplistic and may not give a true representation of the reality. In the following sections, we highlight five improvements that could be done to enhance theses analyses and lead to a better overview of the spread of the Coronavirus in Belgium.&lt;/p&gt;
 &lt;div id=&#34;ascertainment-rates&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Ascertainment rates&lt;/h2&gt;
 &lt;p&gt;In the previous analyses and graphs, it is assumed that the number of confirmed cases represent all the cases that are infectious. This is far from reality as only a proportion of all cases are screened, detected and counted in the official figures. This proportion is known as the ascertainment rate.&lt;/p&gt;
 &lt;p&gt;The ascertainment rate is likely to vary during the course of an outbreak, in particular if testing and screening efforts are increased, or if detections methods are changed. Such changing ascertainment rates can be easily incorporated into the model by using a weighting function for the incidence cases.&lt;/p&gt;
-&lt;p&gt;In his article, Tim Churches demonstrates that a fixed ascertainment rates of 20% makes little difference to the modelled outbreak with no intervention, except that it all happens a bit more quickly.&lt;/p&gt;
+&lt;p&gt;In his first &lt;a href=&#34;https://timchurches.github.io/blog/posts/2020-02-18-analysing-covid-19-2019-ncov-outbreak-data-with-r-part-1/&#34; target=&#34;_blank&#34;&gt;article&lt;/a&gt;, Tim Churches demonstrates that a fixed ascertainment rates of 20% makes little difference to the modelled outbreak with no intervention, except that it all happens a bit more quickly.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;more-sophisticated-models&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;More sophisticated models&lt;/h2&gt;
@@ -345,16 +377,15 @@ fitted_cumulative_incidence %&amp;gt;% ggplot(aes(x = Date)) + geom_line(aes(y =
 &lt;/div&gt;
 &lt;div id=&#34;more-sophisticated-projections&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;More sophisticated projections&lt;/h2&gt;
-&lt;p&gt;In addition to naïve predictions based on a simple SIR model, more advanced and complex projections are also possible, notably, with the &lt;code&gt;{projections}&lt;/code&gt; package. This packages uses data on daily incidence, the serial interval and the reproduction number to simulate plausible epidemic trajectories and project future incidence.&lt;/p&gt;
+&lt;p&gt;In addition to naïve predictions based on a simple &lt;em&gt;SIR&lt;/em&gt; model, more advanced and complex projections are also possible, notably, with the &lt;code&gt;{projections}&lt;/code&gt; package. This packages uses data on daily incidence, the serial interval and the reproduction number to simulate plausible epidemic trajectories and project future incidence.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Conclusion&lt;/h1&gt;
-&lt;p&gt;This article started with mentioning a couple of R resources on the Coronavirus pandemic that can be used as background materials. We then detailed the most common epidemiological model, i.e. the &lt;em&gt;SIR&lt;/em&gt; model, before actually applying it on Belgium data.&lt;/p&gt;
-&lt;p&gt;This resulted in a visual comparison of the fitted and observed cumulative incidence in Belgium. It showed that the observed confirmed cases were higher than expected by the model until a few days ago, and it seems that the rate at which people are infected is decreasing. More data is however necessary to confirm this downard trend.&lt;/p&gt;
-&lt;p&gt;We then explained what is the reproduction number and how to compute it in R. Finally, our model was used to analyze the outbreak of the Coronavirus if there was no intervention at all.&lt;/p&gt;
-&lt;p&gt;Under this simplistic and unreal scenario of no public health intervention, the peak of the COVID-19 would be on April 18, 2020, with around 1.7 million infected people and several thousands deaths. These very alarmist naïve predictions highlight the importance of restrictive public health actions taken by governments to mitigate the spread of the virus (or at least slow it enough to allow health care systems to cope with it).&lt;/p&gt;
-&lt;p&gt;xxx to continue by finish reading conclusion of Tim and reading 2 other articles (medium and holger).&lt;/p&gt;
+&lt;p&gt;This article started with (i) a description of a couple of R resources on the Coronavirus pandemic (i.e., a &lt;a href=&#34;/blog/top-r-resources-on-covid-19-coronavirus/&#34;&gt;collection&lt;/a&gt; and a &lt;a href=&#34;/blog/how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r&#34;&gt;dashboard&lt;/a&gt;) that can be used as background materials and (ii) the motivations behind this article. We then detailed the most common epidemiological model, i.e. the &lt;em&gt;SIR&lt;/em&gt; model, before actually applying it on Belgium incidence data.&lt;/p&gt;
+&lt;p&gt;This resulted in a visual comparison of the fitted and observed cumulative incidence in Belgium. It showed that the COVID-19 pandemic is clearly in an exponential phase in Belgium in terms of number of confirmed cases.&lt;/p&gt;
+&lt;p&gt;We then explained what is the reproduction number and how to compute it in R. Finally, our model was used to analyze the outbreak of the Coronavirus if there was no public health intervention at all.&lt;/p&gt;
+&lt;p&gt;Under this (probably too) simplistic scenario, the peak of the COVID-19 in Belgium is expected to be reached by the end of April, 2020, with around 525,000 infected people and about 3,700 deaths. These very alarmist naïve predictions highlight the importance of restrictive public health actions taken by governments, and the urgence for citizens to follow these health actions in order to mitigate the spread of the virus in Belgium (or at least slow it enough to allow health care systems to cope with it).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;references&#34; class=&#34;section level1 unnumbered&#34;&gt;
 &lt;h1&gt;References&lt;/h1&gt;
