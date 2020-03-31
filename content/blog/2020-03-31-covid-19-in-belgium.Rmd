@@ -113,7 +113,7 @@ $$RSS(\beta, \gamma) = \sum_t \big(I(t) - \hat{I}(t) \big)^2$$
 
 In order to fit a model to the incidence data for Belgium, we need a value *N* for the initial uninfected population. The population of Belgium in November 2019 was 11,515,793 people, according to [Wikipedia](https://en.wikipedia.org/wiki/Belgium){target="_blank"}. We will thus use *N = 11515793* as the initial uninfected population.
 
-Next, we need to create a vector with the daily cumulative incidence for Belgium, from February 29 (when our daily incidence data starts), through to March 30 (last available date at the time of publication of this article). We will then compare the predicted incidence from the *SIR* model fitted to these data with the actual incidence since February 29. We also need to initialise the values for *N*, *S*, *I* and *R*. Note that the daily cumulative incidence for Belgium is extracted from the [`{coronavirus}` R package](/blog/top-r-resources-on-covid-19-coronavirus/#coronavirus) developed by Rami Krispin.
+Next, we need to create a vector with the daily cumulative incidence for Belgium, from February 4 (when our daily incidence data starts), through to March 30 (last available date at the time of publication of this article). We will then compare the predicted incidence from the *SIR* model fitted to these data with the actual incidence since February 4. We also need to initialise the values for *N*, *S*, *I* and *R*. Note that the daily cumulative incidence for Belgium is extracted from the [`{coronavirus}` R package](/blog/top-r-resources-on-covid-19-coronavirus/#coronavirus) developed by Rami Krispin.
 
 ```{r, message = FALSE}
 # devtools::install_github("RamiKrispin/coronavirus")
@@ -142,9 +142,9 @@ df <- coronavirus %>%
   )
 
 # put the daily cumulative incidence numbers for Belgium from
-# Feb 29 to March 30 into a vector called Infected
+# Feb 4 to March 30 into a vector called Infected
 library(lubridate)
-Infected <- subset(df, date >= ymd("2020-02-29"))$confirmed_cum
+Infected <- subset(df, date >= ymd("2020-02-04"))$confirmed_cum
 
 # Create an incrementing Day vector the same length as our
 # cases vector
@@ -205,7 +205,7 @@ Opt_par
 Remember that $\beta$ controls the transition between *S* and *I* (i.e., susceptible and infectious) and $\gamma$ controls the transition between *I* and *R* (i.e., infectious and recovered). However, those values do not mean a lot but we use them to get the fitted numbers of people in each compartment of our *SIR* model for the dates up to March 30 that were used to fit the model, and compare those fitted values with the observed (real) data.
 
 ```{r, eval = TRUE, message = FALSE}
-sir_start_date <- "2020-02-29"
+sir_start_date <- "2020-02-04"
 
 # time in days for predictions
 t <- 1:as.integer(today() - ymd(sir_start_date))
@@ -239,11 +239,9 @@ fitted_cumulative_incidence %>%
   theme_minimal()
 ```
 
-From the above graph we see that there were more observed confirmed cases than expected until March 28, a simliar amount on March 29 and then a lower number of observed confirmed cases than expected on March 30. More data would be needed to see whether this downard trend is confirmed in the long term.
+From the above graph we see that the number of observed confirmed cases follows the number of confirmed cases expected by our model. The fact that both trends are overlapping indicates that the pandemic is clearly in an exponential phase in Belgium. More data would be needed to see whether this trend is confirmed in the long term.
 
-The following graph is similar than the previous one, except that the *y*-axis is measured on a log scale on the y-axis (a so-called semi-log plot or more precisely log-linear plot here), which indicates that the epidemic is in an exponential phase, although at a slightly smaller rate than at the beginning. By the way: many people were not alarmed at all at the beginning. Why? Because an exponential function looks linear in the beginning. It was the same with HIV/AIDS when it first started.
-
-nand the rate of incidence seems to decrease for a week (perhaps thanks to the new containment measures?).
+The following graph is similar than the previous one, except that the *y*-axis is measured on a log scale. This kind of plot is called a semi-log plot or more precisely a log-linear plot because only the *y*-axis is transformed with a logarithm scale. Transforming the scale in log has the advantage that it is more easily readable in terms of difference between the observed and expected number of confirmed cases and it also shows how the observed confirmed cases differ from an exponential trend.
 
 ```{r}
 fitted_cumulative_incidence %>%
@@ -251,7 +249,7 @@ fitted_cumulative_incidence %>%
   geom_line(aes(y = I), colour = "red") +
   geom_point(aes(y = cumulative_incident_cases), colour = "blue") +
   labs(
-    y = "Cumulative incidence",
+    y = "Cumulative incidence (log scale)",
     title = "COVID-19 fitted vs observed cumulative incidence, Belgium",
     subtitle = "(Red = fitted incidence from SIR model, blue = observed incidence)"
   ) +
@@ -259,29 +257,32 @@ fitted_cumulative_incidence %>%
   scale_y_log10()
 ```
 
+The plot indicates that, at the beginning of the pandemic and until March 6, the number of confirmed cases stayed below what would be expected in an exponential phase. In particular, the number of confirmed cases stayed constant at 1 case from February 4 to February 29. From March 7 and until March 30, the number of confirmed cases kept increasing at an exponential rate.
+
+We also notice a small jump between March 12 and March 13, which may potentially indicate an error in the data collection or a change in the testing/screening methods.
 
 ## Reproduction number $R_0$
 
-The fit to the observed cumulative incidence data is far from perfect but it is still reasonable, so we can now use our fitted model to calculate the basic reproduction number $R_0$ which gives the average number of susceptible people who are infected by each infectious person:
+The fit to the observed cumulative incidence data is far from perfect but it is still reasonable, so we can now use our fitted model to calculate the basic reproduction number $R_0$. The reproduction number gives the average number of susceptible people who are infected by each infectious person. In other words, the reproduction number refers to the number of healthy people that get infected per number of infected people. Formally, we have:
 
 $$R_0 = \frac{\beta}{\gamma}$$
-
-xxx Add a note about its interpretation from article on medium, and interpretation about a $R_0$ above and below 0.
 
 We can compute it in R:
 
 ```{r}
 Opt_par
 
-R0 <- Opt_par[1] / Opt_par[2]
-as.numeric(R0)
+R0 <- as.numeric(Opt_par[1] / Opt_par[2])
+R0
 ```
 
-An $R_0$ of 1.97 is consistent with the values calculated by others for COVID-19, and is also consistent with the $R_0$ for SARS and MERS, which are similar diseases also cause by coronavirus.
+An $R_0$ of `r round(R0, 2)` is consistent with the values calculated by others for COVID-19, and is also consistent with the $R_0$ for SARS and MERS, which are similar diseases also cause by coronavirus.
+
+A $R_0$ of `r round(R0, 2)` means that, on average in Belgium, `r round(R0, 2)` persons are infected by each infected person.
 
 ## Using our model to analyze the outbreak if there was no intervention
 
-It is instructive to use our model fitted to the first 30 days of available data on confirmed cases in Belgium, to see what would happen if the outbreak were left to run its course, without public health interventions.
+It is instructive to use our model fitted to the first 31 days of available data on confirmed cases in Belgium, to see what would happen if the outbreak were left to run its course, without public health interventions.
 
 ```{r, warning = FALSE}
 # time in days for predictions
@@ -322,7 +323,7 @@ fitted_cumulative_incidence %>%
   theme_minimal()
 ```
 
-The same graph in log scale:
+The same graph in log scale for the *y*-axis and with a legend for better readability:
 
 ```{r, warning = FALSE, tidy = TRUE}
 # plot the data
@@ -345,19 +346,21 @@ fitted_cumulative_incidence %>%
   theme_minimal()
 ```
 
-Given this prediction, with the exact same setting and no intervention at all to limit the spread of the pandemic, the peak would be on April 18th 2020, with around 1.7 million infected persons. With a mortality rate of 2%, this would mean that our model predicts that more than 30,000 people would die. At this point, we understand why such containment measures and regulations are taken within Belgium!
+Given this prediction, with the exact same setting and no intervention at all to limit the spread of the pandemic, the peak would happen on April 19, 2020, with around 1.65 million infected persons. With a mortality rate of 2%, this would mean that our model predicts that more than 30,000 people would die. At this point, we understand why such strict containment measures and regulations are taken within Belgium!
 
-Note that those predictions should be taken with caution. As mentioned above, they are based on rather unrealistic assumptions (for examle, no publich health interventions, fixed reproduction number $R_0$, etc.). More advanced projections are possible with the `{projections}` package, among others (see this [section](/blog/covid-19-in-belgium/#more-sophisticated-projections/) for more information on this matter).
+Note that those predictions should be taken with a lot of caution. As mentioned above, they are based on rather unrealistic assumptions (for examle, no publich health interventions, fixed reproduction number $R_0$, etc.). More advanced projections are possible with the `{projections}` package, among others (see this [section](/blog/covid-19-in-belgium/#more-sophisticated-projections) for more information on this matter).
 
 # Additional considerations
 
-As previously mentioned, the SIR model and the analyses done above are rather simplistic and may not give a true representation of the reality. In the following sections, we highlight xxx improvements that could be done to enhance theses analyses and lead to a better overview of the reality.
+As previously mentioned, the *SIR* model and the analyses done above are rather simplistic and may not give a true representation of the reality. In the following sections, we highlight five improvements that could be done to enhance theses analyses and lead to a better overview of the reality.
 
 ## Ascertainment rates
 
 In the previous analyses and graphs, it is assumed that the number of confirmed cases represent all the cases that are infectious. This is far from reality as only a proportion of all cases are screened, detected and counted in the official figures. This proportion is known as the ascertainment rate.
 
 The ascertainment rate is likely to vary during the course of an outbreak, in particular if testing and screening efforts are increased, or if detections methods are changed. Such changing ascertainment rates can be easily incorporated into the model by using a weighting function for the incidence cases.
+
+In his article, Tim Churches demonstrates that a fixed ascertainment rates of 20% makes little difference to the modelled outbreak with no intervention, except that it all happens a bit more quickly.
 
 ## More sophisticated models
 
@@ -366,11 +369,11 @@ More sophisticated models could also be used to better reflect real-life transmi
 1. **E** for the **E**xposed/infected but asymptomatic
 1. **I** for the **I**nfected and symptomatic
 
-These models belong to the continuous-time dynamic models that assume fixed transition rates. There are other, stochastic models that allow for varying transition rates depending on attributes of individuals, social networking, etc.
+These models belong to the continuous-time dynamic models that assume fixed transition rates. There are other stochastic models that allow for varying transition rates depending on attributes of individuals, social networking, etc.
 
 ## Modelling the epidemic trajectory using log-linear models
 
-As noted above, the initial exponential phase of an outbreak, when shown in a log-linear plot (the y-axis on a log scale and the x-axis without transformation), appears (somewhat) linear. This suggests that we can model epidemic growth, and decay, using a simple log-linear model of the form:
+As noted above, the initial exponential phase of an outbreak, when shown in a log-linear plot (the *y*-axis on a log scale and the *x*-axis without transformation), appears (somewhat) linear. This suggests that we can model epidemic growth, and decay, using a simple log-linear model of the form:
 
 $$log(y)=rt+b$$
 
