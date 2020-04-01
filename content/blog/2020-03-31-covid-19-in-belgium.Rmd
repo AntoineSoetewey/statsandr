@@ -208,7 +208,7 @@ Remember that $\beta$ controls the transition between *S* and *I* (i.e., suscept
 sir_start_date <- "2020-02-04"
 
 # time in days for predictions
-t <- 1:as.integer(today() - ymd(sir_start_date))
+t <- 1:as.integer(ymd("2020-03-31") - ymd(sir_start_date))
 
 # get the fitted values from our SIR model
 fitted_cumulative_incidence <- data.frame(ode(
@@ -249,12 +249,12 @@ fitted_cumulative_incidence %>%
   geom_line(aes(y = I), colour = "red") +
   geom_point(aes(y = cumulative_incident_cases), colour = "blue") +
   labs(
-    y = "Cumulative incidence (log scale)",
+    y = "Cumulative incidence",
     title = "COVID-19 fitted vs observed cumulative incidence, Belgium",
     subtitle = "(Red = fitted incidence from SIR model, blue = observed incidence)"
   ) +
   theme_minimal() +
-  scale_y_log10()
+  scale_y_log10(labels = scales::comma)
 ```
 
 The plot indicates that, at the beginning of the pandemic and until March 12, the number of confirmed cases stayed below what would be expected in an exponential phase. In particular, the number of confirmed cases stayed constant at 1 case from February 4 to February 29. From March 13 and until March 30, the number of confirmed cases kept increasing at a rate close to an exponential rate.
@@ -339,7 +339,7 @@ fitted_cumulative_incidence %>%
   geom_point(aes(y = c(Infected, rep(NA, length(t) - length(Infected))), colour = "blue")) +
   scale_y_log10(labels = scales::comma) +
   labs(
-    y = "Persons (log scale)",
+    y = "Persons",
     title = "COVID-19 fitted vs observed cumulative incidence, Belgium"
   ) +
   scale_colour_manual(

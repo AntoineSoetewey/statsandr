@@ -202,7 +202,7 @@ Opt_par&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sir_start_date &amp;lt;- &amp;quot;2020-02-04&amp;quot;
 
 # time in days for predictions
-t &amp;lt;- 1:as.integer(today() - ymd(sir_start_date))
+t &amp;lt;- 1:as.integer(ymd(&amp;quot;2020-03-31&amp;quot;) - ymd(sir_start_date))
 
 # get the fitted values from our SIR model
 fitted_cumulative_incidence &amp;lt;- data.frame(ode(
@@ -239,12 +239,12 @@ fitted_cumulative_incidence %&amp;gt;%
   geom_line(aes(y = I), colour = &amp;quot;red&amp;quot;) +
   geom_point(aes(y = cumulative_incident_cases), colour = &amp;quot;blue&amp;quot;) +
   labs(
-    y = &amp;quot;Cumulative incidence (log scale)&amp;quot;,
+    y = &amp;quot;Cumulative incidence&amp;quot;,
     title = &amp;quot;COVID-19 fitted vs observed cumulative incidence, Belgium&amp;quot;,
     subtitle = &amp;quot;(Red = fitted incidence from SIR model, blue = observed incidence)&amp;quot;
   ) +
   theme_minimal() +
-  scale_y_log10()&lt;/code&gt;&lt;/pre&gt;
+  scale_y_log10(labels = scales::comma)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;The plot indicates that, at the beginning of the pandemic and until March 12, the number of confirmed cases stayed below what would be expected in an exponential phase. In particular, the number of confirmed cases stayed constant at 1 case from February 4 to February 29. From March 13 and until March 30, the number of confirmed cases kept increasing at a rate close to an exponential rate.&lt;/p&gt;
 &lt;p&gt;We also notice a small jump between March 12 and March 13, which may potentially indicate an error in the data collection, or a change in the testing/screening methods.&lt;/p&gt;
@@ -310,7 +310,7 @@ fitted_cumulative_incidence %&amp;gt;%
 fitted_cumulative_incidence %&amp;gt;% ggplot(aes(x = Date)) + geom_line(aes(y = I, colour = &amp;quot;red&amp;quot;)) + 
     geom_line(aes(y = S, colour = &amp;quot;black&amp;quot;)) + geom_line(aes(y = R, colour = &amp;quot;green&amp;quot;)) + 
     geom_point(aes(y = c(Infected, rep(NA, length(t) - length(Infected))), colour = &amp;quot;blue&amp;quot;)) + 
-    scale_y_log10(labels = scales::comma) + labs(y = &amp;quot;Persons (log scale)&amp;quot;, title = &amp;quot;COVID-19 fitted vs observed cumulative incidence, Belgium&amp;quot;) + 
+    scale_y_log10(labels = scales::comma) + labs(y = &amp;quot;Persons&amp;quot;, title = &amp;quot;COVID-19 fitted vs observed cumulative incidence, Belgium&amp;quot;) + 
     scale_colour_manual(name = &amp;quot;&amp;quot;, values = c(red = &amp;quot;red&amp;quot;, black = &amp;quot;black&amp;quot;, green = &amp;quot;green&amp;quot;, 
         blue = &amp;quot;blue&amp;quot;), labels = c(&amp;quot;Susceptible&amp;quot;, &amp;quot;Observed incidence&amp;quot;, &amp;quot;Recovered&amp;quot;, 
         &amp;quot;Infectious&amp;quot;)) + theme_minimal()&lt;/code&gt;&lt;/pre&gt;

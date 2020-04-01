@@ -338,7 +338,7 @@ Opt_par</code></pre>
 <pre class="r"><code>sir_start_date &lt;- &quot;2020-02-04&quot;
 
 # time in days for predictions
-t &lt;- 1:as.integer(today() - ymd(sir_start_date))
+t &lt;- 1:as.integer(ymd(&quot;2020-03-31&quot;) - ymd(sir_start_date))
 
 # get the fitted values from our SIR model
 fitted_cumulative_incidence &lt;- data.frame(ode(
@@ -375,12 +375,12 @@ fitted_cumulative_incidence %&gt;%
   geom_line(aes(y = I), colour = &quot;red&quot;) +
   geom_point(aes(y = cumulative_incident_cases), colour = &quot;blue&quot;) +
   labs(
-    y = &quot;Cumulative incidence (log scale)&quot;,
+    y = &quot;Cumulative incidence&quot;,
     title = &quot;COVID-19 fitted vs observed cumulative incidence, Belgium&quot;,
     subtitle = &quot;(Red = fitted incidence from SIR model, blue = observed incidence)&quot;
   ) +
   theme_minimal() +
-  scale_y_log10()</code></pre>
+  scale_y_log10(labels = scales::comma)</code></pre>
 <p><img src="/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>The plot indicates that, at the beginning of the pandemic and until March 12, the number of confirmed cases stayed below what would be expected in an exponential phase. In particular, the number of confirmed cases stayed constant at 1 case from February 4 to February 29. From March 13 and until March 30, the number of confirmed cases kept increasing at a rate close to an exponential rate.</p>
 <p>We also notice a small jump between March 12 and March 13, which may potentially indicate an error in the data collection, or a change in the testing/screening methods.</p>
@@ -446,7 +446,7 @@ fitted_cumulative_incidence %&gt;%
 fitted_cumulative_incidence %&gt;% ggplot(aes(x = Date)) + geom_line(aes(y = I, colour = &quot;red&quot;)) + 
     geom_line(aes(y = S, colour = &quot;black&quot;)) + geom_line(aes(y = R, colour = &quot;green&quot;)) + 
     geom_point(aes(y = c(Infected, rep(NA, length(t) - length(Infected))), colour = &quot;blue&quot;)) + 
-    scale_y_log10(labels = scales::comma) + labs(y = &quot;Persons (log scale)&quot;, title = &quot;COVID-19 fitted vs observed cumulative incidence, Belgium&quot;) + 
+    scale_y_log10(labels = scales::comma) + labs(y = &quot;Persons&quot;, title = &quot;COVID-19 fitted vs observed cumulative incidence, Belgium&quot;) + 
     scale_colour_manual(name = &quot;&quot;, values = c(red = &quot;red&quot;, black = &quot;black&quot;, green = &quot;green&quot;, 
         blue = &quot;blue&quot;), labels = c(&quot;Susceptible&quot;, &quot;Observed incidence&quot;, &quot;Recovered&quot;, 
         &quot;Infectious&quot;)) + theme_minimal()</code></pre>
