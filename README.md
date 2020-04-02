@@ -13,8 +13,6 @@ If you are new to this blog, I invite you to:
 * [Contribute](https://www.statsandr.com/contribute/) by submitting your article
 * See the [most recent comments](https://www.statsandr.com/recent-comments/) so you can follow the discussion
 
-If you need help in performing statistical data analyses for your thesis or academic/work related projects, do not hesitate to [contact me](https://www.statsandr.com/contact/).
-
 # Status
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/8ef22d4a-c312-4c44-a02d-06db75dc8c6f/deploy-status)](https://app.netlify.com/sites/statsandr/deploys)
