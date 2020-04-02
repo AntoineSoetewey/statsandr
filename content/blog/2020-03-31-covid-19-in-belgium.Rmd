@@ -69,8 +69,6 @@ The basic idea behind the *SIR* model (**S**usceptible - **I**nfectious - **R**e
 * the infectious (and thus, infected) people: *I*
 * people who have recovered: *R*
 
-![SIR model. Source: Wikipedia](/blog/2020-03-31-covid-19-in-belgium_files/SIR model.png){width=100%}
-
 To model the dynamics of the outbreak we need three differential equations to describe the rates of change in each group, parameterised by:
 
 * $\beta$ which controls the transition between *S* and *I*
@@ -83,6 +81,10 @@ $$\frac{dS}{dt} = - \frac{\beta IS}{N}$$
 $$\frac{dI}{dt} = \frac{\beta IS}{N} - \gamma I$$
 
 $$\frac{dR}{dt} = \gamma I$$
+
+And visually, we have:
+
+![SIR model. Source: Kai Sasaki.](/blog/2020-03-31-covid-19-in-belgium_files/SIR-model-covid-19-belgium.png){width=100%}
 
 Before fitting the *SIR* model to the data, the first step is to express these differential equations as an R function, with respect to time *t*.
 
@@ -144,7 +146,7 @@ df <- coronavirus %>%
 # put the daily cumulative incidence numbers for Belgium from
 # Feb 4 to March 30 into a vector called Infected
 library(lubridate)
-Infected <- subset(df, date >= ymd("2020-02-04"))$confirmed_cum
+Infected <- subset(df, date >= ymd("2020-02-04") & date <= ymd("2020-03-30"))$confirmed_cum
 
 # Create an incrementing Day vector the same length as our
 # cases vector

@@ -223,10 +223,6 @@
 <li>the infectious (and thus, infected) people: <em>I</em></li>
 <li>people who have recovered: <em>R</em></li>
 </ul>
-<div class="figure">
-<figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="/blog/2020-03-31-covid-19-in-belgium_files/SIR%20model.png" src="/blog/2020-03-31-covid-19-in-belgium_files/low/SIR%20model.png" alt="SIR model. Source: Wikipedia" style="width:100.0%" /></figure>
-<p class="caption">SIR model. Source: Wikipedia</p>
-</div>
 <p>To model the dynamics of the outbreak we need three differential equations to describe the rates of change in each group, parameterised by:</p>
 <ul>
 <li><span class="math inline">\(\beta\)</span> which controls the transition between <em>S</em> and <em>I</em></li>
@@ -236,6 +232,11 @@
 <p><span class="math display">\[\frac{dS}{dt} = - \frac{\beta IS}{N}\]</span></p>
 <p><span class="math display">\[\frac{dI}{dt} = \frac{\beta IS}{N} - \gamma I\]</span></p>
 <p><span class="math display">\[\frac{dR}{dt} = \gamma I\]</span></p>
+<p>And visually, we have:</p>
+<div class="figure">
+<figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="/blog/2020-03-31-covid-19-in-belgium_files/SIR-model-covid-19-belgium.png" src="/blog/2020-03-31-covid-19-in-belgium_files/low/SIR-model-covid-19-belgium.png" alt="SIR model. Source: Kai Sasaki." style="width:100.0%" /></figure>
+<p class="caption">SIR model. Source: Kai Sasaki.</p>
+</div>
 <p>Before fitting the <em>SIR</em> model to the data, the first step is to express these differential equations as an R function, with respect to time <em>t</em>.</p>
 <pre class="r"><code>SIR &lt;- function(time, state, parameters) {
   par &lt;- as.list(c(state, parameters))
@@ -287,7 +288,7 @@ df &lt;- coronavirus %&gt;%
 # put the daily cumulative incidence numbers for Belgium from
 # Feb 4 to March 30 into a vector called Infected
 library(lubridate)
-Infected &lt;- subset(df, date &gt;= ymd(&quot;2020-02-04&quot;))$confirmed_cum
+Infected &lt;- subset(df, date &gt;= ymd(&quot;2020-02-04&quot;) &amp; date &lt;= ymd(&quot;2020-03-30&quot;))$confirmed_cum
 
 # Create an incrementing Day vector the same length as our
 # cases vector
