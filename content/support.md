@@ -10,7 +10,7 @@ description: "See the different ways you can support this blog so I can continue
 1. [Recommendations](#recommendations)
 1. [Amazon](#amazon)
 
-Running and maintaining a blog is not free unfortunately ([Shiny app](/tags/shiny/) servers being the biggest expense). There are several ways you can contribute to this blog. Any help will be greatly appreciated!
+Running and maintaining a blog is not free unfortunately. There are several ways you can contribute to this blog. Any help will be greatly appreciated!
 
 <a name="donation"></a>
 ## Donation
