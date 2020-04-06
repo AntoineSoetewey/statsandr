@@ -421,7 +421,7 @@ fitted_cumulative_incidence &lt;- fitted_cumulative_incidence %&gt;%
   mutate(
     Date = ymd(sir_start_date) + days(t - 1),
     Country = &quot;Belgium&quot;,
-    cumulative_incident_cases = I
+    cumulative_incident_cases = c(Infected, rep(NA, length(t) - length(Infected)))
   )
 
 # plot the data
@@ -430,7 +430,7 @@ fitted_cumulative_incidence %&gt;%
   geom_line(aes(y = I), colour = &quot;red&quot;) +
   geom_line(aes(y = S), colour = &quot;black&quot;) +
   geom_line(aes(y = R), colour = &quot;green&quot;) +
-  geom_point(aes(y = c(Infected, rep(NA, length(t) - length(Infected)))),
+  geom_point(aes(y = cumulative_incident_cases),
     colour = &quot;blue&quot;
   ) +
   scale_y_continuous(labels = scales::comma) +
@@ -451,7 +451,7 @@ fitted_cumulative_incidence %&gt;%
   geom_line(aes(y = I, colour = &quot;red&quot;)) +
   geom_line(aes(y = S, colour = &quot;black&quot;)) +
   geom_line(aes(y = R, colour = &quot;green&quot;)) +
-  geom_point(aes(y = c(Infected, rep(NA, length(t) - length(Infected))), colour = &quot;blue&quot;)) +
+  geom_point(aes(y = cumulative_incident_cases, colour = &quot;blue&quot;)) +
   scale_y_log10(labels = scales::comma) +
   labs(
     y = &quot;Persons&quot;,
