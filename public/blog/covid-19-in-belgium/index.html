@@ -288,7 +288,7 @@ df &lt;- coronavirus %&gt;%
 # put the daily cumulative incidence numbers for Belgium from
 # Feb 4 to March 30 into a vector called Infected
 library(lubridate)
-Infected &lt;- subset(df, date &gt;= ymd(&quot;2020-02-04&quot;) &amp; date &lt;= ymd(&quot;2020-03-30&quot;))$confirmed_cum
+Infected &lt;- subset(df, date &gt;= ymd(&quot;2020-02-04&quot;) &amp; date &lt;= ymd(&quot;2020-03-30&quot;))$active_cum
 
 # Create an incrementing Day vector the same length as our
 # cases vector
@@ -334,7 +334,7 @@ Opt$message</code></pre>
 <pre class="r"><code>Opt_par &lt;- setNames(Opt$par, c(&quot;beta&quot;, &quot;gamma&quot;))
 Opt_par</code></pre>
 <pre><code>##      beta     gamma 
-## 0.5986056 0.4271395</code></pre>
+## 0.5841185 0.4158816</code></pre>
 <p>Remember that <span class="math inline">\(\beta\)</span> controls the transition between <em>S</em> and <em>I</em> (i.e., susceptible and infectious) and <span class="math inline">\(\gamma\)</span> controls the transition between <em>I</em> and <em>R</em> (i.e., infectious and recovered). However, those values do not mean a lot but we use them to get the fitted numbers of people in each compartment of our <em>SIR</em> model for the dates up to March 30 that were used to fit the model, and compare those fitted values with the observed (real) data.</p>
 <pre class="r"><code>sir_start_date &lt;- &quot;2020-02-04&quot;
 
@@ -395,14 +395,14 @@ fitted_cumulative_incidence %&gt;%
 <p>We can compute it in R:</p>
 <pre class="r"><code>Opt_par</code></pre>
 <pre><code>##      beta     gamma 
-## 0.5986056 0.4271395</code></pre>
+## 0.5841185 0.4158816</code></pre>
 <pre class="r"><code>R0 &lt;- as.numeric(Opt_par[1] / Opt_par[2])
 R0</code></pre>
-<pre><code>## [1] 1.401429</code></pre>
+<pre><code>## [1] 1.404531</code></pre>
 <p>An <span class="math inline">\(R_0\)</span> of 1.4 is slightly below the values calculated by others for COVID-19 and the <span class="math inline">\(R_0\)</span> for SARS and MERS, which are similar diseases also caused by coronavirus. This is mainly due to the fact that the number of confirmed cases stayed constant and equal to 1 at the beginning of the pandemic.</p>
 <p>A <span class="math inline">\(R_0\)</span> of 1.4 means that, on average in Belgium, 1.4 persons are infected for each infected person.</p>
-<p>Under some conditions, <span class="math inline">\(1 - \frac{1}{R_0}\)</span> gives an indication about the proportion of the population likely to be infected throughout the pandemic. The reproduction number of 1.4 we just calculated suggests that, given the formula 1 - (1 / 1.4), 28.64% of the population could be infected.
-<!-- With a population in Belgium of _11515793_, we would expect that _3298613_ people could be infected. --></p>
+<p>Under some conditions, <span class="math inline">\(1 - \frac{1}{R_0}\)</span> gives an indication about the proportion of the population likely to be infected throughout the pandemic. The reproduction number of 1.4 we just calculated suggests that, given the formula 1 - (1 / 1.4), 28.8% of the population could be infected.
+<!-- With a population in Belgium of _11515793_, we would expect that _3316761_ people could be infected. --></p>
 </div>
 <div id="using-our-model-to-analyze-the-outbreak-if-there-was-no-intervention" class="section level2">
 <h2>Using our model to analyze the outbreak if there was no intervention</h2>
@@ -478,18 +478,18 @@ fitted_cumulative_incidence %&gt;%
 # peak of pandemic
 fit[fit$I == max(fit$I), c(&quot;Date&quot;, &quot;I&quot;)]</code></pre>
 <pre><code>##          Date        I
-## 87 2020-04-30 525315.7</code></pre>
+## 89 2020-05-02 531000.4</code></pre>
 <pre class="r"><code># severe cases
 max_infected &lt;- max(fit$I)
 max_infected / 5</code></pre>
-<pre><code>## [1] 105063.1</code></pre>
+<pre><code>## [1] 106200.1</code></pre>
 <pre class="r"><code># cases with need for intensive care
 max_infected * 0.06</code></pre>
-<pre><code>## [1] 31518.94</code></pre>
+<pre><code>## [1] 31860.03</code></pre>
 <pre class="r"><code># deaths with supposed 0.7% fatality rate
 max_infected * 0.007</code></pre>
-<pre><code>## [1] 3677.21</code></pre>
-<p>Given these predictions, with the exact same settings and no intervention at all to limit the spread of the pandemic, the peak in Belgium is expected to be reached by the end of April. About 525,000 people would be infected by then, which translates to about 105,000 severe cases, about 32,000 persons in need of intensive care and up to 3,700 deaths (assuming a 0.7% fatality rate, as suggested by this <a href="https://www.newscientist.com/article/mg24532733-700-why-is-it-so-hard-to-calculate-how-many-people-will-die-from-covid-19/" target="_blank">source</a>).</p>
+<pre><code>## [1] 3717.003</code></pre>
+<p>Given these predictions, with the exact same settings and no intervention at all to limit the spread of the pandemic, the peak in Belgium is expected to be reached by the beginning of May. About 530,000 people would be infected by then, which translates to about 106,000 severe cases, about 32,000 persons in need of intensive care and up to 3,700 deaths (assuming a 0.7% fatality rate, as suggested by this <a href="https://www.newscientist.com/article/mg24532733-700-why-is-it-so-hard-to-calculate-how-many-people-will-die-from-covid-19/" target="_blank">source</a>).</p>
 <p>At this point, we understand why such strict containment measures and regulations are taken in Belgium!</p>
 <p>Note that those predictions should be taken with a lot of caution. On the one hand, as mentioned above, they are based on rather unrealistic assumptions (for example, no public health interventions, fixed reproduction number <span class="math inline">\(R_0\)</span>, etc.). More advanced projections are possible with the <code>{projections}</code> package, among others (see this <a href="/blog/covid-19-in-belgium/#more-sophisticated-projections">section</a> for more information on this matter). On the other hand, we still have to be careful and strictly follow public health interventions because previous pandemics such as H1N1 and Spanish flu have shown that incredibly high numbers are not impossible!</p>
 <p>The purpose of this article was to give an illustration of how such analyses are done in R with a simple epidemiological model. Those are the numbers our simple model produces and we hope they are wrong.</p>
