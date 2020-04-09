@@ -9,6 +9,10 @@ Hello, my name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a P
 
 In parallel with my doctoral thesis, I am teaching assistant for several courses in statistics and probability at bachelor and master’s level. From time to time, I also provide trainings and workshops in statistics and R in a Belgian consulting company.
 
-This blog was launched to help academics and professionals to grasp important statistical concepts, using examples and plain English. I will also occasionally present some work related to data science using R and news about my research.
+This blog aims at helping academics and professionals working with data to grasp important statistical concepts using examples and plain English. When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R. I will also occasionally present some work related to data science using R and news about my research.
+
+I really enjoy learning new things. I learn (and I am still learning) a lot by teaching statistics to students from diverse backgrounds. So far, I believed that I understood a statistical concept only if I was able to teach it to my students. If I was not able to explain it in a clear and understandable way to my students, it meant that I needed to study it more carefully because I actually did not fully understand it.
+
+With this blog, I have discovered that in order to understand and learn something new, one must be able to clearly (i) communicate it *and* more importantly, be able to (ii) write it down. So this blog was first launched to share statistical concepts I am familiar with, but I quickly realized that I would actually learn much more than expected. I learn by writing, and I learn thanks to valuable feedback.
 
 Note that all opinions and views are my own and do not represent my employer.
