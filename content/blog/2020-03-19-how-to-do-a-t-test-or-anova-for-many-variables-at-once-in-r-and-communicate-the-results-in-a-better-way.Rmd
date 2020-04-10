@@ -19,6 +19,7 @@ output:
     toc: true
     toc_depth: 6
 # draft: true
+bibliography: bibliography.bib
 ---
 
 ![Photo by Teemu Paananen](/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way.jpeg){width=100%}
@@ -160,6 +161,8 @@ The only lines of code that need to be modified for your own project is the name
 
 Based on these graphs, it is easy, even for non-experts, to interpret the results and conclude that the `versicolor` and `virginica` species are significantly different in terms of all 4 variables (since all *p*-values $< \frac{0.05}{4} = 0.0125$ (remind that the Bonferroni correction is applied to avoid the issue of multiple testing, so we divide the usual $\alpha$ level by 4 because there are 4 t-tests)).
 
+### Additional *p*-value adjustment methods
+
 If you would like to use another *p*-value adjustment method, you can use the `p.adjust()` function. Below are the raw *p*-values found above, together with *p*-values derived from the main adjustment methods (presented in a dataframe):
 
 ```{r}
@@ -204,6 +207,102 @@ df
 ```
 
 Regardless of the *p*-value adjustment method, the two species are different for all 4 variables. Note that the adjustment method should be chosen before looking at the results to avoid choosing the method based on the results.
+
+Below another function that allows to perform multiple Student's t-tests or Wilcoxon tests at once and choose the *p*-value adjustment method. The function also allows to specify whether samples are paired or unpaired and whether the variances are assumed to be equal or not. (The code has been adapted from Mark White.)
+
+```{r}
+t_table <- function(data, dvs, iv,
+                    var_equal = TRUE,
+                    p_adj = "none",
+                    alpha = 0.05,
+                    paired = FALSE,
+                    wilcoxon = FALSE) {
+  if (!inherits(data, "data.frame")) {
+    stop("data must be a data.frame")
+  }
+
+  if (!all(c(dvs, iv) %in% names(data))) {
+    stop("at least one column given in dvs and iv are not in the data")
+  }
+
+  if (!all(sapply(data[, dvs], is.numeric))) {
+    stop("all dvs must be numeric")
+  }
+
+  if (length(unique(na.omit(data[[iv]]))) != 2) {
+    stop("independent variable must only have two unique values")
+  }
+
+  out <- lapply(dvs, function(x) {
+    if (paired == FALSE & wilcoxon == FALSE) {
+      tres <- t.test(data[[x]] ~ data[[iv]], var.equal = var_equal)
+    }
+
+    else if (paired == FALSE & wilcoxon == TRUE) {
+      tres <- wilcox.test(data[[x]] ~ data[[iv]])
+    }
+
+    else if (paired == TRUE & wilcoxon == FALSE) {
+      tres <- t.test(data[[x]] ~ data[[iv]],
+        var.equal = var_equal,
+        paired = TRUE
+      )
+    }
+
+    else {
+      tres <- wilcox.test(data[[x]] ~ data[[iv]],
+        paired = TRUE
+      )
+    }
+
+    c(
+      p_value = tres$p.value
+    )
+  })
+
+  out <- as.data.frame(do.call(rbind, out))
+  out <- cbind(variable = dvs, out)
+  names(out) <- gsub("[^0-9A-Za-z_]", "", names(out))
+
+  out$p_value <- ifelse(out$p_value < 0.001,
+    "<0.001",
+    round(p.adjust(out$p_value, p_adj), 3)
+  )
+  out$conclusion <- ifelse(out$p_value < alpha,
+    paste0("Reject H0 at ", alpha * 100, "%"),
+    paste0("Do not reject H0 at ", alpha * 100, "%")
+  )
+
+  return(out)
+}
+```
+
+Applied to our dataset, with no adjustment method for the *p*-values:
+
+```{r}
+result <- t_table(
+  data = dat,
+  c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
+  "Species"
+)
+
+result
+```
+
+And with the @holm1979simple adjustment method:
+
+```{r}
+result <- t_table(
+  data = dat,
+  c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
+  "Species",
+  p_adj = "holm"
+)
+
+result
+```
+
+Again, with the Holm's adjustment method, we conclude that, at the 5% significance level, the two species are significantly different from each other in terms of all 4 variables.
 
 ## ANOVA
 

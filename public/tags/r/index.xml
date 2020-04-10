@@ -573,7 +573,9 @@ devtools::install_github(&amp;quot;RamiKrispin/coronavirus&amp;quot;)&lt;/code&g
 &lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#perform-multiple-tests-at-once&#34;&gt;Perform multiple tests at once&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#concise-and-easily-interpretable-results&#34;&gt;Concise and easily interpretable results&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#t-test&#34;&gt;T-test&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#t-test&#34;&gt;T-test&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#additional-p-value-adjustment-methods&#34;&gt;Additional &lt;em&gt;p&lt;/em&gt;-value adjustment methods&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#anova&#34;&gt;ANOVA&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#to-go-even-further&#34;&gt;To go even further&lt;/a&gt;&lt;/li&gt;
@@ -746,6 +748,8 @@ for (i in y) {
 &lt;p&gt;In my experience, I have noticed that students and professionals (especially those from a less scientific background) understand way better these results than the ones presented in the previous section.&lt;/p&gt;
 &lt;p&gt;The only lines of code that need to be modified for your own project is the name of the grouping variable (&lt;code&gt;Species&lt;/code&gt; in the above code), the names of the variables you want to test (&lt;code&gt;Sepal.Length&lt;/code&gt;, &lt;code&gt;Sepal.Width&lt;/code&gt;, etc.),&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt; whether you want to apply a t-test (&lt;code&gt;t.test&lt;/code&gt;) or Wilcoxon test (&lt;code&gt;wilcox.test&lt;/code&gt;) and whether the samples are paired or not (&lt;code&gt;FALSE&lt;/code&gt; if samples are independent, &lt;code&gt;TRUE&lt;/code&gt; if they are paired).&lt;/p&gt;
 &lt;p&gt;Based on these graphs, it is easy, even for non-experts, to interpret the results and conclude that the &lt;code&gt;versicolor&lt;/code&gt; and &lt;code&gt;virginica&lt;/code&gt; species are significantly different in terms of all 4 variables (since all &lt;em&gt;p&lt;/em&gt;-values &lt;span class=&#34;math inline&#34;&gt;\(&amp;lt; \frac{0.05}{4} = 0.0125\)&lt;/span&gt; (remind that the Bonferroni correction is applied to avoid the issue of multiple testing, so we divide the usual &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; level by 4 because there are 4 t-tests)).&lt;/p&gt;
+&lt;div id=&#34;additional-p-value-adjustment-methods&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Additional &lt;em&gt;p&lt;/em&gt;-value adjustment methods&lt;/h3&gt;
 &lt;p&gt;If you would like to use another &lt;em&gt;p&lt;/em&gt;-value adjustment method, you can use the &lt;code&gt;p.adjust()&lt;/code&gt; function. Below are the raw &lt;em&gt;p&lt;/em&gt;-values found above, together with &lt;em&gt;p&lt;/em&gt;-values derived from the main adjustment methods (presented in a dataframe):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;raw_pvalue &amp;lt;- numeric(length = length(1:4))
 for (i in (1:4)) {
@@ -791,6 +795,100 @@ df&lt;/code&gt;&lt;/pre&gt;
 ## 3 Petal.Length      0.000      0.000 0.000 0.000    0.000  0.000 0.000
 ## 4  Petal.Width      0.000      0.000 0.000 0.000    0.000  0.000 0.000&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Regardless of the &lt;em&gt;p&lt;/em&gt;-value adjustment method, the two species are different for all 4 variables. Note that the adjustment method should be chosen before looking at the results to avoid choosing the method based on the results.&lt;/p&gt;
+&lt;p&gt;Below another function that allows to perform multiple Student’s t-tests or Wilcoxon tests at once and choose the &lt;em&gt;p&lt;/em&gt;-value adjustment method. The function also allows to specify whether samples are paired or unpaired and whether the variances are assumed to be equal or not. (The code has been adapted from Mark White.)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;t_table &amp;lt;- function(data, dvs, iv,
+                    var_equal = TRUE,
+                    p_adj = &amp;quot;none&amp;quot;,
+                    alpha = 0.05,
+                    paired = FALSE,
+                    wilcoxon = FALSE) {
+  if (!inherits(data, &amp;quot;data.frame&amp;quot;)) {
+    stop(&amp;quot;data must be a data.frame&amp;quot;)
+  }
+
+  if (!all(c(dvs, iv) %in% names(data))) {
+    stop(&amp;quot;at least one column given in dvs and iv are not in the data&amp;quot;)
+  }
+
+  if (!all(sapply(data[, dvs], is.numeric))) {
+    stop(&amp;quot;all dvs must be numeric&amp;quot;)
+  }
+
+  if (length(unique(na.omit(data[[iv]]))) != 2) {
+    stop(&amp;quot;independent variable must only have two unique values&amp;quot;)
+  }
+
+  out &amp;lt;- lapply(dvs, function(x) {
+    if (paired == FALSE &amp;amp; wilcoxon == FALSE) {
+      tres &amp;lt;- t.test(data[[x]] ~ data[[iv]], var.equal = var_equal)
+    }
+
+    else if (paired == FALSE &amp;amp; wilcoxon == TRUE) {
+      tres &amp;lt;- wilcox.test(data[[x]] ~ data[[iv]])
+    }
+
+    else if (paired == TRUE &amp;amp; wilcoxon == FALSE) {
+      tres &amp;lt;- t.test(data[[x]] ~ data[[iv]],
+        var.equal = var_equal,
+        paired = TRUE
+      )
+    }
+
+    else {
+      tres &amp;lt;- wilcox.test(data[[x]] ~ data[[iv]],
+        paired = TRUE
+      )
+    }
+
+    c(
+      p_value = tres$p.value
+    )
+  })
+
+  out &amp;lt;- as.data.frame(do.call(rbind, out))
+  out &amp;lt;- cbind(variable = dvs, out)
+  names(out) &amp;lt;- gsub(&amp;quot;[^0-9A-Za-z_]&amp;quot;, &amp;quot;&amp;quot;, names(out))
+
+  out$p_value &amp;lt;- ifelse(out$p_value &amp;lt; 0.001,
+    &amp;quot;&amp;lt;0.001&amp;quot;,
+    round(p.adjust(out$p_value, p_adj), 3)
+  )
+  out$conclusion &amp;lt;- ifelse(out$p_value &amp;lt; alpha,
+    paste0(&amp;quot;Reject H0 at &amp;quot;, alpha * 100, &amp;quot;%&amp;quot;),
+    paste0(&amp;quot;Do not reject H0 at &amp;quot;, alpha * 100, &amp;quot;%&amp;quot;)
+  )
+
+  return(out)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Applied to our dataset, with no adjustment method for the &lt;em&gt;p&lt;/em&gt;-values:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;result &amp;lt;- t_table(
+  data = dat,
+  c(&amp;quot;Sepal.Length&amp;quot;, &amp;quot;Sepal.Width&amp;quot;, &amp;quot;Petal.Length&amp;quot;, &amp;quot;Petal.Width&amp;quot;),
+  &amp;quot;Species&amp;quot;
+)
+
+result&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##       variable p_value      conclusion
+## 1 Sepal.Length  &amp;lt;0.001 Reject H0 at 5%
+## 2  Sepal.Width   0.002 Reject H0 at 5%
+## 3 Petal.Length  &amp;lt;0.001 Reject H0 at 5%
+## 4  Petal.Width  &amp;lt;0.001 Reject H0 at 5%&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And with the &lt;span class=&#34;citation&#34;&gt;Holm (1979)&lt;/span&gt; adjustment method:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;result &amp;lt;- t_table(
+  data = dat,
+  c(&amp;quot;Sepal.Length&amp;quot;, &amp;quot;Sepal.Width&amp;quot;, &amp;quot;Petal.Length&amp;quot;, &amp;quot;Petal.Width&amp;quot;),
+  &amp;quot;Species&amp;quot;,
+  p_adj = &amp;quot;holm&amp;quot;
+)
+
+result&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##       variable p_value      conclusion
+## 1 Sepal.Length  &amp;lt;0.001 Reject H0 at 5%
+## 2  Sepal.Width   0.002 Reject H0 at 5%
+## 3 Petal.Length  &amp;lt;0.001 Reject H0 at 5%
+## 4  Petal.Width  &amp;lt;0.001 Reject H0 at 5%&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Again, with the Holm’s adjustment method, we conclude that, at the 5% significance level, the two species are significantly different from each other in terms of all 4 variables.&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;anova&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;ANOVA&lt;/h2&gt;
@@ -827,7 +925,7 @@ for (i in y) {
     )
   }
 }&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-4-2.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-4-3.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-4-4.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-2.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-3.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-4.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Like the improved routine for the t-test, I have noticed that students and non-expert professionals understand ANOVA results presented this way much more easily compared to the default R outputs.&lt;/p&gt;
 &lt;p&gt;With one graph for each variable, it is easy to see that all species are different from each other in terms of all 4 variables.&lt;/p&gt;
 &lt;p&gt;If you want to apply the same automated process to your data, you will need to modify the name of the grouping variable (&lt;code&gt;Species&lt;/code&gt;), the names of the variables you want to test (&lt;code&gt;Sepal.Length&lt;/code&gt;, etc.), whether you want to perform an ANOVA (&lt;code&gt;anova&lt;/code&gt;) or Kruskal-Wallis test (&lt;code&gt;kruskal.test&lt;/code&gt;) and finally specify the comparisons for the post-hoc tests.&lt;a href=&#34;#fn3&#34; class=&#34;footnote-ref&#34; id=&#34;fnref3&#34;&gt;&lt;sup&gt;3&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
@@ -865,6 +963,11 @@ cGroupsWUI()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;McDonald, J.H. 2014. Handbook of Biological Statistics (3rd ed.). Sparky House Publishing, Baltimore, Maryland.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Related articles:&lt;/strong&gt;&lt;/p&gt;
 &lt;script src=&#34;//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&amp;detail=-1&amp;limit=5&amp;showtitle=false&amp;type=js&#34;&gt;&lt;/script&gt;
+&lt;div id=&#34;refs&#34; class=&#34;references&#34;&gt;
+&lt;div id=&#34;ref-holm1979simple&#34;&gt;
+&lt;p&gt;Holm, Sture. 1979. “A Simple Sequentially Rejective Multiple Test Procedure.” &lt;em&gt;Scandinavian Journal of Statistics&lt;/em&gt;. JSTOR, 65–70.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&#34;footnotes&#34;&gt;
 &lt;hr /&gt;
@@ -1049,7 +1152,8 @@ cGroupsWUI()&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;covid-19-prediction&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Covid-19 Prediction&lt;/h2&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/top-r-resources-on-coronavirus_files/Covid-19%20Prediction.png&#34; style=&#34;width:100.0%&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;Developed by Manuel Oviedo and Manuel Febrero (Modestya research group of the University of Santiago de Compostela), this &lt;a href=&#34;http://modestya.securized.net/covid19prediction/&#34; target=&#34;_blank&#34;&gt;Shiny app&lt;/a&gt; predicts the growth rate at 5-day horizon using the evolution during the last 15 days of growth rate. Three functional regression models are fitted and re-estimated when new data is available. The app also shows an interactive plot and table for the expected number of accumulated cases and new daily cases to each horizon (for confirmed and deaths responses) by country (from &lt;a href=&#34;https://github.com/CSSEGISandData/COVID-19&#34; target=&#34;_blank&#34;&gt;Johns Hopkins CSSE&lt;/a&gt;) and Spanish region (from &lt;a href=&#34;https://covid19.isciii.es/&#34; target=&#34;_blank&#34;&gt;ISCII&lt;/a&gt;). See an explanation of the methodology in the About tab.&lt;/p&gt;
+&lt;p&gt;Developed by Manuel Oviedo and Manuel Febrero (Modestya research group of the University of Santiago de Compostela), this &lt;a href=&#34;http://modestya.securized.net/covid19prediction/&#34; target=&#34;_blank&#34;&gt;Shiny app&lt;/a&gt; predicts the growth rate at 5-day horizon using the evolution during the last 15 days of growth rate. Three functional regression models are fitted and re-estimated when new data is available. The app also shows an interactive plot and table for the expected number of accumulated cases and new daily cases to each horizon (for confirmed and deaths responses) by country (from &lt;a href=&#34;https://github.com/CSSEGISandData/COVID-19&#34; target=&#34;_blank&#34;&gt;Johns Hopkins CSSE&lt;/a&gt;) and Spanish region (from &lt;a href=&#34;https://covid19.isciii.es/&#34; target=&#34;_blank&#34;&gt;ISCII&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;See an explanation of the methodology in the About tab.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;r-packages&#34; class=&#34;section level1&#34;&gt;

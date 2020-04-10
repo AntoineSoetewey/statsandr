@@ -125,7 +125,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            17 minute read
+                            19 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -176,7 +176,9 @@
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#perform-multiple-tests-at-once">Perform multiple tests at once</a></li>
 <li><a href="#concise-and-easily-interpretable-results">Concise and easily interpretable results</a><ul>
-<li><a href="#t-test">T-test</a></li>
+<li><a href="#t-test">T-test</a><ul>
+<li><a href="#additional-p-value-adjustment-methods">Additional <em>p</em>-value adjustment methods</a></li>
+</ul></li>
 <li><a href="#anova">ANOVA</a></li>
 </ul></li>
 <li><a href="#to-go-even-further">To go even further</a></li>
@@ -349,6 +351,8 @@ for (i in y) {
 <p>In my experience, I have noticed that students and professionals (especially those from a less scientific background) understand way better these results than the ones presented in the previous section.</p>
 <p>The only lines of code that need to be modified for your own project is the name of the grouping variable (<code>Species</code> in the above code), the names of the variables you want to test (<code>Sepal.Length</code>, <code>Sepal.Width</code>, etc.),<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> whether you want to apply a t-test (<code>t.test</code>) or Wilcoxon test (<code>wilcox.test</code>) and whether the samples are paired or not (<code>FALSE</code> if samples are independent, <code>TRUE</code> if they are paired).</p>
 <p>Based on these graphs, it is easy, even for non-experts, to interpret the results and conclude that the <code>versicolor</code> and <code>virginica</code> species are significantly different in terms of all 4 variables (since all <em>p</em>-values <span class="math inline">\(&lt; \frac{0.05}{4} = 0.0125\)</span> (remind that the Bonferroni correction is applied to avoid the issue of multiple testing, so we divide the usual <span class="math inline">\(\alpha\)</span> level by 4 because there are 4 t-tests)).</p>
+<div id="additional-p-value-adjustment-methods" class="section level3">
+<h3>Additional <em>p</em>-value adjustment methods</h3>
 <p>If you would like to use another <em>p</em>-value adjustment method, you can use the <code>p.adjust()</code> function. Below are the raw <em>p</em>-values found above, together with <em>p</em>-values derived from the main adjustment methods (presented in a dataframe):</p>
 <pre class="r"><code>raw_pvalue &lt;- numeric(length = length(1:4))
 for (i in (1:4)) {
@@ -394,6 +398,100 @@ df</code></pre>
 ## 3 Petal.Length      0.000      0.000 0.000 0.000    0.000  0.000 0.000
 ## 4  Petal.Width      0.000      0.000 0.000 0.000    0.000  0.000 0.000</code></pre>
 <p>Regardless of the <em>p</em>-value adjustment method, the two species are different for all 4 variables. Note that the adjustment method should be chosen before looking at the results to avoid choosing the method based on the results.</p>
+<p>Below another function that allows to perform multiple Student’s t-tests or Wilcoxon tests at once and choose the <em>p</em>-value adjustment method. The function also allows to specify whether samples are paired or unpaired and whether the variances are assumed to be equal or not. (The code has been adapted from Mark White.)</p>
+<pre class="r"><code>t_table &lt;- function(data, dvs, iv,
+                    var_equal = TRUE,
+                    p_adj = &quot;none&quot;,
+                    alpha = 0.05,
+                    paired = FALSE,
+                    wilcoxon = FALSE) {
+  if (!inherits(data, &quot;data.frame&quot;)) {
+    stop(&quot;data must be a data.frame&quot;)
+  }
+
+  if (!all(c(dvs, iv) %in% names(data))) {
+    stop(&quot;at least one column given in dvs and iv are not in the data&quot;)
+  }
+
+  if (!all(sapply(data[, dvs], is.numeric))) {
+    stop(&quot;all dvs must be numeric&quot;)
+  }
+
+  if (length(unique(na.omit(data[[iv]]))) != 2) {
+    stop(&quot;independent variable must only have two unique values&quot;)
+  }
+
+  out &lt;- lapply(dvs, function(x) {
+    if (paired == FALSE &amp; wilcoxon == FALSE) {
+      tres &lt;- t.test(data[[x]] ~ data[[iv]], var.equal = var_equal)
+    }
+
+    else if (paired == FALSE &amp; wilcoxon == TRUE) {
+      tres &lt;- wilcox.test(data[[x]] ~ data[[iv]])
+    }
+
+    else if (paired == TRUE &amp; wilcoxon == FALSE) {
+      tres &lt;- t.test(data[[x]] ~ data[[iv]],
+        var.equal = var_equal,
+        paired = TRUE
+      )
+    }
+
+    else {
+      tres &lt;- wilcox.test(data[[x]] ~ data[[iv]],
+        paired = TRUE
+      )
+    }
+
+    c(
+      p_value = tres$p.value
+    )
+  })
+
+  out &lt;- as.data.frame(do.call(rbind, out))
+  out &lt;- cbind(variable = dvs, out)
+  names(out) &lt;- gsub(&quot;[^0-9A-Za-z_]&quot;, &quot;&quot;, names(out))
+
+  out$p_value &lt;- ifelse(out$p_value &lt; 0.001,
+    &quot;&lt;0.001&quot;,
+    round(p.adjust(out$p_value, p_adj), 3)
+  )
+  out$conclusion &lt;- ifelse(out$p_value &lt; alpha,
+    paste0(&quot;Reject H0 at &quot;, alpha * 100, &quot;%&quot;),
+    paste0(&quot;Do not reject H0 at &quot;, alpha * 100, &quot;%&quot;)
+  )
+
+  return(out)
+}</code></pre>
+<p>Applied to our dataset, with no adjustment method for the <em>p</em>-values:</p>
+<pre class="r"><code>result &lt;- t_table(
+  data = dat,
+  c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;, &quot;Petal.Length&quot;, &quot;Petal.Width&quot;),
+  &quot;Species&quot;
+)
+
+result</code></pre>
+<pre><code>##       variable p_value      conclusion
+## 1 Sepal.Length  &lt;0.001 Reject H0 at 5%
+## 2  Sepal.Width   0.002 Reject H0 at 5%
+## 3 Petal.Length  &lt;0.001 Reject H0 at 5%
+## 4  Petal.Width  &lt;0.001 Reject H0 at 5%</code></pre>
+<p>And with the <span class="citation">Holm (1979)</span> adjustment method:</p>
+<pre class="r"><code>result &lt;- t_table(
+  data = dat,
+  c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;, &quot;Petal.Length&quot;, &quot;Petal.Width&quot;),
+  &quot;Species&quot;,
+  p_adj = &quot;holm&quot;
+)
+
+result</code></pre>
+<pre><code>##       variable p_value      conclusion
+## 1 Sepal.Length  &lt;0.001 Reject H0 at 5%
+## 2  Sepal.Width   0.002 Reject H0 at 5%
+## 3 Petal.Length  &lt;0.001 Reject H0 at 5%
+## 4  Petal.Width  &lt;0.001 Reject H0 at 5%</code></pre>
+<p>Again, with the Holm’s adjustment method, we conclude that, at the 5% significance level, the two species are significantly different from each other in terms of all 4 variables.</p>
+</div>
 </div>
 <div id="anova" class="section level2">
 <h2>ANOVA</h2>
@@ -430,7 +528,7 @@ for (i in y) {
     )
   }
 }</code></pre>
-<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-4-1.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-4-2.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-4-3.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-4-4.png" width="672" /></p>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-1.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-2.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-3.png" width="672" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-4.png" width="672" /></p>
 <p>Like the improved routine for the t-test, I have noticed that students and non-expert professionals understand ANOVA results presented this way much more easily compared to the default R outputs.</p>
 <p>With one graph for each variable, it is easy to see that all species are different from each other in terms of all 4 variables.</p>
 <p>If you want to apply the same automated process to your data, you will need to modify the name of the grouping variable (<code>Species</code>), the names of the variables you want to test (<code>Sepal.Length</code>, etc.), whether you want to perform an ANOVA (<code>anova</code>) or Kruskal-Wallis test (<code>kruskal.test</code>) and finally specify the comparisons for the post-hoc tests.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
@@ -468,6 +566,11 @@ cGroupsWUI()</code></pre>
 <p>McDonald, J.H. 2014. Handbook of Biological Statistics (3rd ed.). Sparky House Publishing, Baltimore, Maryland.</p>
 <p><strong>Related articles:</strong></p>
 <script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
+<div id="refs" class="references">
+<div id="ref-holm1979simple">
+<p>Holm, Sture. 1979. “A Simple Sequentially Rejective Multiple Test Procedure.” <em>Scandinavian Journal of Statistics</em>. JSTOR, 65–70.</p>
+</div>
+</div>
 </div>
 <div class="footnotes">
 <hr />
