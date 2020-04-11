@@ -7,9 +7,9 @@ menu: "main"
 
 Hello, my name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a PhD student in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences. My research interests focus on survival analysis and bio-statistical procedures applied to cancer patients. See more in the research section of my [personal website](https://www.antoinesoetewey.com/research).
 
-In parallel with my doctoral thesis, I am teaching assistant for several courses in statistics and probability at bachelor and master’s level. From time to time, I also provide trainings and workshops in statistics and R in a Belgian consulting company.
+In parallel with my doctoral thesis, I am [teaching assistant](https://www.antoinesoetewey.com/teaching/) for several courses in statistics and probability at bachelor and master’s level. From time to time, I also provide trainings and workshops in statistics and R in a Belgian consulting company.
 
-This blog about statistics and R aims at helping academics and professionals working with data to grasp important statistical concepts using examples and plain English. When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R. I will also occasionally present some work related to data science using R and news about my research.
+This blog about [statistics](/tags/statistics/) and [R](/tags/r/) aims at helping academics and professionals working with data to grasp important statistical concepts using examples and plain English. When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R. I will also occasionally present some work related to data science using R and news about my research.
 
 I really enjoy learning new things. I learn (and I am still learning) a lot by teaching statistics to students from diverse backgrounds. So far, I believed that I understood a statistical concept only if I was able to teach it to my students. If I was not able to explain it in a clear and understandable way, it meant that I needed to study it more thoroughly because I actually did not fully understand it.
 
