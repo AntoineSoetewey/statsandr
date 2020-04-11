@@ -365,10 +365,10 @@ ggplot(dat1) +
   aes(y = value) +
   geom_boxplot() +
   theme_minimal()</code></pre>
-<p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Note that you can use the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse"><code>{esquisse}</code> RStudio addin</a> if you want to draw a boxplot with the package <code>{ggplot2}</code> without writing the code yourself. If you prefer the default graphics, use the <code>boxplot()</code> function:</p>
 <pre class="r"><code>boxplot(dat1$value)</code></pre>
-<p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The boxplot shows that the distribution of the sample is not distant from 0 (the hypothesized value), so we tend to believe that we will not be able to reject the null hypothesis that the population mean is equal to 0. However, only a formal statistical test will confirm this belief.</p>
 <p>Since there is no function in R to perform a t-test with a known population variance, here is one with arguments accepting the sample (<code>x</code>), the variance of the population (<code>V</code>), the mean under the null hypothesis (<code>m0</code>, default is <code>0</code>), the significance level (<code>alpha</code>, default is <code>0.05</code>) and the alternative (<code>alternative</code>, one of <code>&quot;two.sided&quot;</code> (default), <code>&quot;less&quot;</code> or <code>&quot;greater&quot;</code>):</p>
 <pre class="r"><code>t.test2 &lt;- function(x, V, m0 = 0, alpha = 0.05, alternative = &quot;two.sided&quot;) {
@@ -453,7 +453,7 @@ dat2</code></pre>
   aes(y = value) +
   geom_boxplot() +
   theme_minimal()</code></pre>
-<p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Unlike the previous scenario, the box is quite distant from the hypothesized value of 5. From this boxplot, we can expect the test to reject the null hypothesis of the population mean being equal to 5. Nonetheless, only a formal statistical test will confirm this expectation.</p>
 <p>There is a function in R, and it is simply the <code>t.test()</code> function. This version of the test is actually the “standard” t-test for one sample. Note that in our case the alternative hypothesis is <span class="math inline">\(H_1: \mu &gt; 5\)</span> so we need to add the arguments <code>mu = 5</code> and <code>alternative = &quot;greater&quot;</code> to the function because the default arguments are <code>mu = 0</code> and the two-sided test:</p>
 <pre class="r"><code>test &lt;- t.test(dat2$value,
