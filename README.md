@@ -10,7 +10,6 @@ If you are new to this blog, I invite you to:
 * Learn more [about me](https://www.statsandr.com/about/)
 * Follow me on [Medium](https://medium.com/@ant.soetewey) or [Twitter](https://twitter.com/statsandr)
 * [Subscribe to this blog](https://www.statsandr.com/subscribe/) to receive updates every time a new article is published
-* [Contribute](https://www.statsandr.com/contribute/) by submitting your article
 * See the [most recent comments](https://www.statsandr.com/recent-comments/) so you can follow the discussion
 
 # Status
