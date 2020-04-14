@@ -1,4 +1,4 @@
-# statsandr
+# [statsandr.com](https://www.statsandr.com/)
 
 Welcome to the blog [Stats and R](https://www.statsandr.com/). As the name suggests, this blog is about [statistics](https://www.statsandr.com/tags/statistics/) and its applications in [R](https://www.statsandr.com/tags/r/) (an open source statistical software program). It aims at helping academics and professionals working with data to grasp important concepts in statistics and to apply them in R.
 
