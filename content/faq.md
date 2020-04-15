@@ -22,10 +22,10 @@ This blog is written in R using Hugo, and deployed and hosted via Netlify. The c
 
 If you are new to this blog, you can start with the following articles:
  
-* [How to install R and RStudio](/blog/how-to-install-r-and-rstudio)
-* [How to import an Excel file in RStudio](/blog/how-to-import-an-excel-file-in-rstudio)
-* [Data manipulation in R](/blog/data-manipulation-in-r)
-* [Descriptive statistics by hand](/blog/descriptive-statistics-by-hand) and [in R](/blog/descriptive-statistics-in-r)
+* [How to install R and RStudio](/blog/how-to-install-r-and-rstudio/)
+* [How to import an Excel file in RStudio](/blog/how-to-import-an-excel-file-in-rstudio/)
+* [Data manipulation in R](/blog/data-manipulation-in-r/)
+* [Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/) and [in R](/blog/descriptive-statistics-in-r/)
 
 Alternatively, you can check all articles with the tag "[Basics](/tags/basics/)".
 
