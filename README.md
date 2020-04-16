@@ -7,7 +7,7 @@ The goal of this website is to make statistics easy to understand by illustratin
 If you are new to this blog, I invite you to:
 
 * See [all articles](https://www.statsandr.com/blog/) or [articles by categories](https://www.statsandr.com/tags/)
-* Learn more [about me](https://www.statsandr.com/about/)
+* Learn more about [who is behind this blog](https://www.statsandr.com/about/)
 * Follow me on [Medium](https://medium.com/@ant.soetewey) or [Twitter](https://twitter.com/statsandr)
 * [Subscribe to this blog](https://www.statsandr.com/subscribe/) to receive updates every time a new article is published
 * See the [most recent comments](https://www.statsandr.com/recent-comments/) so you can follow the discussion
