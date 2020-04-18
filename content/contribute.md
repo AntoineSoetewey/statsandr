@@ -19,6 +19,7 @@ Before submitting your article, please bear in mind the following points:
 * To avoid any of us being penalized by Google for duplicate content, I only accept original blog posts that:
   + have not been published anywhere else in the past and
   + will never be published anywhere else in the future
+* I only accept articles that are in line with this blog, i.e., articles about statistics and/or applications in R. Even if your article is about one of these topics, it's not guaranteed that it will be published.
 * I personally read and check the content and formatting of your article to guarantee its correctness and so that it fits into this blog. I may edit the article with minor corrections, without changing the content. I might also remove images where the source is not clearly cited to avoid copyright violations.
 * It is your responsibility to ensure you have the permission to use all content, images, and videos you include in your articles.
 * You can edit and remove your article from the blog at any time, without any justification needed.
