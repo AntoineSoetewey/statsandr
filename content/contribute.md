@@ -12,6 +12,8 @@ meta_img: contribute_files/submit-article-blog-statsandr.com.jpg
 
 If you want to contribute and write for [www.statsandr.com](/), please submit your article through this [contribution form](https://antoine233987.typeform.com/to/nlWzhn).
 
+Once your guest post is received, I will review it and inform you about the decision (accepted, rejected, or accepted with minor changes).
+
 ## Submission rules and guidelines
 
 Before submitting your article, please bear in mind the following points:
@@ -19,7 +21,7 @@ Before submitting your article, please bear in mind the following points:
 * To avoid any of us being penalized by Google for duplicate content, I only accept original blog posts that:
   + have not been published anywhere else in the past and
   + will never be published anywhere else in the future
-This means that you may not republish your post on any other site, including yours (if you have one).
+* This means that you may not republish your post on any other site, including yours (if you have one).
 * I only accept articles that are in line with this blog, i.e., articles about statistics and/or applications in R.
 * Even if your article is about one of these topics, it's not guaranteed that it will be published: quality of the post is the most important determining factor.
 * I personally read and check the content and formatting of your article to guarantee its correctness and so that it fits into this blog. I may edit the article with minor corrections, without changing the content. However, guest posts should be edited for spelling and grammar before they are submitted. I might also remove images where the source is not clearly cited to avoid copyright violations.
@@ -28,5 +30,12 @@ This means that you may not republish your post on any other site, including you
 * This blog is written in R and deployed thanks to the {blogdown} package. Therefore, it is much easier for me to publish articles written in R Markdown (.Rmd) or Markdown (.md). However, if your article is in another format, feel free to submit it as well.
 * If you are having an issue with the online form, you can send a link to your article via the [contact page](/contact/). (But please do not send your article via the contact page if you already submitted it via the contribution form.)
 * All articles that are accepted on the blog will be published on [Medium](https://medium.com/@ant.soetewey) via the [Towards Data Science](https://towardsdatascience.com/@ant.soetewey) publication. Moreover, it will also be published on [R Weekly](https://rweekly.org/live) and, if it is related to R, on [R-Bloggers](https://www.r-bloggers.com/author/r-on-stats-and-r/) as well.
+* At the moment, there is no financial retribution for writing a guest post.
 
-Thanks in advance for your interest! Do not hesitate to [contact me](/contact/) if you have any question.
+## After publishing
+
+Once your post is published, I encourage you to share it with your social media following as you like. Bear in mind that the more popular the guest post is, the more referral traffic your website will receive.
+
+You are also more than welcome and encouraged to respond to any comments that the guest post receives.
+
+Thanks in advance for your interest! Do not hesitate to [contact me](/contact/) if you have any questions.
