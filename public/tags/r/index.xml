@@ -6400,6 +6400,7 @@ library(ViewPipeSteps)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;&lt;a href=&#34;#advanced-descriptive-statistics&#34;&gt;Advanced descriptive statistics&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#summarytools-package&#34;&gt;&lt;code&gt;{summarytools}&lt;/code&gt; package&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#frequency-tables-with-freq&#34;&gt;Frequency tables with &lt;code&gt;freq()&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#cross-tabulations-with-ctable&#34;&gt;Cross-tabulations with &lt;code&gt;ctable()&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -6862,8 +6863,9 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 ##        virginica     50     33.33         100.00     33.33         100.00
 ##             &amp;lt;NA&amp;gt;      0                               0.00         100.00
 ##            Total    150    100.00         100.00    100.00         100.00&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;If you do not need information about missing values add the &lt;code&gt;report.nas = FALSE&lt;/code&gt; argument:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;freq(dat$Species, report.nas = FALSE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you do not need information about missing values, add the &lt;code&gt;report.nas = FALSE&lt;/code&gt; argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;freq(dat$Species,
+     report.nas = FALSE) # remove NA information&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Frequencies  
 ## dat$Species  
 ## Type: Factor  
@@ -6874,6 +6876,67 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 ##       versicolor     50    33.33    66.67
 ##        virginica     50    33.33   100.00
 ##            Total    150   100.00   100.00&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And for a minimalist output with only counts and proportions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;freq(dat$Species,
+     report.nas = FALSE, # remove NA information
+     totals = FALSE, # remove totals
+     cumul = FALSE, # remove cumuls
+     headings = FALSE) # remove headings&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##                    Freq       %
+## ---------------- ------ -------
+##           setosa     50   33.33
+##       versicolor     50   33.33
+##        virginica     50   33.33&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;cross-tabulations-with-ctable&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Cross-tabulations with &lt;code&gt;ctable()&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;ctable()&lt;/code&gt; produces cross-tabulations (contingency tables) for pairs of categorical variables. Using the two categorical variables in our dataset:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ctable(x = dat$Species,
+       y = dat$size)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Cross-Tabulation, Row Proportions  
+## Species * size  
+## Data Frame: dat  
+## 
+## ------------ ------ ------------ ------------ --------------
+##                size          big        small          Total
+##      Species                                                
+##       setosa           1 ( 2.0%)   49 (98.0%)    50 (100.0%)
+##   versicolor          29 (58.0%)   21 (42.0%)    50 (100.0%)
+##    virginica          47 (94.0%)    3 ( 6.0%)    50 (100.0%)
+##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
+## ------------ ------ ------------ ------------ --------------&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Row proportions are shown by default. To display column or total proportions, add the &lt;code&gt;prop = &amp;quot;c&amp;quot;&lt;/code&gt; or &lt;code&gt;prop = &amp;quot;t&amp;quot;&lt;/code&gt; arguments, respectively:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ctable(x = dat$Species,
+       y = dat$size,
+       prop = &amp;quot;t&amp;quot;) # total proportions&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Cross-Tabulation, Total Proportions  
+## Species * size  
+## Data Frame: dat  
+## 
+## ------------ ------ ------------ ------------ --------------
+##                size          big        small          Total
+##      Species                                                
+##       setosa           1 ( 0.7%)   49 (32.7%)    50 ( 33.3%)
+##   versicolor          29 (19.3%)   21 (14.0%)    50 ( 33.3%)
+##    virginica          47 (31.3%)    3 ( 2.0%)    50 ( 33.3%)
+##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
+## ------------ ------ ------------ ------------ --------------&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To remove proportions altogether, add the argument &lt;code&gt;prop = &amp;quot;n&amp;quot;&lt;/code&gt;. To display only the bare minimum, add the &lt;code&gt;totals = FALSE&lt;/code&gt; and &lt;code&gt;headings = FALSE&lt;/code&gt; arguments:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ctable(x = dat$Species,
+       y = dat$size,
+       prop = &amp;quot;n&amp;quot;, # remove proportions
+       totals = FALSE, # remove totals
+       headings = FALSE) # remove headings&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## ------------ ------ ----- -------
+##                size   big   small
+##      Species                     
+##       setosa            1      49
+##   versicolor           29      21
+##    virginica           47       3
+## ------------ ------ ----- -------&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is equivalent than &lt;code&gt;table(dat$Species, dat$size)&lt;/code&gt; performed in an earlier &lt;a href=&#34;/blog/descriptive-statistics-in-r/#contingency-table&#34;&gt;section&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article “&lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;Descriptive statistics by hand&lt;/a&gt;”.&lt;/p&gt;
 &lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can &lt;a href=&#34;/contact/&#34;&gt;contact me&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
@@ -6886,7 +6949,7 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 &lt;hr /&gt;
 &lt;ol&gt;
 &lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Note that the &lt;code&gt;plain.ascii&lt;/code&gt; and &lt;code&gt;style&lt;/code&gt; arguments are needed for this package. In our examples, these arguments are added at the chunk-level so they are not visible.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Note that the &lt;code&gt;plain.ascii&lt;/code&gt; and &lt;code&gt;style&lt;/code&gt; arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
 </description>

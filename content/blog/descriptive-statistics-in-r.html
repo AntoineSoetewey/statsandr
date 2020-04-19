@@ -48,6 +48,7 @@ output:
 <li><a href="#advanced-descriptive-statistics">Advanced descriptive statistics</a><ul>
 <li><a href="#summarytools-package"><code>{summarytools}</code> package</a><ul>
 <li><a href="#frequency-tables-with-freq">Frequency tables with <code>freq()</code></a></li>
+<li><a href="#cross-tabulations-with-ctable">Cross-tabulations with <code>ctable()</code></a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -510,8 +511,9 @@ freq(dat$Species)</code></pre>
 ##        virginica     50     33.33         100.00     33.33         100.00
 ##             &lt;NA&gt;      0                               0.00         100.00
 ##            Total    150    100.00         100.00    100.00         100.00</code></pre>
-<p>If you do not need information about missing values add the <code>report.nas = FALSE</code> argument:</p>
-<pre class="r"><code>freq(dat$Species, report.nas = FALSE)</code></pre>
+<p>If you do not need information about missing values, add the <code>report.nas = FALSE</code> argument:</p>
+<pre class="r"><code>freq(dat$Species,
+     report.nas = FALSE) # remove NA information</code></pre>
 <pre><code>## Frequencies  
 ## dat$Species  
 ## Type: Factor  
@@ -522,6 +524,67 @@ freq(dat$Species)</code></pre>
 ##       versicolor     50    33.33    66.67
 ##        virginica     50    33.33   100.00
 ##            Total    150   100.00   100.00</code></pre>
+<p>And for a minimalist output with only counts and proportions:</p>
+<pre class="r"><code>freq(dat$Species,
+     report.nas = FALSE, # remove NA information
+     totals = FALSE, # remove totals
+     cumul = FALSE, # remove cumuls
+     headings = FALSE) # remove headings</code></pre>
+<pre><code>## 
+##                    Freq       %
+## ---------------- ------ -------
+##           setosa     50   33.33
+##       versicolor     50   33.33
+##        virginica     50   33.33</code></pre>
+</div>
+<div id="cross-tabulations-with-ctable" class="section level3">
+<h3>Cross-tabulations with <code>ctable()</code></h3>
+<p><code>ctable()</code> produces cross-tabulations (contingency tables) for pairs of categorical variables. Using the two categorical variables in our dataset:</p>
+<pre class="r"><code>ctable(x = dat$Species,
+       y = dat$size)</code></pre>
+<pre><code>## Cross-Tabulation, Row Proportions  
+## Species * size  
+## Data Frame: dat  
+## 
+## ------------ ------ ------------ ------------ --------------
+##                size          big        small          Total
+##      Species                                                
+##       setosa           1 ( 2.0%)   49 (98.0%)    50 (100.0%)
+##   versicolor          29 (58.0%)   21 (42.0%)    50 (100.0%)
+##    virginica          47 (94.0%)    3 ( 6.0%)    50 (100.0%)
+##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
+## ------------ ------ ------------ ------------ --------------</code></pre>
+<p>Row proportions are shown by default. To display column or total proportions, add the <code>prop = &quot;c&quot;</code> or <code>prop = &quot;t&quot;</code> arguments, respectively:</p>
+<pre class="r"><code>ctable(x = dat$Species,
+       y = dat$size,
+       prop = &quot;t&quot;) # total proportions</code></pre>
+<pre><code>## Cross-Tabulation, Total Proportions  
+## Species * size  
+## Data Frame: dat  
+## 
+## ------------ ------ ------------ ------------ --------------
+##                size          big        small          Total
+##      Species                                                
+##       setosa           1 ( 0.7%)   49 (32.7%)    50 ( 33.3%)
+##   versicolor          29 (19.3%)   21 (14.0%)    50 ( 33.3%)
+##    virginica          47 (31.3%)    3 ( 2.0%)    50 ( 33.3%)
+##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
+## ------------ ------ ------------ ------------ --------------</code></pre>
+<p>To remove proportions altogether, add the argument <code>prop = &quot;n&quot;</code>. To display only the bare minimum, add the <code>totals = FALSE</code> and <code>headings = FALSE</code> arguments:</p>
+<pre class="r"><code>ctable(x = dat$Species,
+       y = dat$size,
+       prop = &quot;n&quot;, # remove proportions
+       totals = FALSE, # remove totals
+       headings = FALSE) # remove headings</code></pre>
+<pre><code>## 
+## ------------ ------ ----- -------
+##                size   big   small
+##      Species                     
+##       setosa            1      49
+##   versicolor           29      21
+##    virginica           47       3
+## ------------ ------ ----- -------</code></pre>
+<p>This is equivalent than <code>table(dat$Species, dat$size)</code> performed in an earlier <a href="/blog/descriptive-statistics-in-r/#contingency-table">section</a>.</p>
 <p>Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article “<a href="/blog/descriptive-statistics-by-hand/">Descriptive statistics by hand</a>”.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank">raising an issue on GitHub</a>. For all other requests, you can <a href="/contact/">contact me</a>.</p>
 <p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
@@ -534,6 +597,6 @@ freq(dat$Species)</code></pre>
 <hr />
 <ol>
 <li id="fn1"><p>Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).<a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p>Note that the <code>plain.ascii</code> and <code>style</code> arguments are needed for this package. In our examples, these arguments are added at the chunk-level so they are not visible.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>Note that the <code>plain.ascii</code> and <code>style</code> arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.<a href="#fnref2" class="footnote-back">↩</a></p></li>
 </ol>
 </div>

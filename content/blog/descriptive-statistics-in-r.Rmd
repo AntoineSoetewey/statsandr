@@ -481,7 +481,7 @@ One package for descriptive statistics I often use for my projects in R is the [
 
 A combination of these 4 functions is usually more than enough for most descriptive analyses. Moreover, the package has been built with [R Markdown](/blog/getting-started-in-r-markdown/) in mind, meaning that outputs render well in HTML reports. And for non-English speakers, built-in translations exist for French, Portuguese, Spanish, Russian and Turkish.
 
-I illustrate each of the 4 functions in the following sections. See the setup settings in the [vignette](https://cran.r-project.org/web/packages/summarytools/vignettes/Introduction.html){target="_blank"} of the package if you want to print the outputs in a nice way in R Markdown.^[Note that the `plain.ascii` and `style` arguments are needed for this package. In our examples, these arguments are added at the chunk-level so they are not visible.]
+I illustrate each of the 4 functions in the following sections. See the setup settings in the [vignette](https://cran.r-project.org/web/packages/summarytools/vignettes/Introduction.html){target="_blank"} of the package if you want to print the outputs in a nice way in R Markdown.^[Note that the `plain.ascii` and `style` arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.]
 
 ### Frequency tables with `freq()`
 
@@ -495,15 +495,49 @@ freq(dat$Species)
 If you do not need information about missing values, add the `report.nas = FALSE` argument:
 
 ```{r, plain.ascii = FALSE, style = "rmarkdown"}
-freq(dat$Species, report.nas = FALSE)
+freq(dat$Species,
+     report.nas = FALSE) # remove NA information
 ```
 
 And for a minimalist output with only counts and proportions:
 
 ```{r, plain.ascii = FALSE, style = "rmarkdown"}
-freq(dat$Species, report.nas = FALSE, totals = FALSE, 
-     cumul = FALSE, headings = FALSE)
+freq(dat$Species,
+     report.nas = FALSE, # remove NA information
+     totals = FALSE, # remove totals
+     cumul = FALSE, # remove cumuls
+     headings = FALSE) # remove headings
 ```
+
+### Cross-tabulations with `ctable()`
+
+`ctable()` produces cross-tabulations (contingency tables) for pairs of categorical variables. Using the two categorical variables in our dataset:
+
+```{r, plain.ascii = FALSE, style = "rmarkdown"}
+ctable(x = dat$Species,
+       y = dat$size)
+```
+
+Row proportions are shown by default. To display column or total proportions, add the `prop = "c"` or `prop = "t"` arguments, respectively:
+
+```{r, plain.ascii = FALSE, style = "rmarkdown"}
+ctable(x = dat$Species,
+       y = dat$size,
+       prop = "t") # total proportions
+```
+
+To remove proportions altogether, add the argument `prop = "n"`. To display only the bare minimum, add the `totals = FALSE` and `headings = FALSE` arguments:
+
+```{r, plain.ascii = FALSE, style = "rmarkdown"}
+ctable(x = dat$Species,
+       y = dat$size,
+       prop = "n", # remove proportions
+       totals = FALSE, # remove totals
+       headings = FALSE) # remove headings
+```
+
+This is equivalent than `table(dat$Species, dat$size)` performed in an earlier [section](/blog/descriptive-statistics-in-r/#contingency-table).
+
 
 
 
