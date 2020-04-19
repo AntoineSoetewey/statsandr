@@ -17,7 +17,7 @@ This blog is, as its name suggests, about [statistics](/tags/statistics/) and [R
 
 I started this blog in December 2019 and friends, family, colleagues and even some readers often ask why I started this blog. I really enjoy learning new things. I learn (and I am still learning) a lot by teaching statistics to students from diverse backgrounds. So far, I believed that I understood a statistical concept only if I was able to teach it to my students. If I was not able to explain it in a clear and understandable way, it meant that I needed to study it more thoroughly because I actually did not fully understand it.
 
-With this blog, I realized that in order to learn and fully understand something new, one must be able to clearly (i) communicate it *and* more importantly, be able to (ii) write it down in a precise and concise manner. So although this blog was first launched to share statistical concepts I am most familiar with, I now use it to learn by writing. I think that this additional way of learning is actually as powerful as teaching, and valuable feedback from people all over the world makes the whole journey even more interesting and enriching.
+With this blog, I realized that in order to learn and fully understand something new, one must be able to clearly (i) communicate it *and* more importantly, be able to (ii) write it down in a precise and concise manner. So although this blog was first launched to share statistical concepts I am most familiar with, I now also use it to learn by writing. I think that this additional way of learning is actually as powerful as teaching, and valuable feedback from people all over the world makes the whole journey even more interesting and enriching.
 
 ## Contact
 
