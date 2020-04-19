@@ -125,7 +125,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            19 minute read
+                            20 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -190,7 +190,11 @@
 </ul></li>
 <li><a href="#density-plot">Density plot</a></li>
 <li><a href="#correlation-plot">Correlation plot</a></li>
-<li><a href="#advanced-descriptive-statistics">Advanced descriptive statistics</a></li>
+<li><a href="#advanced-descriptive-statistics">Advanced descriptive statistics</a><ul>
+<li><a href="#summarytools-package"><code>{summarytools}</code> package</a><ul>
+<li><a href="#frequency-tables-with-freq">Frequency tables with <code>freq()</code></a></li>
+</ul></li>
+</ul></li>
 </ul>
 </div>
 
@@ -609,8 +613,7 @@ ggqqplot(dat$Sepal.Length)</code></pre>
 <div id="density-plot" class="section level1">
 <h1>Density plot</h1>
 <p>Density plot is a smoothed version of the histogram and is used in the same concept, that is, to represent the distribution of a numeric variable. The functions <code>plot()</code> and <code>density()</code> are used together to draw a density plot:</p>
-<pre class="r"><code>plot(density(dat$Sepal.Length),
-     main = &quot;Density plot of sepal length&quot;) # edit title</code></pre>
+<pre class="r"><code>plot(density(dat$Sepal.Length))</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>ggplot(dat) +
@@ -624,17 +627,59 @@ ggqqplot(dat$Sepal.Length)</code></pre>
 </div>
 <div id="advanced-descriptive-statistics" class="section level1">
 <h1>Advanced descriptive statistics</h1>
-<p>We covered the main functions to compute the most common and basic descriptive statistics. There are, however, many more functions to perform more advanced descriptive statistics in R. In this section, I present some of them with applications to our dataset.</p>
+<p>We covered the main functions to compute the most common and basic descriptive statistics. There are, however, many more functions and packages to perform more advanced descriptive statistics in R. In this section, I present some of them with applications to our dataset.</p>
+<div id="summarytools-package" class="section level2">
+<h2><code>{summarytools}</code> package</h2>
+<p>One package for descriptive statistics I often use for my projects in R is the <a href="https://cran.r-project.org/web/packages/summarytools/index.html" target="_blank"><code>{summarytools}</code></a> package. The package is centered around 4 functions:</p>
+<ol style="list-style-type: decimal">
+<li><code>freq()</code> for frequencies tables</li>
+<li><code>ctable()</code> for cross-tabulations</li>
+<li><code>descr()</code> for descriptive statistics</li>
+<li><code>dfSummary()</code> for dataframe summaries</li>
+</ol>
+<p>A combination of these 4 functions is usually more than enough for most descriptive analyses. Moreover, the package has been built with <a href="/blog/getting-started-in-r-markdown/">R Markdown</a> in mind, meaning that outputs render well in HTML reports. And for non-English speakers, built-in translations exist for French, Portuguese, Spanish, Russian and Turkish.</p>
+<p>I illustrate each of the 4 functions in the following sections. See the setup settings in the <a href="https://cran.r-project.org/web/packages/summarytools/vignettes/Introduction.html" target="_blank">vignette</a> of the package if you want to print the outputs in a nice way in R Markdown.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<div id="frequency-tables-with-freq" class="section level3">
+<h3>Frequency tables with <code>freq()</code></h3>
+<p>The <code>freq()</code> function produces frequency tables with frequencies, proportions, as well as missing data information.</p>
+<pre class="r"><code>library(summarytools)
+freq(dat$Species)</code></pre>
+<pre><code>## Frequencies  
+## dat$Species  
+## Type: Factor  
+## 
+##                    Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+## ---------------- ------ --------- -------------- --------- --------------
+##           setosa     50     33.33          33.33     33.33          33.33
+##       versicolor     50     33.33          66.67     33.33          66.67
+##        virginica     50     33.33         100.00     33.33         100.00
+##             &lt;NA&gt;      0                               0.00         100.00
+##            Total    150    100.00         100.00    100.00         100.00</code></pre>
+<p>If you do not need information about missing values add the <code>report.nas = FALSE</code> argument:</p>
+<pre class="r"><code>freq(dat$Species, report.nas = FALSE)</code></pre>
+<pre><code>## Frequencies  
+## dat$Species  
+## Type: Factor  
+## 
+##                    Freq        %   % Cum.
+## ---------------- ------ -------- --------
+##           setosa     50    33.33    33.33
+##       versicolor     50    33.33    66.67
+##        virginica     50    33.33   100.00
+##            Total    150   100.00   100.00</code></pre>
 <p>Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article “<a href="/blog/descriptive-statistics-by-hand/">Descriptive statistics by hand</a>”.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank">raising an issue on GitHub</a>. For all other requests, you can <a href="/contact/">contact me</a>.</p>
 <p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
 <p><strong>Related articles:</strong></p>
 <script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
 </div>
+</div>
+</div>
 <div class="footnotes">
 <hr />
 <ol>
 <li id="fn1"><p>Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>Note that the <code>plain.ascii</code> and <code>style</code> arguments are needed for this package. In our examples, these arguments are added at the chunk-level so they are not visible.<a href="#fnref2" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 

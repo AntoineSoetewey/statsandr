@@ -451,8 +451,7 @@ It is also possible to differentiate groups by only shape or color. For this, re
 Density plot is a smoothed version of the histogram and is used in the same concept, that is, to represent the distribution of a numeric variable. The functions `plot()` and `density()` are used together to draw a density plot:
 
 ```{r}
-plot(density(dat$Sepal.Length),
-     main = "Density plot of sepal length") # edit title
+plot(density(dat$Sepal.Length))
 ```
 
 In `{ggplot2}`:
@@ -469,8 +468,43 @@ The last type of descriptive plot is a correlation plot, also called a correlogr
 
 # Advanced descriptive statistics
 
-We covered the main functions to compute the most common and basic descriptive statistics. There are, however, many more functions to perform more advanced descriptive statistics in R. In this section, I present some of them with applications to our dataset.
+We covered the main functions to compute the most common and basic descriptive statistics. There are, however, many more functions and packages to perform more advanced descriptive statistics in R. In this section, I present some of them with applications to our dataset.
+
+## `{summarytools}` package
  
+One package for descriptive statistics I often use for my projects in R is the [`{summarytools}`](https://cran.r-project.org/web/packages/summarytools/index.html){target="_blank"} package. The package is centered around 4 functions:
+
+1. `freq()` for frequencies tables
+1. `ctable()` for cross-tabulations
+1. `descr()` for descriptive statistics
+1. `dfSummary()` for dataframe summaries
+
+A combination of these 4 functions is usually more than enough for most descriptive analyses. Moreover, the package has been built with [R Markdown](/blog/getting-started-in-r-markdown/) in mind, meaning that outputs render well in HTML reports. And for non-English speakers, built-in translations exist for French, Portuguese, Spanish, Russian and Turkish.
+
+I illustrate each of the 4 functions in the following sections. See the setup settings in the [vignette](https://cran.r-project.org/web/packages/summarytools/vignettes/Introduction.html){target="_blank"} of the package if you want to print the outputs in a nice way in R Markdown.^[Note that the `plain.ascii` and `style` arguments are needed for this package. In our examples, these arguments are added at the chunk-level so they are not visible.]
+
+### Frequency tables with `freq()`
+
+The `freq()` function produces frequency tables with frequencies, proportions, as well as missing data information.
+
+```{r, message = FALSE, warning = FALSE, plain.ascii = FALSE, style = "rmarkdown"}
+library(summarytools)
+freq(dat$Species)
+```
+
+If you do not need information about missing values, add the `report.nas = FALSE` argument:
+
+```{r, plain.ascii = FALSE, style = "rmarkdown"}
+freq(dat$Species, report.nas = FALSE)
+```
+
+And for a minimalist output with only counts and proportions:
+
+```{r, plain.ascii = FALSE, style = "rmarkdown"}
+freq(dat$Species, report.nas = FALSE, totals = FALSE, 
+     cumul = FALSE, headings = FALSE)
+```
+
 
 
 Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)".
