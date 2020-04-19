@@ -285,7 +285,7 @@ To go further, we can see from the table that setosa flowers seem to be larger i
 
 Note that `Species` are in rows and `size` in column because we specified `Species` and then `size` in `table()`. Change the order if you want to switch the two variables.
 
-Instead of having the frequencies (i.e.. the number of cases) you can also have the relative frequencies in each subgroup by adding the `table()` function inside the `prop.table()` function:
+Instead of having the frequencies (i.e.. the number of cases) you can also have the relative frequencies (i.e., proportions) in each subgroup by adding the `table()` function inside the `prop.table()` function:
 
 ```{r}
 prop.table(table(dat$Species, dat$size))
@@ -299,6 +299,8 @@ round(prop.table(table(dat$Species, dat$size), 1), 2) # round to 2 digits with r
 # percentages by column:
 round(prop.table(table(dat$Species, dat$size), 2), 2) # round to 2 digits with round()
 ```
+
+See the section on [advanced descriptive statistics](/blog/descriptive-statistics-in-r/#cross-tabulations-with-ctable) for more advanced contingency tables.
 
 # Barplot
 
@@ -481,7 +483,7 @@ One package for descriptive statistics I often use for my projects in R is the [
 
 A combination of these 4 functions is usually more than enough for most descriptive analyses. Moreover, the package has been built with [R Markdown](/blog/getting-started-in-r-markdown/) in mind, meaning that outputs render well in HTML reports. And for non-English speakers, built-in translations exist for French, Portuguese, Spanish, Russian and Turkish.
 
-I illustrate each of the 4 functions in the following sections. See the setup settings in the [vignette](https://cran.r-project.org/web/packages/summarytools/vignettes/Introduction.html){target="_blank"} of the package if you want to print the outputs in a nice way in R Markdown.^[Note that the `plain.ascii` and `style` arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.]
+I illustrate each of the 4 functions in the following sections. Outputs that follow display much better in R Markdown reports, but in this article I limit myself to the raw outputs as the goal is to show how the functions work, not how to make them render well. See the setup settings in the [vignette](https://cran.r-project.org/web/packages/summarytools/vignettes/Introduction.html){target="_blank"} of the package if you want to print the outputs in a nice way in R Markdown.^[Note that the `plain.ascii` and `style` arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.]
 
 ### Frequency tables with `freq()`
 
@@ -536,10 +538,64 @@ ctable(x = dat$Species,
        headings = FALSE) # remove headings
 ```
 
-This is equivalent than `table(dat$Species, dat$size)` performed in an earlier [section](/blog/descriptive-statistics-in-r/#contingency-table).
+This is equivalent than `table(dat$Species, dat$size)` and `xtabs(~ dat$Species + dat$size)` performed in the section about [contingency tables](/blog/descriptive-statistics-in-r/#contingency-table).
 
+To display results of the [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/), add the `chisq = TRUE` argument:
 
+```{r, plain.ascii = FALSE, style = "rmarkdown"}
+ctable(x = dat$Species,
+       y = dat$size,
+       chisq = TRUE, # display results of Chi-square test
+       headings = FALSE) # remove headings
+```
 
+The *p*-value is close to 0 so we reject the null hypothesis of independence between the two variables. In our context, this indicates that there is a significant relationship between the species and the size.
+
+It is also possible to create a contingency table for each level of a third categorical variable thanks to the combination of the `stby()` and `ctable()` functions. There are only 2 categorical variables in our dataset, so let's use the `tabacco` dataset which has 4 categorical variables (i.e., gender, age group, smoker, diseased). For this example, we would like to create a contingency table of the variables `smoker` and `diseased`, and for each `gender`:
+
+```{r, plain.ascii = FALSE, style = "rmarkdown"}
+stby(list(x = tobacco$smoker,
+          y = tobacco$diseased), 
+     INDICES = tobacco$gender,
+     FUN = ctable)
+```
+
+### Descriptive statistics with `descr()`
+
+`descr()` produces descriptive (univariate) statistics with common central tendency statistics and measures of dispersion. (See the [difference between a measure of central tendency and dispersion](/blog/descriptive-statistics-by-hand/#location-versus-dispersion-measures).)
+
+A major advantage of this function is that it accepts single vectors as well as data frames. If a data frame is provided, all non-numerical columns are ignored so you do not have to remove them yourself.
+
+`descr()` allows to display:
+
+* only a selection of descriptive statistics, with the `stats = c("mean", "sd")` argument for mean and standard deviation for example
+* the minimum, first quartile, median, third quartile and maximum with `stats = "fivenum"`
+* the most common descriptive statistics (mean, standard deviation, minimum, median, maximum, number and percentage of valid observations), with `stats = "common"`:
+
+```{r, plain.ascii = FALSE, style = "rmarkdown", message = FALSE}
+descr(dat,
+      headings = FALSE, # remove headings
+      stats = "common") # most common descriptive statistics)
+```
+
+Tip: if you have a large number of variables, add the `transpose = TRUE` argument for a better display.
+
+In order to compute these descriptive statistics by group (e.g., `Species` in our dataset), use the `stby()` function:
+
+```{r, plain.ascii = FALSE, style = "rmarkdown", message = FALSE}
+stby(data = dat,
+     INDICES = dat$Species, # descr. stats by Species
+     FUN = descr,
+     stats = "common") # most common descr. stats
+```
+
+### Data frame summaries with `dfSummary()`
+
+`dfSummary()` generates a summary table with statistics, frequencies and graphs for all variables in a dataset. The information shown depend on the type of the variables (character, factor, numeric, date) and also varies according to the number of distinct values.
+
+```{r, plain.ascii = FALSE, style = "rmarkdown", message = FALSE}
+dfSummary(dat)
+```
 
 Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)".
 

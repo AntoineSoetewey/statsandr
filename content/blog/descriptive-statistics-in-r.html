@@ -49,6 +49,8 @@ output:
 <li><a href="#summarytools-package"><code>{summarytools}</code> package</a><ul>
 <li><a href="#frequency-tables-with-freq">Frequency tables with <code>freq()</code></a></li>
 <li><a href="#cross-tabulations-with-ctable">Cross-tabulations with <code>ctable()</code></a></li>
+<li><a href="#descriptive-statistics-with-descr">Descriptive statistics with <code>descr()</code></a></li>
+<li><a href="#data-frame-summaries-with-dfsummary">Data frame summaries with <code>dfSummary()</code></a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -341,7 +343,7 @@ sort(tab, decreasing = TRUE) # sort highest to lowest</code></pre>
 <p>The contingency table gives the number of cases in each subgroup. For instance, there is only one big setosa flower, while there are 49 small setosa flowers in the dataset.</p>
 <p>To go further, we can see from the table that setosa flowers seem to be larger in size than virginica flowers. In order to check whether size is significantly associated with species, we could perform a Chi-square test of independence since both variables are categorical variables. See how to do this test <a href="/blog/chi-square-test-of-independence-by-hand/">by hand</a> and <a href="/blog/chi-square-test-of-independence-in-r/">in R</a>.</p>
 <p>Note that <code>Species</code> are in rows and <code>size</code> in column because we specified <code>Species</code> and then <code>size</code> in <code>table()</code>. Change the order if you want to switch the two variables.</p>
-<p>Instead of having the frequencies (i.e.. the number of cases) you can also have the relative frequencies in each subgroup by adding the <code>table()</code> function inside the <code>prop.table()</code> function:</p>
+<p>Instead of having the frequencies (i.e.. the number of cases) you can also have the relative frequencies (i.e., proportions) in each subgroup by adding the <code>table()</code> function inside the <code>prop.table()</code> function:</p>
 <pre class="r"><code>prop.table(table(dat$Species, dat$size))</code></pre>
 <pre><code>##             
 ##                      big       small
@@ -363,6 +365,7 @@ round(prop.table(table(dat$Species, dat$size), 2), 2) # round to 2 digits with r
 ##   setosa     0.01  0.67
 ##   versicolor 0.38  0.29
 ##   virginica  0.61  0.04</code></pre>
+<p>See the section on <a href="/blog/descriptive-statistics-in-r/#cross-tabulations-with-ctable">advanced descriptive statistics</a> for more advanced contingency tables.</p>
 </div>
 <div id="barplot" class="section level1">
 <h1>Barplot</h1>
@@ -494,7 +497,7 @@ ggqqplot(dat$Sepal.Length)</code></pre>
 <li><code>dfSummary()</code> for dataframe summaries</li>
 </ol>
 <p>A combination of these 4 functions is usually more than enough for most descriptive analyses. Moreover, the package has been built with <a href="/blog/getting-started-in-r-markdown/">R Markdown</a> in mind, meaning that outputs render well in HTML reports. And for non-English speakers, built-in translations exist for French, Portuguese, Spanish, Russian and Turkish.</p>
-<p>I illustrate each of the 4 functions in the following sections. See the setup settings in the <a href="https://cran.r-project.org/web/packages/summarytools/vignettes/Introduction.html" target="_blank">vignette</a> of the package if you want to print the outputs in a nice way in R Markdown.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>I illustrate each of the 4 functions in the following sections. Outputs that follow display much better in R Markdown reports, but in this article I limit myself to the raw outputs as the goal is to show how the functions work, not how to make them render well. See the setup settings in the <a href="https://cran.r-project.org/web/packages/summarytools/vignettes/Introduction.html" target="_blank">vignette</a> of the package if you want to print the outputs in a nice way in R Markdown.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
 <div id="frequency-tables-with-freq" class="section level3">
 <h3>Frequency tables with <code>freq()</code></h3>
 <p>The <code>freq()</code> function produces frequency tables with frequencies, proportions, as well as missing data information.</p>
@@ -584,7 +587,169 @@ freq(dat$Species)</code></pre>
 ##   versicolor           29      21
 ##    virginica           47       3
 ## ------------ ------ ----- -------</code></pre>
-<p>This is equivalent than <code>table(dat$Species, dat$size)</code> performed in an earlier <a href="/blog/descriptive-statistics-in-r/#contingency-table">section</a>.</p>
+<p>This is equivalent than <code>table(dat$Species, dat$size)</code> and <code>xtabs(~ dat$Species + dat$size)</code> performed in the section about <a href="/blog/descriptive-statistics-in-r/#contingency-table">contingency tables</a>.</p>
+<p>To display results of the <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a>, add the <code>chisq = TRUE</code> argument:</p>
+<pre class="r"><code>ctable(x = dat$Species,
+       y = dat$size,
+       chisq = TRUE, # display results of Chi-square test
+       headings = FALSE) # remove headings</code></pre>
+<pre><code>## 
+## ------------ ------ ------------ ------------ --------------
+##                size          big        small          Total
+##      Species                                                
+##       setosa           1 ( 2.0%)   49 (98.0%)    50 (100.0%)
+##   versicolor          29 (58.0%)   21 (42.0%)    50 (100.0%)
+##    virginica          47 (94.0%)    3 ( 6.0%)    50 (100.0%)
+##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
+## ------------ ------ ------------ ------------ --------------
+## 
+## ----------------------------
+##  Chi.squared   df   p.value 
+## ------------- ---- ---------
+##     86.03      2       0    
+## ----------------------------</code></pre>
+<p>The <em>p</em>-value is close to 0 so we reject the null hypothesis of independence between the two variables. In our context, this indicates that there is a significant relationship between the species and the size.</p>
+<p>It is also possible to create a contingency table for each level of a third categorical variable thanks to the combination of the <code>stby()</code> and <code>ctable()</code> functions. There are only 2 categorical variables in our dataset, so let’s use the <code>tabacco</code> dataset which has 4 categorical variables (i.e., gender, age group, smoker, diseased). For this example, we would like to create a contingency table of the variables <code>smoker</code> and <code>diseased</code>, and for each <code>gender</code>:</p>
+<pre class="r"><code>stby(list(x = tobacco$smoker,
+          y = tobacco$diseased), 
+     INDICES = tobacco$gender,
+     FUN = ctable)</code></pre>
+<pre><code>## Cross-Tabulation, Row Proportions  
+## smoker * diseased  
+## Data Frame: tobacco  
+## Group: gender = F  
+## 
+## -------- ---------- ------------- ------------- --------------
+##            diseased           Yes            No          Total
+##   smoker                                                      
+##      Yes               62 (42.2%)    85 (57.8%)   147 (100.0%)
+##       No               49 (14.3%)   293 (85.7%)   342 (100.0%)
+##    Total              111 (22.7%)   378 (77.3%)   489 (100.0%)
+## -------- ---------- ------------- ------------- --------------
+## 
+## Group: gender = M  
+## 
+## -------- ---------- ------------- ------------- --------------
+##            diseased           Yes            No          Total
+##   smoker                                                      
+##      Yes               63 (44.1%)    80 (55.9%)   143 (100.0%)
+##       No               47 (13.6%)   299 (86.4%)   346 (100.0%)
+##    Total              110 (22.5%)   379 (77.5%)   489 (100.0%)
+## -------- ---------- ------------- ------------- --------------</code></pre>
+</div>
+<div id="descriptive-statistics-with-descr" class="section level3">
+<h3>Descriptive statistics with <code>descr()</code></h3>
+<p><code>descr()</code> produces descriptive (univariate) statistics with common central tendency statistics and measures of dispersion. (See the <a href="/blog/descriptive-statistics-by-hand/#location-versus-dispersion-measures">difference between a measure of central tendency and dispersion</a>.)</p>
+<p>A major advantage of this function is that it accepts single vectors as well as data frames. If a data frame is provided, all non-numerical columns are ignored so you do not have to remove them yourself.</p>
+<p><code>descr()</code> allows to display:</p>
+<ul>
+<li>only a selection of descriptive statistics, with the <code>stats = c(&quot;mean&quot;, &quot;sd&quot;)</code> argument for mean and standard deviation for example</li>
+<li>the minimum, first quartile, median, third quartile and maximum with <code>stats = &quot;fivenum&quot;</code></li>
+<li>the most common descriptive statistics (mean, standard deviation, minimum, median, maximum, number and percentage of valid observations), with <code>stats = &quot;common&quot;</code>:</li>
+</ul>
+<pre class="r"><code>descr(dat,
+      headings = FALSE, # remove headings
+      stats = &quot;common&quot;) # most common descriptive statistics)</code></pre>
+<pre><code>## 
+##                   Petal.Length   Petal.Width   Sepal.Length   Sepal.Width
+## --------------- -------------- ------------- -------------- -------------
+##            Mean           3.76          1.20           5.84          3.06
+##         Std.Dev           1.77          0.76           0.83          0.44
+##             Min           1.00          0.10           4.30          2.00
+##          Median           4.35          1.30           5.80          3.00
+##             Max           6.90          2.50           7.90          4.40
+##         N.Valid         150.00        150.00         150.00        150.00
+##       Pct.Valid         100.00        100.00         100.00        100.00</code></pre>
+<p>Tip: if you have a large number of variables, add the <code>transpose = TRUE</code> argument for a better display.</p>
+<p>In order to compute these descriptive statistics by group (e.g., <code>Species</code> in our dataset), use the <code>stby()</code> function:</p>
+<pre class="r"><code>stby(data = dat,
+     INDICES = dat$Species, # descr. stats by Species
+     FUN = descr,
+     stats = &quot;common&quot;) # most common descr. stats</code></pre>
+<pre><code>## Descriptive Statistics  
+## dat  
+## Group: Species = setosa  
+## N: 50  
+## 
+##                   Petal.Length   Petal.Width   Sepal.Length   Sepal.Width
+## --------------- -------------- ------------- -------------- -------------
+##            Mean           1.46          0.25           5.01          3.43
+##         Std.Dev           0.17          0.11           0.35          0.38
+##             Min           1.00          0.10           4.30          2.30
+##          Median           1.50          0.20           5.00          3.40
+##             Max           1.90          0.60           5.80          4.40
+##         N.Valid          50.00         50.00          50.00         50.00
+##       Pct.Valid         100.00        100.00         100.00        100.00
+## 
+## Group: Species = versicolor  
+## N: 50  
+## 
+##                   Petal.Length   Petal.Width   Sepal.Length   Sepal.Width
+## --------------- -------------- ------------- -------------- -------------
+##            Mean           4.26          1.33           5.94          2.77
+##         Std.Dev           0.47          0.20           0.52          0.31
+##             Min           3.00          1.00           4.90          2.00
+##          Median           4.35          1.30           5.90          2.80
+##             Max           5.10          1.80           7.00          3.40
+##         N.Valid          50.00         50.00          50.00         50.00
+##       Pct.Valid         100.00        100.00         100.00        100.00
+## 
+## Group: Species = virginica  
+## N: 50  
+## 
+##                   Petal.Length   Petal.Width   Sepal.Length   Sepal.Width
+## --------------- -------------- ------------- -------------- -------------
+##            Mean           5.55          2.03           6.59          2.97
+##         Std.Dev           0.55          0.27           0.64          0.32
+##             Min           4.50          1.40           4.90          2.20
+##          Median           5.55          2.00           6.50          3.00
+##             Max           6.90          2.50           7.90          3.80
+##         N.Valid          50.00         50.00          50.00         50.00
+##       Pct.Valid         100.00        100.00         100.00        100.00</code></pre>
+</div>
+<div id="data-frame-summaries-with-dfsummary" class="section level3">
+<h3>Data frame summaries with <code>dfSummary()</code></h3>
+<p><code>dfSummary()</code> generates a summary table with statistics, frequencies and graphs for all variables in a dataset. The information shown depend on the type of the variables (character, factor, numeric, date) and also varies according to the number of distinct values.</p>
+<pre class="r"><code>dfSummary(dat)</code></pre>
+<pre><code>## Data Frame Summary  
+## dat  
+## Dimensions: 150 x 6  
+## Duplicates: 1  
+## 
+## ----------------------------------------------------------------------------------------------------------------------
+## No   Variable        Stats / Values           Freqs (% of Valid)   Graph                            Valid    Missing  
+## ---- --------------- ------------------------ -------------------- -------------------------------- -------- ---------
+## 1    Sepal.Length    Mean (sd) : 5.8 (0.8)    35 distinct values     . . : :                        150      0        
+##      [numeric]       min &lt; med &lt; max:                                : : : :                        (100%)   (0%)     
+##                      4.3 &lt; 5.8 &lt; 7.9                                 : : : : :                                        
+##                      IQR (CV) : 1.3 (0.1)                            : : : : :                                        
+##                                                                    : : : : : : : :                                    
+## 
+## 2    Sepal.Width     Mean (sd) : 3.1 (0.4)    23 distinct values           :                        150      0        
+##      [numeric]       min &lt; med &lt; max:                                      :                        (100%)   (0%)     
+##                      2 &lt; 3 &lt; 4.4                                         . :                                          
+##                      IQR (CV) : 0.5 (0.1)                              : : : :                                        
+##                                                                    . . : : : : : :                                    
+## 
+## 3    Petal.Length    Mean (sd) : 3.8 (1.8)    43 distinct values   :                                150      0        
+##      [numeric]       min &lt; med &lt; max:                              :         . :                    (100%)   (0%)     
+##                      1 &lt; 4.3 &lt; 6.9                                 :         : : .                                    
+##                      IQR (CV) : 3.5 (0.5)                          : :       : : : .                                  
+##                                                                    : :   . : : : : : .                                
+## 
+## 4    Petal.Width     Mean (sd) : 1.2 (0.8)    22 distinct values   :                                150      0        
+##      [numeric]       min &lt; med &lt; max:                              :                                (100%)   (0%)     
+##                      0.1 &lt; 1.3 &lt; 2.5                               :       . .   :                                    
+##                      IQR (CV) : 1.5 (0.6)                          :       : :   :   .                                
+##                                                                    : :   : : : . : : :                                
+## 
+## 5    Species         1. setosa                50 (33.3%)           IIIIII                           150      0        
+##      [factor]        2. versicolor            50 (33.3%)           IIIIII                           (100%)   (0%)     
+##                      3. virginica             50 (33.3%)           IIIIII                                             
+## 
+## 6    size            1. big                   77 (51.3%)           IIIIIIIIII                       150      0        
+##      [character]     2. small                 73 (48.7%)           IIIIIIIII                        (100%)   (0%)     
+## ----------------------------------------------------------------------------------------------------------------------</code></pre>
 <p>Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article “<a href="/blog/descriptive-statistics-by-hand/">Descriptive statistics by hand</a>”.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank">raising an issue on GitHub</a>. For all other requests, you can <a href="/contact/">contact me</a>.</p>
 <p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
