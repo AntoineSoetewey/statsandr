@@ -4763,6 +4763,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#density-plot&#34;&gt;Density plot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#correlation-plot&#34;&gt;Correlation plot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#advanced-descriptive-statistics&#34;&gt;Advanced descriptive statistics&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -4902,7 +4903,7 @@ range2(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.8280661&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;var(dat$Sepal.Length) # variance&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.6856935&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Remember from this &lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;article&lt;/a&gt; that the standard deviation and the variance are different whether we compute it for a sample or a population (see the difference between the two &lt;a href=&#34;/blog/what-is-the-difference-between-population-and-sample/&#34;&gt;here&lt;/a&gt;). In R, the standard deviation and the variance are computed as if the data represent a sample (so the denominator is &lt;span class=&#34;math inline&#34;&gt;\(n - 1\)&lt;/span&gt;, where &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; is the number of observations). To my knowledge, there is no function by default in R that computes the standard deviation or variance for a population.&lt;/p&gt;
+&lt;p&gt;Remember from the article &lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;descriptive statistics by hand&lt;/a&gt; that the standard deviation and the variance are different whether we compute it for a sample or a population (see the &lt;a href=&#34;/blog/what-is-the-difference-between-population-and-sample/&#34;&gt;difference between sample and population&lt;/a&gt;). In R, the standard deviation and the variance are computed as if the data represent a sample (so the denominator is &lt;span class=&#34;math inline&#34;&gt;\(n - 1\)&lt;/span&gt;, where &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; is the number of observations). To my knowledge, there is no function by default in R that computes the standard deviation or variance for a population.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Tip:&lt;/em&gt; to compute the standard deviation (or variance) of multiple variables at the same time, use &lt;code&gt;lapply()&lt;/code&gt; with the appropriate statistics as second argument:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lapply(dat[, 1:4], sd)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Sepal.Length
@@ -5181,7 +5182,8 @@ ggqqplot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;density-plot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Density plot&lt;/h1&gt;
 &lt;p&gt;Density plot is a smoothed version of the histogram and is used in the same concept, that is, to represent the distribution of a numeric variable. The functions &lt;code&gt;plot()&lt;/code&gt; and &lt;code&gt;density()&lt;/code&gt; are used together to draw a density plot:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(density(dat$Sepal.Length))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(density(dat$Sepal.Length),
+     main = &amp;quot;Density plot of sepal length&amp;quot;) # edit title&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
@@ -5192,6 +5194,10 @@ ggqqplot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;correlation-plot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Correlation plot&lt;/h1&gt;
 &lt;p&gt;The last type of descriptive plot is a correlation plot, also called a correlogram. This type of graph is more complex than the ones presented above, so it is detailed in a separate article. See &lt;a href=&#34;/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/&#34;&gt;how to draw a correlogram to highlight the most correlated variables in a dataset&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;advanced-descriptive-statistics&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Advanced descriptive statistics&lt;/h1&gt;
+&lt;p&gt;We covered the main functions to compute the most common and basic descriptive statistics. There are, however, many more functions to perform more advanced descriptive statistics in R. In this section, I present some of them with applications to our dataset.&lt;/p&gt;
 &lt;p&gt;Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article “&lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;Descriptive statistics by hand&lt;/a&gt;”.&lt;/p&gt;
 &lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can &lt;a href=&#34;/contact/&#34;&gt;contact me&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
