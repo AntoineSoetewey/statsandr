@@ -125,7 +125,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            30 minute read
+                            31 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -200,7 +200,7 @@
 <li><a href="#data-frame-summaries-with-dfsummary">Data frame summaries with <code>dfSummary()</code></a></li>
 </ul></li>
 <li><a href="#describeby-from-the-psych-package"><code>describeBy()</code> from the <code>{psych}</code> package</a></li>
-<li><a href="#aggregate"><code>aggregate()</code></a></li>
+<li><a href="#aggregate-function"><code>aggregate()</code> function</a></li>
 </ul></li>
 </ul>
 </div>
@@ -520,11 +520,11 @@ round(prop.table(table(dat$Species, dat$size), 2), 2) # round to 2 digits with r
 <p>A mosaic plot allows to visualize a contingency table of two variables:</p>
 <pre class="r"><code>mosaicplot(table(dat$Species, dat$size),
   color = TRUE,
-  xlab = &quot;Species&quot;,
-  ylab = &quot;Size&quot;
+  xlab = &quot;Species&quot;, # label for x-axis
+  ylab = &quot;Size&quot; # label for y-axis
 )</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-31-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<p>The mosaic plot shows that, for our sample, the proportion of big and small flowers is clearly different between the three species.</p>
+<p>The mosaic plot shows that, for our sample, the proportion of big and small flowers is clearly different between the three species. In particular, the virginica species is the biggest, and the setosa species is the smallest of the three species (in terms of sepal length since the variable <code>size</code> is based on the variable <code>Sepal.Length</code>).</p>
 </div>
 </div>
 <div id="barplot" class="section level1">
@@ -702,7 +702,7 @@ freq(dat$Species)</code></pre>
 </div>
 <div id="cross-tabulations-with-ctable" class="section level3">
 <h3>Cross-tabulations with <code>ctable()</code></h3>
-<p><code>ctable()</code> produces cross-tabulations (contingency tables) for pairs of categorical variables. Using the two categorical variables in our dataset:</p>
+<p><code>ctable()</code> produces cross-tabulations (also known as contingency tables) for pairs of categorical variables. Using the two categorical variables in our dataset:</p>
 <pre class="r"><code>ctable(x = dat$Species,
        y = dat$size)</code></pre>
 <pre><code>## Cross-Tabulation, Row Proportions  
@@ -733,7 +733,7 @@ freq(dat$Species)</code></pre>
 ##    virginica          47 (31.3%)    3 ( 2.0%)    50 ( 33.3%)
 ##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
 ## ------------ ------ ------------ ------------ --------------</code></pre>
-<p>To remove proportions altogether, add the argument <code>prop = &quot;n&quot;</code>. To display only the bare minimum, add the <code>totals = FALSE</code> and <code>headings = FALSE</code> arguments:</p>
+<p>To remove proportions altogether, add the argument <code>prop = &quot;n&quot;</code>. Furthermore, to display only the bare minimum, add the <code>totals = FALSE</code> and <code>headings = FALSE</code> arguments:</p>
 <pre class="r"><code>ctable(x = dat$Species,
        y = dat$size,
        prop = &quot;n&quot;, # remove proportions
@@ -747,11 +747,11 @@ freq(dat$Species)</code></pre>
 ##   versicolor           29      21
 ##    virginica           47       3
 ## ------------ ------ ----- -------</code></pre>
-<p>This is equivalent than <code>table(dat$Species, dat$size)</code> and <code>xtabs(~ dat$Species + dat$size)</code> performed in the section about <a href="/blog/descriptive-statistics-in-r/#contingency-table">contingency tables</a>.</p>
+<p>This is equivalent than <code>table(dat$Species, dat$size)</code> and <code>xtabs(~ dat$Species + dat$size)</code> performed in the section on <a href="/blog/descriptive-statistics-in-r/#contingency-table">contingency tables</a>.</p>
 <p>To display results of the <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a>, add the <code>chisq = TRUE</code> argument:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <pre class="r"><code>ctable(x = dat$Species,
        y = dat$size,
-       chisq = TRUE, # display results of Chi-square test
+       chisq = TRUE, # display results of Chi-square test of independence
        headings = FALSE) # remove headings</code></pre>
 <pre><code>## 
 ## ------------ ------ ------------ ------------ --------------
@@ -768,12 +768,12 @@ freq(dat$Species)</code></pre>
 ## ------------- ---- ---------
 ##     86.03      2       0    
 ## ----------------------------</code></pre>
-<p>The <em>p</em>-value is close to 0 so we reject the null hypothesis of independence between the two variables. In our context, this indicates that there is a significant relationship between the species and the size.</p>
-<p>It is also possible to create a contingency table for each level of a third categorical variable thanks to the combination of the <code>stby()</code> and <code>ctable()</code> functions. There are only 2 categorical variables in our dataset, so let’s use the <code>tabacco</code> dataset which has 4 categorical variables (i.e., gender, age group, smoker, diseased). For this example, we would like to create a contingency table of the variables <code>smoker</code> and <code>diseased</code>, and for each <code>gender</code>:</p>
-<pre class="r"><code>stby(list(x = tobacco$smoker,
+<p>The <em>p</em>-value is close to 0 so we reject the null hypothesis of independence between the two variables. In our context, this indicates that species and size are dependent and that there is a significant relationship between the two variables.</p>
+<p>It is also possible to create a contingency table for each level of a third categorical variable thanks to the combination of the <code>stby()</code> and <code>ctable()</code> functions. There are only 2 categorical variables in our dataset, so let’s use the <code>tabacco</code> dataset which has 4 categorical variables (i.e., gender, age group, smoker, diseased). For this example, we would like to create a contingency table of the variables <code>smoker</code> and <code>diseased</code>, and this for each <code>gender</code>:</p>
+<pre class="r"><code>stby(list(x = tobacco$smoker, # smoker and diseased
           y = tobacco$diseased), 
-     INDICES = tobacco$gender,
-     FUN = ctable)</code></pre>
+     INDICES = tobacco$gender, # for each gender
+     FUN = ctable) # ctable for cross-tabulation</code></pre>
 <pre><code>## Cross-Tabulation, Row Proportions  
 ## smoker * diseased  
 ## Data Frame: tobacco  
@@ -799,17 +799,17 @@ freq(dat$Species)</code></pre>
 </div>
 <div id="descriptive-statistics-with-descr" class="section level3">
 <h3>Descriptive statistics with <code>descr()</code></h3>
-<p><code>descr()</code> produces descriptive (univariate) statistics with common central tendency statistics and measures of dispersion. (See the <a href="/blog/descriptive-statistics-by-hand/#location-versus-dispersion-measures">difference between a measure of central tendency and dispersion</a>.)</p>
-<p>A major advantage of this function is that it accepts single vectors as well as data frames. If a data frame is provided, all non-numerical columns are ignored so you do not have to remove them yourself.</p>
-<p><code>descr()</code> allows to display:</p>
+<p><code>descr()</code> produces descriptive (univariate) statistics with common central tendency statistics and measures of dispersion. (See the <a href="/blog/descriptive-statistics-by-hand/#location-versus-dispersion-measures">difference between a measure of central tendency and dispersion</a> if you need a reminder.)</p>
+<p>A major advantage of this function is that it accepts single vectors as well as data frames. If a data frame is provided, all non-numerical columns are ignored so you do not have to remove them yourself before running the function.</p>
+<p>The <code>descr()</code> function allows to display:</p>
 <ul>
-<li>only a selection of descriptive statistics, with the <code>stats = c(&quot;mean&quot;, &quot;sd&quot;)</code> argument for mean and standard deviation for example</li>
+<li>only a selection of descriptive statistics of your choice, with the <code>stats = c(&quot;mean&quot;, &quot;sd&quot;)</code> argument for mean and standard deviation for example</li>
 <li>the minimum, first quartile, median, third quartile and maximum with <code>stats = &quot;fivenum&quot;</code></li>
 <li>the most common descriptive statistics (mean, standard deviation, minimum, median, maximum, number and percentage of valid observations), with <code>stats = &quot;common&quot;</code>:</li>
 </ul>
 <pre class="r"><code>descr(dat,
       headings = FALSE, # remove headings
-      stats = &quot;common&quot;) # most common descriptive statistics)</code></pre>
+      stats = &quot;common&quot;) # most common descriptive statistics</code></pre>
 <pre><code>## 
 ##                   Petal.Length   Petal.Width   Sepal.Length   Sepal.Width
 ## --------------- -------------- ------------- -------------- -------------
@@ -820,11 +820,11 @@ freq(dat$Species)</code></pre>
 ##             Max           6.90          2.50           7.90          4.40
 ##         N.Valid         150.00        150.00         150.00        150.00
 ##       Pct.Valid         100.00        100.00         100.00        100.00</code></pre>
-<p>Tip: if you have a large number of variables, add the <code>transpose = TRUE</code> argument for a better display.</p>
-<p>In order to compute these descriptive statistics by group (e.g., <code>Species</code> in our dataset), use the <code>stby()</code> function:</p>
+<p><em>Tip</em>: if you have a large number of variables, add the <code>transpose = TRUE</code> argument for a better display.</p>
+<p>In order to compute these descriptive statistics by group (e.g., <code>Species</code> in our dataset), use the <code>descr()</code> function in combination with the <code>stby()</code> function:</p>
 <pre class="r"><code>stby(data = dat,
-     INDICES = dat$Species, # descr. stats by Species
-     FUN = descr,
+     INDICES = dat$Species, # by Species
+     FUN = descr, # descriptive statistics
      stats = &quot;common&quot;) # most common descr. stats</code></pre>
 <pre><code>## Descriptive Statistics  
 ## dat  
@@ -869,7 +869,7 @@ freq(dat$Species)</code></pre>
 </div>
 <div id="data-frame-summaries-with-dfsummary" class="section level3">
 <h3>Data frame summaries with <code>dfSummary()</code></h3>
-<p><code>dfSummary()</code> generates a summary table with statistics, frequencies and graphs for all variables in a dataset. The information shown depend on the type of the variables (character, factor, numeric, date) and also varies according to the number of distinct values.</p>
+<p><code>dfSummary()</code> generates a summary table with statistics, frequencies and graphs for all variables in a dataset. The information shown depends on the type of the variables (character, factor, numeric, date) and also varies according to the number of distinct values.</p>
 <pre class="r"><code>dfSummary(dat)</code></pre>
 <pre><code>## Data Frame Summary  
 ## dat  
@@ -914,7 +914,7 @@ freq(dat$Species)</code></pre>
 </div>
 <div id="describeby-from-the-psych-package" class="section level2">
 <h2><code>describeBy()</code> from the <code>{psych}</code> package</h2>
-<p>The <code>describeBy()</code> funtion from the <code>{psych}</code> package allows to report several summary statistics (i.e., number of valid cases, mean, standard deviation, median, mad: median absolute deviation (from the median), minimum, maximum, skewness and kurtosis) by a grouping variable.</p>
+<p>The <code>describeBy()</code> function from the <code>{psych}</code> package allows to report several summary statistics (i.e., number of valid cases, mean, standard deviation, median, trimmed mean, mad: median absolute deviation (from the median), minimum, maximum, range, skewness and kurtosis) by a grouping variable.</p>
 <pre class="r"><code>library(psych)
 describeBy(dat,
            dat$Species) # grouping variable</code></pre>
@@ -968,9 +968,9 @@ describeBy(dat,
 ## Species*          NaN 0.00
 ## size*              NA   NA</code></pre>
 </div>
-<div id="aggregate" class="section level2">
-<h2><code>aggregate()</code></h2>
-<p>The <code>aggregate()</code> function allows to split the data into subsets and to compute summary statistics for each. For instance, if we want to compute the mean for the variables <code>Sepal.Length</code> and <code>Sepal.Width</code> by <code>Species</code> and <code>Size</code>:</p>
+<div id="aggregate-function" class="section level2">
+<h2><code>aggregate()</code> function</h2>
+<p>The <code>aggregate()</code> function allows to split the data into subsets and then to compute summary statistics for each. For instance, if we want to compute the mean for the variables <code>Sepal.Length</code> and <code>Sepal.Width</code> by <code>Species</code> and <code>Size</code>:</p>
 <pre class="r"><code>aggregate(cbind(Sepal.Length, Sepal.Width) ~ Species + size,
           data = dat,
           mean)</code></pre>
@@ -981,7 +981,7 @@ describeBy(dat,
 ## 4     setosa small     4.989796    3.416327
 ## 5 versicolor small     5.457143    2.633333
 ## 6  virginica small     5.400000    2.600000</code></pre>
-<p>Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article “<a href="/blog/descriptive-statistics-by-hand/">Descriptive statistics by hand</a>”.</p>
+<p>Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, I invite you to read the article “<a href="/blog/descriptive-statistics-by-hand/">Descriptive statistics by hand</a>”.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank">raising an issue on GitHub</a>. For all other requests, you can <a href="/contact/">contact me</a>.</p>
 <p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
 <p><strong>Related articles:</strong></p>
@@ -993,7 +993,7 @@ describeBy(dat,
 <ol>
 <li id="fn1"><p>Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).<a href="#fnref1" class="footnote-back">↩</a></p></li>
 <li id="fn2"><p>Note that the <code>plain.ascii</code> and <code>style</code> arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.<a href="#fnref2" class="footnote-back">↩</a></p></li>
-<li id="fn3"><p>Note that it is also possible to compute odds ratio and risk ratio. See the vignette of the package for more information on this matter.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>Note that it is also possible to compute odds ratio and risk ratio. See the vignette of the package for more information on this matter as these ratios are beyond the scope of this article.<a href="#fnref3" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 

@@ -189,7 +189,7 @@ corr_cross(dat, # name of dataset
 &lt;li&gt;&lt;a href=&#34;#data-frame-summaries-with-dfsummary&#34;&gt;Data frame summaries with &lt;code&gt;dfSummary()&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#describeby-from-the-psych-package&#34;&gt;&lt;code&gt;describeBy()&lt;/code&gt; from the &lt;code&gt;{psych}&lt;/code&gt; package&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#aggregate&#34;&gt;&lt;code&gt;aggregate()&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#aggregate-function&#34;&gt;&lt;code&gt;aggregate()&lt;/code&gt; function&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
@@ -509,11 +509,11 @@ round(prop.table(table(dat$Species, dat$size), 2), 2) # round to 2 digits with r
 &lt;p&gt;A mosaic plot allows to visualize a contingency table of two variables:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mosaicplot(table(dat$Species, dat$size),
   color = TRUE,
-  xlab = &amp;quot;Species&amp;quot;,
-  ylab = &amp;quot;Size&amp;quot;
+  xlab = &amp;quot;Species&amp;quot;, # label for x-axis
+  ylab = &amp;quot;Size&amp;quot; # label for y-axis
 )&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;The mosaic plot shows that, for our sample, the proportion of big and small flowers is clearly different between the three species.&lt;/p&gt;
+&lt;p&gt;The mosaic plot shows that, for our sample, the proportion of big and small flowers is clearly different between the three species. In particular, the virginica species is the biggest, and the setosa species is the smallest of the three species (in terms of sepal length since the variable &lt;code&gt;size&lt;/code&gt; is based on the variable &lt;code&gt;Sepal.Length&lt;/code&gt;).&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;barplot&#34; class=&#34;section level1&#34;&gt;
@@ -691,7 +691,7 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;cross-tabulations-with-ctable&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Cross-tabulations with &lt;code&gt;ctable()&lt;/code&gt;&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;ctable()&lt;/code&gt; produces cross-tabulations (contingency tables) for pairs of categorical variables. Using the two categorical variables in our dataset:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ctable()&lt;/code&gt; produces cross-tabulations (also known as contingency tables) for pairs of categorical variables. Using the two categorical variables in our dataset:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ctable(x = dat$Species,
        y = dat$size)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Cross-Tabulation, Row Proportions  
@@ -722,7 +722,7 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 ##    virginica          47 (31.3%)    3 ( 2.0%)    50 ( 33.3%)
 ##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
 ## ------------ ------ ------------ ------------ --------------&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;To remove proportions altogether, add the argument &lt;code&gt;prop = &amp;quot;n&amp;quot;&lt;/code&gt;. To display only the bare minimum, add the &lt;code&gt;totals = FALSE&lt;/code&gt; and &lt;code&gt;headings = FALSE&lt;/code&gt; arguments:&lt;/p&gt;
+&lt;p&gt;To remove proportions altogether, add the argument &lt;code&gt;prop = &amp;quot;n&amp;quot;&lt;/code&gt;. Furthermore, to display only the bare minimum, add the &lt;code&gt;totals = FALSE&lt;/code&gt; and &lt;code&gt;headings = FALSE&lt;/code&gt; arguments:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ctable(x = dat$Species,
        y = dat$size,
        prop = &amp;quot;n&amp;quot;, # remove proportions
@@ -736,11 +736,11 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 ##   versicolor           29      21
 ##    virginica           47       3
 ## ------------ ------ ----- -------&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This is equivalent than &lt;code&gt;table(dat$Species, dat$size)&lt;/code&gt; and &lt;code&gt;xtabs(~ dat$Species + dat$size)&lt;/code&gt; performed in the section about &lt;a href=&#34;/blog/descriptive-statistics-in-r/#contingency-table&#34;&gt;contingency tables&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;This is equivalent than &lt;code&gt;table(dat$Species, dat$size)&lt;/code&gt; and &lt;code&gt;xtabs(~ dat$Species + dat$size)&lt;/code&gt; performed in the section on &lt;a href=&#34;/blog/descriptive-statistics-in-r/#contingency-table&#34;&gt;contingency tables&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;To display results of the &lt;a href=&#34;/blog/chi-square-test-of-independence-in-r/&#34;&gt;Chi-square test of independence&lt;/a&gt;, add the &lt;code&gt;chisq = TRUE&lt;/code&gt; argument:&lt;a href=&#34;#fn3&#34; class=&#34;footnote-ref&#34; id=&#34;fnref3&#34;&gt;&lt;sup&gt;3&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ctable(x = dat$Species,
        y = dat$size,
-       chisq = TRUE, # display results of Chi-square test
+       chisq = TRUE, # display results of Chi-square test of independence
        headings = FALSE) # remove headings&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
 ## ------------ ------ ------------ ------------ --------------
@@ -757,12 +757,12 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 ## ------------- ---- ---------
 ##     86.03      2       0    
 ## ----------------------------&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is close to 0 so we reject the null hypothesis of independence between the two variables. In our context, this indicates that there is a significant relationship between the species and the size.&lt;/p&gt;
-&lt;p&gt;It is also possible to create a contingency table for each level of a third categorical variable thanks to the combination of the &lt;code&gt;stby()&lt;/code&gt; and &lt;code&gt;ctable()&lt;/code&gt; functions. There are only 2 categorical variables in our dataset, so let’s use the &lt;code&gt;tabacco&lt;/code&gt; dataset which has 4 categorical variables (i.e., gender, age group, smoker, diseased). For this example, we would like to create a contingency table of the variables &lt;code&gt;smoker&lt;/code&gt; and &lt;code&gt;diseased&lt;/code&gt;, and for each &lt;code&gt;gender&lt;/code&gt;:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;stby(list(x = tobacco$smoker,
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is close to 0 so we reject the null hypothesis of independence between the two variables. In our context, this indicates that species and size are dependent and that there is a significant relationship between the two variables.&lt;/p&gt;
+&lt;p&gt;It is also possible to create a contingency table for each level of a third categorical variable thanks to the combination of the &lt;code&gt;stby()&lt;/code&gt; and &lt;code&gt;ctable()&lt;/code&gt; functions. There are only 2 categorical variables in our dataset, so let’s use the &lt;code&gt;tabacco&lt;/code&gt; dataset which has 4 categorical variables (i.e., gender, age group, smoker, diseased). For this example, we would like to create a contingency table of the variables &lt;code&gt;smoker&lt;/code&gt; and &lt;code&gt;diseased&lt;/code&gt;, and this for each &lt;code&gt;gender&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;stby(list(x = tobacco$smoker, # smoker and diseased
           y = tobacco$diseased), 
-     INDICES = tobacco$gender,
-     FUN = ctable)&lt;/code&gt;&lt;/pre&gt;
+     INDICES = tobacco$gender, # for each gender
+     FUN = ctable) # ctable for cross-tabulation&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Cross-Tabulation, Row Proportions  
 ## smoker * diseased  
 ## Data Frame: tobacco  
@@ -788,17 +788,17 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;descriptive-statistics-with-descr&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Descriptive statistics with &lt;code&gt;descr()&lt;/code&gt;&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;descr()&lt;/code&gt; produces descriptive (univariate) statistics with common central tendency statistics and measures of dispersion. (See the &lt;a href=&#34;/blog/descriptive-statistics-by-hand/#location-versus-dispersion-measures&#34;&gt;difference between a measure of central tendency and dispersion&lt;/a&gt;.)&lt;/p&gt;
-&lt;p&gt;A major advantage of this function is that it accepts single vectors as well as data frames. If a data frame is provided, all non-numerical columns are ignored so you do not have to remove them yourself.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;descr()&lt;/code&gt; allows to display:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;descr()&lt;/code&gt; produces descriptive (univariate) statistics with common central tendency statistics and measures of dispersion. (See the &lt;a href=&#34;/blog/descriptive-statistics-by-hand/#location-versus-dispersion-measures&#34;&gt;difference between a measure of central tendency and dispersion&lt;/a&gt; if you need a reminder.)&lt;/p&gt;
+&lt;p&gt;A major advantage of this function is that it accepts single vectors as well as data frames. If a data frame is provided, all non-numerical columns are ignored so you do not have to remove them yourself before running the function.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;descr()&lt;/code&gt; function allows to display:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;only a selection of descriptive statistics, with the &lt;code&gt;stats = c(&amp;quot;mean&amp;quot;, &amp;quot;sd&amp;quot;)&lt;/code&gt; argument for mean and standard deviation for example&lt;/li&gt;
+&lt;li&gt;only a selection of descriptive statistics of your choice, with the &lt;code&gt;stats = c(&amp;quot;mean&amp;quot;, &amp;quot;sd&amp;quot;)&lt;/code&gt; argument for mean and standard deviation for example&lt;/li&gt;
 &lt;li&gt;the minimum, first quartile, median, third quartile and maximum with &lt;code&gt;stats = &amp;quot;fivenum&amp;quot;&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;the most common descriptive statistics (mean, standard deviation, minimum, median, maximum, number and percentage of valid observations), with &lt;code&gt;stats = &amp;quot;common&amp;quot;&lt;/code&gt;:&lt;/li&gt;
 &lt;/ul&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;descr(dat,
       headings = FALSE, # remove headings
-      stats = &amp;quot;common&amp;quot;) # most common descriptive statistics)&lt;/code&gt;&lt;/pre&gt;
+      stats = &amp;quot;common&amp;quot;) # most common descriptive statistics&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
 ##                   Petal.Length   Petal.Width   Sepal.Length   Sepal.Width
 ## --------------- -------------- ------------- -------------- -------------
@@ -809,11 +809,11 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 ##             Max           6.90          2.50           7.90          4.40
 ##         N.Valid         150.00        150.00         150.00        150.00
 ##       Pct.Valid         100.00        100.00         100.00        100.00&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Tip: if you have a large number of variables, add the &lt;code&gt;transpose = TRUE&lt;/code&gt; argument for a better display.&lt;/p&gt;
-&lt;p&gt;In order to compute these descriptive statistics by group (e.g., &lt;code&gt;Species&lt;/code&gt; in our dataset), use the &lt;code&gt;stby()&lt;/code&gt; function:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Tip&lt;/em&gt;: if you have a large number of variables, add the &lt;code&gt;transpose = TRUE&lt;/code&gt; argument for a better display.&lt;/p&gt;
+&lt;p&gt;In order to compute these descriptive statistics by group (e.g., &lt;code&gt;Species&lt;/code&gt; in our dataset), use the &lt;code&gt;descr()&lt;/code&gt; function in combination with the &lt;code&gt;stby()&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;stby(data = dat,
-     INDICES = dat$Species, # descr. stats by Species
-     FUN = descr,
+     INDICES = dat$Species, # by Species
+     FUN = descr, # descriptive statistics
      stats = &amp;quot;common&amp;quot;) # most common descr. stats&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Descriptive Statistics  
 ## dat  
@@ -858,7 +858,7 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;data-frame-summaries-with-dfsummary&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Data frame summaries with &lt;code&gt;dfSummary()&lt;/code&gt;&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;dfSummary()&lt;/code&gt; generates a summary table with statistics, frequencies and graphs for all variables in a dataset. The information shown depend on the type of the variables (character, factor, numeric, date) and also varies according to the number of distinct values.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;dfSummary()&lt;/code&gt; generates a summary table with statistics, frequencies and graphs for all variables in a dataset. The information shown depends on the type of the variables (character, factor, numeric, date) and also varies according to the number of distinct values.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dfSummary(dat)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Data Frame Summary  
 ## dat  
@@ -903,7 +903,7 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;describeby-from-the-psych-package&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;&lt;code&gt;describeBy()&lt;/code&gt; from the &lt;code&gt;{psych}&lt;/code&gt; package&lt;/h2&gt;
-&lt;p&gt;The &lt;code&gt;describeBy()&lt;/code&gt; funtion from the &lt;code&gt;{psych}&lt;/code&gt; package allows to report several summary statistics (i.e., number of valid cases, mean, standard deviation, median, mad: median absolute deviation (from the median), minimum, maximum, skewness and kurtosis) by a grouping variable.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;describeBy()&lt;/code&gt; function from the &lt;code&gt;{psych}&lt;/code&gt; package allows to report several summary statistics (i.e., number of valid cases, mean, standard deviation, median, trimmed mean, mad: median absolute deviation (from the median), minimum, maximum, range, skewness and kurtosis) by a grouping variable.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(psych)
 describeBy(dat,
            dat$Species) # grouping variable&lt;/code&gt;&lt;/pre&gt;
@@ -957,9 +957,9 @@ describeBy(dat,
 ## Species*          NaN 0.00
 ## size*              NA   NA&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;div id=&#34;aggregate&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;&lt;code&gt;aggregate()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;The &lt;code&gt;aggregate()&lt;/code&gt; function allows to split the data into subsets and to compute summary statistics for each. For instance, if we want to compute the mean for the variables &lt;code&gt;Sepal.Length&lt;/code&gt; and &lt;code&gt;Sepal.Width&lt;/code&gt; by &lt;code&gt;Species&lt;/code&gt; and &lt;code&gt;Size&lt;/code&gt;:&lt;/p&gt;
+&lt;div id=&#34;aggregate-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;aggregate()&lt;/code&gt; function&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;aggregate()&lt;/code&gt; function allows to split the data into subsets and then to compute summary statistics for each. For instance, if we want to compute the mean for the variables &lt;code&gt;Sepal.Length&lt;/code&gt; and &lt;code&gt;Sepal.Width&lt;/code&gt; by &lt;code&gt;Species&lt;/code&gt; and &lt;code&gt;Size&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;aggregate(cbind(Sepal.Length, Sepal.Width) ~ Species + size,
           data = dat,
           mean)&lt;/code&gt;&lt;/pre&gt;
@@ -970,7 +970,7 @@ describeBy(dat,
 ## 4     setosa small     4.989796    3.416327
 ## 5 versicolor small     5.457143    2.633333
 ## 6  virginica small     5.400000    2.600000&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article “&lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;Descriptive statistics by hand&lt;/a&gt;”.&lt;/p&gt;
+&lt;p&gt;Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, I invite you to read the article “&lt;a href=&#34;/blog/descriptive-statistics-by-hand/&#34;&gt;Descriptive statistics by hand&lt;/a&gt;”.&lt;/p&gt;
 &lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by &lt;a href=&#34;https://github.com/AntoineSoetewey/statsandr/issues&#34; target=&#34;_blank&#34;&gt;raising an issue on GitHub&lt;/a&gt;. For all other requests, you can &lt;a href=&#34;/contact/&#34;&gt;contact me&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Get updates every time a new article is published by &lt;a href=&#34;/subscribe/&#34;&gt;subscribing to this blog&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Related articles:&lt;/strong&gt;&lt;/p&gt;
@@ -982,7 +982,7 @@ describeBy(dat,
 &lt;ol&gt;
 &lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Note that the &lt;code&gt;plain.ascii&lt;/code&gt; and &lt;code&gt;style&lt;/code&gt; arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;Note that it is also possible to compute odds ratio and risk ratio. See the vignette of the package for more information on this matter.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;Note that it is also possible to compute odds ratio and risk ratio. See the vignette of the package for more information on this matter as these ratios are beyond the scope of this article.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
 </description>
