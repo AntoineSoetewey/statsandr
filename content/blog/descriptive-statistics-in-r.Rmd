@@ -302,6 +302,20 @@ round(prop.table(table(dat$Species, dat$size), 2), 2) # round to 2 digits with r
 
 See the section on [advanced descriptive statistics](/blog/descriptive-statistics-in-r/#cross-tabulations-with-ctable) for more advanced contingency tables.
 
+## Mosaic plot
+
+A mosaic plot allows to visualize a contingency table of two variables:
+
+```{r}
+mosaicplot(table(dat$Species, dat$size),
+  color = TRUE,
+  xlab = "Species",
+  ylab = "Size"
+)
+```
+
+The mosaic plot shows that, for our sample, the proportion of big and small flowers is clearly different between the three species.
+
 # Barplot
 
 Barplots can only be done on qualitative variables (see the difference with a quantitative variable [here](/blog/variable-types-and-examples/)). A barplot is a tool to visualize the distribution of a qualitative variable. We draw a barplot on the qualitative variable `size`:
@@ -540,7 +554,7 @@ ctable(x = dat$Species,
 
 This is equivalent than `table(dat$Species, dat$size)` and `xtabs(~ dat$Species + dat$size)` performed in the section about [contingency tables](/blog/descriptive-statistics-in-r/#contingency-table).
 
-To display results of the [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/), add the `chisq = TRUE` argument:
+To display results of the [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/), add the `chisq = TRUE` argument:^[Note that it is also possible to compute odds ratio and risk ratio. See the vignette of the package for more information on this matter.]
 
 ```{r, plain.ascii = FALSE, style = "rmarkdown"}
 ctable(x = dat$Species,
@@ -596,6 +610,27 @@ stby(data = dat,
 ```{r, plain.ascii = FALSE, style = "rmarkdown", message = FALSE}
 dfSummary(dat)
 ```
+
+## `describeBy()` from the `{psych}` package
+
+The `describeBy()` funtion from the `{psych}` package allows to report several summary statistics (i.e., number of valid cases, mean, standard deviation, median, mad: median absolute deviation (from the median), minimum, maximum, skewness and kurtosis) by a grouping variable.
+
+```{r, message = FALSE, warning = FALSE}
+library(psych)
+describeBy(dat,
+           dat$Species) # grouping variable
+```
+
+## `aggregate()`
+
+The `aggregate()` function allows to split the data into subsets and to compute summary statistics for each. For instance, if we want to compute the mean for the variables `Sepal.Length` and `Sepal.Width` by `Species` and `Size`:
+
+```{r}
+aggregate(cbind(Sepal.Length, Sepal.Width) ~ Species + size,
+          data = dat,
+          mean)
+```
+
 
 Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)".
 

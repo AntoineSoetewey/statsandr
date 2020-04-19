@@ -125,7 +125,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            27 minute read
+                            30 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -179,7 +179,9 @@
 <li><a href="#summary">Summary</a></li>
 <li><a href="#coefficient-of-variation">Coefficient of variation</a></li>
 <li><a href="#mode">Mode</a></li>
-<li><a href="#contingency-table">Contingency table</a></li>
+<li><a href="#contingency-table">Contingency table</a><ul>
+<li><a href="#mosaic-plot">Mosaic plot</a></li>
+</ul></li>
 <li><a href="#barplot">Barplot</a></li>
 <li><a href="#histogram">Histogram</a></li>
 <li><a href="#boxplot">Boxplot</a></li>
@@ -197,6 +199,8 @@
 <li><a href="#descriptive-statistics-with-descr">Descriptive statistics with <code>descr()</code></a></li>
 <li><a href="#data-frame-summaries-with-dfsummary">Data frame summaries with <code>dfSummary()</code></a></li>
 </ul></li>
+<li><a href="#describeby-from-the-psych-package"><code>describeBy()</code> from the <code>{psych}</code> package</a></li>
+<li><a href="#aggregate"><code>aggregate()</code></a></li>
 </ul></li>
 </ul>
 </div>
@@ -511,15 +515,26 @@ round(prop.table(table(dat$Species, dat$size), 2), 2) # round to 2 digits with r
 ##   versicolor 0.38  0.29
 ##   virginica  0.61  0.04</code></pre>
 <p>See the section on <a href="/blog/descriptive-statistics-in-r/#cross-tabulations-with-ctable">advanced descriptive statistics</a> for more advanced contingency tables.</p>
+<div id="mosaic-plot" class="section level2">
+<h2>Mosaic plot</h2>
+<p>A mosaic plot allows to visualize a contingency table of two variables:</p>
+<pre class="r"><code>mosaicplot(table(dat$Species, dat$size),
+  color = TRUE,
+  xlab = &quot;Species&quot;,
+  ylab = &quot;Size&quot;
+)</code></pre>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-31-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The mosaic plot shows that, for our sample, the proportion of big and small flowers is clearly different between the three species.</p>
+</div>
 </div>
 <div id="barplot" class="section level1">
 <h1>Barplot</h1>
 <p>Barplots can only be done on qualitative variables (see the difference with a quantitative variable <a href="/blog/variable-types-and-examples/">here</a>). A barplot is a tool to visualize the distribution of a qualitative variable. We draw a barplot on the qualitative variable <code>size</code>:</p>
 <pre class="r"><code>barplot(table(dat$size)) # table() is mandatory</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-31-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-32-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>You can also draw a barplot of the relative frequencies instead of the frequencies by adding <code>prop.table()</code> as we did earlier:</p>
 <pre class="r"><code>barplot(prop.table(table(dat$size)))</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-32-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-33-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>library(ggplot2) # needed each time you open RStudio
 # The package ggplot2 must be installed first
@@ -527,19 +542,19 @@ round(prop.table(table(dat$Species, dat$size), 2), 2) # round to 2 digits with r
 ggplot(dat) +
   aes(x = size) +
   geom_bar()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-33-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-34-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="histogram" class="section level1">
 <h1>Histogram</h1>
 <p>A histogram gives an idea about the distribution of a quantitative variable. The idea is to break the range of values into intervals and count how many observations fall into each interval. Histograms are a bit similar to barplots, but histograms are used for quantitative variables whereas barplots are used for qualitative variables. To draw a histogram in R, use <code>hist()</code>:</p>
 <pre class="r"><code>hist(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-34-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Add the arguments <code>breaks =</code> inside the <code>hist()</code> function if you want to change the number of bins. A rule of thumb (known as Sturges’ law) is that the number of bins should be the rounded value of the square root of the number of observations. The dataset includes 150 observations so in this case the number of bins can be set to 12.</p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>ggplot(dat) +
   aes(x = Sepal.Length) +
   geom_histogram()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-36-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>By default, the number of bins is 30. You can change this value with <code>geom_histogram(bins = 12)</code> for instance.</p>
 </div>
 <div id="boxplot" class="section level1">
@@ -551,33 +566,33 @@ ggplot(dat) +
 </div>
 <p>Now an example with our dataset:</p>
 <pre class="r"><code>boxplot(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-36-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-37-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Boxplots are even more informative when presented side-by-side for comparing and contrasting distributions from two or more groups. For instance, we compare the length of the sepal across the different species:</p>
 <pre class="r"><code>boxplot(dat$Sepal.Length ~ dat$Species)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-37-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-38-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>ggplot(dat) +
   aes(x = Species, y = Sepal.Length) +
   geom_boxplot()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-38-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-39-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="scatterplot" class="section level1">
 <h1>Scatterplot</h1>
 <p>Scatterplots allow to check whether there is a potential link between two quantitative variables. For instance, when drawing a scatterplot of the length of the sepal and the length of the petal:</p>
 <pre class="r"><code>plot(dat$Sepal.Length, dat$Petal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-39-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-40-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>There seems to be a positive association between the two variables.</p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>ggplot(dat) +
   aes(x = Sepal.Length, y = Petal.Length) +
   geom_point()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-40-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-41-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As boxplots, scatterplots are even more informative when differentiating the points according to a factor, in this case the species:</p>
 <pre class="r"><code>ggplot(dat) +
   aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
   geom_point() +
   scale_color_hue()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-41-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-42-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="qq-plot" class="section level1">
 <h1>QQ-plot</h1>
@@ -588,29 +603,29 @@ ggplot(dat) +
 qqnorm(dat$Sepal.Length)
 # Draw the reference line:
 qqline(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-42-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Or a QQ-plot with confidence bands with the <code>qqPlot()</code> function from the <code>{car}</code> package:</p>
 <pre class="r"><code>library(car) # package must be installed first
 qqPlot(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 132 118</code></pre>
 <p>If points are close to the reference line (sometimes referred as Henry’s line) and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The variable <code>Sepal.Length</code> does not seem to follow a normal distribution because several points lie outside the confidence bands. When facing a non-normal distribution, the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. Applying the logarithm transformation can be done with the <code>log()</code> function.</p>
 <p>In <code>{ggpubr}</code>:</p>
 <pre class="r"><code>library(ggpubr)
 ggqqplot(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="by-groups" class="section level2">
 <h2>By groups</h2>
 <p>For some statistical tests, the normality assumption is required in all groups. One solution is to draw a QQ-plot for each group by manually splitting the dataset into different groups and then draw a QQ-plot for each subset of the data (with the methods shown above). Another (easier) solution is to draw a QQ-plot for each group automatically with the argument <code>groups =</code> in the function <code>qqPlot()</code> from the <code>{car}</code> package:</p>
 <pre class="r"><code>qqPlot(dat$Sepal.Length, groups = dat$size)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-46-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>qplot(
   sample = Sepal.Length, data = dat,
   col = size, shape = size
 )</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-46-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>It is also possible to differentiate groups by only shape or color. For this, remove one of the argument <code>col</code> or <code>shape</code> in the <code>qplot()</code> function above.</p>
 </div>
 </div>
@@ -618,12 +633,12 @@ ggqqplot(dat$Sepal.Length)</code></pre>
 <h1>Density plot</h1>
 <p>Density plot is a smoothed version of the histogram and is used in the same concept, that is, to represent the distribution of a numeric variable. The functions <code>plot()</code> and <code>density()</code> are used together to draw a density plot:</p>
 <pre class="r"><code>plot(density(dat$Sepal.Length))</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-48-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>ggplot(dat) +
   aes(x = Sepal.Length) +
   geom_density()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-48-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-49-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="correlation-plot" class="section level1">
 <h1>Correlation plot</h1>
@@ -733,7 +748,7 @@ freq(dat$Species)</code></pre>
 ##    virginica           47       3
 ## ------------ ------ ----- -------</code></pre>
 <p>This is equivalent than <code>table(dat$Species, dat$size)</code> and <code>xtabs(~ dat$Species + dat$size)</code> performed in the section about <a href="/blog/descriptive-statistics-in-r/#contingency-table">contingency tables</a>.</p>
-<p>To display results of the <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a>, add the <code>chisq = TRUE</code> argument:</p>
+<p>To display results of the <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a>, add the <code>chisq = TRUE</code> argument:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <pre class="r"><code>ctable(x = dat$Species,
        y = dat$size,
        chisq = TRUE, # display results of Chi-square test
@@ -895,6 +910,77 @@ freq(dat$Species)</code></pre>
 ## 6    size            1. big                   77 (51.3%)           IIIIIIIIII                       150      0        
 ##      [character]     2. small                 73 (48.7%)           IIIIIIIII                        (100%)   (0%)     
 ## ----------------------------------------------------------------------------------------------------------------------</code></pre>
+</div>
+</div>
+<div id="describeby-from-the-psych-package" class="section level2">
+<h2><code>describeBy()</code> from the <code>{psych}</code> package</h2>
+<p>The <code>describeBy()</code> funtion from the <code>{psych}</code> package allows to report several summary statistics (i.e., number of valid cases, mean, standard deviation, median, mad: median absolute deviation (from the median), minimum, maximum, skewness and kurtosis) by a grouping variable.</p>
+<pre class="r"><code>library(psych)
+describeBy(dat,
+           dat$Species) # grouping variable</code></pre>
+<pre><code>## 
+##  Descriptive statistics by group 
+## group: setosa
+##              vars  n mean   sd median trimmed  mad min  max range skew kurtosis
+## Sepal.Length    1 50 5.01 0.35    5.0    5.00 0.30 4.3  5.8   1.5 0.11    -0.45
+## Sepal.Width     2 50 3.43 0.38    3.4    3.42 0.37 2.3  4.4   2.1 0.04     0.60
+## Petal.Length    3 50 1.46 0.17    1.5    1.46 0.15 1.0  1.9   0.9 0.10     0.65
+## Petal.Width     4 50 0.25 0.11    0.2    0.24 0.00 0.1  0.6   0.5 1.18     1.26
+## Species*        5 50 1.00 0.00    1.0    1.00 0.00 1.0  1.0   0.0  NaN      NaN
+## size*           6 50  NaN   NA     NA     NaN   NA Inf -Inf  -Inf   NA       NA
+##                se
+## Sepal.Length 0.05
+## Sepal.Width  0.05
+## Petal.Length 0.02
+## Petal.Width  0.01
+## Species*     0.00
+## size*          NA
+## ------------------------------------------------------------ 
+## group: versicolor
+##              vars  n mean   sd median trimmed  mad min  max range  skew
+## Sepal.Length    1 50 5.94 0.52   5.90    5.94 0.52 4.9  7.0   2.1  0.10
+## Sepal.Width     2 50 2.77 0.31   2.80    2.78 0.30 2.0  3.4   1.4 -0.34
+## Petal.Length    3 50 4.26 0.47   4.35    4.29 0.52 3.0  5.1   2.1 -0.57
+## Petal.Width     4 50 1.33 0.20   1.30    1.32 0.22 1.0  1.8   0.8 -0.03
+## Species*        5 50 2.00 0.00   2.00    2.00 0.00 2.0  2.0   0.0   NaN
+## size*           6 50  NaN   NA     NA     NaN   NA Inf -Inf  -Inf    NA
+##              kurtosis   se
+## Sepal.Length    -0.69 0.07
+## Sepal.Width     -0.55 0.04
+## Petal.Length    -0.19 0.07
+## Petal.Width     -0.59 0.03
+## Species*          NaN 0.00
+## size*              NA   NA
+## ------------------------------------------------------------ 
+## group: virginica
+##              vars  n mean   sd median trimmed  mad min  max range  skew
+## Sepal.Length    1 50 6.59 0.64   6.50    6.57 0.59 4.9  7.9   3.0  0.11
+## Sepal.Width     2 50 2.97 0.32   3.00    2.96 0.30 2.2  3.8   1.6  0.34
+## Petal.Length    3 50 5.55 0.55   5.55    5.51 0.67 4.5  6.9   2.4  0.52
+## Petal.Width     4 50 2.03 0.27   2.00    2.03 0.30 1.4  2.5   1.1 -0.12
+## Species*        5 50 3.00 0.00   3.00    3.00 0.00 3.0  3.0   0.0   NaN
+## size*           6 50  NaN   NA     NA     NaN   NA Inf -Inf  -Inf    NA
+##              kurtosis   se
+## Sepal.Length    -0.20 0.09
+## Sepal.Width      0.38 0.05
+## Petal.Length    -0.37 0.08
+## Petal.Width     -0.75 0.04
+## Species*          NaN 0.00
+## size*              NA   NA</code></pre>
+</div>
+<div id="aggregate" class="section level2">
+<h2><code>aggregate()</code></h2>
+<p>The <code>aggregate()</code> function allows to split the data into subsets and to compute summary statistics for each. For instance, if we want to compute the mean for the variables <code>Sepal.Length</code> and <code>Sepal.Width</code> by <code>Species</code> and <code>Size</code>:</p>
+<pre class="r"><code>aggregate(cbind(Sepal.Length, Sepal.Width) ~ Species + size,
+          data = dat,
+          mean)</code></pre>
+<pre><code>##      Species  size Sepal.Length Sepal.Width
+## 1     setosa   big     5.800000    4.000000
+## 2 versicolor   big     6.282759    2.868966
+## 3  virginica   big     6.663830    2.997872
+## 4     setosa small     4.989796    3.416327
+## 5 versicolor small     5.457143    2.633333
+## 6  virginica small     5.400000    2.600000</code></pre>
 <p>Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, read the article “<a href="/blog/descriptive-statistics-by-hand/">Descriptive statistics by hand</a>”.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank">raising an issue on GitHub</a>. For all other requests, you can <a href="/contact/">contact me</a>.</p>
 <p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
@@ -902,12 +988,12 @@ freq(dat$Species)</code></pre>
 <script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fr%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
 </div>
 </div>
-</div>
 <div class="footnotes">
 <hr />
 <ol>
 <li id="fn1"><p>Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).<a href="#fnref1" class="footnote-back">↩</a></p></li>
 <li id="fn2"><p>Note that the <code>plain.ascii</code> and <code>style</code> arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>Note that it is also possible to compute odds ratio and risk ratio. See the vignette of the package for more information on this matter.<a href="#fnref3" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 
