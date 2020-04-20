@@ -68,28 +68,46 @@ In the remaining of the article, we first introduce the model which will be used
 
 Before diving into the real-life application, we first introduce the model that will be used.
 
-There are many epidemiological models but we will use one of the simplest, the ***SIR* model**. Tim Churches' explanation of this model and how to fit it using R is so nice, I will reproduce it here with a few minor changes.
+There are many epidemiological models but we will use one of the most common one, the ***SIR* model**. The *SIR* model can be complexified to incorporate more specificities of the virus outbreak, but in this article we keep its simplest version. Tim Churches' explanation of this model and how to fit it using R is so nice, I will reproduce it here with a few minor changes.
 
-The basic idea behind the *SIR* model (**S**usceptible - **I**nfectious - **R**ecovered) of communicable disease outbreaks is that there are three groups (also called compartments) of people:
+The basic idea behind the *SIR* model (**S**usceptible - **I**nfectious - **R**ecovered) of communicable disease outbreaks is that there are three groups (also called compartments) of individuals:
 
-* those who are healthy but susceptible to the disease: *S*
-* the infectious (and thus, infected) people: *I*
-* people who have recovered: *R*
+* *S*: those who are healthy but susceptible to the disease (i.e., at risk of being contaminated). At the start of the pandemic, *S* is the entire population since no one is immune to the virus.
+* *I*: the infectious (and thus, infected) people
+* *R*: individuals who have recovered, i.e., people that were contaminated but who have either recovered or died. They are not infectious anymore.
+
+These groups evolve over time as the virus progresses in the population:
+
+* *S* decreases when individuals are contaminated and move to the infectious group *I*
+* As people recover or die, they go from the infected group *I* to the recovered group *R*
 
 To model the dynamics of the outbreak we need three differential equations to describe the rates of change in each group, parameterised by:
 
-* $\beta$ which controls the transition between *S* and *I*
-* $\gamma$ which controls the transition between *I* and *R*
+* $\beta$, the infection rate, which controls the transition between *S* and *I*
+* $\gamma$, the removal or recovery rate, which controls the transition between *I* and *R*
 
 Formally, this gives:
 
-$$\frac{dS}{dt} = - \frac{\beta IS}{N}$$
+$$\frac{dS}{dt} = - \frac{\beta IS}{N} \text{ (Eq. 1)}$$
 
-$$\frac{dI}{dt} = \frac{\beta IS}{N} - \gamma I$$
+$$\frac{dI}{dt} = \frac{\beta IS}{N} - \gamma I \text{ (Eq. 2)}$$
 
-$$\frac{dR}{dt} = \gamma I$$
+$$\frac{dR}{dt} = \gamma I \text{ (Eq. 3)}$$
 
-And visually, we have:
+The first equation (Eq. 1) states that the number of susceptible individuals (*S*) decreases with the number of newly infected individuals, where new infected cases are the result of the infection rate ($\beta$) multiplied by the number of susceptible individuals (*S*) who had a contact with infectious individuals (*I*).
+
+The second equation (Eq. 2) states that the number of infectious individuals (*I*) increases with the newly infected individuals ($\beta I S$), minus the previously infected people who recovered (i.e., $\gamma I$ which is the removal rate $\gamma$ multiplied by the infectious individuals *I*).
+
+Finally, the last equation (Eq. 3) states that the recovered group increases by the number of individuals who were infectious and who either recovered or died ($\gamma I$).
+
+An epidemic develops as follows:
+
+1. Before the start of the disease outbreak, *S* equals the entire population as no one has anti-bodies.
+1. At the beginning of the outbrek, as soon as the first individual is infected, *S* decreases by 1 and *I* increases by 1 as well.
+1. This first infectious individual contaminates (before recovering or dying) other individuals who were susceptible.
+1. The dynamic continues, with recently contaminated individuals who in turn infect other susceptible people before they recover.
+
+Visually, we have:
 
 ![SIR model. Source: Kai Sasaki.](/blog/2020-03-31-covid-19-in-belgium_files/SIR-model-covid-19-belgium.png){width=100%}
 
@@ -272,9 +290,9 @@ We also notice a small jump between March 12 and March 13, which may potentially
 
 ## Reproduction number $R_0$
 
-Our *SIR* model looks like a good fit to the observed cumulative incidence data in Belgium, so we can now use our fitted model to calculate the basic reproduction number $R_0$, also referred as basic reproduction ratio.^[See a more detailed [note](https://web.stanford.edu/~jhj1/teachingdocs/Jones-on-R0.pdf){target="_blank"} on the reproduction number by James Holland Jones if you need a deeper understanding.]
+Our *SIR* model looks like a good fit to the observed cumulative incidence data in Belgium, so we can now use our fitted model to calculate the basic reproduction number $R_0$, also referred as basic reproduction ratio, and which is closely linked to $\beta$ and $\gamma$.^[See a more detailed [note](https://web.stanford.edu/~jhj1/teachingdocs/Jones-on-R0.pdf){target="_blank"} on the reproduction number by James Holland Jones if you need a deeper understanding.]
 
-The reproduction number gives the average number of susceptible people who are infected by each infectious person. In other words, the reproduction number refers to the number of healthy people that get infected per number of sick people. When $R_0 > 1$ the disease starts spreading in a population, but not if $R_0 < 1$. Usually, the larger the value of $R_0$, the harder it is to control the epidemic.
+The reproduction number gives the average number of susceptible people who are infected by each infectious person. In other words, the reproduction number refers to the number of healthy people that get infected per number of sick people. When $R_0 > 1$ the disease starts spreading in a population, but not if $R_0 < 1$. Usually, the larger the value of $R_0$, the harder it is to control the epidemic and the higher the probability of pandemic.
 
 Formally, we have:
 
@@ -289,7 +307,7 @@ R0 <- as.numeric(Opt_par[1] / Opt_par[2])
 R0
 ```
 
-An $R_0$ of `r round(R0, 2)` is slightly below the values calculated by others for COVID-19 and the $R_0$ for SARS and MERS, which are similar diseases also caused by coronavirus. This is mainly due to the fact that the number of confirmed cases stayed constant and equal to 1 at the beginning of the pandemic.
+An $R_0$ of `r round(R0, 2)` is below values found by others for COVID-19 and the $R_0$ for SARS and MERS, which are similar diseases also caused by coronavirus. Furthermore, in the literature, it has been estimated that the reproduction number for COVID-19 is approximately 2.7 (with $\beta$ close to 0.54 and $\gamma$ close to 0.2). Our reproduction number being lower is mainly due to the fact that the number of confirmed cases stayed constant and equal to 1 at the beginning of the pandemic.
 
 A $R_0$ of `r round(R0, 2)` means that, on average in Belgium, `r round(R0, 2)` persons are infected for each infected person.
 
@@ -388,17 +406,17 @@ max_infected * 0.2
 # cases with need for intensive care
 max_infected * 0.06
 
-# deaths with supposed 0.7% fatality rate
-max_infected * 0.007
+# deaths with supposed 4.5% fatality rate
+max_infected * 0.045
 ```
 
-Given these predictions, with the exact same settings and no intervention at all to limit the spread of the pandemic, the peak in Belgium is expected to be reached by the beginning of May. About 530,000 people would be infected by then, which translates to about 106,000 severe cases, about 32,000 persons in need of intensive care and up to 3,700 deaths (assuming a 0.7% fatality rate, as suggested by this [source](https://www.newscientist.com/article/mg24532733-700-why-is-it-so-hard-to-calculate-how-many-people-will-die-from-covid-19/){target="_blank"}).
+Given these predictions, with the exact same settings and no intervention at all to limit the spread of the pandemic, the peak in Belgium is expected to be reached by the beginning of May. About 530,000 people would be infected by then, which translates to about 106,000 severe cases, about 32,000 persons in need of intensive care (given that there are about 2000 intensive care units in Belgium, the health sector would be completely overwhelmed) and up to 24,000 deaths (assuming a 4.5% fatality rate, as suggested by this [source](https://learning-from-the-curve.github.io/epidemic-models/2020/04/13/COVID-SIR.html){target="_blank"}).
 
 At this point, we understand why such strict containment measures and regulations are taken in Belgium!
 
 Note that those predictions should be taken with a lot of caution. On the one hand, as mentioned above, they are based on rather unrealistic assumptions (for example, no public health interventions, fixed reproduction number $R_0$, etc.). More advanced projections are possible with the `{projections}` package, among others (see this [section](/blog/covid-19-in-belgium/#more-sophisticated-projections) for more information on this matter). On the other hand, we still have to be careful and strictly follow public health interventions because previous pandemics such as H1N1 and Spanish flu have shown that incredibly high numbers are not impossible!
 
-The purpose of this article was to give an illustration of how such analyses are done in R with a simple epidemiological model. Those are the numbers our simple model produces and we hope they are wrong.
+The purpose of this article was to give an illustration of how such analyses are done in R with a simple epidemiological model. Those are the numbers our simple model produces and we hope they are wrong because the cost in terms of lives would be enormous.
 
 # Additional considerations
 
@@ -451,7 +469,7 @@ This resulted in a visual comparison of the fitted and observed cumulative incid
 
 We then explained what is the reproduction number and how to compute it in R. Finally, our model was used to analyze the outbreak of the Coronavirus if there was no public health intervention at all.
 
-Under this (probably too) simplistic scenario, the peak of the COVID-19 in Belgium is expected to be reached by the end of April, 2020, with around 525,000 infected people and about 3,700 deaths. These very alarmist naïve predictions highlight the importance of restrictive public health actions taken by governments, and the urgence for citizens to follow these health actions in order to mitigate the spread of the virus in Belgium (or at least slow it enough to allow health care systems to cope with it).
+Under this (probably too) simplistic scenario, the peak of the COVID-19 in Belgium is expected to be reached by the beginning of May, 2020, with around 530,000 infected people and about 24,000 deaths. These very alarmist naïve predictions highlight the importance of restrictive public health actions taken by governments, and the urgence for citizens to follow these health actions in order to mitigate the spread of the virus in Belgium (or at least slow it enough to allow health care systems to cope with it).
 
 We concluded this article by describing five improvements that could be implemented to further analyze the disease outbreak.
 
