@@ -380,7 +380,7 @@ fitted_cumulative_incidence %&gt;%
   labs(
     y = &quot;Cumulative incidence&quot;,
     title = &quot;COVID-19 fitted vs observed cumulative incidence, Belgium&quot;,
-    subtitle = &quot;(Red = fitted incidence from SIR model, blue = observed incidence)&quot;
+    subtitle = &quot;(Red = fitted from SIR model, blue = observed)&quot;
   ) +
   theme_minimal()</code></pre>
 <p><img src="/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
@@ -393,7 +393,7 @@ fitted_cumulative_incidence %&gt;%
   labs(
     y = &quot;Cumulative incidence&quot;,
     title = &quot;COVID-19 fitted vs observed cumulative incidence, Belgium&quot;,
-    subtitle = &quot;(Red = fitted incidence from SIR model, blue = observed incidence)&quot;
+    subtitle = &quot;(Red = fitted from SIR model, blue = observed)&quot;
   ) +
   theme_minimal() +
   scale_y_log10(labels = scales::comma)</code></pre>
@@ -455,7 +455,7 @@ fitted_cumulative_incidence %&gt;%
     green = &quot;green&quot;, blue = &quot;blue&quot;
   ), labels = c(
     &quot;Susceptible&quot;,
-    &quot;Recovered&quot;, &quot;Observed incidence&quot;, &quot;Infectious&quot;
+    &quot;Recovered&quot;, &quot;Observed&quot;, &quot;Infectious&quot;
   )) +
   theme_minimal()</code></pre>
 <p><img src="/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
@@ -475,7 +475,7 @@ fitted_cumulative_incidence %&gt;%
   scale_colour_manual(
     name = &quot;&quot;,
     values = c(red = &quot;red&quot;, black = &quot;black&quot;, green = &quot;green&quot;, blue = &quot;blue&quot;),
-    labels = c(&quot;Susceptible&quot;, &quot;Observed incidence&quot;, &quot;Recovered&quot;, &quot;Infectious&quot;)
+    labels = c(&quot;Susceptible&quot;, &quot;Observed&quot;, &quot;Recovered&quot;, &quot;Infectious&quot;)
   ) +
   theme_minimal()</code></pre>
 <p><img src="/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
@@ -483,7 +483,7 @@ fitted_cumulative_incidence %&gt;%
 <h3>More summary statistics</h3>
 <p>Other interesting statistics can be computed from the fit of our model. For example:</p>
 <ul>
-<li>the date of the peak of the pandemic</li>
+<li>the peak of the pandemic</li>
 <li>the number of severe cases</li>
 <li>the number of people in need of intensive care</li>
 <li>the number of deaths</li>
@@ -533,7 +533,12 @@ max_infected * 0.045</code></pre>
 <h2>Modelling the epidemic trajectory using log-linear models</h2>
 <p>As noted above, the initial exponential phase of an outbreak, when shown in a log-linear plot (the <em>y</em>-axis on a log scale and the <em>x</em>-axis without transformation), appears (somewhat) linear. This suggests that we can model epidemic growth, and decay, using a simple log-linear model of the form:</p>
 <p><span class="math display">\[log(y)=rt+b\]</span></p>
-<p>where <em>y</em> is the incidence, <em>r</em> is the growth rate, <em>t</em> is the number of days since a specific point in time (typically the start of the outbreak), and <em>b</em> is the intercept. In this context, two log-linear models, one to the growth phase before the peak, and one to the decay phase after the peak are fitted to the epidemic (incidence cases) curve.</p>
+<p>where <em>y</em> is the incidence, <em>r</em> is the growth rate, <em>t</em> is the number of days since a specific point in time (typically the start of the outbreak), and <em>b</em> is the intercept. In this context, two log-linear models:</p>
+<ol style="list-style-type: decimal">
+<li>one to the growth phase (before the peak), and</li>
+<li>one to the decay phase (after the peak)</li>
+</ol>
+<p>are fitted to the epidemic (incidence cases) curve.</p>
 <p>The doubling and halving time estimates which you very often hear in the news can be estimated from these log-linear models. Furthermore, these log-linear models can also be used on the epidemic trajectory to estimate the reproduction number <span class="math inline">\(R_0\)</span> in the growth and decay phases of the epidemic.</p>
 <p>The <code>{incidence}</code> package in R, part of the <a href="https://www.repidemicsconsortium.org/" target="_blank">R Epidemics Consortium (RECON)</a> suite of packages for epidemic modelling and control, makes the fitting of this kind of models very convenient.</p>
 </div>

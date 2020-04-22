@@ -244,7 +244,7 @@ fitted_cumulative_incidence %&amp;gt;%
   labs(
     y = &amp;quot;Cumulative incidence&amp;quot;,
     title = &amp;quot;COVID-19 fitted vs observed cumulative incidence, Belgium&amp;quot;,
-    subtitle = &amp;quot;(Red = fitted incidence from SIR model, blue = observed incidence)&amp;quot;
+    subtitle = &amp;quot;(Red = fitted from SIR model, blue = observed)&amp;quot;
   ) +
   theme_minimal()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
@@ -257,7 +257,7 @@ fitted_cumulative_incidence %&amp;gt;%
   labs(
     y = &amp;quot;Cumulative incidence&amp;quot;,
     title = &amp;quot;COVID-19 fitted vs observed cumulative incidence, Belgium&amp;quot;,
-    subtitle = &amp;quot;(Red = fitted incidence from SIR model, blue = observed incidence)&amp;quot;
+    subtitle = &amp;quot;(Red = fitted from SIR model, blue = observed)&amp;quot;
   ) +
   theme_minimal() +
   scale_y_log10(labels = scales::comma)&lt;/code&gt;&lt;/pre&gt;
@@ -319,7 +319,7 @@ fitted_cumulative_incidence %&amp;gt;%
     green = &amp;quot;green&amp;quot;, blue = &amp;quot;blue&amp;quot;
   ), labels = c(
     &amp;quot;Susceptible&amp;quot;,
-    &amp;quot;Recovered&amp;quot;, &amp;quot;Observed incidence&amp;quot;, &amp;quot;Infectious&amp;quot;
+    &amp;quot;Recovered&amp;quot;, &amp;quot;Observed&amp;quot;, &amp;quot;Infectious&amp;quot;
   )) +
   theme_minimal()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
@@ -339,7 +339,7 @@ fitted_cumulative_incidence %&amp;gt;%
   scale_colour_manual(
     name = &amp;quot;&amp;quot;,
     values = c(red = &amp;quot;red&amp;quot;, black = &amp;quot;black&amp;quot;, green = &amp;quot;green&amp;quot;, blue = &amp;quot;blue&amp;quot;),
-    labels = c(&amp;quot;Susceptible&amp;quot;, &amp;quot;Observed incidence&amp;quot;, &amp;quot;Recovered&amp;quot;, &amp;quot;Infectious&amp;quot;)
+    labels = c(&amp;quot;Susceptible&amp;quot;, &amp;quot;Observed&amp;quot;, &amp;quot;Recovered&amp;quot;, &amp;quot;Infectious&amp;quot;)
   ) +
   theme_minimal()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-03-31-covid-19-in-belgium_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
@@ -347,7 +347,7 @@ fitted_cumulative_incidence %&amp;gt;%
 &lt;h3&gt;More summary statistics&lt;/h3&gt;
 &lt;p&gt;Other interesting statistics can be computed from the fit of our model. For example:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;the date of the peak of the pandemic&lt;/li&gt;
+&lt;li&gt;the peak of the pandemic&lt;/li&gt;
 &lt;li&gt;the number of severe cases&lt;/li&gt;
 &lt;li&gt;the number of people in need of intensive care&lt;/li&gt;
 &lt;li&gt;the number of deaths&lt;/li&gt;
@@ -397,7 +397,12 @@ max_infected * 0.045&lt;/code&gt;&lt;/pre&gt;
 &lt;h2&gt;Modelling the epidemic trajectory using log-linear models&lt;/h2&gt;
 &lt;p&gt;As noted above, the initial exponential phase of an outbreak, when shown in a log-linear plot (the &lt;em&gt;y&lt;/em&gt;-axis on a log scale and the &lt;em&gt;x&lt;/em&gt;-axis without transformation), appears (somewhat) linear. This suggests that we can model epidemic growth, and decay, using a simple log-linear model of the form:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[log(y)=rt+b\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;where &lt;em&gt;y&lt;/em&gt; is the incidence, &lt;em&gt;r&lt;/em&gt; is the growth rate, &lt;em&gt;t&lt;/em&gt; is the number of days since a specific point in time (typically the start of the outbreak), and &lt;em&gt;b&lt;/em&gt; is the intercept. In this context, two log-linear models, one to the growth phase before the peak, and one to the decay phase after the peak are fitted to the epidemic (incidence cases) curve.&lt;/p&gt;
+&lt;p&gt;where &lt;em&gt;y&lt;/em&gt; is the incidence, &lt;em&gt;r&lt;/em&gt; is the growth rate, &lt;em&gt;t&lt;/em&gt; is the number of days since a specific point in time (typically the start of the outbreak), and &lt;em&gt;b&lt;/em&gt; is the intercept. In this context, two log-linear models:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;one to the growth phase (before the peak), and&lt;/li&gt;
+&lt;li&gt;one to the decay phase (after the peak)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;are fitted to the epidemic (incidence cases) curve.&lt;/p&gt;
 &lt;p&gt;The doubling and halving time estimates which you very often hear in the news can be estimated from these log-linear models. Furthermore, these log-linear models can also be used on the epidemic trajectory to estimate the reproduction number &lt;span class=&#34;math inline&#34;&gt;\(R_0\)&lt;/span&gt; in the growth and decay phases of the epidemic.&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;{incidence}&lt;/code&gt; package in R, part of the &lt;a href=&#34;https://www.repidemicsconsortium.org/&#34; target=&#34;_blank&#34;&gt;R Epidemics Consortium (RECON)&lt;/a&gt; suite of packages for epidemic modelling and control, makes the fitting of this kind of models very convenient.&lt;/p&gt;
 &lt;/div&gt;
