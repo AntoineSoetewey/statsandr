@@ -336,6 +336,186 @@
 
 
                     </div>
+                    
+                    <div class="content">
+      
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#hypotheses">Hypotheses</a></li>
+<li><a href="#how-the-test-works">How the test works?</a></li>
+<li><a href="#example">Example</a><ul>
+<li><a href="#observed-frequencies">Observed frequencies</a></li>
+<li><a href="#expected-frequencies">Expected frequencies</a></li>
+<li><a href="#test-statistic">Test statistic</a></li>
+<li><a href="#critical-value">Critical value</a></li>
+<li><a href="#conclusion-and-interpretation">Conclusion and interpretation</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div class="figure">
+<img src="/blog/chi-square-test-of-independence-by-hand_files/chi-square-test-of-independence-by-hand.jpeg" alt="Photo by David Pennington" style="width:100.0%" />
+<p class="caption">Photo by David Pennington</p>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Chi-square tests of independence test whether two <a href="/blog/variable-types-and-examples/#qualitative">qualitative variables</a> are independent, that is, whether there exists a relationship between two categorical variables. In other words, this test is used to determine whether the values of one of the 2 qualitative variables depend on the values of the other qualitative variable.</p>
+<p>If the test shows no association between the two variables (i.e., the variables are independent), it means that knowing the value of one variable gives no information about the value of the other variable. On the contrary, if the test shows a relationship between the variables (i.e., the variables are dependent), it means that knowing the value of one variable provides information about the value of the other variable.</p>
+<p>This article focuses on how to perform a Chi-square test of independence by hand and how to interpret the results with a concrete example. To learn how to do this test in R, read the article “<a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence in R</a>”.</p>
+</div>
+<div id="hypotheses" class="section level1">
+<h1>Hypotheses</h1>
+<p>The Chi-square test of independence is a hypothesis test so it has a null (<span class="math inline">\(H_0\)</span>) and an alternative hypothesis (<span class="math inline">\(H_1\)</span>):</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span> : the variables are independent, there is <strong>no</strong> relationship between the two categorical variables. Knowing the value of one variable does not help to predict the value of the other variable</li>
+<li><span class="math inline">\(H_1\)</span> : the variables are dependent, there is a relationship between the two categorical variables. Knowing the value of one variable helps to predict the value of the other variable</li>
+</ul>
+</div>
+<div id="how-the-test-works" class="section level1">
+<h1>How the test works?</h1>
+<p>The Chi-square test of independence works by comparing the observed frequencies (so the frequencies observed in your sample) to the expected frequencies if there was no relationship between the two categorical variables (so the expected frequencies if the null hypothesis was true).</p>
+<p>If the difference between the observed frequencies and the expected frequencies is <strong>small</strong>, we cannot reject the null hypothesis of independence and thus we cannot reject the fact that the two <strong>variables are not related</strong>. On the other hand, if the difference between the observed frequencies and the expected frequencies is <strong>large</strong>, we can reject the null hypothesis of independence and thus we can conclude that the two <strong>variables are related</strong>.</p>
+<p>The threshold between a small and large difference is a value that comes from the Chi-square distribution (hence the name of the test). This value, referred as the critical value, depends on the significance level <span class="math inline">\(\alpha\)</span> (usually set equal to 5%) and on the degrees of freedom. This critical value can be found in the statistical table of the Chi-square distribution. More on this critical value and the degrees of freedom later in the article.</p>
+</div>
+<div id="example" class="section level1">
+<h1>Example</h1>
+<p>For our example, we want to determine whether there is a statistically significant association between smoking and being a professional athlete. Smoking can only be “yes” or “no” and being a professional athlete can only be “yes” or “no”. The two variables of interest are qualitative variables so we need to use a Chi-square test of independence, and the data have been collected on 28 persons.</p>
+<p>Note that we chose binary variables (binary variables = qualitative variables with two levels) for the sake of easiness, but the Chi-square test of independence can also be performed on qualitative variables with more than two levels. For instance, if the variable smoking had three levels: (i) non-smokers, (ii) moderate smokers and (iii) heavy smokers, the steps and the interpretation of the results of the test are similar than with two levels.</p>
+<div id="observed-frequencies" class="section level2">
+<h2>Observed frequencies</h2>
+<p>Our data are summarized in the contingency table below reporting the number of people in each subgroup, totals by row, by column and the grand total:</p>
+<table style="width:68%;">
+<colgroup>
+<col width="25%" />
+<col width="18%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Non-smoker</th>
+<th align="center">Smoker</th>
+<th align="center">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Athlete</strong></td>
+<td align="center">14</td>
+<td align="center">4</td>
+<td align="center">18</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Non-athlete</strong></td>
+<td align="center">0</td>
+<td align="center">10</td>
+<td align="center">10</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Total</strong></td>
+<td align="center">14</td>
+<td align="center">14</td>
+<td align="center">28</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="expected-frequencies" class="section level2">
+<h2>Expected frequencies</h2>
+<p>Remember that for the Chi-square test of independence we need to determine whether the observed counts are significantly different from the counts that we would expect if there was no association between the two variables. We have the observed counts (see the table above), so we now need to compute the expected counts in the case the variables were independent. These expected frequencies are computed for each subgroup one by one with the following formula:</p>
+<p><span class="math display">\[\text{expected frequencies} = \frac{\text{total # of obs. for the row} \cdot \text{total # of obs. for the column}}{\text{total number of observations}}\]</span></p>
+<p>where obs. correspond to observations. Given our table of observed frequencies above, below is the table of the expected frequencies computed for each subgroup:</p>
+<table style="width:94%;">
+<colgroup>
+<col width="25%" />
+<col width="29%" />
+<col width="29%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Non-smoker</th>
+<th align="center">Smoker</th>
+<th align="center">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Athlete</strong></td>
+<td align="center">(18 * 14) / 28 = 9</td>
+<td align="center">(18 * 14) / 28 = 9</td>
+<td align="center">18</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Non-athlete</strong></td>
+<td align="center">(10 * 14) / 28 = 5</td>
+<td align="center">(10 * 14) / 28 = 5</td>
+<td align="center">10</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Total</strong></td>
+<td align="center">14</td>
+<td align="center">14</td>
+<td align="center">28</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the Chi-square test of independence should only be done when the <strong>expected</strong> frequencies in all groups are equal to or greater than 5. This assumption is met for our example as the minimum number of expected frequencies is 5. If the condition is not met, the <a href="/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/">Fisher’s exact test</a> is preferred.</p>
+</div>
+<div id="test-statistic" class="section level2">
+<h2>Test statistic</h2>
+<p>We have the observed and expected frequencies. We now need to compare these frequencies to determine if they differ significantly. The difference between the observed and expected frequencies, referred as the test statistic (or t-stat) and denoted <span class="math inline">\(\chi^2\)</span>, is computed as follows:</p>
+<p><span class="math display">\[\chi^2 = \sum_{i, j} \frac{\big(O_{ij} - E_{ij}\big)^2}{E_{ij}}\]</span></p>
+<p>where <span class="math inline">\(O\)</span> represents the observed frequencies and <span class="math inline">\(E\)</span> the expected frequencies. We use the square of the differences between the observed and expected frequencies to make sure that negative differences are not compensated by positive differences. The formula looks more complex than what it really is, so let’s illustrate it with our example. We first compute the difference in each subgroup one by one according to the formula:</p>
+<ul>
+<li>in the subgroup of athlete and non-smoker: <span class="math inline">\(\frac{(14 - 9)^2}{9} = 2.78\)</span></li>
+<li>in the subgroup of non-athlete and non-smoker: <span class="math inline">\(\frac{(0 - 5)^2}{5} = 5\)</span></li>
+<li>in the subgroup of athlete and smoker: <span class="math inline">\(\frac{(4 - 9)^2}{9} = 2.78\)</span></li>
+<li>in the subgroup of non-athlete and smoker: <span class="math inline">\(\frac{(10 - 5)^2}{5} = 5\)</span></li>
+</ul>
+<p>and then we sum them all to obtain the test statistic:</p>
+<p><span class="math display">\[\chi^2 = 2.78 + 5 + 2.78 + 5 = 15.56\]</span></p>
+</div>
+<div id="critical-value" class="section level2">
+<h2>Critical value</h2>
+<p>The test statistic alone is not enough to conclude for independence or dependence between the two variables. As previously mentioned, this test statistic (which in some sense is the difference between the observed and expected frequencies) must be compared to a critical value to determine whether the difference is large or small. One cannot tell that a test statistic is large or small without putting it in perspective with the critical value.</p>
+<p>If the test statistic is above the critical value, it means that the probability of observing such a difference between the observed and expected frequencies is unlikely. On the other hand, if the test statistic is below the critical value, it means that the probability of observing such a difference is likely. If it is likely to observe this difference, we cannot reject the hypothesis that the two variables are independent, otherwise we can conclude that there exists a relationship between the variables.</p>
+<p>The critical value can be found in the statistical table of the Chi-square distribution and depends on the significance level, denoted <span class="math inline">\(\alpha\)</span>, and the degrees of freedom, denoted <span class="math inline">\(df\)</span>. The significance level is usually set equal to 5%. The degrees of freedom for a Chi-square test of independence is found as follow:</p>
+<p><span class="math display">\[df = (\text{number of rows} - 1) \cdot (\text{number of columns} - 1)\]</span></p>
+<p>In our example, the degrees of freedom is thus <span class="math inline">\(df = (2 - 1) \cdot (2 - 1) = 1\)</span> since there are two rows and two columns in the contingency table (totals do not count as a row or column).</p>
+<p>We now have all the necessary information to find the critical value in the Chi-square table (<span class="math inline">\(\alpha = 0.05\)</span> and <span class="math inline">\(df = 1\)</span>). To find the critical value we need to look at the row <span class="math inline">\(df = 1\)</span> and the column <span class="math inline">\(\chi^2_{0.050}\)</span> (since <span class="math inline">\(\alpha = 0.05\)</span>) in the picture below. The critical value is <span class="math inline">\(3.84146\)</span>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<div class="figure">
+<img src="/blog/chi-square-test-of-independence-by-hand_files/Screenshot%202020-01-28%20at%2000.56.28.png" alt="Chi-square table - Critical value for alpha = 5% and df = 1" style="width:100.0%" />
+<p class="caption">Chi-square table - Critical value for alpha = 5% and df = 1</p>
+</div>
+</div>
+<div id="conclusion-and-interpretation" class="section level2">
+<h2>Conclusion and interpretation</h2>
+<p>Now that we have the test statistic and the critical value, we can compare them to check whether the null hypothesis of independence of the variables is rejected or not. In our example,</p>
+<p><span class="math display">\[\text{test statistic} = 15.56 &gt; \text{critical value} = 3.84146\]</span></p>
+<p>Like for any statistical test, when the test statistic is larger than the critical value, we can reject the null hypothesis at the specified significance level.</p>
+<p>In our case, we can therefore reject the null hypothesis of independence between the two categorical variables at the 5% significance level.</p>
+<p><span class="math inline">\(\Rightarrow\)</span> This means that there is a significant relationship between the smoking habit and being an athlete or not. Knowing the value of one variable helps to predict the value of the other variable.</p>
+<p>Thanks for reading. I hope the article helped you to perform the Chi-square test of independence by hand and interpret its results. If you would like to learn how to do this test in R, read the article “<a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence in R</a>”.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion. If you find a mistake or bug, you can inform me by <a href="https://github.com/AntoineSoetewey/statsandr/issues" target="_blank">raising an issue on GitHub</a>. For all other requests, you can <a href="/contact/">contact me</a>.</p>
+<p>Get updates every time a new article is published by <a href="/subscribe/">subscribing to this blog</a>.</p>
+<p><strong>Related articles:</strong></p>
+<script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.statsandr.com%2Ftags%2Fstatistics%2Findex.xml&detail=-1&limit=5&showtitle=false&type=js"></script>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>For readers that prefer to check the <span class="math inline">\(p\)</span>-value in order to reject or not the null hypothesis, I also created a <a href="/blog/a-guide-on-how-to-read-statistical-tables/">Shiny app</a> to help you compute the <span class="math inline">\(p\)</span>-value given a test statistic.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
+
+      
+    </div>
 
                     
                         <div class="navigation">
