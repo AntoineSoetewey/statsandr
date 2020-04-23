@@ -16,7 +16,7 @@ This FAQ may be updated with new questions. Feel free to [contact me](/contact/)
 
 ## 1. What technology do you use to write this blog and the articles?
 
-This blog is written in R using the `{blogdown}` package and Hugo, and deployed and hosted via Netlify. The code can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr).
+This blog is written in R using the [`{blogdown}` package](https://bookdown.org/yihui/blogdown/) and Hugo, and deployed and hosted via Netlify. The code can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr).
 
 ## 2. I am new to this blog, to R or to statistics, from where can I start?
 
