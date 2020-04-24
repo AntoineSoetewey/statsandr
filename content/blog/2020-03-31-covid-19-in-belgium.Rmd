@@ -171,7 +171,11 @@ df <- coronavirus %>%
 # put the daily cumulative incidence numbers for Belgium from
 # Feb 4 to March 30 into a vector called Infected
 library(lubridate)
-Infected <- subset(df, date >= ymd("2020-02-04") & date <= ymd("2020-03-30"))$active_cum
+
+sir_start_date <- "2020-02-04"
+sir_end_date <- "2020-03-30"
+
+Infected <- subset(df, date >= ymd(sir_start_date) & date <= ymd(sir_end_date))$active_cum
 
 # Create an incrementing Day vector the same length as our
 # cases vector
@@ -232,10 +236,8 @@ Opt_par
 Remember that $\beta$ controls the transition between *S* and *I* (i.e., susceptible and infectious) and $\gamma$ controls the transition between *I* and *R* (i.e., infectious and recovered). However, those values do not mean a lot but we use them to get the fitted numbers of people in each compartment of our *SIR* model for the dates up to March 30 that were used to fit the model, and compare those fitted values with the observed (real) data.
 
 ```{r, eval = TRUE, message = FALSE}
-sir_start_date <- "2020-02-04"
-
 # time in days for predictions
-t <- 1:as.integer(ymd("2020-03-31") - ymd(sir_start_date))
+t <- 1:as.integer(ymd(sir_end_date) + 1 - ymd(sir_start_date))
 
 # get the fitted values from our SIR model
 fitted_cumulative_incidence <- data.frame(ode(
