@@ -6,10 +6,6 @@ menu: "main"
 meta_img: contribute_files/submit-article-blog-statsandr.com.jpg
 ---
 
-
-<img src="/contribute_files/submit-article-blog-statsandr.com.jpg" alt="Contribute by writing a guest post for Stats and R" width="80"/>
-
-
 Stats and R welcomes guest posts that provides unique insight into statistics and R.
 
 ## How can you contribute?
