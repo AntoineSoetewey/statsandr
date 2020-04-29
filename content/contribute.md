@@ -6,7 +6,7 @@ menu: "main"
 meta_img: contribute_files/submit-article-blog-statsandr.com.jpg
 ---
 
-![Photo by Florian Klauer](/contribute_files/submit-article-blog-statsandr.com.jpg)
+![](/contribute_files/submit-article-blog-statsandr.com.jpg)
 
 Stats and R welcomes guest posts that provides unique insight into statistics and R.
 
