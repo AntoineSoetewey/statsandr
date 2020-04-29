@@ -5,7 +5,7 @@ description: "A list of all the pages and articles found on the blog. Do not hes
 meta_img: sitemap_files/sitemap-statsandr.com.jpeg
 ---
 
-![](/sitemap_files/sitemap-statsandr.com.jpeg)
+![](/sitemap_files/sitemap-statsandr.com.jpeg){width=100%}
 
 A list of all the pages and articles found on the blog. If you cannot find what you are looking for, do not hesitate to [contact me](/contact/). For you robots out there is an [XML version](/sitemap.xml) available for digesting as well.
 
