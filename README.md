@@ -16,8 +16,3 @@ If you are new to this blog, I invite you to:
 # Status
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/8ef22d4a-c312-4c44-a02d-06db75dc8c6f/deploy-status)](https://app.netlify.com/sites/statsandr/deploys)
-
-<!-- https://buttons.github.io/ -->
-<a class="github-button" href="https://github.com/AntoineSoetewey" data-show-count="true" aria-label="Follow @AntoineSoetewey on GitHub">Follow @AntoineSoetewey</a>&nbsp;
-<a class="github-button" href="https://github.com/AntoineSoetewey/statsandr" data-icon="octicon-star" data-show-count="true" aria-label="Star AntoineSoetewey/statsandr on GitHub">Star</a>&nbsp;
-<a class="github-button" href="https://github.com/AntoineSoetewey/statsandr/fork" data-icon="octicon-repo-forked" data-show-count="true" aria-label="Fork AntoineSoetewey/statsandr on GitHub">Fork</a>
