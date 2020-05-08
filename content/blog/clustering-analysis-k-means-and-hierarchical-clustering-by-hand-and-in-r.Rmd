@@ -20,7 +20,7 @@ bibliography: bibliography.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   fig.align = "center",
-  out.width='100%'
+  out.width = "100%"
 )
 ```
 
@@ -82,11 +82,15 @@ Note that the argument `method = "euclidean"` is not mandatory because the Eucli
 
 The distance matrix resulting from the `dist()` function gives the distance between the different points. The Euclidean distance between the points $\boldsymbol{b}$ and $\boldsymbol{c}$ is `r round(distance[3], 6)`, which corresponds to what we found above via the Pythagorean formula.
 
+**Note**: If two variables do not have the same units, one may have more weight in the calculation of the Euclidean distance than the other. In that case, it is preferable to scale the data. Scaling data allows to obtain variables independent of their unit, and this can be done with the [`scale()`](/blog/data-manipulation-in-r/#scale) function.
+
 Now that the distance has been presented, let's see how to perform clustering analysis with the k-means algorithm. 
 
 # *k*-means clustering
 
-The first form of classification is the method called _*k*-means clustering_ or the mobile center algorithm. As a reminder, this method aims at partitioning $n$ observations into $k$ clusters in which each observation belongs to the cluster with the closest average, serving as a prototype of the cluster. It is presented below.
+The first form of classification is the method called _*k*-means clustering_ or the mobile center algorithm. As a reminder, this method aims at partitioning $n$ observations into $k$ clusters in which each observation belongs to the cluster with the closest average, serving as a prototype of the cluster.
+
+It is presented below via an application in R and by hand.
 
 ## Application 2: *k*-means clustering
 
@@ -129,14 +133,15 @@ Eurojobs # displays dataset
 dim(Eurojobs) # displays the number of rows and columns
 ```
 
-We now have a "clean" dataset of 26 observations and 9 variables on which we can base the classification. Note that in this case it is not necessary to standardize the data because they are all expressed in the same unit (in percentage). If this was not the case, we would have had to standardize the data via the `scale()` function (do not forget it otherwise your results may be completely different!). The so-called *k*-means clustering is done via the `kmeans()` function. We apply the classification with 2 classes and then 3 classes as examples.
+We now have a "clean" dataset of 26 observations and 9 [quantitative continuous variables](/blog/variable-types-and-examples/#continuous) on which we can base the classification. Note that in this case it is not necessary to standardize the data because they are all expressed in the same unit (in percentage). If this was not the case, we would have had to standardize the data via the `scale()` function (do not forget it otherwise your results may be completely different!).
+
+The so-called *k*-means clustering is done via the `kmeans()` function, with the argument `centers` that corresponds to the number of desired clusters. In the following we apply the classification with 2 classes and then 3 classes as examples.
 
 ### `kmeans()` with 2 groups
 
 ```{r, echo = FALSE}
 set.seed(42)
 ```
-
 
 ```{r}
 model <- kmeans(Eurojobs, centers = 2)
@@ -146,13 +151,14 @@ model <- kmeans(Eurojobs, centers = 2)
 print(model$cluster)
 ```
 
-Note that the argument `centers = 2` is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis. Calling `print(model$cluster)` or `model$cluster` is the same. This output specifies the group (i.e., 1 or 2) to which each country belongs to.
+Note that the argument `centers = 2` is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis, or based on methods explained in this [section](/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/#optimal-number-of-clusters). Calling `print(model$cluster)` or `model$cluster` is the same. This output specifies the group (i.e., 1 or 2) to which each country belongs to.
 
 The cluster for each observation can be stored directly in the dataset as a column:
 
 ```{r}
 Eurojobs_cluster <- data.frame(Eurojobs,
-                               cluster = as.factor(model$cluster))
+  cluster = as.factor(model$cluster)
+)
 head(Eurojobs_cluster)
 ```
 
@@ -181,7 +187,7 @@ The quality of the partition is `r round(BSS / TSS * 100, 2)`%. This value has n
 
 ### `nstart` for several initial centers and better stability
 
-The *k*-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command `kmeans(Eurojobs, centers = 2)` may give slightly different results every time it is run, and thus slight differences in the quality of the partitions. The `nstart` argument in the `kmeans()` function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:
+The *k*-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command `kmeans(Eurojobs, centers = 2)` may give different results every time it is run, and thus slight differences in the quality of the partitions. The `nstart` argument in the `kmeans()` function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:
 
 ```{r, echo = FALSE}
 set.seed(42)
@@ -212,6 +218,108 @@ BSS3 / TSS3 * 100
 ```
 
 It can be seen that the classification into three groups allows for a higher explained percentage and a higher quality. This will always be the case: with more classes, the partition will be finer, and the *BSS* contribution will be higher. On the other hand, the "model" will be more complex, requiring more classes. In the extreme case where *k = n* (each observation is a singleton class), we have *BSS = TSS*, but the partition has lost all interest.
+
+### Optimal number of clusters
+
+In order to find the optimal number of clusters for a *k*-means, it is recommended to choose it based on:
+
+* the context of the problem at hand, for instance if you know that there is a specific number of groups in your data (this is option is however subjective), or
+* the following four approaches:
+  1. Elbow method (which uses the within cluster sums of squares)
+  1. Average silhouette method
+  1. Gap statistic method
+  1. `NbClust()` function
+
+We show the R code for these 4 methods below, more theoritical information can be found [here](https://www.datanovia.com/en/lessons/determining-the-optimal-number-of-clusters-3-must-know-methods/){target="_blank"}.
+
+#### Elbow method
+
+The Elbow method looks at the total within-cluster sum of square (WSS) as a function of the number of clusters.
+
+```{r}
+# load required packages
+library(factoextra)
+library(NbClust)
+
+# Elbow method
+fviz_nbclust(Eurojobs, kmeans, method = "wss") +
+  geom_vline(xintercept = 4, linetype = 2) + # add line for better visualisation
+  labs(subtitle = "Elbow method") # add subtitle
+```
+
+The location of a knee in the plot is usually considered as an indicator of the appropriate number of clusters because it means that adding another cluster does not improve much better the partition. This method seems to suggest 4 clusters.
+
+The Elbow method is sometimes ambiguous and an alternative is the average silhouette method.
+
+#### Silhouette method
+
+The Silhouette method measures the quality of a clustering and determines how well each point lies within its cluster.
+
+```{r}
+# Silhouette method
+fviz_nbclust(Eurojobs, kmeans, method = "silhouette") +
+  labs(subtitle = "Silhouette method")
+```
+
+The Silhouette method suggests 2 clusters.
+
+#### Gap statistic method
+
+```{r}
+# Gap statistic
+set.seed(42)
+fviz_nbclust(Eurojobs, kmeans,
+  nstart = 25,
+  method = "gap_stat",
+  nboot = 500
+) + # reduce it for lower computation time (but less precise results)
+  labs(subtitle = "Gap statistic method")
+```
+
+The optimal number of clusters is the one that maximizes the gap statistic. This method suggests only 1 cluster (which is therefore a useless clustering).
+
+As you can see these three methods do not necessarily lead to the same result. Here, all 3 approaches suggest a different number of clusters.
+
+#### `NbClust()`
+
+A fourth alternative is to use the `NbClust()` function, which provides 30 indices for choosing the best number of clusters.
+
+```{r, warning = FALSE}
+nbclust_out <- NbClust(
+  data = Eurojobs,
+  distance = "euclidean",
+  min.nc = 2, # minimum number of clusters
+  max.nc = 5, # maximum number of clusters
+  method = "kmeans"
+) # one of: "ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid", "kmeans"
+
+# create a dataframe of the optimal number of clusters
+nbclust_plot <- data.frame(clusters = nbclust_out$Best.nc[1, ])
+# select only indices which select between 2 and 5 clusters
+nbclust_plot <- subset(nbclust_plot, clusters >= 2 & clusters <= 5)
+
+# create plot
+ggplot(nbclust_plot) +
+  aes(x = clusters) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  labs(x = "Number of clusters", y = "Frequency among all indices", title = "Optimal number of clusters") +
+  theme_minimal()
+```
+
+Based on all 30 indices, the best number of clusters is 3 clusters.
+
+### Visualizations
+
+It is also possible to plot clusters by using the `fviz_cluster()` function. Note that a principal component analysis is performed to represent the variables in a 2 dimensions plane.
+
+We visualize the data in 2 clusters, as suggested by the average silhouette method.
+
+```{r}
+library(factoextra)
+
+km_res <- kmeans(Eurojobs, centers = 2, nstart = 20)
+fviz_cluster(km_res, Eurojobs, ellipse.type = "norm")
+```
 
 Now that the *k*-means clustering has been detailed in R, see how to do the algorithm by hand in the following sections.
 
@@ -687,7 +795,7 @@ The 3 results are equal to what we found by hand (except the quality which is sl
 
 Remind that the difference with the partition by *k*-means is that for hierarchical clustering, the number of classes is **not** specified in advance. Hierarchical clustering will help to determine the optimal number of clusters.
 
-Before applying hierarchical clustering by hand and in R, let's see how it is working step by step:
+Before applying hierarchical clustering by hand and in R, let's see how it works step by step:
 
 1. It starts by putting every point in its own cluster, so each cluster is a singleton
 2. It then merges the 2 points that are closest to each other based on the distances from the distance matrix. The consequence is that there is one less cluster
