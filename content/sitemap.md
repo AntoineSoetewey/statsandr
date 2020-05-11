@@ -14,7 +14,7 @@ A list of all the pages and articles found on the blog. If you cannot find what 
 * [Tags](/tags/)
 * [About](/about/)
 * [Contact](/contact/)
-* [Subscribe to this blog](/subscribe/)
+* [Subscribe to the newsletter](/subscribe/)
 * [FAQ - Frequently asked questions](/faq/)
 * [Contribute - Guest post](/contribute/)
 * [Support this blog](/support/)
