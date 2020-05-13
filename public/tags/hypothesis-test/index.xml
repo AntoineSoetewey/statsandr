@@ -106,7 +106,8 @@ round(prop.table(table(dat$size)), 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;expected probability (the one we want to test against)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Considering (arbitrarily) that &lt;code&gt;big&lt;/code&gt; is the success, we have:&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- prop.test(
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# one-proportion test
+test &amp;lt;- prop.test(
   x = 77, # number of successes
   n = 150, # total number of trials (77 + 73)
   p = 0.5
@@ -124,14 +125,14 @@ test&lt;/code&gt;&lt;/pre&gt;
 ## sample estimates:
 ##         p 
 ## 0.5133333&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We obtain an output with, among others, the null probability (&lt;code&gt;0.5&lt;/code&gt;), the test statistic (&lt;code&gt;X-squared&lt;/code&gt;), the degrees of freedom (&lt;code&gt;df&lt;/code&gt;), the &lt;em&gt;p&lt;/em&gt;-value (&lt;code&gt;p-value = 0.8065&lt;/code&gt;) and the alternative hypothesis (&lt;code&gt;true p is not equal to 0.5&lt;/code&gt;). The &lt;em&gt;p&lt;/em&gt;-value is 0.806 so, at the 5% significance level, we do not reject the null hypothesis that the proportions of small and big flowers are the same.&lt;/p&gt;
+&lt;p&gt;We obtain an output with, among others, the null probability (&lt;code&gt;0.5&lt;/code&gt;), the test statistic (&lt;code&gt;X-squared = 0.06&lt;/code&gt;), the degrees of freedom (&lt;code&gt;df = 1&lt;/code&gt;), the &lt;em&gt;p&lt;/em&gt;-value (&lt;code&gt;p-value = 0.8065&lt;/code&gt;) and the alternative hypothesis (&lt;code&gt;true p is not equal to 0.5&lt;/code&gt;). The &lt;em&gt;p&lt;/em&gt;-value is 0.806 so, at the 5% significance level, we do not reject the null hypothesis that the proportions of small and big flowers are the same.&lt;/p&gt;
 &lt;div id=&#34;assumption-of-prop.test-and-binom.test&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Assumption of &lt;code&gt;prop.test()&lt;/code&gt; and &lt;code&gt;binom.test()&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;Note that &lt;code&gt;prop.test()&lt;/code&gt; uses a normal approximation to the binomial distribution. Therefore, one assumption of this test is that the sample size is large enough (usually, &lt;em&gt;n &amp;gt; 30&lt;/em&gt;). If the sample size is small, it is recommended to use the exact binomial test.&lt;/p&gt;
 &lt;p&gt;The exact binomial test can be performed with the &lt;code&gt;binom.test()&lt;/code&gt; function and accepts the same arguments as the &lt;code&gt;prop.test()&lt;/code&gt; function. For this example, suppose now that we have a sample of 12 big and 3 small flowers and we want to test whether the proportions are the same among both sizes:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# barplot
 barplot(c(12, 3), # observed counts
-  names.arg = c(&amp;quot;big&amp;quot;, &amp;quot;small&amp;quot;),
+  names.arg = c(&amp;quot;big&amp;quot;, &amp;quot;small&amp;quot;), # rename labels
   ylab = &amp;quot;Frequency&amp;quot;, # y-label
   xlab = &amp;quot;Size&amp;quot;
 ) # x-label
@@ -435,7 +436,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;div class=&#34;footnotes&#34;&gt;
 &lt;hr /&gt;
 &lt;ol&gt;
-&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Choosing big or small as the success event gives the same conclusion.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Choosing big or small as the success event gives the exact same conclusion.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Similarily, this argument can also be added to the &lt;code&gt;prop.test()&lt;/code&gt; function to test whether the observed proportion is larger than the expected proportion. Use &lt;code&gt;alternative = &amp;quot;less&amp;quot;&lt;/code&gt; if you want to test whether the observed proportion is smaller than the expected one.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;One assumption of this test is that &lt;span class=&#34;math inline&#34;&gt;\(n \cdot p \ge 5\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(n \cdot (1 - p) \ge 5\)&lt;/span&gt;. The assumption is met so we can use the normal approximation to the binomial distribution.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;li id=&#34;fn4&#34;&gt;&lt;p&gt;Source: &lt;a href=&#34;http://uregina.ca/~gingrich/ch10.pdf&#34; class=&#34;uri&#34;&gt;http://uregina.ca/~gingrich/ch10.pdf&lt;/a&gt;.&lt;a href=&#34;#fnref4&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;

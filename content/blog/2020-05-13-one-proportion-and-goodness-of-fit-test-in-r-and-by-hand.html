@@ -108,7 +108,8 @@ round(prop.table(table(dat$size)), 2)</code></pre>
 <li>expected probability (the one we want to test against)</li>
 </ul>
 <p>Considering (arbitrarily) that <code>big</code> is the success, we have:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
-<pre class="r"><code>test &lt;- prop.test(
+<pre class="r"><code># one-proportion test
+test &lt;- prop.test(
   x = 77, # number of successes
   n = 150, # total number of trials (77 + 73)
   p = 0.5
@@ -126,14 +127,14 @@ test</code></pre>
 ## sample estimates:
 ##         p 
 ## 0.5133333</code></pre>
-<p>We obtain an output with, among others, the null probability (<code>0.5</code>), the test statistic (<code>X-squared</code>), the degrees of freedom (<code>df</code>), the <em>p</em>-value (<code>p-value = 0.8065</code>) and the alternative hypothesis (<code>true p is not equal to 0.5</code>). The <em>p</em>-value is 0.806 so, at the 5% significance level, we do not reject the null hypothesis that the proportions of small and big flowers are the same.</p>
+<p>We obtain an output with, among others, the null probability (<code>0.5</code>), the test statistic (<code>X-squared = 0.06</code>), the degrees of freedom (<code>df = 1</code>), the <em>p</em>-value (<code>p-value = 0.8065</code>) and the alternative hypothesis (<code>true p is not equal to 0.5</code>). The <em>p</em>-value is 0.806 so, at the 5% significance level, we do not reject the null hypothesis that the proportions of small and big flowers are the same.</p>
 <div id="assumption-of-prop.test-and-binom.test" class="section level3">
 <h3>Assumption of <code>prop.test()</code> and <code>binom.test()</code></h3>
 <p>Note that <code>prop.test()</code> uses a normal approximation to the binomial distribution. Therefore, one assumption of this test is that the sample size is large enough (usually, <em>n &gt; 30</em>). If the sample size is small, it is recommended to use the exact binomial test.</p>
 <p>The exact binomial test can be performed with the <code>binom.test()</code> function and accepts the same arguments as the <code>prop.test()</code> function. For this example, suppose now that we have a sample of 12 big and 3 small flowers and we want to test whether the proportions are the same among both sizes:</p>
 <pre class="r"><code># barplot
 barplot(c(12, 3), # observed counts
-  names.arg = c(&quot;big&quot;, &quot;small&quot;),
+  names.arg = c(&quot;big&quot;, &quot;small&quot;), # rename labels
   ylab = &quot;Frequency&quot;, # y-label
   xlab = &quot;Size&quot;
 ) # x-label
@@ -437,7 +438,7 @@ test</code></pre>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Choosing big or small as the success event gives the same conclusion.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>Choosing big or small as the success event gives the exact same conclusion.<a href="#fnref1" class="footnote-back">↩</a></p></li>
 <li id="fn2"><p>Similarily, this argument can also be added to the <code>prop.test()</code> function to test whether the observed proportion is larger than the expected proportion. Use <code>alternative = &quot;less&quot;</code> if you want to test whether the observed proportion is smaller than the expected one.<a href="#fnref2" class="footnote-back">↩</a></p></li>
 <li id="fn3"><p>One assumption of this test is that <span class="math inline">\(n \cdot p \ge 5\)</span> and <span class="math inline">\(n \cdot (1 - p) \ge 5\)</span>. The assumption is met so we can use the normal approximation to the binomial distribution.<a href="#fnref3" class="footnote-back">↩</a></p></li>
 <li id="fn4"><p>Source: <a href="http://uregina.ca/~gingrich/ch10.pdf" class="uri">http://uregina.ca/~gingrich/ch10.pdf</a>.<a href="#fnref4" class="footnote-back">↩</a></p></li>
