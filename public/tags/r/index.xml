@@ -141,10 +141,10 @@ abline(
   lty = 2 # dashed line
 ) &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# test
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# exact binomial test
 test &amp;lt;- binom.test(
   x = 12, # counts of successes
-  n = 15, # total counts (10 + 5)
+  n = 15, # total counts (12 + 3)
   p = 0.5 # expected proportion
 )
 
@@ -160,11 +160,11 @@ test&lt;/code&gt;&lt;/pre&gt;
 ## sample estimates:
 ## probability of success 
 ##                    0.8&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.035 so, at the 5% significance level, we reject the null hypothesis and we conclude that the proportions of small and big flowers are significantly different. This is equivalent than concluding that the proportion of big flowers is significantly different from 0.5.&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.035 so, at the 5% significance level, we reject the null hypothesis and we conclude that the proportions of small and big flowers are significantly different. This is equivalent than concluding that the proportion of big flowers is significantly different from 0.5 (since there are only two sizes).&lt;/p&gt;
 &lt;p&gt;If you want to test that the proportion of big flowers is greater than 50%, add the &lt;code&gt;alternative = &amp;quot;greater&amp;quot;&lt;/code&gt; argument into the &lt;code&gt;binom.test()&lt;/code&gt; function:&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- binom.test(
   x = 12, # counts of successes
-  n = 15, # total counts (10 + 5)
+  n = 15, # total counts (12 + 3)
   p = 0.5, # expected proportion
   alternative = &amp;quot;greater&amp;quot; # test that prop of big flowers is &amp;gt; 0.5
 )
@@ -205,7 +205,8 @@ table(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;a vector of probabilities (of the same length of x) representing the expected proportions&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Applied to our research question (i.e., are the 3 species equally common?), we have:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- chisq.test(table(dat$Species), # observed proportions
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# goodness of fit test
+test &amp;lt;- chisq.test(table(dat$Species), # observed proportions
   p = c(1 / 3, 1 / 3, 1 / 3) # expected proportions
 )
 
@@ -215,10 +216,11 @@ test&lt;/code&gt;&lt;/pre&gt;
 ## 
 ## data:  table(dat$Species)
 ## X-squared = 0, df = 2, p-value = 1&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 1 so, at the 5% significance level, we do not reject the null hypothesis that the proportions are equal among all species. (This was quite obvious even before doing the statistical test given that there are exactly 50 flowers of each species.)&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 1 so, at the 5% significance level, we do not reject the null hypothesis that the proportions are equal among all species.&lt;/p&gt;
+&lt;p&gt;This was quite obvious even before doing the statistical test given that there are exactly 50 flowers of each species, so it was easy to see that the species are equally common. We however still did the test to show how it works in practice.&lt;/p&gt;
 &lt;div id=&#34;does-my-distribution-follow-a-given-distribution&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Does my distribution follow a given distribution?&lt;/h3&gt;
-&lt;p&gt;The goodness of fit test is also particularily useful to compare observed proportions with expected proportions based on some known distribution.&lt;/p&gt;
+&lt;p&gt;In the previous section, we chose the proportions ourselves. The goodness of fit test is also particularily useful to compare observed proportions with expected proportions that are based on some known distribution.&lt;/p&gt;
 &lt;p&gt;Remember the hypotheses of the test:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;: there is no significant difference between the observed and the expected frequencies&lt;/li&gt;
@@ -229,6 +231,9 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;h4&gt;Observed frequencies&lt;/h4&gt;
 &lt;p&gt;Here is the distribution of the number of girls per family in our sample of 100 families of 5 children:&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;And the corresponding frequency and relative frequency (remember that the relative frequency is the frequency divided by the total sample size):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# counts
+dat&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##   Girls Frequency Relative_freq
 ## 1     0         5          0.05
 ## 2     1        12          0.12
@@ -256,7 +261,7 @@ p &amp;lt;- ggplot(df, aes(x = Girls, y = Expected_freq)) +
   labs(title = &amp;quot;Binomial distribution Bi(x, 5, 0.5)&amp;quot;) +
   theme_minimal()
 p&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# expected frequencies
 df&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##   Girls Expected_relative_freq Expected_freq
@@ -292,7 +297,7 @@ ggplot() +
   xlab(&amp;quot;Number of girls per family&amp;quot;) +
   theme_minimal() +
   theme(legend.title = element_blank()) # remove legend title&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;We see that the observed and expected frequencies are quite similar, so we expect that the number of girls in families of 5 children follows a binomial distribution. However, only the goodness of fit test will confirm our belief:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# goodness of fit test
 test &amp;lt;- chisq.test(dat$Freq, # observed frequencies
@@ -340,7 +345,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\pm z_{\alpha/2} = \pm z_{0.025} = \pm 1.96\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Step 4.&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;We compare the test statistic with the rejection region and we conclude. Visually, we have:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;The test statistic lies within the rejection region (i.e., the grey shaded areas). Therefore, at the 5% significance level, we reject the null hypothesis and we conclude that the proportion of heads (and thus tails) is significantly different than 50%. In other words, still at the 5% significance level, we conclude that the coin is unfair.&lt;/p&gt;
 &lt;div id=&#34;verification-in-r&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Verification in R&lt;/h3&gt;
@@ -371,7 +376,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;h2&gt;Goodness of fit test&lt;/h2&gt;
 &lt;p&gt;We now illustrate the goodness of fit test by hand with the following example.&lt;/p&gt;
 &lt;p&gt;Suppose that we toss a dice 100 times, we note how many times it lands on each face (1 to 6) and we test whether the dice is fair. Here are the observed counts by dice face:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-14-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;## dice_face
 ##  1  2  3  4  5  6 
 ## 15 24 10 19 19 13&lt;/code&gt;&lt;/pre&gt;
@@ -410,7 +415,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\chi^2_{\alpha; k-1} = \chi^2_{0.05; 5} = 11.0705\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Step 4.&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;We compare the test statistic with the rejection region and we conclude. Visually, we have:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;The test statistic does not lie within the rejection region (i.e., the grey shaded area). Therefore, at the 5% significance level, we do not reject the null hypothesis that there is no significant difference between the observed and the expected frequencies. In other words, still at the 5% significance level, we cannot reject the hypothesis that the dice is fair.&lt;/p&gt;
 &lt;div id=&#34;verification-in-r-1&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Verification in R&lt;/h3&gt;
