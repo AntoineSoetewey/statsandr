@@ -85,9 +85,9 @@ head(dat, n = 5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# barplot
 library(ggplot2)
 ggplot(dat) +
- aes(x = size) +
- geom_bar(fill = &amp;quot;#0c4c8a&amp;quot;) +
- theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+  aes(x = size) +
+  geom_bar(fill = &amp;quot;#0c4c8a&amp;quot;) +
+  theme_minimal()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# counts by size
 table(dat$size)&lt;/code&gt;&lt;/pre&gt;
@@ -106,9 +106,11 @@ round(prop.table(table(dat$size)), 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;expected probability (the one we want to test against)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Considering (arbitrarily) that &lt;code&gt;big&lt;/code&gt; is the success, we have:&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- prop.test(x = 77, # number of successes
-          n = 150, # total number of trials (77 + 73)
-          p = 0.5) # we test for equal proportion so prob = 0.5 in each group
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- prop.test(
+  x = 77, # number of successes
+  n = 150, # total number of trials (77 + 73)
+  p = 0.5
+) # we test for equal proportion so prob = 0.5 in each group
 
 test&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
@@ -129,16 +131,21 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The exact binomial test can be performed with the &lt;code&gt;binom.test()&lt;/code&gt; function and accepts the same arguments as the &lt;code&gt;prop.test()&lt;/code&gt; function. For this example, suppose now that we have a sample of 12 big and 3 small flowers and we want to test whether the proportions are the same among both sizes:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# barplot
 barplot(c(12, 3), # observed counts
-        names.arg = c(&amp;quot;big&amp;quot;, &amp;quot;small&amp;quot;),
-        ylab = &amp;quot;Frequency&amp;quot;, # y-label
-        xlab = &amp;quot;Size&amp;quot;) # x-label
-abline(h = 15/2, # expected counts in each level
-       lty = 2) # dashed line&lt;/code&gt;&lt;/pre&gt;
+  names.arg = c(&amp;quot;big&amp;quot;, &amp;quot;small&amp;quot;),
+  ylab = &amp;quot;Frequency&amp;quot;, # y-label
+  xlab = &amp;quot;Size&amp;quot;
+) # x-label
+abline(
+  h = 15 / 2, # expected counts in each level
+  lty = 2
+) # dashed line&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# test
-test &amp;lt;- binom.test(x = 12, # counts of successes
-           n = 15, # total counts (10 + 5)
-           p = 0.5) # expected proportion
+test &amp;lt;- binom.test(
+  x = 12, # counts of successes
+  n = 15, # total counts (10 + 5)
+  p = 0.5
+) # expected proportion
 
 test&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
@@ -154,10 +161,12 @@ test&lt;/code&gt;&lt;/pre&gt;
 ##                    0.8&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.035 so, at the 5% significance level, we reject the null hypothesis and we conclude that the proportions of small and big flowers are significantly different. This is equivalent than concluding that the proportion of big flowers is significantly different from 0.5.&lt;/p&gt;
 &lt;p&gt;If you want to test that the proportion of big flowers is greater than 50%, add the &lt;code&gt;alternative = &amp;quot;greater&amp;quot;&lt;/code&gt; argument into the &lt;code&gt;binom.test()&lt;/code&gt; function:&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- binom.test(x = 12, # counts of successes
-           n = 15, # total counts (10 + 5)
-           p = 0.5, # expected proportion
-           alternative = &amp;quot;greater&amp;quot;) # test that prop of big flowers is &amp;gt; 0.5
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- binom.test(
+  x = 12, # counts of successes
+  n = 15, # total counts (10 + 5)
+  p = 0.5, # expected proportion
+  alternative = &amp;quot;greater&amp;quot;
+) # test that prop of big flowers is &amp;gt; 0.5
 
 test&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
@@ -179,9 +188,9 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Suppose now that the qualitative variable has more than two levels as it is the case for the variable &lt;code&gt;Species&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# barplot
 ggplot(dat) +
- aes(x = Species) +
- geom_bar(fill = &amp;quot;#0c4c8a&amp;quot;) +
- theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+  aes(x = Species) +
+  geom_bar(fill = &amp;quot;#0c4c8a&amp;quot;) +
+  theme_minimal()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# counts by Species
 table(dat$Species)&lt;/code&gt;&lt;/pre&gt;
@@ -196,7 +205,8 @@ table(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 &lt;/ul&gt;
 &lt;p&gt;Applied to our research question (i.e., are the 3 species equally common?), we have:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- chisq.test(table(dat$Species), # observed proportions
-                   p = c(1/3, 1/3, 1/3)) # expected proportions
+  p = c(1 / 3, 1 / 3, 1 / 3)
+) # expected proportions
 
 test&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
@@ -230,16 +240,18 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;h4&gt;Expected frequencies&lt;/h4&gt;
 &lt;p&gt;In order to compare the observed frequencies to a binomial distribution, we first need to determine the expected frequencies that would be obtained in case of a binomial distribution. The expected frequencies assuming a probability of 0.5 of having a girl (for each of the 5 children) are as follows:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# create expected frequencies for a binomial distribution
-x  &amp;lt;- 0:5
-df &amp;lt;- data.frame(Girls = factor(x),
-                 Expected_relative_freq = dbinom(x, size = 5, prob = 0.5))
+x &amp;lt;- 0:5
+df &amp;lt;- data.frame(
+  Girls = factor(x),
+  Expected_relative_freq = dbinom(x, size = 5, prob = 0.5)
+)
 df$Expected_freq &amp;lt;- df$Expected_relative_freq * 100 # *100 since there are 100 families
 
 # create barplot
 p &amp;lt;- ggplot(df, aes(x = Girls, y = Expected_freq)) +
-  geom_bar(stat = &amp;quot;identity&amp;quot;, fill = &amp;quot;#F8766D&amp;quot;) + 
+  geom_bar(stat = &amp;quot;identity&amp;quot;, fill = &amp;quot;#F8766D&amp;quot;) +
   xlab(&amp;quot;Number of girls per family&amp;quot;) +
-  ylab(&amp;quot;Expected frequency&amp;quot;) + 
+  ylab(&amp;quot;Expected frequency&amp;quot;) +
   labs(title = &amp;quot;Binomial distribution Bi(x, 5, 0.5)&amp;quot;) +
   theme_minimal()
 p&lt;/code&gt;&lt;/pre&gt;
@@ -259,16 +271,22 @@ df&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We now compare the observed frequencies to the expected frequencies to see whether the two differ significantly. If the two differ significantly, we reject the hypothesis that the number of girls per family of 5 children follows a binomial distribution. On the other hand, if the observed and expected frequencies are similar, we do not reject the hypothesis that the number of girls per family follows a binomial distribution.&lt;/p&gt;
 &lt;p&gt;Visually we have:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# create data
-data &amp;lt;- data.frame(num_girls = factor(rep(c(0:5), times = 2)),
-                  Freq = c(dat$Freq, df$Expected_freq),
-                  obs_exp = c(rep(&amp;quot;observed&amp;quot;, 6), rep(&amp;quot;expected&amp;quot;, 6)))
+data &amp;lt;- data.frame(
+  num_girls = factor(rep(c(0:5), times = 2)),
+  Freq = c(dat$Freq, df$Expected_freq),
+  obs_exp = c(rep(&amp;quot;observed&amp;quot;, 6), rep(&amp;quot;expected&amp;quot;, 6))
+)
 
 # create plot
 ggplot() +
-  geom_bar(data = data, aes(x = num_girls, y = Freq,
-                            fill = obs_exp),
-           position = &amp;quot;dodge&amp;quot;, # bar next to each other
-           stat = &amp;quot;identity&amp;quot;) +
+  geom_bar(
+    data = data, aes(
+      x = num_girls, y = Freq,
+      fill = obs_exp
+    ),
+    position = &amp;quot;dodge&amp;quot;, # bar next to each other
+    stat = &amp;quot;identity&amp;quot;
+  ) +
   ylab(&amp;quot;Frequency&amp;quot;) +
   xlab(&amp;quot;Number of girls per family&amp;quot;) +
   theme_minimal() +
@@ -277,7 +295,8 @@ ggplot() +
 &lt;p&gt;We see that the observed and expected frequencies are quite similar, so we expect that the number of girls in families of 5 children follows a binomial distribution. However, only the goodness of fit test will confirm our belief:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# goodness of fit test
 test &amp;lt;- chisq.test(dat$Freq, # observed frequencies
-                   p = df$Expected_relative_freq) # expected proportions
+  p = df$Expected_relative_freq
+) # expected proportions
 
 test&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
@@ -326,9 +345,11 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;h3&gt;Verification in R&lt;/h3&gt;
 &lt;p&gt;Just for the sake of illustration, here is the verification of the above example in R:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# one-proportion test
-test &amp;lt;- prop.test(x = 67, # number of heads
-                  n = 100, # number of trials
-                  p = 0.5) # expected probability of heads
+test &amp;lt;- prop.test(
+  x = 67, # number of heads
+  n = 100, # number of trials
+  p = 0.5
+) # expected probability of heads
 
 test&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
@@ -395,7 +416,8 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Just for the sake of illustration, here is the verification of the above example in R:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# goodness of fit test
 test &amp;lt;- chisq.test(dat$observed_freq, # observed frequencies for each dice face
-                  p = rep(1/6, 6)) # expected probabilities for each dice face
+  p = rep(1 / 6, 6)
+) # expected probabilities for each dice face
 
 test&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
