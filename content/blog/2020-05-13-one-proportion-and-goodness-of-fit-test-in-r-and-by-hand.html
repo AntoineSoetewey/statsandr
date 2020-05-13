@@ -40,7 +40,9 @@ draft: true
 <li><a href="#one-proportion-test-1">One-proportion test</a><ul>
 <li><a href="#verification-in-r">Verification in R</a></li>
 </ul></li>
-<li><a href="#goodness-of-fit-test">Goodness of fit test</a></li>
+<li><a href="#goodness-of-fit-test">Goodness of fit test</a><ul>
+<li><a href="#verification-in-r-1">Verification in R</a></li>
+</ul></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -298,7 +300,7 @@ test</code></pre>
 <p>For this example, suppose that we tossed a coin 100 times and noted that it landed on heads 67 times. Following this, we want to test whether the coin is fair, that is, the propbability of landing on heads or tails is equal to 50%.</p>
 <p>As for many hypothesis tests, we do it through 4 easy steps:</p>
 <ol style="list-style-type: decimal">
-<li>Stating the null and alternative hypotheses</li>
+<li>State the null and alternative hypotheses</li>
 <li>Compute the test-statistic (also known as t-stat)</li>
 <li>Find the rejection region</li>
 <li>Conclude by comparing the test-statistic with the rejection region</li>
@@ -312,11 +314,11 @@ test</code></pre>
 <p><strong>Step 2.</strong></p>
 <p>The test statistic is:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <p><span class="math display">\[z_{obs} = \frac{\hat{p} - p_0}{\sqrt{\frac{\hat{p}(1 - \hat{p})}{n}}} = \frac{0.67 - 0.5}{\sqrt{\frac{0.67 \cdot (1 - 0.67)}{100}}} = 3.615\]</span></p>
-<p>(See how to perform <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand/">hypothesis tests in a Shiny app</a> if you need more help.)</p>
+<p>(See how to perform <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand/">hypothesis tests in a Shiny app</a> if you need more help in computing the test statistic.)</p>
 <p><strong>Step 3.</strong></p>
 <p>The rejection region is found via the normal distribution table. Assuming a significance level <span class="math inline">\(\alpha = 0.05\)</span>, we have:</p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/Screenshot%202020-05-13%20at%2012.23.38.png" style="width:100.0%" /></p>
 <p><span class="math display">\[\pm z_{\alpha/2} = \pm z_{0.025} = \pm 1.96\]</span></p>
-<p>(See <a href="/blog/a-guide-on-how-to-read-statistical-tables/">how to read statistical tables</a> if you do not know how to find the critical value.)</p>
 <p><strong>Step 4.</strong></p>
 <p>We compare the test statistic with the rejection region and we conclude. Visually, we have:</p>
 <p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;" /></p>
@@ -360,7 +362,53 @@ test</code></pre>
 ## 4         4            19         16.67
 ## 5         5            19         16.67
 ## 6         6            13         16.67</code></pre>
-<p>We now perform the hypothesis test following the 4 easy steps mentioned <a href="">above</a>.</p>
+<p>We now perform the appropriate hypothesis test following the 4 easy steps mentioned above:</p>
+<ol style="list-style-type: decimal">
+<li>State the null and alternative hypotheses</li>
+<li>Compute the test-statistic (also known as t-stat)</li>
+<li>Find the rejection region</li>
+<li>Conclude by comparing the test-statistic with the rejection region</li>
+</ol>
+<p><strong>Step 1.</strong></p>
+<p>In our example, the null and alternative hypotheses are:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: there is no significant difference between the observed and the expected frequencies</li>
+<li><span class="math inline">\(H_1\)</span>: there is a significant difference between the observed and the expected frequencies</li>
+</ul>
+<p><strong>Step 2.</strong></p>
+<p>The test statistic is:</p>
+<p><span class="math display">\[\chi^2 = \sum_{i = 1}^k \frac{(O_i - E_i)^2}{E_i}\]</span></p>
+<p>where <span class="math inline">\(O_i\)</span> is the observed frequency, <span class="math inline">\(E_i\)</span> is the expected frequency and <span class="math inline">\(k\)</span> is the number of categories.</p>
+<p>This <span class="math inline">\(\chi^2\)</span> statistic is obtained by calculating the difference between the observed number of cases and the expected number of cases in each category. This difference is squared (to avoid negative and positive differences being compensated) and divided by the expected number of cases in that category. These values are then summed for all categories, and the total is referred to as the <span class="math inline">\(\chi^2\)</span> statistic. Large values of this statistic lead to the rejection of the null hypothesis, small values mean that the null hypothesis cannot be rejected.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<p>Given our data, we have:</p>
+<p><span class="math display">\[\chi^2 = \frac{(15 - 16.67)^2}{16.67} + \frac{(24 - 16.67)^2}{16.67} + \frac{(10 - 16.67)^2}{16.67} + \\
+\frac{(19 - 16.67)^2}{16.67} + \frac{(19 - 16.67)^2}{16.67} + \frac{(13 - 16.67)^2}{16.67}  =  7.52\]</span></p>
+<p><strong>Step 3.</strong></p>
+<p>Whether the <span class="math inline">\(\chi^2\)</span> test statistic is small or large depends on the rejection region. The rejection region is found via the <span class="math inline">\(\chi^2\)</span> distribution table. With a degrees of freedom equals to <span class="math inline">\(k - 1\)</span> (where <span class="math inline">\(k\)</span> is the number of categories) and assuming a significance level <span class="math inline">\(\alpha = 0.05\)</span>, we have:</p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/Screenshot%202020-05-13%20at%2012.20.42.png" style="width:100.0%" /></p>
+<p><span class="math display">\[\chi^2_{\alpha; k-1} = \chi^2_{0.05; 5} = 11.0705\]</span></p>
+<p><strong>Step 4.</strong></p>
+<p>We compare the test statistic with the rejection region and we conclude. Visually, we have:</p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The test statistic does not lie within the rejection region (i.e., the grey shaded area). Therefore, at the 5% significance level, we do not reject the null hypothesis that there is no significant difference between the observed and the expected frequencies. In other words, still at the 5% significance level, we cannot reject the hypothesis that the dice is fair.</p>
+<div id="verification-in-r-1" class="section level4">
+<h4>Verification in R</h4>
+<p>Just for the sake of illustration, here is the verification of the above example in R:</p>
+<pre class="r"><code># goodness of fit test
+test &lt;- chisq.test(dat$observed_freq, # observed frequencies for each dice face
+                  p = rep(1/6, 6)) # expected probabilities for each dice face
+
+test</code></pre>
+<pre><code>## 
+##  Chi-squared test for given probabilities
+## 
+## data:  dat$observed_freq
+## X-squared = 7.52, df = 5, p-value = 0.1847</code></pre>
+<p>The test statistic and degrees of freedom are exactly the same than the ones found by hand. The <em>p</em>-value is 0.185 which, still at the 5% significance level, leads to the same conclusion than by hand (i.e., fail to reject the null hypothesis).</p>
+<p>Thanks for reading. I hope this article helped you understand and perform the one-proportion and goodgness of fit test in R and by hand.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+<p>Get updates every time a new article is published by subscribing to this blog.</p>
+</div>
 </div>
 </div>
 </div>
@@ -370,5 +418,6 @@ test</code></pre>
 <li id="fn1"><p>Choosing big or small as the success event gives the same conclusion.<a href="#fnref1" class="footnote-back">↩</a></p></li>
 <li id="fn2"><p>Similarily, this argument can also be added to the <code>prop.test()</code> function to test whether the observed proportion is larger than the expected proportion. Use <code>alternative = &quot;less&quot;</code> if you want to test whether the observed proportion is smaller than the expected one.<a href="#fnref2" class="footnote-back">↩</a></p></li>
 <li id="fn3"><p>One assumption of this test is that <span class="math inline">\(n \cdot p \ge 5\)</span> and <span class="math inline">\(n \cdot (1 - p) \ge 5\)</span>. The assumption is met so we can use the normal approximation to the binomial distribution.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn4"><p>Source: <a href="http://uregina.ca/~gingrich/ch10.pdf" class="uri">http://uregina.ca/~gingrich/ch10.pdf</a>.<a href="#fnref4" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
