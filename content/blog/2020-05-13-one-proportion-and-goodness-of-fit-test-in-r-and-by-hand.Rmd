@@ -1,0 +1,262 @@
+---
+title: One-proportion and goodness of fit test (in R and by hand)
+author: Antoine Soetewey
+date: '2020-05-13'
+slug: one-proportion-and-goodness-of-fit-test-in-r-and-by-hand
+categories: []
+tags:
+  - Basics
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/One-proportion and goodness of fit test in R and by hand.jpeg
+description: Best R resources about Coronavirus (COVID-19). These resources are Shiny app, R packages or code that you can use freely to analyse the Coronavirus outbreak.
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+draft: true
+# bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width='100%'
+)
+```
+
+![](/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/One-proportion and goodness of fit test in R and by hand.jpeg){width=100%}
+
+# Introduction
+
+In a previous article, I presented the [Chi-square test of independence in R](/blog/chi-square-test-of-independence-in-r/) which is used to test the independence between two [categorical](/blog/variable-types-and-examples/#qualitative) variables. In this article, I show how to perform, first in R and then by hand, the:
+
+1. one-proportion test (also sometimes referred as binomial test on one proportion)
+1. Chi-square goodness of fit test
+
+The first test is used to compare an observed proportion to an expected proportion, when the qualitative variable has only **two categories**. The second test is used to compare multiple observed proportions to multiple expected proportions, in a situation where the qualitative variable has **two or more categories**.
+
+Both tests allow to test the equality of proportions between the levels of the qualitative variable or to test the equality with given proportions. These given proportions could be determined arbitrarily or based on the theoretical probabilities of a known distribution.
+
+# In R
+
+## Data
+
+For this section, we use the same dataset than in the article on [descriptive statistics](/blog/descriptive-statistics-in-r/). It is the well-known `iris` dataset, to which we add the variable `size`. The variable `size` corresponds to `small` if the length of the petal is smaller than the median of all flowers, `big` otherwise:
+
+```{r}
+# load iris dataset
+dat <- iris
+
+# create size variable
+dat$size <- ifelse(dat$Sepal.Length < median(dat$Sepal.Length),
+  "small", "big"
+)
+
+# show first 5 observations
+head(dat, n = 5)
+```
+
+## One-proportion test
+
+For this example, we have a sample of 150 flowers and we want to test whether the proportion of small flowers is the same than the proportion of big flowers (measured by the variable `size`). Here are the number of flowers by size, and the corresponding proportions:
+
+```{r}
+# barplot
+library(ggplot2)
+ggplot(dat) +
+ aes(x = size) +
+ geom_bar(fill = "#0c4c8a") +
+ theme_minimal()
+
+# counts by size
+table(dat$size)
+
+# proportions by size, rounded to 2 decimals
+round(prop.table(table(dat$size)), 2)
+```
+
+Among the 150 flowers forming our sample, 51% and 49% are big and small, respectively. To test whether the proportions are the same among both sizes, we use the `prop.test()` function which accepts the following arguments:
+
+* number of successes
+* number of observations/trials
+* expected probability (the one we want to test against)
+
+Considering (arbitrarily) that `big` is the success, we have:^[Choosing big or small as the success event gives the same conclusion.]
+
+```{r}
+test <- prop.test(x = 77, # number of successes
+          n = 150, # total number of trials (77 + 73)
+          p = 0.5) # we test for equal proportion so prob = 0.5 in each group
+
+test
+```
+
+We obtain an output with, among others, the null probability (`0.5`), the test statistic (`X-squared`), the degrees of freedom (`df`), the *p*-value (`p-value = 0.8065`) and the alternative hypothesis (`true p is not equal to 0.5`). The *p*-value is `r round(test$p.value, 3)` so, at the 5% significance level, we do not reject the null hypothesis that the proportions of small and big flowers are the same.
+
+### Assumption of `prop.test()` and `binom.test()`
+
+Note that `prop.test()` uses a normal approximation to the binomial distribution. Therefore, one assumption of this test is that the sample size is large enough (usually, *n > 30*). If the sample size is small, it is recommended to use the exact binomial test.
+
+The exact binomial test can be performed with the `binom.test()` function and accepts the same arguments as the `prop.test()` function. For this example, suppose now that we have a sample of 12 big and 3 small flowers and we want to test whether the proportions are the same among both sizes:
+
+```{r}
+# barplot
+barplot(c(12, 3), # observed counts
+        names.arg = c("big", "small"),
+        ylab = "Frequency", # y-label
+        xlab = "Size") # x-label
+abline(h = 15/2, # expected counts in each level
+       lty = 2) # dashed line
+
+# test
+test <- binom.test(x = 12, # counts of successes
+           n = 15, # total counts (10 + 5)
+           p = 0.5) # expected proportion
+
+test
+```
+
+The *p*-value is `r round(test$p.value, 3)` so, at the 5% significance level, we reject the null hypothesis and we conclude that the proportions of small and big flowers are significantly different. This is equivalent than concluding that the proportion of big flowers is significantly different from 0.5.
+
+If you want to test that the proportion of big flowers is greater than 50%, add the `alternative = "greater"` argument into the `binom.test()` function:^[Similarily, this argument can also be added to the `prop.test()` function to test whether the observed proportion is larger than the expected proportion. Use `alternative = "less"` if you want to test whether the observed proportion is smaller than the expected one.]
+
+```{r}
+test <- binom.test(x = 12, # counts of successes
+           n = 15, # total counts (10 + 5)
+           p = 0.5, # expected proportion
+           alternative = "greater") # test that prop of big flowers is > 0.5
+
+test
+```
+
+The *p*-value is `r round(test$p.value, 3)` so, at the 5% significance level, we reject the null hypothesis and we conclude that the proportion of big flowers is significantly larger than 50%.
+
+## Chi-square goodness of fit test
+
+Suppose now that the qualitative variable has more than two levels as it is the case for the variable `Species`:
+
+```{r}
+# barplot
+ggplot(dat) +
+ aes(x = Species) +
+ geom_bar(fill = "#0c4c8a") +
+ theme_minimal()
+
+# counts by Species
+table(dat$Species)
+```
+
+The variable `Species` has 3 levels, with 50 observations in each level. Suppose for this example that we want to test whether the 3 species are equally common. If they were equally common, they would be equally distributed and the expected proportions would be $\frac{1}{3}$ for each of the species.
+
+This test can be done with the `chisq.test()` function, accepting the following arguments:
+
+* a numeric vector representing the observed proportions
+* a vector of probabilities (of the same length of x) representing the expected proportions
+
+Applied to our research question (i.e., are the 3 species equally common?), we have:
+
+```{r}
+test <- chisq.test(table(dat$Species), # observed proportions
+                   p = c(1/3, 1/3, 1/3)) # expected proportions
+
+test
+```
+
+The *p*-value is `r round(test$p.value, 3)` so, at the 5% significance level, we do not reject the null hypothesis that the proportions are equal among all species. (This was quite obvious even before doing the statistical test given that there are 50 flowers of each species.)
+
+### Does my distribution follow a given distribution?
+
+The goodness of fit test is also particularily useful to compare observed proportions with expected proportions based on some known distribution.
+
+For this example, suppose that we measured the number of girls in 100 families of 5 children. We want to test whether the (observed) distribution of number girls follows a binomial distribution.
+
+#### Observed frequencies
+
+Here is the distribution of the number of girls per family in our sample of 100 families of 5 children:
+
+```{r, echo = FALSE}
+set.seed(42)
+n <- 100
+size <- 5
+p <- 0.5
+num_girls <- rbinom(n = n,
+       size = size,
+       p = p)
+
+dat <- data.frame(table(num_girls))
+dat$Relative_freq <- dat$Freq / n
+colnames(dat) <- c("Girls", "Frequency", "Relative_freq")
+
+# barplot
+ggplot(dat) +
+ aes(x = Girls, weight = Frequency) +
+ geom_bar(fill = "#00BFC4") +
+ theme_minimal() +
+  xlab("Number of girls per family") +
+  ylab("Observed frequency")
+
+# counts
+dat
+```
+
+#### Expected frequencies
+
+In order to compare the observed frequencies to a binomial distribution, we first need to determine the expected frequencies that would be obtained in case of a binomial distribution. The expected frequencies assuming a probability of 0.5 of having a girl (for each of the 5 children) are as follows:
+
+```{r}
+# create expected frequencies for a binomial distribution
+x  <- 0:5
+df <- data.frame(Girls = factor(x),
+                 Expected_relative_freq = dbinom(x, size = 5, prob = 0.5))
+df$Expected_freq <- df$Expected_relative_freq * 100 # *100 since there are 100 families
+
+# create barplot
+p <- ggplot(df, aes(x = Girls, y = Expected_freq)) +
+  geom_bar(stat = "identity", fill = "#F8766D") + 
+  xlab("Number of girls per family") +
+  ylab("Expected frequency") + 
+  labs(title = "Binomial distribution Bi(x, 5, 0.5)") +
+  theme_minimal()
+p
+
+# expected frequencies
+df
+```
+
+#### Observed vs. expected relative frequencies
+
+We now compare the observed frequencies to the expected frequencies to see whether the two differ significantly. If the two differ significantly, we reject the hypothesis that the number of girls per family of 5 children follows a binomial distribution. On the other hand, if the observed and expected frequencies are similar, we do not reject the hypothesis that the number of girls per family follows a binomial distribution.
+
+Visually we have:
+
+```{r}
+# create data
+data <- data.frame(num_girls = factor(rep(c(0:5), times = 2)),
+                  Freq = c(dat$Freq, df$Expected_freq),
+                  obs_exp = c(rep("observed", 6), rep("expected", 6)))
+
+# create plot
+ggplot() +
+  geom_bar(data = data, aes(x = num_girls, y = Freq,
+                            fill = obs_exp),
+           position = "dodge", # bar next to each other
+           stat = "identity") +
+  ylab("Frequency") +
+  xlab("Number of girls per family") +
+  theme_minimal() +
+  theme(legend.title = element_blank()) # remove legend title
+```
+
+We see that the observed and expected frequencies are quite similar, so we expect that the number of girls in families of 5 children follows a binomial distribution. However, the goodness of fit test will confirm or infirm this belief:
+
+```{r}
+test <- chisq.test(dat$Freq, # observed frequencies
+                   p = df$Expected_relative_freq) # expected proportions
+
+library(pander)
+pander(test)
+```
+

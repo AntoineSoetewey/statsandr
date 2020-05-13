@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title> One-proportion and goodness of fit test (in R and by hand) - Stats and R </title>
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="Best R resources about Coronavirus (COVID-19). These resources are Shiny app, R packages or code that you can use freely to analyse the Coronavirus outbreak." />
+    <meta property="og:site_name" content="Stats and R" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="/blog/one-proportion-and-goodness-of-fit-test-in-r-and-by-hand/" />
+    <meta property="og:title" content="One-proportion and goodness of fit test (in R and by hand)" />
+    <meta property="og:image" content="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/One-proportion and goodness of fit test in R and by hand.jpeg" />
+    <meta property="og:description" content="Best R resources about Coronavirus (COVID-19). These resources are Shiny app, R packages or code that you can use freely to analyse the Coronavirus outbreak." />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:site" content="@statsandr">
+    <meta name="twitter:creator" content="@statsandr">
+    
+    <meta name="twitter:title" content="One-proportion and goodness of fit test (in R and by hand)" />
+    <meta name="twitter:description" content="Best R resources about Coronavirus (COVID-19). These resources are Shiny app, R packages or code that you can use freely to analyse the Coronavirus outbreak." />
+    <meta name="twitter:image" content="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/One-proportion and goodness of fit test in R and by hand.jpeg" />
+
+    <link rel="canonical" href="/blog/one-proportion-and-goodness-of-fit-test-in-r-and-by-hand/">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="/css/custom.css" />
+
+    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/tomorrow.min.css" integrity="sha256-0QU8ry64q+N6YBIEF/6XF6vUeF15gbNO4tLS6ikk0FI=" crossorigin="anonymous" />
+    
+
+    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/progressively/1.2.5/progressively.min.css" integrity="sha256-xbqLYBMsjpuCihs+3Fgp/MFMtPdo2SWKoOjEWOqR4X0=" crossorigin="anonymous" />
+    
+
+    <link rel="shortcut icon"
+        href="/image/favicon.png">
+
+    
+        <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Stats and R" />
+    
+</head>
+
+<body>
+    
+    <div class="my-4 my-md-5 header">
+    <div class="container">
+        <div class="row">
+            <div class="col-auto offset-md-1 d-none d-md-block">
+                
+                    <a href="/">
+                        <img class="ml-md-4 logo img-fluid d-block rounded-circle" src="/image/avatar.png" alt="logo">
+                    </a>
+                
+            </div>
+            <div class="col-auto align-self-center mr-auto">
+                <a href="/">
+                    <h1 class="name">Stats and R</h1>
+                </a>
+
+                <ul class="nav nav-primary">
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-blog" href="/blog/">
+                                
+                                Blog
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-tags" href="/tags/">
+                                
+                                Tags
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-about" href="/about/">
+                                
+                                About
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-newsletter" href="/subscribe/">
+                                
+                                Newsletter
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-contact" href="/contact/">
+                                
+                                Contact
+                            </a>
+                        </li>
+                    
+
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-12 col-md-10">
+                    <h1 class="mx-0 mx-md-4 blog-post-title">One-proportion and goodness of fit test (in R and by hand)</h1>
+
+                    <div class="mb-md-4 meta">
+                        
+                            
+                                <span class="author" title="Antoine Soetewey">
+                                    Antoine Soetewey
+                                </span>
+                            
+                        
+
+                        <span class="date middot" title='Wed May 13 2020 00:00:00 UTC'>
+                            2020-05-13
+                        </span>
+
+                        <span class="reading-time middot">
+                            9 minute read
+                        </span>
+
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/basics">Basics</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/hypothesis-test">Hypothesis test</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/inferential-statistics">Inferential statistics</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/r">R</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/statistics">Statistics</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="markdown">
+                        
+    
+    
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#in-r">In R</a><ul>
+<li><a href="#data">Data</a></li>
+<li><a href="#one-proportion-test">One-proportion test</a><ul>
+<li><a href="#assumption-of-prop.test-and-binom.test">Assumption of <code>prop.test()</code> and <code>binom.test()</code></a></li>
+</ul></li>
+<li><a href="#chi-square-goodness-of-fit-test">Chi-square goodness of fit test</a><ul>
+<li><a href="#does-my-distribution-follow-a-given-distribution">Does my distribution follow a given distribution?</a><ul>
+<li><a href="#observed-frequencies">Observed frequencies</a></li>
+<li><a href="#expected-frequencies">Expected frequencies</a></li>
+<li><a href="#observed-vs.expected-relative-frequencies">Observed vs. expected relative frequencies</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/One-proportion%20and%20goodness%20of%20fit%20test%20in%20R%20and%20by%20hand.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In a previous article, I presented the <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence in R</a> which is used to test the independence between two <a href="/blog/variable-types-and-examples/#qualitative">categorical</a> variables. In this article, I show how to perform, first in R and then by hand, the:</p>
+<ol style="list-style-type: decimal">
+<li>one-proportion test (also sometimes referred as binomial test on one proportion)</li>
+<li>Chi-square goodness of fit test</li>
+</ol>
+<p>The first test is used to compare an observed proportion to an expected proportion, when the qualitative variable has only <strong>two categories</strong>. The second test is used to compare multiple observed proportions to multiple expected proportions, in a situation where the qualitative variable has <strong>two or more categories</strong>.</p>
+<p>Both tests allow to test the equality of proportions between the levels of the qualitative variable or to test the equality with given proportions. These given proportions could be determined arbitrarily or based on the theoretical probabilities of a known distribution.</p>
+</div>
+<div id="in-r" class="section level1">
+<h1>In R</h1>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>For this section, we use the same dataset than in the article on <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a>. It is the well-known <code>iris</code> dataset, to which we add the variable <code>size</code>. The variable <code>size</code> corresponds to <code>small</code> if the length of the petal is smaller than the median of all flowers, <code>big</code> otherwise:</p>
+<pre class="r"><code># load iris dataset
+dat &lt;- iris
+
+# create size variable
+dat$size &lt;- ifelse(dat$Sepal.Length &lt; median(dat$Sepal.Length),
+  &quot;small&quot;, &quot;big&quot;
+)
+
+# show first 5 observations
+head(dat, n = 5)</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species  size
+## 1          5.1         3.5          1.4         0.2  setosa small
+## 2          4.9         3.0          1.4         0.2  setosa small
+## 3          4.7         3.2          1.3         0.2  setosa small
+## 4          4.6         3.1          1.5         0.2  setosa small
+## 5          5.0         3.6          1.4         0.2  setosa small</code></pre>
+</div>
+<div id="one-proportion-test" class="section level2">
+<h2>One-proportion test</h2>
+<p>For this example, we have a sample of 150 flowers and we want to test whether the proportion of small flowers is the same than the proportion of big flowers (measured by the variable <code>size</code>). Here are the number of flowers by size, and the corresponding proportions:</p>
+<pre class="r"><code># barplot
+library(ggplot2)
+ggplot(dat) +
+ aes(x = size) +
+ geom_bar(fill = &quot;#0c4c8a&quot;) +
+ theme_minimal()</code></pre>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># counts by size
+table(dat$size)</code></pre>
+<pre><code>## 
+##   big small 
+##    77    73</code></pre>
+<pre class="r"><code># proportions by size, rounded to 2 decimals
+round(prop.table(table(dat$size)), 2)</code></pre>
+<pre><code>## 
+##   big small 
+##  0.51  0.49</code></pre>
+<p>Among the 150 flowers forming our sample, 51% and 49% are big and small, respectively. To test whether the proportions are the same among both sizes, we use the <code>prop.test()</code> function which accepts the following arguments:</p>
+<ul>
+<li>number of successes</li>
+<li>number of observations/trials</li>
+<li>expected probability (the one we want to test against)</li>
+</ul>
+<p>Considering (arbitrarily) that <code>big</code> is the success, we have:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<pre class="r"><code>test &lt;- prop.test(x = 77, # number of successes
+          n = 150, # total number of trials (77 + 73)
+          p = 0.5) # we test for equal proportion so prob = 0.5 in each group
+
+test</code></pre>
+<pre><code>## 
+##  1-sample proportions test with continuity correction
+## 
+## data:  77 out of 150, null probability 0.5
+## X-squared = 0.06, df = 1, p-value = 0.8065
+## alternative hypothesis: true p is not equal to 0.5
+## 95 percent confidence interval:
+##  0.4307558 0.5952176
+## sample estimates:
+##         p 
+## 0.5133333</code></pre>
+<p>We obtain an output with, among others, the null probability (<code>0.5</code>), the test statistic (<code>X-squared</code>), the degrees of freedom (<code>df</code>), the <em>p</em>-value (<code>p-value = 0.8065</code>) and the alternative hypothesis (<code>true p is not equal to 0.5</code>). The <em>p</em>-value is 0.806 so, at the 5% significance level, we do not reject the null hypothesis that the proportions of small and big flowers are the same.</p>
+<div id="assumption-of-prop.test-and-binom.test" class="section level3">
+<h3>Assumption of <code>prop.test()</code> and <code>binom.test()</code></h3>
+<p>Note that <code>prop.test()</code> uses a normal approximation to the binomial distribution. Therefore, one assumption of this test is that the sample size is large enough (usually, <em>n &gt; 30</em>). If the sample size is small, it is recommended to use the exact binomial test.</p>
+<p>The exact binomial test can be performed with the <code>binom.test()</code> function and accepts the same arguments as the <code>prop.test()</code> function. For this example, suppose now that we have a sample of 12 big and 3 small flowers and we want to test whether the proportions are the same among both sizes:</p>
+<pre class="r"><code># barplot
+barplot(c(12, 3), # observed counts
+        names.arg = c(&quot;big&quot;, &quot;small&quot;),
+        ylab = &quot;Frequency&quot;, # y-label
+        xlab = &quot;Size&quot;) # x-label
+abline(h = 15/2, # expected counts in each level
+       lty = 2) # dashed line</code></pre>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># test
+test &lt;- binom.test(x = 12, # counts of successes
+           n = 15, # total counts (10 + 5)
+           p = 0.5) # expected proportion
+
+test</code></pre>
+<pre><code>## 
+##  Exact binomial test
+## 
+## data:  12 and 15
+## number of successes = 12, number of trials = 15, p-value = 0.03516
+## alternative hypothesis: true probability of success is not equal to 0.5
+## 95 percent confidence interval:
+##  0.5191089 0.9566880
+## sample estimates:
+## probability of success 
+##                    0.8</code></pre>
+<p>The <em>p</em>-value is 0.035 so, at the 5% significance level, we reject the null hypothesis and we conclude that the proportions of small and big flowers are significantly different. This is equivalent than concluding that the proportion of big flowers is significantly different from 0.5.</p>
+<p>If you want to test that the proportion of big flowers is greater than 50%, add the <code>alternative = &quot;greater&quot;</code> argument into the <code>binom.test()</code> function:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<pre class="r"><code>test &lt;- binom.test(x = 12, # counts of successes
+           n = 15, # total counts (10 + 5)
+           p = 0.5, # expected proportion
+           alternative = &quot;greater&quot;) # test that prop of big flowers is &gt; 0.5
+
+test</code></pre>
+<pre><code>## 
+##  Exact binomial test
+## 
+## data:  12 and 15
+## number of successes = 12, number of trials = 15, p-value = 0.01758
+## alternative hypothesis: true probability of success is greater than 0.5
+## 95 percent confidence interval:
+##  0.5602156 1.0000000
+## sample estimates:
+## probability of success 
+##                    0.8</code></pre>
+<p>The <em>p</em>-value is 0.018 so, at the 5% significance level, we reject the null hypothesis and we conclude that the proportion of big flowers is significantly larger than 50%.</p>
+</div>
+</div>
+<div id="chi-square-goodness-of-fit-test" class="section level2">
+<h2>Chi-square goodness of fit test</h2>
+<p>Suppose now that the qualitative variable has more than two levels as it is the case for the variable <code>Species</code>:</p>
+<pre class="r"><code># barplot
+ggplot(dat) +
+ aes(x = Species) +
+ geom_bar(fill = &quot;#0c4c8a&quot;) +
+ theme_minimal()</code></pre>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># counts by Species
+table(dat$Species)</code></pre>
+<pre><code>## 
+##     setosa versicolor  virginica 
+##         50         50         50</code></pre>
+<p>The variable <code>Species</code> has 3 levels, with 50 observations in each level. Suppose for this example that we want to test whether the 3 species are equally common. If they were equally common, they would be equally distributed and the expected proportions would be <span class="math inline">\(\frac{1}{3}\)</span> for each of the species.</p>
+<p>This test can be done with the <code>chisq.test()</code> function, accepting the following arguments:</p>
+<ul>
+<li>a numeric vector representing the observed proportions</li>
+<li>a vector of probabilities (of the same length of x) representing the expected proportions</li>
+</ul>
+<p>Applied to our research question (i.e., are the 3 species equally common?), we have:</p>
+<pre class="r"><code>test &lt;- chisq.test(table(dat$Species), # observed proportions
+                   p = c(1/3, 1/3, 1/3)) # expected proportions
+
+test</code></pre>
+<pre><code>## 
+##  Chi-squared test for given probabilities
+## 
+## data:  table(dat$Species)
+## X-squared = 0, df = 2, p-value = 1</code></pre>
+<p>The <em>p</em>-value is 1 so, at the 5% significance level, we do not reject the null hypothesis that the proportions are equal among all species. (This was quite obvious even before doing the statistical test given that there are 50 flowers of each species.)</p>
+<div id="does-my-distribution-follow-a-given-distribution" class="section level3">
+<h3>Does my distribution follow a given distribution?</h3>
+<p>The goodness of fit test is also particularily useful to compare observed proportions with expected proportions based on some known distribution.</p>
+<p>For this example, suppose that we measured the number of girls in 100 families of 5 children. We want to test whether the (observed) distribution of number girls follows a binomial distribution.</p>
+<div id="observed-frequencies" class="section level4">
+<h4>Observed frequencies</h4>
+<p>Here is the distribution of the number of girls per family in our sample of 100 families of 5 children:</p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre><code>##   Girls Frequency Relative_freq
+## 1     0         5          0.05
+## 2     1        12          0.12
+## 3     2        28          0.28
+## 4     3        33          0.33
+## 5     4        17          0.17
+## 6     5         5          0.05</code></pre>
+</div>
+<div id="expected-frequencies" class="section level4">
+<h4>Expected frequencies</h4>
+<p>In order to compare the observed frequencies to a binomial distribution, we first need to determine the expected frequencies that would be obtained in case of a binomial distribution. The expected frequencies assuming a probability of 0.5 of having a girl (for each of the 5 children) are as follows:</p>
+<pre class="r"><code># create expected frequencies for a binomial distribution
+x  &lt;- 0:5
+df &lt;- data.frame(Girls = factor(x),
+                 Expected_relative_freq = dbinom(x, size = 5, prob = 0.5))
+df$Expected_freq &lt;- df$Expected_relative_freq * 100 # *100 since there are 100 families
+
+# create barplot
+p &lt;- ggplot(df, aes(x = Girls, y = Expected_freq)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;#F8766D&quot;) + 
+  xlab(&quot;Number of girls per family&quot;) +
+  ylab(&quot;Expected frequency&quot;) + 
+  labs(title = &quot;Binomial distribution Bi(x, 5, 0.5)&quot;) +
+  theme_minimal()
+p</code></pre>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># expected frequencies
+df</code></pre>
+<pre><code>##   Girls Expected_relative_freq Expected_freq
+## 1     0                0.03125         3.125
+## 2     1                0.15625        15.625
+## 3     2                0.31250        31.250
+## 4     3                0.31250        31.250
+## 5     4                0.15625        15.625
+## 6     5                0.03125         3.125</code></pre>
+</div>
+<div id="observed-vs.expected-relative-frequencies" class="section level4">
+<h4>Observed vs. expected relative frequencies</h4>
+<p>We now compare the observed frequencies to the expected frequencies to see whether the two differ significantly. If the two differ significantly, we reject the hypothesis that the number of girls per family of 5 children follows a binomial distribution. On the other hand, if the observed and expected frequencies are similar, we do not reject the hypothesis that the number of girls per family follows a binomial distribution.</p>
+<p>Visually we have:</p>
+<pre class="r"><code># create data
+data &lt;- data.frame(num_girls = factor(rep(c(0:5), times = 2)),
+                  Freq = c(dat$Freq, df$Expected_freq),
+                  obs_exp = c(rep(&quot;observed&quot;, 6), rep(&quot;expected&quot;, 6)))
+
+# create plot
+ggplot() +
+  geom_bar(data = data, aes(x = num_girls, y = Freq,
+                            fill = obs_exp),
+           position = &quot;dodge&quot;, # bar next to each other
+           stat = &quot;identity&quot;) +
+  ylab(&quot;Frequency&quot;) +
+  xlab(&quot;Number of girls per family&quot;) +
+  theme_minimal() +
+  theme(legend.title = element_blank()) # remove legend title</code></pre>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We see that the observed and expected frequencies are quite similar, so we expect that the number of girls in families of 5 children follows a binomial distribution. However, the goodness of fit test will confirm or infirm this belief:</p>
+<pre class="r"><code>test &lt;- chisq.test(dat$Freq, # observed frequencies
+                   p = df$Expected_relative_freq) # expected proportions</code></pre>
+<pre><code>## Warning in chisq.test(dat$Freq, p = df$Expected_relative_freq): Chi-squared
+## approximation may be incorrect</code></pre>
+<pre class="r"><code>library(pander)
+pander(test)</code></pre>
+<table style="width:44%;">
+<caption>Chi-squared test for given probabilities: <code>dat$Freq</code></caption>
+<colgroup>
+<col width="23%" />
+<col width="6%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Test statistic</th>
+<th align="center">df</th>
+<th align="center">P value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">3.648</td>
+<td align="center">5</td>
+<td align="center">0.6011</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Choosing big or small as the success event gives the same conclusion.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>Similarily, this argument can also be added to the <code>prop.test()</code> function to test whether the observed proportion is larger than the expected proportion. Use <code>alternative = &quot;less&quot;</code> if you want to test whether the observed proportion is smaller than the expected one.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
+
+
+
+                    </div>
+                    
+
+      <div class="related">
+
+<h3>Related articles</h3>
+<ul>
+	
+	<li><a href="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/">How to perform a one sample t-test by hand and in R: test on one mean</a></li>
+	
+	<li><a href="/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/">How to do a t-test or ANOVA for more than one variable at once in R and communicate the results in a better way</a></li>
+	
+	<li><a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student&#39;s t-test in R and by hand: how to compare two groups under different scenarios</a></li>
+	
+	<li><a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence in R</a></li>
+	
+	<li><a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/">The 9 concepts and formulas in probability that every data scientist should know</a></li>
+	
+</ul>
+</div>
+      
+
+                    
+                        <div class="navigation">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    
+                                        <div class="mx-0 mx-md-4 mt-4 text-left">
+                                            <a href="/blog/a-package-to-download-free-springer-books-during-covid-19-quarantine/">« A package to download free Springer books during Covid-19 quarantine</a>
+                                        </div>
+                                    
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/js/copy-code-button.js"></script>
+
+
+    <section id="comments">
+
+      <div class="py-3 content">
+            <div class="container">
+                  <div class="row justify-content-center">
+                        <div class="col-sm-12 col-md-10">
+                              <div class="comments">
+                                    <div id="disqus_thread"></div>
+                              </div>
+                        </div>
+                  </div>
+            </div>
+      </div>
+
+      <script type="text/javascript">
+            (function () {
+                  
+                  
+                  if (window.location.hostname == "localhost")
+                        return;
+
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = 'statsandr';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+      </script>
+      <noscript>
+            Please enable JavaScript to view the
+            <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+</section>
+    <div class="my-4 footer">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-5">
+                
+                    <div class="mx-0 mx-md-4 text-left">
+                        
+                            <p>
+                              <a href="/subscribe/">Newsletter</a>
+                              <a href="/faq/">FAQ</a>
+                              <a href="/contribute/">Contribute</a>
+                              <a href="/terms/">Terms</a>
+                              <a href="/sitemap/">Sitemap</a>
+                              
+                              
+                              
+
+
+
+
+  
+
+
+
+<a href='https://github.com/AntoineSoetewey/statsandr/edit/master/content/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand.Rmd' target="_blank">Edit</a>
+
+
+
+                              
+                            </p>
+                            <p>
+                              <a href="/">&copy; <script>document.write(new Date().getFullYear())</script> Antoine Soetewey</a>
+                            </p>
+                        
+                    </div>
+                
+            </div>
+            <div class="col-sm-12 col-md-5">
+                <div class="mx-0 mx-md-4 text-right">
+                  
+                    
+                    <a href="https://medium.com/@ant.soetewey" target="_blank">
+                        <img class="icon" src="/img/medium.svg" alt="Medium" title="Medium"/>
+                    </a>
+                    
+                    
+                    
+                        <a href="https://github.com/AntoineSoetewey" target="_blank">
+                            <img class="icon" src="/img/github.svg" alt="GitHub" title="GitHub"/>
+                        </a>
+                    
+
+                    
+
+                    
+                    <a href="https://twitter.com/statsandr" target="_blank">
+                        <img class="icon" src="/img/twitter.svg" alt="Twitter" title="Twitter"/>
+                    </a>
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+                    
+                    
+                    <a href="/contact/">
+                        <img class="icon" src="/img/email.svg" alt="Contact" title="Contact"/>
+                    </a>
+                    
+
+                    
+                        <a href="/index.xml" class="mr-0">
+                            <img class="icon" src="/img/rss.svg" alt="RSS" title="RSS"/>
+                        </a>
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js" integrity="sha256-sNPiigbfSkqUzMc5rgrdztLnneCMAp6W9wetJUZu9Zw=" crossorigin="anonymous"></script>
+        
+        <script>
+            window.addEventListener('load', function() {
+                hljs.initHighlighting();
+            }, true);
+        </script>
+    
+
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/progressively/1.2.5/progressively.min.js" integrity="sha256-LvFVlLdfGI3WeEH+8Ni4kxLm02g2GlOfeGCGLXfRk/U=" crossorigin="anonymous"></script>
+        <script>
+            window.addEventListener('load', function() {
+                progressively.init({delay: 30, throttle: 50});
+            }, true);
+        </script>
+    
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-86997981-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
+        
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+</body>
+
+</html>

@@ -6,10 +6,303 @@
     <description>Recent content in Statistics on Stats and R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 19 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 13 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/statistics/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>One-proportion and goodness of fit test (in R and by hand)</title>
+      <link>/blog/one-proportion-and-goodness-of-fit-test-in-r-and-by-hand/</link>
+      <pubDate>Wed, 13 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/one-proportion-and-goodness-of-fit-test-in-r-and-by-hand/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#in-r&#34;&gt;In R&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#data&#34;&gt;Data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#one-proportion-test&#34;&gt;One-proportion test&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#assumption-of-prop.test-and-binom.test&#34;&gt;Assumption of &lt;code&gt;prop.test()&lt;/code&gt; and &lt;code&gt;binom.test()&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#chi-square-goodness-of-fit-test&#34;&gt;Chi-square goodness of fit test&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#does-my-distribution-follow-a-given-distribution&#34;&gt;Does my distribution follow a given distribution?&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#observed-frequencies&#34;&gt;Observed frequencies&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#expected-frequencies&#34;&gt;Expected frequencies&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#observed-vs.expected-relative-frequencies&#34;&gt;Observed vs. expected relative frequencies&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/One-proportion%20and%20goodness%20of%20fit%20test%20in%20R%20and%20by%20hand.jpeg&#34; style=&#34;width:100.0%&#34; /&gt;&lt;/p&gt;
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;In a previous article, I presented the &lt;a href=&#34;/blog/chi-square-test-of-independence-in-r/&#34;&gt;Chi-square test of independence in R&lt;/a&gt; which is used to test the independence between two &lt;a href=&#34;/blog/variable-types-and-examples/#qualitative&#34;&gt;categorical&lt;/a&gt; variables. In this article, I show how to perform, first in R and then by hand, the:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;one-proportion test (also sometimes referred as binomial test on one proportion)&lt;/li&gt;
+&lt;li&gt;Chi-square goodness of fit test&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The first test is used to compare an observed proportion to an expected proportion, when the qualitative variable has only &lt;strong&gt;two categories&lt;/strong&gt;. The second test is used to compare multiple observed proportions to multiple expected proportions, in a situation where the qualitative variable has &lt;strong&gt;two or more categories&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Both tests allow to test the equality of proportions between the levels of the qualitative variable or to test the equality with given proportions. These given proportions could be determined arbitrarily or based on the theoretical probabilities of a known distribution.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;in-r&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;In R&lt;/h1&gt;
+&lt;div id=&#34;data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Data&lt;/h2&gt;
+&lt;p&gt;For this section, we use the same dataset than in the article on &lt;a href=&#34;/blog/descriptive-statistics-in-r/&#34;&gt;descriptive statistics&lt;/a&gt;. It is the well-known &lt;code&gt;iris&lt;/code&gt; dataset, to which we add the variable &lt;code&gt;size&lt;/code&gt;. The variable &lt;code&gt;size&lt;/code&gt; corresponds to &lt;code&gt;small&lt;/code&gt; if the length of the petal is smaller than the median of all flowers, &lt;code&gt;big&lt;/code&gt; otherwise:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# load iris dataset
+dat &amp;lt;- iris
+
+# create size variable
+dat$size &amp;lt;- ifelse(dat$Sepal.Length &amp;lt; median(dat$Sepal.Length),
+  &amp;quot;small&amp;quot;, &amp;quot;big&amp;quot;
+)
+
+# show first 5 observations
+head(dat, n = 5)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species  size
+## 1          5.1         3.5          1.4         0.2  setosa small
+## 2          4.9         3.0          1.4         0.2  setosa small
+## 3          4.7         3.2          1.3         0.2  setosa small
+## 4          4.6         3.1          1.5         0.2  setosa small
+## 5          5.0         3.6          1.4         0.2  setosa small&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;one-proportion-test&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;One-proportion test&lt;/h2&gt;
+&lt;p&gt;For this example, we have a sample of 150 flowers and we want to test whether the proportion of small flowers is the same than the proportion of big flowers (measured by the variable &lt;code&gt;size&lt;/code&gt;). Here are the number of flowers by size, and the corresponding proportions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# barplot
+library(ggplot2)
+ggplot(dat) +
+ aes(x = size) +
+ geom_bar(fill = &amp;quot;#0c4c8a&amp;quot;) +
+ theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# counts by size
+table(dat$size)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##   big small 
+##    77    73&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# proportions by size, rounded to 2 decimals
+round(prop.table(table(dat$size)), 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##   big small 
+##  0.51  0.49&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Among the 150 flowers forming our sample, 51% and 49% are big and small, respectively. To test whether the proportions are the same among both sizes, we use the &lt;code&gt;prop.test()&lt;/code&gt; function which accepts the following arguments:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;number of successes&lt;/li&gt;
+&lt;li&gt;number of observations/trials&lt;/li&gt;
+&lt;li&gt;expected probability (the one we want to test against)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Considering (arbitrarily) that &lt;code&gt;big&lt;/code&gt; is the success, we have:&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- prop.test(x = 77, # number of successes
+          n = 150, # total number of trials (77 + 73)
+          p = 0.5) # we test for equal proportion so prob = 0.5 in each group
+
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  1-sample proportions test with continuity correction
+## 
+## data:  77 out of 150, null probability 0.5
+## X-squared = 0.06, df = 1, p-value = 0.8065
+## alternative hypothesis: true p is not equal to 0.5
+## 95 percent confidence interval:
+##  0.4307558 0.5952176
+## sample estimates:
+##         p 
+## 0.5133333&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We obtain an output with, among others, the null probability (&lt;code&gt;0.5&lt;/code&gt;), the test statistic (&lt;code&gt;X-squared&lt;/code&gt;), the degrees of freedom (&lt;code&gt;df&lt;/code&gt;), the &lt;em&gt;p&lt;/em&gt;-value (&lt;code&gt;p-value = 0.8065&lt;/code&gt;) and the alternative hypothesis (&lt;code&gt;true p is not equal to 0.5&lt;/code&gt;). The &lt;em&gt;p&lt;/em&gt;-value is 0.806 so, at the 5% significance level, we do not reject the null hypothesis that the proportions of small and big flowers are the same.&lt;/p&gt;
+&lt;div id=&#34;assumption-of-prop.test-and-binom.test&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Assumption of &lt;code&gt;prop.test()&lt;/code&gt; and &lt;code&gt;binom.test()&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;Note that &lt;code&gt;prop.test()&lt;/code&gt; uses a normal approximation to the binomial distribution. Therefore, one assumption of this test is that the sample size is large enough (usually, &lt;em&gt;n &amp;gt; 30&lt;/em&gt;). If the sample size is small, it is recommended to use the exact binomial test.&lt;/p&gt;
+&lt;p&gt;The exact binomial test can be performed with the &lt;code&gt;binom.test()&lt;/code&gt; function and accepts the same arguments as the &lt;code&gt;prop.test()&lt;/code&gt; function. For this example, suppose now that we have a sample of 12 big and 3 small flowers and we want to test whether the proportions are the same among both sizes:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# barplot
+barplot(c(12, 3), # observed counts
+        names.arg = c(&amp;quot;big&amp;quot;, &amp;quot;small&amp;quot;),
+        ylab = &amp;quot;Frequency&amp;quot;, # y-label
+        xlab = &amp;quot;Size&amp;quot;) # x-label
+abline(h = 15/2, # expected counts in each level
+       lty = 2) # dashed line&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# test
+test &amp;lt;- binom.test(x = 12, # counts of successes
+           n = 15, # total counts (10 + 5)
+           p = 0.5) # expected proportion
+
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Exact binomial test
+## 
+## data:  12 and 15
+## number of successes = 12, number of trials = 15, p-value = 0.03516
+## alternative hypothesis: true probability of success is not equal to 0.5
+## 95 percent confidence interval:
+##  0.5191089 0.9566880
+## sample estimates:
+## probability of success 
+##                    0.8&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.035 so, at the 5% significance level, we reject the null hypothesis and we conclude that the proportions of small and big flowers are significantly different. This is equivalent than concluding that the proportion of big flowers is significantly different from 0.5.&lt;/p&gt;
+&lt;p&gt;If you want to test that the proportion of big flowers is greater than 50%, add the &lt;code&gt;alternative = &amp;quot;greater&amp;quot;&lt;/code&gt; argument into the &lt;code&gt;binom.test()&lt;/code&gt; function:&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- binom.test(x = 12, # counts of successes
+           n = 15, # total counts (10 + 5)
+           p = 0.5, # expected proportion
+           alternative = &amp;quot;greater&amp;quot;) # test that prop of big flowers is &amp;gt; 0.5
+
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Exact binomial test
+## 
+## data:  12 and 15
+## number of successes = 12, number of trials = 15, p-value = 0.01758
+## alternative hypothesis: true probability of success is greater than 0.5
+## 95 percent confidence interval:
+##  0.5602156 1.0000000
+## sample estimates:
+## probability of success 
+##                    0.8&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.018 so, at the 5% significance level, we reject the null hypothesis and we conclude that the proportion of big flowers is significantly larger than 50%.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;chi-square-goodness-of-fit-test&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Chi-square goodness of fit test&lt;/h2&gt;
+&lt;p&gt;Suppose now that the qualitative variable has more than two levels as it is the case for the variable &lt;code&gt;Species&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# barplot
+ggplot(dat) +
+ aes(x = Species) +
+ geom_bar(fill = &amp;quot;#0c4c8a&amp;quot;) +
+ theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# counts by Species
+table(dat$Species)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##     setosa versicolor  virginica 
+##         50         50         50&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The variable &lt;code&gt;Species&lt;/code&gt; has 3 levels, with 50 observations in each level. Suppose for this example that we want to test whether the 3 species are equally common. If they were equally common, they would be equally distributed and the expected proportions would be &lt;span class=&#34;math inline&#34;&gt;\(\frac{1}{3}\)&lt;/span&gt; for each of the species.&lt;/p&gt;
+&lt;p&gt;This test can be done with the &lt;code&gt;chisq.test()&lt;/code&gt; function, accepting the following arguments:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a numeric vector representing the observed proportions&lt;/li&gt;
+&lt;li&gt;a vector of probabilities (of the same length of x) representing the expected proportions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Applied to our research question (i.e., are the 3 species equally common?), we have:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- chisq.test(table(dat$Species), # observed proportions
+                   p = c(1/3, 1/3, 1/3)) # expected proportions
+
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Chi-squared test for given probabilities
+## 
+## data:  table(dat$Species)
+## X-squared = 0, df = 2, p-value = 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 1 so, at the 5% significance level, we do not reject the null hypothesis that the proportions are equal among all species. (This was quite obvious even before doing the statistical test given that there are 50 flowers of each species.)&lt;/p&gt;
+&lt;div id=&#34;does-my-distribution-follow-a-given-distribution&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Does my distribution follow a given distribution?&lt;/h3&gt;
+&lt;p&gt;The goodness of fit test is also particularily useful to compare observed proportions with expected proportions based on some known distribution.&lt;/p&gt;
+&lt;p&gt;For this example, suppose that we measured the number of girls in 100 families of 5 children. We want to test whether the (observed) distribution of number girls follows a binomial distribution.&lt;/p&gt;
+&lt;div id=&#34;observed-frequencies&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;Observed frequencies&lt;/h4&gt;
+&lt;p&gt;Here is the distribution of the number of girls per family in our sample of 100 families of 5 children:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;##   Girls Frequency Relative_freq
+## 1     0         5          0.05
+## 2     1        12          0.12
+## 3     2        28          0.28
+## 4     3        33          0.33
+## 5     4        17          0.17
+## 6     5         5          0.05&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;expected-frequencies&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;Expected frequencies&lt;/h4&gt;
+&lt;p&gt;In order to compare the observed frequencies to a binomial distribution, we first need to determine the expected frequencies that would be obtained in case of a binomial distribution. The expected frequencies assuming a probability of 0.5 of having a girl (for each of the 5 children) are as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# create expected frequencies for a binomial distribution
+x  &amp;lt;- 0:5
+df &amp;lt;- data.frame(Girls = factor(x),
+                 Expected_relative_freq = dbinom(x, size = 5, prob = 0.5))
+df$Expected_freq &amp;lt;- df$Expected_relative_freq * 100 # *100 since there are 100 families
+
+# create barplot
+p &amp;lt;- ggplot(df, aes(x = Girls, y = Expected_freq)) +
+  geom_bar(stat = &amp;quot;identity&amp;quot;, fill = &amp;quot;#F8766D&amp;quot;) + 
+  xlab(&amp;quot;Number of girls per family&amp;quot;) +
+  ylab(&amp;quot;Expected frequency&amp;quot;) + 
+  labs(title = &amp;quot;Binomial distribution Bi(x, 5, 0.5)&amp;quot;) +
+  theme_minimal()
+p&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# expected frequencies
+df&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   Girls Expected_relative_freq Expected_freq
+## 1     0                0.03125         3.125
+## 2     1                0.15625        15.625
+## 3     2                0.31250        31.250
+## 4     3                0.31250        31.250
+## 5     4                0.15625        15.625
+## 6     5                0.03125         3.125&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;observed-vs.expected-relative-frequencies&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;Observed vs. expected relative frequencies&lt;/h4&gt;
+&lt;p&gt;We now compare the observed frequencies to the expected frequencies to see whether the two differ significantly. If the two differ significantly, we reject the hypothesis that the number of girls per family of 5 children follows a binomial distribution. On the other hand, if the observed and expected frequencies are similar, we do not reject the hypothesis that the number of girls per family follows a binomial distribution.&lt;/p&gt;
+&lt;p&gt;Visually we have:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# create data
+data &amp;lt;- data.frame(num_girls = factor(rep(c(0:5), times = 2)),
+                  Freq = c(dat$Freq, df$Expected_freq),
+                  obs_exp = c(rep(&amp;quot;observed&amp;quot;, 6), rep(&amp;quot;expected&amp;quot;, 6)))
+
+# create plot
+ggplot() +
+  geom_bar(data = data, aes(x = num_girls, y = Freq,
+                            fill = obs_exp),
+           position = &amp;quot;dodge&amp;quot;, # bar next to each other
+           stat = &amp;quot;identity&amp;quot;) +
+  ylab(&amp;quot;Frequency&amp;quot;) +
+  xlab(&amp;quot;Number of girls per family&amp;quot;) +
+  theme_minimal() +
+  theme(legend.title = element_blank()) # remove legend title&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We see that the observed and expected frequencies are quite similar, so we expect that the number of girls in families of 5 children follows a binomial distribution. However, the goodness of fit test will confirm or infirm this belief:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- chisq.test(dat$Freq, # observed frequencies
+                   p = df$Expected_relative_freq) # expected proportions&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in chisq.test(dat$Freq, p = df$Expected_relative_freq): Chi-squared
+## approximation may be incorrect&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(pander)
+pander(test)&lt;/code&gt;&lt;/pre&gt;
+&lt;table style=&#34;width:44%;&#34;&gt;
+&lt;caption&gt;Chi-squared test for given probabilities: &lt;code&gt;dat$Freq&lt;/code&gt;&lt;/caption&gt;
+&lt;colgroup&gt;
+&lt;col width=&#34;23%&#34; /&gt;
+&lt;col width=&#34;6%&#34; /&gt;
+&lt;col width=&#34;13%&#34; /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;Test statistic&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;df&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;P value&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;3.648&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.6011&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Choosing big or small as the success event gives the same conclusion.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Similarily, this argument can also be added to the &lt;code&gt;prop.test()&lt;/code&gt; function to test whether the observed proportion is larger than the expected proportion. Use &lt;code&gt;alternative = &amp;quot;less&amp;quot;&lt;/code&gt; if you want to test whether the observed proportion is smaller than the expected one.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>How to do a t-test or ANOVA for more than one variable at once in R and communicate the results in a better way</title>
