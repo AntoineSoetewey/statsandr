@@ -500,9 +500,10 @@ test</code></pre>
 <p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/Screenshot%202020-05-13%20at%2012.23.38.png" style="width:100.0%" /></p>
 <p><span class="math display">\[\pm z_{\alpha/2} = \pm z_{0.025} = \pm 1.96\]</span></p>
 <p><strong>Step 4.</strong></p>
-<p>We compare the test statistic with the rejection region and we conclude. Visually, we have:</p>
+<p>We compare the test statistic (found in step 2) with the rejection region (found in step 3) and we conclude. Visually, we have:</p>
 <p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The test statistic lies within the rejection region (i.e., the grey shaded areas). Therefore, at the 5% significance level, we reject the null hypothesis and we conclude that the proportion of heads (and thus tails) is significantly different than 50%. In other words, still at the 5% significance level, we conclude that the coin is unfair.</p>
+<p>If you prefer to compute the <em>p</em>-value instead of comparing the t-stat and the rejection region, you can use this <a href="/blog/a-guide-on-how-to-read-statistical-tables/">Shiny app to easily compute <em>p</em>-values</a> for different probability distributions. After having opened the app, set the t-stat, the correspongind alternative and you will find the <em>p</em>-value at the top of the page.</p>
 <div id="verification-in-r" class="section level3">
 <h3>Verification in R</h3>
 <p>Just for the sake of illustration, here is the verification of the above example in R:</p>
@@ -536,7 +537,7 @@ test</code></pre>
 <pre><code>## dice_face
 ##  1  2  3  4  5  6 
 ## 15 24 10 19 19 13</code></pre>
-<p>With a fair dice, we would expect it to land <span class="math inline">\(\frac{100}{6} \approx 16.67\)</span> times on each face (this expected value is represented by the dashed line in the above plot). Although the observed frequencies are different than the expected value of 16.67, we need to test whether they are <em>significantly</em> different.</p>
+<p>With a fair dice, we would expect it to land <span class="math inline">\(\frac{100}{6} \approx 16.67\)</span> times on each face (this expected value is represented by the dashed line in the above plot). Although the observed frequencies are different than the expected value of 16.67:</p>
 <pre><code>##   dice_face observed_freq expected_freq
 ## 1         1            15         16.67
 ## 2         2            24         16.67
@@ -544,7 +545,7 @@ test</code></pre>
 ## 4         4            19         16.67
 ## 5         5            19         16.67
 ## 6         6            13         16.67</code></pre>
-<p>We now perform the appropriate hypothesis test following the 4 easy steps mentioned above:</p>
+<p>we need to test whether they are <em>significantly</em> different. For this, we perform the appropriate hypothesis test following the 4 easy steps mentioned above:</p>
 <ol style="list-style-type: decimal">
 <li>State the null and alternative hypotheses</li>
 <li>Compute the test-statistic (also known as t-stat)</li>
@@ -552,7 +553,7 @@ test</code></pre>
 <li>Conclude by comparing the test-statistic with the rejection region</li>
 </ol>
 <p><strong>Step 1.</strong></p>
-<p>In our example, the null and alternative hypotheses are:</p>
+<p>The null and alternative hypotheses of the goodness of fit test are:</p>
 <ul>
 <li><span class="math inline">\(H_0\)</span>: there is no significant difference between the observed and the expected frequencies</li>
 <li><span class="math inline">\(H_1\)</span>: there is a significant difference between the observed and the expected frequencies</li>
@@ -560,8 +561,8 @@ test</code></pre>
 <p><strong>Step 2.</strong></p>
 <p>The test statistic is:</p>
 <p><span class="math display">\[\chi^2 = \sum_{i = 1}^k \frac{(O_i - E_i)^2}{E_i}\]</span></p>
-<p>where <span class="math inline">\(O_i\)</span> is the observed frequency, <span class="math inline">\(E_i\)</span> is the expected frequency and <span class="math inline">\(k\)</span> is the number of categories.</p>
-<p>This <span class="math inline">\(\chi^2\)</span> statistic is obtained by calculating the difference between the observed number of cases and the expected number of cases in each category. This difference is squared (to avoid negative and positive differences being compensated) and divided by the expected number of cases in that category. These values are then summed for all categories, and the total is referred to as the <span class="math inline">\(\chi^2\)</span> statistic. Large values of this statistic lead to the rejection of the null hypothesis, small values mean that the null hypothesis cannot be rejected.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<p>where <span class="math inline">\(O_i\)</span> is the observed frequency, <span class="math inline">\(E_i\)</span> is the expected frequency and <span class="math inline">\(k\)</span> is the number of categories (in our case, there are 6 categories, representing the 6 dice faces).</p>
+<p>This <span class="math inline">\(\chi^2\)</span> statistic is obtained by calculating the difference between the observed number of cases and the expected number of cases in each category. This difference is squared (to avoid negative and positive differences being compensated) and divided by the expected number of cases in that category. These values are then summed for all categories, and the total is referred to as the <span class="math inline">\(\chi^2\)</span> statistic. Large values of this test statistic lead to the rejection of the null hypothesis, small values mean that the null hypothesis cannot be rejected.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 <p>Given our data, we have:</p>
 <p><span class="math display">\[\chi^2 = \frac{(15 - 16.67)^2}{16.67} + \frac{(24 - 16.67)^2}{16.67} + \frac{(10 - 16.67)^2}{16.67} + \\
 \frac{(19 - 16.67)^2}{16.67} + \frac{(19 - 16.67)^2}{16.67} + \frac{(13 - 16.67)^2}{16.67}  =  7.52\]</span></p>
@@ -570,7 +571,7 @@ test</code></pre>
 <p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/Screenshot%202020-05-13%20at%2012.20.42.png" style="width:100.0%" /></p>
 <p><span class="math display">\[\chi^2_{\alpha; k-1} = \chi^2_{0.05; 5} = 11.0705\]</span></p>
 <p><strong>Step 4.</strong></p>
-<p>We compare the test statistic with the rejection region and we conclude. Visually, we have:</p>
+<p>We compare the test statistic (found in step 2) with the rejection region (found in step 3) and we conclude. Visually, we have:</p>
 <p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The test statistic does not lie within the rejection region (i.e., the grey shaded area). Therefore, at the 5% significance level, we do not reject the null hypothesis that there is no significant difference between the observed and the expected frequencies. In other words, still at the 5% significance level, we cannot reject the hypothesis that the dice is fair.</p>
 <div id="verification-in-r-1" class="section level3">

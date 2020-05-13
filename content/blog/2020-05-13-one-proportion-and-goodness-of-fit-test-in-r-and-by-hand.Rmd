@@ -340,7 +340,7 @@ $$\pm z_{\alpha/2} = \pm z_{0.025} = \pm 1.96$$
 
 **Step 4.**
 
-We compare the test statistic with the rejection region and we conclude. Visually, we have:
+We compare the test statistic (found in step 2) with the rejection region (found in step 3) and we conclude. Visually, we have:
 
 ```{r, echo = FALSE, warning = FALSE}
 funcShaded <- function(x) {
@@ -365,6 +365,8 @@ p
 ```
 
 The test statistic lies within the rejection region (i.e., the grey shaded areas). Therefore, at the 5% significance level, we reject the null hypothesis and we conclude that the proportion of heads (and thus tails) is significantly different than 50%. In other words, still at the 5% significance level, we conclude that the coin is unfair.
+
+If you prefer to compute the *p*-value instead of comparing the t-stat and the rejection region, you can use this [Shiny app to easily compute *p*-values](/blog/a-guide-on-how-to-read-statistical-tables/) for different probability distributions. After having opened the app, set the t-stat, the correspongind alternative and you will find the *p*-value at the top of the page.
 
 ### Verification in R
 
@@ -404,7 +406,7 @@ abline(
 table(dice_face)
 ```
 
-With a fair dice, we would expect it to land $\frac{100}{6} \approx 16.67$ times on each face (this expected value is represented by the dashed line in the above plot). Although the observed frequencies are different than the expected value of 16.67, we need to test whether they are *significantly* different.
+With a fair dice, we would expect it to land $\frac{100}{6} \approx 16.67$ times on each face (this expected value is represented by the dashed line in the above plot). Although the observed frequencies are different than the expected value of 16.67:
 
 ```{r, echo = FALSE}
 dat <- data.frame(
@@ -416,7 +418,7 @@ colnames(dat) <- c("dice_face", "observed_freq", "expected_freq")
 dat
 ```
 
-We now perform the appropriate hypothesis test following the 4 easy steps mentioned above:
+we need to test whether they are *significantly* different. For this, we perform the appropriate hypothesis test following the 4 easy steps mentioned above:
 
 1. State the null and alternative hypotheses
 1. Compute the test-statistic (also known as t-stat)
@@ -425,7 +427,7 @@ We now perform the appropriate hypothesis test following the 4 easy steps mentio
 
 **Step 1.**
 
-In our example, the null and alternative hypotheses are:
+The null and alternative hypotheses of the goodness of fit test are:
 
 * $H_0$: there is no significant difference between the observed and the expected frequencies
 * $H_1$: there is a significant difference between the observed and the expected frequencies
@@ -436,9 +438,9 @@ The test statistic is:
 
 $$\chi^2 = \sum_{i = 1}^k \frac{(O_i - E_i)^2}{E_i}$$
 
-where $O_i$ is the observed frequency, $E_i$ is the expected frequency and $k$ is the number of categories.
+where $O_i$ is the observed frequency, $E_i$ is the expected frequency and $k$ is the number of categories (in our case, there are 6 categories, representing the 6 dice faces).
 
-This $\chi^2$ statistic is obtained by calculating the difference between the observed number of cases and the expected number of cases in each category. This difference is squared (to avoid negative and positive differences being compensated) and divided by the expected number of cases in that category. These values are then summed for all categories, and the total is referred to as the $\chi^2$ statistic. Large values of this statistic lead to the rejection of the null hypothesis, small values mean that the null hypothesis cannot be rejected.^[Source: http://uregina.ca/~gingrich/ch10.pdf.]
+This $\chi^2$ statistic is obtained by calculating the difference between the observed number of cases and the expected number of cases in each category. This difference is squared (to avoid negative and positive differences being compensated) and divided by the expected number of cases in that category. These values are then summed for all categories, and the total is referred to as the $\chi^2$ statistic. Large values of this test statistic lead to the rejection of the null hypothesis, small values mean that the null hypothesis cannot be rejected.^[Source: http://uregina.ca/~gingrich/ch10.pdf.]
 
 Given our data, we have:
 
@@ -455,7 +457,7 @@ $$\chi^2_{\alpha; k-1} = \chi^2_{0.05; 5} = 11.0705$$
 
 **Step 4.**
 
-We compare the test statistic with the rejection region and we conclude. Visually, we have:
+We compare the test statistic (found in step 2) with the rejection region (found in step 3) and we conclude. Visually, we have:
 
 ```{r, echo = FALSE, warning = FALSE}
 funcShaded <- function(x) {
@@ -468,7 +470,7 @@ p <- ggplot(data.frame(x = c(qchisq(0.99999, df = 5, lower.tail = FALSE), qchisq
   stat_function(fun = funcShaded, geom = "area", alpha = 0.8) +
   theme_minimal() +
   geom_vline(xintercept = 7.52, color = "steelblue") +
-  geom_text(aes(x = 7.52, label = "Test statistic = 7.52", y = 0.2), colour = "steelblue", angle = 90, vjust = 1.3, text = element_text(size = 11)) +
+  geom_text(aes(x = 7.52, label = "Test statistic = 7.52", y = 0.1), colour = "steelblue", angle = 90, vjust = 1.3, text = element_text(size = 11)) +
   ggtitle("Chi-square distribution (df = 5)") +
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) +
   ylab("Density") +
