@@ -14,5 +14,3 @@ If you are new to this blog, I invite you to:
 * Follow me on [Medium](https://medium.com/@ant.soetewey) or [Twitter](https://twitter.com/statsandr)
 * [Subscribe to the newsletter](/subscribe/) to receive updates every time a new article is published
 * Contribute by writing a [guest post](/contribute/)
-* See the [most recent comments](/recent-comments/) so you can follow the discussion
-<!--- * [Contribute](/contribute/) by submitting your article --->

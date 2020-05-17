@@ -11,7 +11,6 @@ If you are new to this blog, I invite you to:
 * Follow me on [Medium](https://medium.com/@ant.soetewey) or [Twitter](https://twitter.com/statsandr)
 * [Subscribe to the newsletter](https://www.statsandr.com/subscribe/) to receive updates every time a new article is published
 * Contribute by writing a [guest post](https://www.statsandr.com/contribute/)
-* See the [most recent comments](https://www.statsandr.com/recent-comments/) so you can follow the discussion
 
 # Status
 
