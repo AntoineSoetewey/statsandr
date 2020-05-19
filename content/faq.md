@@ -52,3 +52,5 @@ Absolutely! To share your post on this blog, please send it via the [contributio
 ## 7. How can I support you and support this blog?
 
 You can support the development of this blog via the [support page](/support/). Thanks in advance for your support, any help is greatly appreciated!
+
+[Back to top](#top)
