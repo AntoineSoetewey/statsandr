@@ -24,3 +24,5 @@ With this blog, I realized that in order to learn and fully understand something
 ## Contact
 
 Thanks in advance for reading and feel free to [contact me](/contact/) if you have any questions, remarks or inquiries.
+
+[&uarr; Back to top](#top)

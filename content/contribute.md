@@ -44,3 +44,5 @@ You are also more than welcome and encouraged to respond to any comments that th
 ## Contact
 
 Thanks in advance for your interest! Do not hesitate to [contact me](/contact/) if you have any questions.
+
+[&uarr; Back to top](#top)
