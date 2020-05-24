@@ -14,6 +14,8 @@ You can contact me [here](/contact/).
 
 * [Twitter](https://twitter.com/statsandr)
 * [Medium](https://medium.com/@ant.soetewey)
+* [LinkedIn](https://www.linkedin.com/in/antoinesoetewey/)
+* [GitHub](https://github.com/AntoineSoetewey)
 
 ## In the news
 
