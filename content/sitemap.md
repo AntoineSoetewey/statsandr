@@ -18,6 +18,7 @@ A list of all the pages and articles found on the blog. If you cannot find what 
 * [FAQ - Frequently asked questions](/faq/)
 * [Contribute - Guest post](/contribute/)
 * [Support this blog](/support/)
+* [Press](/press/)
 * [Useful links](/links/)
 * [Terms and policies](/terms/)
 * [Sitemap](/sitemap/)
