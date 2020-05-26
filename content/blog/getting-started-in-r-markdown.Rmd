@@ -93,7 +93,7 @@ output:
     toc: true
 ```
 
-Here are my usual settings regarding the format of a HTML document (remove `toc_float: true` if you render the document in PDF, as PDF documents do not accept floating tables of contents):
+Here are my usual settings regarding the format of a HTML document (remove everything after `number_sections: true` if you render the document in PDF, as PDF documents do not accept these options in the YAML header):
 
 ```
 output:
@@ -102,9 +102,12 @@ output:
     toc_depth: 6
     number_sections: true
     toc_float: true
+    code_folding: hide
+    theme: flatly
+    code_download: true
 ```
 
-In addition to adding a table of contents, it sets the depth, adds a section numbering and the table of contents is floating when scrolling down the document (only available for HTML documents).
+In addition to adding a table of contents, it sets its depth, adds a section numbering, the table of contents is floating when scrolling down the document, the code is hidden by default, the `flatly` theme is used and it adds the possibility to download the `.Rmd` document.
 
 You can visualize your table of contents even before knitting the document, or go directly to a specific section by clicking on the small icon in the top right corner. Your table of contents will appear, click on a section to go to this section in your `.Rmd` document:
 
@@ -134,7 +137,7 @@ If you already wrote code in a R script and want to reuse it in your R Markdown 
 
 As you can see, there are two additional arguments in the code chunk of the plot compared to my code chunk of the mean presented above. The first argument following the letter `r` (without comma between the two) is used to set the name of the chunk. In general, do not bother with this, it is mainly used to refer to a specific code chunk. You can remove the name of the chunk, but do not remove the letter `r` between the `{}` as it tells R that the code that follows corresponds to R code (yes you read it well, that also means you can include code from another programming language, e.g., Python, SQL, etc.).
 
-After the name of the chunk (after `pressure` in the example file), you can see that there is an additional argument: `echo=FALSE`. This argument, called an option, indicates that you want to hide the code, and display only the output of the code. Try removing it (or change it to `echo=TRUE`), and you will see that after knitting the document, both the code AND the output will appear, while only the results appeared previously.
+After the name of the chunk (after `pressure` in the example file), you can see that there is an additional argument: `echo = FALSE`. This argument, called an option, indicates that you want to hide the code, and display only the output of the code. Try removing it (or change it to `echo = TRUE`), and you will see that after knitting the document, both the code AND the output will appear, while only the results appeared previously.
 
 You can specify if you want to hide or display the code alongside the output of that code for each code chunk separately, for instance if you want to show the code for some code chunks, but not for others. Alternatively, if you want to always hide/display the code together with the output for the entire document, you can specify it in the setup code chunk located just after the YAML header. The options passed to this setup code chunk will determine the options for all code chunks, except for those that have been specifically modified. By default, the only setup option when you open a new R Markdown file is `knitr::opts_chunk$set(echo = TRUE)`, meaning that by default, all outputs will be accompanied by its corresponding code. If you want to display only the results without the code for the whole document, replace it by `knitr::opts_chunk$set(echo = FALSE)`. Two other options often passed to this setup code chunk are `warning = FALSE` and `message = FALSE` to prevent warnings and messages to be displayed on the report. If you want to pass several options, do not forget to separate them with a comma:
 
