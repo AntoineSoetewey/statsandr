@@ -54,7 +54,9 @@ bibliography: bibliography.bib
 <li><a href="#average-linkage">Average linkage</a></li>
 </ul></li>
 <li><a href="#solution-in-r-1">Solution in R</a><ul>
-<li><a href="#single-linkage-1">Single linkage</a></li>
+<li><a href="#single-linkage-1">Single linkage</a><ul>
+<li><a href="#optimal-number-of-clusters-1">Optimal number of clusters</a></li>
+</ul></li>
 <li><a href="#complete-linkage-1">Complete linkage</a></li>
 <li><a href="#average-linkage-1">Average linkage</a></li>
 </ul></li>
@@ -1021,12 +1023,13 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>It then recalculates the distances between the new and old clusters and save them in a new distance matrix which will be used in the next step</li>
 <li>Finally, steps 1 and 2 are repeated until all clusters are merged into one single cluster including all points.</li>
 </ol>
-<p>There exists four main methods to measure the distance between clusters, referred as linkage methods:</p>
+<p>There exists five main methods to measure the distance between clusters, referred as linkage methods:</p>
 <ul>
 <li>Single linkage: computes the minimum distance between clusters before merging them.</li>
 <li>Complete linkage: computes the maximum distance between clusters before merging them.</li>
 <li>Average linkage: computes the average distance between clusters before merging them.</li>
 <li>Centroid linkage: calculates centroids for both clusters, then computes the distance between the two before merging them.</li>
+<li>Ward’s (minimum variance) criterion: minimizes the total within-cluster variance and find the pair of clusters that leads to minimum increase in total within-cluster variance after merging.</li>
 </ul>
 <p>In the following sections, only the three first linkage methods are presented (first by hand and then the results are verified in R).</p>
 <div id="application-3-hierarchical-clustering" class="section level2">
@@ -1779,7 +1782,7 @@ round(res.k$centers, digits = 2)</code></pre>
 </div>
 <div id="solution-in-r-1" class="section level3">
 <h3>Solution in R</h3>
-<p>To perform the hierarchical clustering with any of the 3 criterion in R, we first need to enter the data (in this case as a matrix format, but it can also be entered as dataframes):</p>
+<p>To perform the hierarchical clustering with any of the 3 criterion in R, we first need to enter the data (in this case as a matrix format, but it can also be entered as a dataframe):</p>
 <pre class="r"><code>X &lt;- matrix(c(2.03, 0.06, -0.64, -0.10, -0.42, -0.53, -0.36, 0.07, 1.14, 0.37),
   nrow = 5, byrow = TRUE
 )</code></pre>
@@ -1795,6 +1798,8 @@ hclust &lt;- hclust(dist(X), method = &quot;single&quot;)</code></pre>
 <pre class="r"><code>plot(hclust)</code></pre>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-34-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
+<div id="optimal-number-of-clusters-1" class="section level5">
+<h5>Optimal number of clusters</h5>
 <p>Remember that hierarchical clustering is used to determine the optimal number of clusters. This optimal number of clusters can be determined thanks to the dendrogram. For this, we usually look at the largest difference of heights:</p>
 <div class="figure">
 <img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/dendrogram-single-linkage.png" alt="How to determine the number of clusters from a dendrogram? Take the largest difference of heights and count how many vertical lines you see" />
@@ -1807,6 +1812,12 @@ rect.hclust(hclust,
   border = &quot;blue&quot;
 )</code></pre>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Below another figure explaining how to determine the optimal number of clusters:</p>
+<div class="figure">
+<img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/optimal%20number%20of%20clusters%20hierarchical%20clustering.png" alt="Determining the optimal numbers of cluster in hierarchical clustering. Source: Towards Data Science" style="width:100.0%" />
+<p class="caption">Determining the optimal numbers of cluster in hierarchical clustering. Source: Towards Data Science</p>
+</div>
+<p>(See this <a href="/blog/files/Hierarchical-clustering-cheatsheet.pdf">hierarchical clustering cheatsheet</a> for more visualizations like this.)</p>
 <p>Finally, we could also determine the optimal number of cluster thanks to a barplot of the heights (stored in <code>$height</code> of the clustering output):</p>
 <pre class="r"><code>barplot(hclust$height,
   names.arg = (nrow(X) - 1):1 # show the number of cluster below each bars
@@ -1814,6 +1825,7 @@ rect.hclust(hclust,
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-36-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.</p>
 <p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the <em>silhouette plot</em>, <em>elbow plot</em> or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better). However, these methods are beyond the scope of this course and the method presented with the dendrogram is generally sufficient.</p>
+</div>
 </div>
 <div id="complete-linkage-1" class="section level4">
 <h4>Complete linkage</h4>
