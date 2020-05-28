@@ -1,0 +1,267 @@
+---
+title: Correlation coefficient and correlation test in R
+author: Antoine Soetewey
+date: '2020-05-28'
+slug: correlation-coefficient-and-correlation-test-in-r
+categories: []
+tags:
+  - Basics
+  - Descriptive statistics
+  - R
+  - Statistics
+meta_img: blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/correlation-coefficient-and-correlation-test-in-r.jpeg
+description: Learn how to compute a correlation coefficient (Pearson and Spearman) and perform a correlation test in R
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+draft: true
+# bibliography: bibliography.bib
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#data">Data</a></li>
+<li><a href="#correlation-coefficient">Correlation coefficient</a><ul>
+<li><a href="#between-two-variables">Between two variables</a></li>
+<li><a href="#correlation-matrix-correlations-for-all-variables">Correlation matrix: correlations for all variables</a></li>
+<li><a href="#interpretation-of-a-correlation-coefficient">Interpretation of a correlation coefficient</a></li>
+</ul></li>
+<li><a href="#visualizations">Visualizations</a><ul>
+<li><a href="#one-scatterplot-for-2-variables">One scatterplot for 2 variables</a></li>
+<li><a href="#scatterplots-for-several-pairs-of-variables">Scatterplots for several pairs of variables</a></li>
+<li><a href="#another-simple-correlation-matrix">Another simple correlation matrix</a></li>
+</ul></li>
+<li><a href="#correlation-test">Correlation test</a><ul>
+<li><a href="#for-2-variables">For 2 variables</a></li>
+<li><a href="#for-several-pairs-of-variables">For several pairs of variables</a></li>
+</ul></li>
+<li><a href="#combination-of-correlation-coefficients-and-correlation-tests">Combination of correlation coefficients and correlation tests</a></li>
+</ul>
+</div>
+
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/correlation-coefficient-and-correlation-test-in-r.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Correlations between variables play an important role in a <a href="/tags/descriptive-statistics/">descriptive analysis</a>. A correlation measures the relationship between two variables, that is, how they are linked to each other. In this sense, a correlation allows to know which variables evolve in the same direction, which ones evolve in the opposite direction, and which ones are independent.</p>
+<p>A correlation is usually computed between two <a href="/blog/variable-types-and-examples/#quantitative">quantitative</a> variables. In this article, I show how to compute correlation coefficients, and how to perform correlation tests in R and how to visualize relationships between variables.</p>
+<p>See the <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a> if you need to study the relationship between two <a href="/blog/variable-types-and-examples/#qualitative">qualitative</a> variables.</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>In this article, we use the <code>mtcars</code> dataset (loaded by default in R):</p>
+<pre class="r"><code># display first 5 observations
+head(mtcars, 5)</code></pre>
+<pre><code>##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre>
+<p>The variables <code>vs</code> and <code>am</code> are categorical variables, so they are removed for this article:</p>
+<pre class="r"><code># remove vs and am variables
+library(tidyverse)
+dat &lt;- mtcars %&gt;%
+  select(-vs, -am)
+
+# display 5 first obs. of new dataset
+head(dat, 5)</code></pre>
+<pre><code>##                    mpg cyl disp  hp drat    wt  qsec gear carb
+## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46    4    4
+## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02    4    4
+## Datsun 710        22.8   4  108  93 3.85 2.320 18.61    4    1
+## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44    3    1
+## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02    3    2</code></pre>
+</div>
+<div id="correlation-coefficient" class="section level1">
+<h1>Correlation coefficient</h1>
+<div id="between-two-variables" class="section level2">
+<h2>Between two variables</h2>
+<p>The correlation between 2 variables is found with the <code>cor()</code> function. Suppose we want to compute the correlation between horsepower (<code>hp</code>) and miles per gallon (<code>mpg</code>):</p>
+<pre class="r"><code># Pearson correlation between 2 variables
+cor(dat$hp, dat$mpg)</code></pre>
+<pre><code>## [1] -0.7761684</code></pre>
+<p>Note 1: the correlation between variables <em>x</em> and <em>y</em> is equal to the correlation between variables <em>y</em> and <em>x</em> so the order of the variables in the <code>cor()</code> function does not matter.</p>
+<p>Note 2: the Pearson correlation is computed by default with the <code>cor()</code> function. If you want to compute the Spearman correlation for instance, add the argument <code>method = "spearman"</code>:</p>
+<pre class="r"><code># Spearman correlation between 2 variables
+cor(dat$hp, dat$mpg,
+  method = &quot;spearman&quot;
+)</code></pre>
+<pre><code>## [1] -0.8946646</code></pre>
+<p>Run <code>?cor</code> for more information about the different methods available in the <code>cor()</code> function.</p>
+</div>
+<div id="correlation-matrix-correlations-for-all-variables" class="section level2">
+<h2>Correlation matrix: correlations for all variables</h2>
+<p>Suppose now that we want to compute correlations for several pairs of variables. We can easily do so for all possible pairs of variables in the dataset, again with the <code>cor()</code> function:</p>
+<pre class="r"><code># correlation for all variables (rounded to 2 decimals)
+round(cor(dat),
+  digits = 2
+)</code></pre>
+<pre><code>##        mpg   cyl  disp    hp  drat    wt  qsec  gear  carb
+## mpg   1.00 -0.85 -0.85 -0.78  0.68 -0.87  0.42  0.48 -0.55
+## cyl  -0.85  1.00  0.90  0.83 -0.70  0.78 -0.59 -0.49  0.53
+## disp -0.85  0.90  1.00  0.79 -0.71  0.89 -0.43 -0.56  0.39
+## hp   -0.78  0.83  0.79  1.00 -0.45  0.66 -0.71 -0.13  0.75
+## drat  0.68 -0.70 -0.71 -0.45  1.00 -0.71  0.09  0.70 -0.09
+## wt   -0.87  0.78  0.89  0.66 -0.71  1.00 -0.17 -0.58  0.43
+## qsec  0.42 -0.59 -0.43 -0.71  0.09 -0.17  1.00 -0.21 -0.66
+## gear  0.48 -0.49 -0.56 -0.13  0.70 -0.58 -0.21  1.00  0.27
+## carb -0.55  0.53  0.39  0.75 -0.09  0.43 -0.66  0.27  1.00</code></pre>
+<p>This correlation matrix gives an overview of the correlations for all combinations of two variables.</p>
+</div>
+<div id="interpretation-of-a-correlation-coefficient" class="section level2">
+<h2>Interpretation of a correlation coefficient</h2>
+<p>First of all, a correlation ranges from <strong>-1 to 1</strong>.</p>
+<p>On the one hand, a negative correlation implies that the two variables under consideration vary in opposite directions, that is, if a variable increases the other decreases and vice versa. On the other hand, a positive correlation implies that the two variables under consideration vary in the same direction, i.e., if a variable increases the other one increases and if one decreases the other one decreases as well. Last but not least, a correlation close to 0 indicates that the two variables are independent.</p>
+<p>As an illustration, the Pearson correlation between horsepower (<code>hp</code>) and miles per gallon (<code>mpg</code>) found above is -0.78, meaning that the 2 variables vary in opposite direction. This makes sense, cars with more horsepower tend to consume more fuel (and thus have a lower millage par gallon). On the contrary, from the correlation matrix we see that the correlation between miles per gallon (<code>mpg</code>) and the 1/4 mile time (<code>qsec</code>) is 0.42, meaning that fast cars (low <code>qsec</code>) tend to have a worse millage per gallon (low <code>mpg</code>). This again make sense as fast cars tend to consume more fuel.</p>
+<p>The correlation matrix is however not easily interpretable, especially when the dataset is composed of many variables. In the following sections, we present some alternatives to the correlation matrix.</p>
+</div>
+</div>
+<div id="visualizations" class="section level1">
+<h1>Visualizations</h1>
+<div id="one-scatterplot-for-2-variables" class="section level2">
+<h2>One scatterplot for 2 variables</h2>
+<p>A good way to visualize a correlation between 2 variables is to draw a scatterplot of the two variables of interest. Suppose we want to examine the relationship between horsepower (<code>hp</code>) and miles per gallon (<code>mpg</code>):</p>
+<pre class="r"><code># scatterplot
+library(ggplot2)
+
+ggplot(dat) +
+  aes(x = hp, y = mpg) +
+  geom_point(colour = &quot;#0c4c8a&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>(You can use the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse">esquisse addin</a> if you want to easily draw plots with the <code>{ggplot2}</code> package.)</p>
+</div>
+<div id="scatterplots-for-several-pairs-of-variables" class="section level2">
+<h2>Scatterplots for several pairs of variables</h2>
+<p>Suppose that instead of visualizing the relationship between only 2 variables, we want to visualize the relationship for several pairs of variables. This is possible thanks to the <code>pair()</code> function. For this illustration, we focus only on miles per gallon (<code>mpg</code>), horsepower (<code>hp</code>) and weight (<code>wt</code>):</p>
+<pre class="r"><code># multiple scatterplots
+pairs(dat[, c(1, 4, 6)])</code></pre>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The figure indicates that weight (<code>wt</code>) and horsepower (<code>hp</code>) are positively correlated, while miles per gallon (<code>mpg</code>) is negatively correlated with horsepower (<code>hp</code>) and weight (<code>wt</code>).</p>
+</div>
+<div id="another-simple-correlation-matrix" class="section level2">
+<h2>Another simple correlation matrix</h2>
+<p>This version of the correlation matrix presents the correlation coefficients in a slightly more readable way by coloring to coefficients depending on their sign. Applied to our dataset, we have:</p>
+<pre class="r"><code>library(corrplot)
+corrplot(cor(dat),
+  method = &quot;number&quot;,
+  type = &quot;upper&quot;
+) # show only upper side</code></pre>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="correlation-test" class="section level1">
+<h1>Correlation test</h1>
+<div id="for-2-variables" class="section level2">
+<h2>For 2 variables</h2>
+<p>Unlike a correlation matrix which indicates correlation coefficients between variables, the correlation test is used to test whether the correlation (denoted <span class="math inline">\(\rho\)</span>) between 2 variables is significantly different from 0 or not.</p>
+<p>In fact, a correlation coefficient different from 0 does not mean that the correlation is <strong>significantly</strong> different from 0. The hypotheses for the correlation test are as follows:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: <span class="math inline">\(\rho = 0\)</span></li>
+<li><span class="math inline">\(H_1\)</span>: <span class="math inline">\(\rho \ne 0\)</span></li>
+</ul>
+<p>Suppose that we want to test whether <code>drat</code> is correlated with <code>qsec</code>:</p>
+<pre class="r"><code># Pearson correlation test
+test &lt;- cor.test(dat$drat, dat$qsec)
+test</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  dat$drat and dat$qsec
+## t = 0.50164, df = 30, p-value = 0.6196
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.265947  0.426340
+## sample estimates:
+##        cor 
+## 0.09120476</code></pre>
+<p>The <em>p</em>-value of the correlation test between these 2 variables is 0.62. At the 5% significance level, we do not reject the null hypothesis of no correlation. We therefore conclude that we do not reject the hypothesis that there is no linear relationship between the 2 variables.</p>
+<p>This test proves that even if the correlation coefficient is slightly different from 0 (the correlation is 0.09), it is actually not significantly different from 0.</p>
+<p>Note that the <em>p</em>-value of a correlation test is based on the correlation coefficient <strong>and</strong> the sample size. The larger the sample size and the more extreme the correlation (closer to -1 or 1), the more likely the null hypothesis of no correlation will be rejected. With a small sample size, it is thus possible to obtain a relatively large correlation, but still find a correlation not significantly different from 0. For this reason, it is recommend to always perform a correlation test before interpreting a correlation coefficient.</p>
+</div>
+<div id="for-several-pairs-of-variables" class="section level2">
+<h2>For several pairs of variables</h2>
+<p>Similar to the correlation matrix used to compute correlation for several pairs of variables, the <code>rcorr()</code> function (from the <code>{Hmisc}</code> package) allows to compute the <em>p</em>-values of the correlation test for several pairs of variables at once. Applied to our dataset, we have:</p>
+<pre class="r"><code># correlation tests for whole dataset
+library(Hmisc)
+res &lt;- rcorr(as.matrix(dat))
+
+# display p-values (rounded to 3 decimals)
+round(res$P, 3)</code></pre>
+<pre><code>##        mpg   cyl  disp    hp  drat    wt  qsec  gear  carb
+## mpg     NA 0.000 0.000 0.000 0.000 0.000 0.017 0.005 0.001
+## cyl  0.000    NA 0.000 0.000 0.000 0.000 0.000 0.004 0.002
+## disp 0.000 0.000    NA 0.000 0.000 0.000 0.013 0.001 0.025
+## hp   0.000 0.000 0.000    NA 0.010 0.000 0.000 0.493 0.000
+## drat 0.000 0.000 0.000 0.010    NA 0.000 0.620 0.000 0.621
+## wt   0.000 0.000 0.000 0.000 0.000    NA 0.339 0.000 0.015
+## qsec 0.017 0.000 0.013 0.000 0.620 0.339    NA 0.243 0.000
+## gear 0.005 0.004 0.001 0.493 0.000 0.000 0.243    NA 0.129
+## carb 0.001 0.002 0.025 0.000 0.621 0.015 0.000 0.129    NA</code></pre>
+<p>Only correlations with <em>p</em>-values smaller than the significance level (usually <span class="math inline">\(\alpha = 0.05\)</span>) should be interpreted.</p>
+</div>
+</div>
+<div id="combination-of-correlation-coefficients-and-correlation-tests" class="section level1">
+<h1>Combination of correlation coefficients and correlation tests</h1>
+<p>Now that we covered the concepts of correlation coefficients and correlation tests, let see if it is possible to combine these two concepts in one single visualization.</p>
+<p>Ideally, we would like to have a concise overview of correlations between all possible pairs of variables present in a dataset, with a clear distinction for correlations that are significantly different from 0.</p>
+<p>The below figure, known as a <a href="/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/">correlogram</a>, does precisely this:</p>
+<pre class="r"><code>corrplot2 &lt;- function(data,
+                      method = &quot;pearson&quot;,
+                      sig.level = 0.05,
+                      order = &quot;original&quot;,
+                      diag = FALSE,
+                      type = &quot;upper&quot;,
+                      tl.srt = 90,
+                      number.font = 1,
+                      number.cex = 1,
+                      mar = c(0, 0, 0, 0)) {
+  library(corrplot)
+  data_incomplete &lt;- data
+  data &lt;- data[complete.cases(data), ]
+  mat &lt;- cor(data, method = method)
+  cor.mtest &lt;- function(mat, method) {
+    mat &lt;- as.matrix(mat)
+    n &lt;- ncol(mat)
+    p.mat &lt;- matrix(NA, n, n)
+    diag(p.mat) &lt;- 0
+    for (i in 1:(n - 1)) {
+      for (j in (i + 1):n) {
+        tmp &lt;- cor.test(mat[, i], mat[, j], method = method)
+        p.mat[i, j] &lt;- p.mat[j, i] &lt;- tmp$p.value
+      }
+    }
+    colnames(p.mat) &lt;- rownames(p.mat) &lt;- colnames(mat)
+    p.mat
+  }
+  p.mat &lt;- cor.mtest(data, method = method)
+  col &lt;- colorRampPalette(c(&quot;#BB4444&quot;, &quot;#EE9988&quot;, &quot;#FFFFFF&quot;, &quot;#77AADD&quot;, &quot;#4477AA&quot;))
+  corrplot(mat,
+    method = &quot;color&quot;, col = col(200), number.font = number.font,
+    mar = mar, number.cex = number.cex,
+    type = type, order = order,
+    addCoef.col = &quot;black&quot;, # add correlation coefficient
+    tl.col = &quot;black&quot;, tl.srt = tl.srt, # rotation of text labels
+    # combine with significance level
+    p.mat = p.mat, sig.level = sig.level, insig = &quot;blank&quot;,
+    # hide correlation coefficiens on the diagonal
+    diag = diag
+  )
+}
+
+corrplot2(
+  data = dat,
+  method = &quot;pearson&quot;,
+  sig.level = 0.05,
+  order = &quot;original&quot;,
+  diag = FALSE,
+  type = &quot;upper&quot;,
+  tl.srt = 75
+)</code></pre>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The above plot shows correlation coefficients for all pairs of variables (with more intense colors for more extreme correlations), and correlations not significantly different from 0 are represented by white box.</p>
+<p>To learn more about this plot and the code used, I invite you to read the article entitled “<a href="/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/">Correlogram in R: how to highlight the most correlated variables in a dataset</a>”.</p>
+</div>
