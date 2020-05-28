@@ -2612,6 +2612,7 @@ library(ViewPipeSteps)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#coefficient-of-variation&#34;&gt;Coefficient of variation&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#mode&#34;&gt;Mode&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#correlation&#34;&gt;Correlation&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#contingency-table&#34;&gt;Contingency table&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#mosaic-plot&#34;&gt;Mosaic plot&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
@@ -2894,6 +2895,11 @@ sort(tab, decreasing = TRUE) # sort highest to lowest&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##     setosa versicolor  virginica 
 ##         50         50         50&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
+&lt;div id=&#34;correlation&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Correlation&lt;/h1&gt;
+&lt;p&gt;Another descriptive statistics is the correlation coefficient. A correlation measures the relationship between two variables.&lt;/p&gt;
+&lt;p&gt;Computing correlation in R requires a detailed explanation so I wrote an article covering &lt;a href=&#34;/blog/correlation-coefficient-and-correlation-test-in-r/&#34;&gt;correlation and correlation test&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
 &lt;div id=&#34;contingency-table&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Contingency table&lt;/h1&gt;
 &lt;p&gt;&lt;code&gt;table()&lt;/code&gt; introduced above can also be used on two qualitative variables to create a contingency table. The dataset &lt;code&gt;iris&lt;/code&gt; has only one qualitative variable so we create a new qualitative variable just for this example. We create the variable &lt;code&gt;size&lt;/code&gt; which corresponds to &lt;code&gt;small&lt;/code&gt; if the length of the petal is smaller than the median of all flowers, &lt;code&gt;big&lt;/code&gt; otherwise:&lt;/p&gt;
@@ -2991,7 +2997,7 @@ ggplot(dat) +
 &lt;h1&gt;Boxplot&lt;/h1&gt;
 &lt;p&gt;Boxplots are really useful in descriptive statistics and are often underused (mostly because it is not well understood by the public). A boxplot graphically represents the distribution of a quantitative variable by visually displaying five common location summary (minimum, median, first and third quartiles and maximum) and any observation that was classified as a suspected outlier using the interquartile range (IQR) criterion. The IQR criterion means that all observations above &lt;span class=&#34;math inline&#34;&gt;\(q_{0.75} + 1.5 \cdot IQR\)&lt;/span&gt; and below &lt;span class=&#34;math inline&#34;&gt;\(q_{0.25} - 1.5 \cdot IQR\)&lt;/span&gt; (where &lt;span class=&#34;math inline&#34;&gt;\(q_{0.25}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(q_{0.75}\)&lt;/span&gt; correspond to first and third quartile respectively) are considered as potential outliers by R. The minimum and maximum in the boxplot are represented without these suspected outliers. Seeing all these information on the same plot help to have a good first overview of the dispersion and the location of the data. Before drawing a boxplot of our data, see below a graph explaining the information present on a boxplot:&lt;/p&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/boxplot.png&#34; alt=&#34;Detailed boxplot. Source: LFSAB1105 at UCLouvain&#34; /&gt;
+&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/boxplot.png&#34; alt=&#34;&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Detailed boxplot. Source: LFSAB1105 at UCLouvain&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;Now an example with our dataset:&lt;/p&gt;
@@ -3147,7 +3153,7 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 ##    virginica          47 (94.0%)    3 ( 6.0%)    50 (100.0%)
 ##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
 ## ------------ ------ ------------ ------------ --------------&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Row proportions are shown by default. To display column or total proportions, add the &lt;code&gt;prop = &amp;quot;c&amp;quot;&lt;/code&gt; or &lt;code&gt;prop = &amp;quot;t&amp;quot;&lt;/code&gt; arguments, respectively:&lt;/p&gt;
+&lt;p&gt;Row proportions are shown by default. To display column or total proportions, add the &lt;code&gt;prop = &#34;c&#34;&lt;/code&gt; or &lt;code&gt;prop = &#34;t&#34;&lt;/code&gt; arguments, respectively:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ctable(x = dat$Species,
        y = dat$size,
        prop = &amp;quot;t&amp;quot;) # total proportions&lt;/code&gt;&lt;/pre&gt;
@@ -3163,7 +3169,7 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 ##    virginica          47 (31.3%)    3 ( 2.0%)    50 ( 33.3%)
 ##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
 ## ------------ ------ ------------ ------------ --------------&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;To remove proportions altogether, add the argument &lt;code&gt;prop = &amp;quot;n&amp;quot;&lt;/code&gt;. Furthermore, to display only the bare minimum, add the &lt;code&gt;totals = FALSE&lt;/code&gt; and &lt;code&gt;headings = FALSE&lt;/code&gt; arguments:&lt;/p&gt;
+&lt;p&gt;To remove proportions altogether, add the argument &lt;code&gt;prop = &#34;n&#34;&lt;/code&gt;. Furthermore, to display only the bare minimum, add the &lt;code&gt;totals = FALSE&lt;/code&gt; and &lt;code&gt;headings = FALSE&lt;/code&gt; arguments:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ctable(x = dat$Species,
        y = dat$size,
        prop = &amp;quot;n&amp;quot;, # remove proportions
@@ -3233,9 +3239,9 @@ freq(dat$Species)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;A major advantage of this function is that it accepts single vectors as well as data frames. If a data frame is provided, all non-numerical columns are ignored so you do not have to remove them yourself before running the function.&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;descr()&lt;/code&gt; function allows to display:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;only a selection of descriptive statistics of your choice, with the &lt;code&gt;stats = c(&amp;quot;mean&amp;quot;, &amp;quot;sd&amp;quot;)&lt;/code&gt; argument for mean and standard deviation for example&lt;/li&gt;
-&lt;li&gt;the minimum, first quartile, median, third quartile and maximum with &lt;code&gt;stats = &amp;quot;fivenum&amp;quot;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;the most common descriptive statistics (mean, standard deviation, minimum, median, maximum, number and percentage of valid observations), with &lt;code&gt;stats = &amp;quot;common&amp;quot;&lt;/code&gt;:&lt;/li&gt;
+&lt;li&gt;only a selection of descriptive statistics of your choice, with the &lt;code&gt;stats = c(&#34;mean&#34;, &#34;sd&#34;)&lt;/code&gt; argument for mean and standard deviation for example&lt;/li&gt;
+&lt;li&gt;the minimum, first quartile, median, third quartile and maximum with &lt;code&gt;stats = &#34;fivenum&#34;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;the most common descriptive statistics (mean, standard deviation, minimum, median, maximum, number and percentage of valid observations), with &lt;code&gt;stats = &#34;common&#34;&lt;/code&gt;:&lt;/li&gt;
 &lt;/ul&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;descr(dat,
       headings = FALSE, # remove headings
@@ -3419,9 +3425,9 @@ describeBy(dat,
 &lt;div class=&#34;footnotes&#34;&gt;
 &lt;hr /&gt;
 &lt;ol&gt;
-&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Note that the &lt;code&gt;plain.ascii&lt;/code&gt; and &lt;code&gt;style&lt;/code&gt; arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;Note that it is also possible to compute odds ratio and risk ratio. See the vignette of the package for more information on this matter as these ratios are beyond the scope of this article.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Note that the &lt;code&gt;plain.ascii&lt;/code&gt; and &lt;code&gt;style&lt;/code&gt; arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;Note that it is also possible to compute odds ratio and risk ratio. See the vignette of the package for more information on this matter as these ratios are beyond the scope of this article.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
 </description>

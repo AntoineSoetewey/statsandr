@@ -35,6 +35,7 @@ output:
 <li><a href="#summary">Summary</a></li>
 <li><a href="#coefficient-of-variation">Coefficient of variation</a></li>
 <li><a href="#mode">Mode</a></li>
+<li><a href="#correlation">Correlation</a></li>
 <li><a href="#contingency-table">Contingency table</a><ul>
 <li><a href="#mosaic-plot">Mosaic plot</a></li>
 </ul></li>
@@ -317,6 +318,11 @@ sort(tab, decreasing = TRUE) # sort highest to lowest</code></pre>
 <pre><code>##     setosa versicolor  virginica 
 ##         50         50         50</code></pre>
 </div>
+<div id="correlation" class="section level1">
+<h1>Correlation</h1>
+<p>Another descriptive statistics is the correlation coefficient. A correlation measures the relationship between two variables.</p>
+<p>Computing correlation in R requires a detailed explanation so I wrote an article covering <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation and correlation test</a>.</p>
+</div>
 <div id="contingency-table" class="section level1">
 <h1>Contingency table</h1>
 <p><code>table()</code> introduced above can also be used on two qualitative variables to create a contingency table. The dataset <code>iris</code> has only one qualitative variable so we create a new qualitative variable just for this example. We create the variable <code>size</code> which corresponds to <code>small</code> if the length of the petal is smaller than the median of all flowers, <code>big</code> otherwise:</p>
@@ -414,7 +420,7 @@ ggplot(dat) +
 <h1>Boxplot</h1>
 <p>Boxplots are really useful in descriptive statistics and are often underused (mostly because it is not well understood by the public). A boxplot graphically represents the distribution of a quantitative variable by visually displaying five common location summary (minimum, median, first and third quartiles and maximum) and any observation that was classified as a suspected outlier using the interquartile range (IQR) criterion. The IQR criterion means that all observations above <span class="math inline">\(q_{0.75} + 1.5 \cdot IQR\)</span> and below <span class="math inline">\(q_{0.25} - 1.5 \cdot IQR\)</span> (where <span class="math inline">\(q_{0.25}\)</span> and <span class="math inline">\(q_{0.75}\)</span> correspond to first and third quartile respectively) are considered as potential outliers by R. The minimum and maximum in the boxplot are represented without these suspected outliers. Seeing all these information on the same plot help to have a good first overview of the dispersion and the location of the data. Before drawing a boxplot of our data, see below a graph explaining the information present on a boxplot:</p>
 <div class="figure">
-<img src="/blog/descriptive-statistics-in-r_files/boxplot.png" alt="Detailed boxplot. Source: LFSAB1105 at UCLouvain" />
+<img src="/blog/descriptive-statistics-in-r_files/boxplot.png" alt="" />
 <p class="caption">Detailed boxplot. Source: LFSAB1105 at UCLouvain</p>
 </div>
 <p>Now an example with our dataset:</p>
@@ -570,7 +576,7 @@ freq(dat$Species)</code></pre>
 ##    virginica          47 (94.0%)    3 ( 6.0%)    50 (100.0%)
 ##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
 ## ------------ ------ ------------ ------------ --------------</code></pre>
-<p>Row proportions are shown by default. To display column or total proportions, add the <code>prop = &quot;c&quot;</code> or <code>prop = &quot;t&quot;</code> arguments, respectively:</p>
+<p>Row proportions are shown by default. To display column or total proportions, add the <code>prop = "c"</code> or <code>prop = "t"</code> arguments, respectively:</p>
 <pre class="r"><code>ctable(x = dat$Species,
        y = dat$size,
        prop = &quot;t&quot;) # total proportions</code></pre>
@@ -586,7 +592,7 @@ freq(dat$Species)</code></pre>
 ##    virginica          47 (31.3%)    3 ( 2.0%)    50 ( 33.3%)
 ##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
 ## ------------ ------ ------------ ------------ --------------</code></pre>
-<p>To remove proportions altogether, add the argument <code>prop = &quot;n&quot;</code>. Furthermore, to display only the bare minimum, add the <code>totals = FALSE</code> and <code>headings = FALSE</code> arguments:</p>
+<p>To remove proportions altogether, add the argument <code>prop = "n"</code>. Furthermore, to display only the bare minimum, add the <code>totals = FALSE</code> and <code>headings = FALSE</code> arguments:</p>
 <pre class="r"><code>ctable(x = dat$Species,
        y = dat$size,
        prop = &quot;n&quot;, # remove proportions
@@ -656,9 +662,9 @@ freq(dat$Species)</code></pre>
 <p>A major advantage of this function is that it accepts single vectors as well as data frames. If a data frame is provided, all non-numerical columns are ignored so you do not have to remove them yourself before running the function.</p>
 <p>The <code>descr()</code> function allows to display:</p>
 <ul>
-<li>only a selection of descriptive statistics of your choice, with the <code>stats = c(&quot;mean&quot;, &quot;sd&quot;)</code> argument for mean and standard deviation for example</li>
-<li>the minimum, first quartile, median, third quartile and maximum with <code>stats = &quot;fivenum&quot;</code></li>
-<li>the most common descriptive statistics (mean, standard deviation, minimum, median, maximum, number and percentage of valid observations), with <code>stats = &quot;common&quot;</code>:</li>
+<li>only a selection of descriptive statistics of your choice, with the <code>stats = c("mean", "sd")</code> argument for mean and standard deviation for example</li>
+<li>the minimum, first quartile, median, third quartile and maximum with <code>stats = "fivenum"</code></li>
+<li>the most common descriptive statistics (mean, standard deviation, minimum, median, maximum, number and percentage of valid observations), with <code>stats = "common"</code>:</li>
 </ul>
 <pre class="r"><code>descr(dat,
       headings = FALSE, # remove headings
@@ -842,8 +848,8 @@ describeBy(dat,
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).<a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p>Note that the <code>plain.ascii</code> and <code>style</code> arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.<a href="#fnref2" class="footnote-back">↩</a></p></li>
-<li id="fn3"><p>Note that it is also possible to compute odds ratio and risk ratio. See the vignette of the package for more information on this matter as these ratios are beyond the scope of this article.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>Normality tests such as Shapiro-Wilk or Kolmogorov-Smirnov tests can also be used to test whether the data follow a normal distribution or not. However, in practice, normality tests are often considered as too conservative in the sense that for large sample size, a small deviation from the normality may cause the normality condition to be violated. For this reason, it is often the case that the normality condition is verified based on a combination of visual inspections (with histograms and QQ-plots) and formal test (Shapiro-Wilk test for instance).<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Note that the <code>plain.ascii</code> and <code>style</code> arguments are needed for this package. In our examples, these arguments are added in the settings of each chunk so they are not visible.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Note that it is also possible to compute odds ratio and risk ratio. See the vignette of the package for more information on this matter as these ratios are beyond the scope of this article.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
