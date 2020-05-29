@@ -4,29 +4,29 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title> COVID-19 in Belgium: is it over yet? - Stats and R </title>
+    <title> How to deploy a Shiny app: an example with shinyapps.io - Stats and R </title>
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <meta name="referrer" content="no-referrer">
-    <meta name="description" content="Evolution of hospital admissions and number of new confirmed cases due to COVID-19 in Belgium (by province and a the national level)" />
+    <meta name="description" content="Learn how to compute a correlation coefficient (Pearson and Spearman) and perform a correlation test in R" />
     <meta property="og:site_name" content="Stats and R" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="/blog/covid-19-in-belgium-is-it-over-yet/" />
-    <meta property="og:title" content="COVID-19 in Belgium: is it over yet?" />
-    <meta property="og:image" content="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/Belgian_Hospitalisations_COVID-19_1.png" />
-    <meta property="og:description" content="Evolution of hospital admissions and number of new confirmed cases due to COVID-19 in Belgium (by province and a the national level)" />
+    <meta property="og:url" content="/blog/how-to-deploy-a-shiny-app-an-example-with-shinyapps-io/" />
+    <meta property="og:title" content="How to deploy a Shiny app: an example with shinyapps.io" />
+    <meta property="og:image" content="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/correlation-coefficient-and-correlation-test-in-r.jpeg" />
+    <meta property="og:description" content="Learn how to compute a correlation coefficient (Pearson and Spearman) and perform a correlation test in R" />
 
     <meta name="twitter:card" content="summary_large_image" />
     
     <meta name="twitter:site" content="@statsandr">
     <meta name="twitter:creator" content="@statsandr">
     
-    <meta name="twitter:title" content="COVID-19 in Belgium: is it over yet?" />
-    <meta name="twitter:description" content="Evolution of hospital admissions and number of new confirmed cases due to COVID-19 in Belgium (by province and a the national level)" />
-    <meta name="twitter:image" content="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/Belgian_Hospitalisations_COVID-19_1.png" />
+    <meta name="twitter:title" content="How to deploy a Shiny app: an example with shinyapps.io" />
+    <meta name="twitter:description" content="Learn how to compute a correlation coefficient (Pearson and Spearman) and perform a correlation test in R" />
+    <meta name="twitter:image" content="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/correlation-coefficient-and-correlation-test-in-r.jpeg" />
 
-    <link rel="canonical" href="/blog/covid-19-in-belgium-is-it-over-yet/">
+    <link rel="canonical" href="/blog/how-to-deploy-a-shiny-app-an-example-with-shinyapps-io/">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
 
@@ -116,7 +116,7 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-sm-12 col-md-10">
-                    <h1 class="mx-0 mx-md-4 blog-post-title">COVID-19 in Belgium: is it over yet?</h1>
+                    <h1 class="mx-0 mx-md-4 blog-post-title">How to deploy a Shiny app: an example with shinyapps.io</h1>
 
                     <div class="mb-md-4 meta">
                         
@@ -127,19 +127,19 @@
                             
                         
 
-                        <span class="date middot" title='Fri May 22 2020 00:00:00 UTC'>
-                            2020-05-22
+                        <span class="date middot" title='Fri May 29 2020 00:00:00 UTC'>
+                            2020-05-29
                         </span>
 
                         <span class="reading-time middot">
-                            2 minute read
+                            1 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
                             <ul class="list-unstyled d-inline">
                                 
                                     <li class="d-inline middot">
-                                        <a href="/tags/coronavirus">Coronavirus</a>
+                                        <a href="/tags/basics">Basics</a>
                                     </li>
                                 
                                     <li class="d-inline middot">
@@ -147,7 +147,11 @@
                                     </li>
                                 
                                     <li class="d-inline middot">
-                                        <a href="/tags/visualization">Visualization</a>
+                                        <a href="/tags/shiny">Shiny</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/web">Web</a>
                                     </li>
                                 
                             </ul>
@@ -169,62 +173,12 @@
 <div id="TOC">
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#new-hospital-admissions">New hospital admissions</a><ul>
-<li><a href="#overall">Overall</a></li>
-<li><a href="#zooming-in">Zooming in</a></li>
-</ul></li>
-<li><a href="#new-confirmed-cases">New confirmed cases</a></li>
 </ul>
 </div>
 
+<p><img src="/blog/2020-05-29-how-to-deploy-a-shiny-app-an-example-with-shinyapps-io_files/how-to-deploy-a-shiny-app-an-example-with-shinyapps-io.png" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p><em>This is a joint work with Prof. <a href="https://twitter.com/NikoSpeybroeck" target="_blank">Niko Speybroeck</a> and <a href="https://twitter.com/arosas_aguirre" target="_blank">Angel Rosas-Aguirre</a>.</em></p>
-<p>Belgium recently started to lift its lockdown measures initially imposed to contain the spread of the Covid-19. Following this decision taken by Belgian authorities, we analyze how the situation evolved so far.</p>
-<p>Contrarily to a previous article in which I analyzed the outbreak of the <a href="/blog/covid-19-in-belgium/">Coronavirus in Belgium using the SIR model</a>, in this article we focus on the evolution of:</p>
-<ul>
-<li>the number of hospital admissions</li>
-<li>the number of new confirmed cases</li>
-</ul>
-<p>at the province and national level.</p>
-<p>Data is from <a href="https://epistat.wiv-isp.be/covid/" target="_blank">Sciensano</a>.</p>
-</div>
-<div id="new-hospital-admissions" class="section level1">
-<h1>New hospital admissions</h1>
-<div id="overall" class="section level2">
-<h2>Overall</h2>
-<div class="figure">
-<figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/Belgian_Hospitalisations_COVID-19_1.png" src="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/low/Belgian_Hospitalisations_COVID-19_1.png" alt="Belgian hospitalisations COVID-19" style="width:100.0%" /></figure>
-<p class="caption">Belgian hospitalisations COVID-19</p>
-</div>
-<p>From the above figure, we see that the rate of hospitalizations continue with a decreasing trend in all provinces (and in Belgium as well).</p>
-<p><a href="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/Belgian_Hospitalisations_COVID-19_1.png">Download</a> the figure, or see the <a href="https://github.com/AntoineSoetewey/COVID-19-Figures/blob/master/plot_hosp_trends_divid_twographs.R" target="_blank">code</a>.</p>
-</div>
-<div id="zooming-in" class="section level2">
-<h2>Zooming in</h2>
-<div class="figure">
-<figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/Belgian_Hospitalisations_COVID-19_3weeks.png" src="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/low/Belgian_Hospitalisations_COVID-19_3weeks.png" alt="Hospital admissions COVID-19 - Belgium" style="width:100.0%" /></figure>
-<p class="caption">Hospital admissions COVID-19 - Belgium</p>
-</div>
-<p><a href="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/Belgian_Hospitalisations_COVID-19_3weeks.png">Download</a> the figure or see the <a href="https://github.com/AntoineSoetewey/COVID-19-Figures/blob/master/plot_hosp_trends_divid_3weeks.R" target="_blank">code</a>.</p>
-</div>
-</div>
-<div id="new-confirmed-cases" class="section level1">
-<h1>New confirmed cases</h1>
-<div class="figure">
-<figure class="progressive"><img class="progressive__img progressive--not-loaded" data-progressive="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/new_cases_divid.png" src="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/low/new_cases_divid.png" alt="New confirmed COVID-19 cases in Belgium" style="width:100.0%" /></figure>
-<p class="caption">New confirmed COVID-19 cases in Belgium</p>
-</div>
-<p><em>Note that the reported number of new confirmed cases is probably underestimated. This number does not take into account undiagnosed (without or with few symptoms) or untested cases. Therefore, this figure should be interpreted with extreme caution.</em></p>
-<p><a href="/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet_files/new_cases_divid.png">Download</a> the figure or see the <a href="https://github.com/AntoineSoetewey/COVID-19-Figures/blob/master/new_cases_divid.R" target="_blank">code</a>.</p>
-<p>Thanks for reading. We hope that these figures will keep evolving in the right direction. In the meantime, take care and stay safe!</p>
-<p>If you would like to be further updated on the evolution of the COVID-19 epidemic, two options:</p>
-<ol style="list-style-type: decimal">
-<li>visit the blog from time to time, and</li>
-<li>join Twitter and follow us: <a href="https://twitter.com/NikoSpeybroeck" target="_blank">NikoSpeybroeck</a>, <a href="https://twitter.com/statsandr" target="_blank">statsandr</a> &amp; <a href="https://twitter.com/arosas_aguirre" target="_blank">arosas_aguirre</a></li>
-</ol>
-<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
-<p>Get updates every time a new article is published by subscribing to this blog.</p>
 </div>
 
 
@@ -237,15 +191,15 @@
 <h3>Related articles</h3>
 <ul>
 	
+	<li><a href="/blog/how-to-upload-r-code-on-github-example-with-an-r-script-on-mac-os/">How to upload your R code on GitHub: example with an R script on MacOS</a></li>
+	
+	<li><a href="/blog/correlation-coefficient-and-correlation-test-in-r/">Correlation coefficient and correlation test in R</a></li>
+	
+	<li><a href="/blog/one-proportion-and-goodness-of-fit-test-in-r-and-by-hand/">One-proportion and goodness of fit test (in R and by hand)</a></li>
+	
 	<li><a href="/blog/how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r/">How to create a simple Coronavirus dashboard specific to your country in R</a></li>
 	
 	<li><a href="/blog/top-r-resources-on-covid-19-coronavirus/">Top 50 R resources on Novel COVID-19 Coronavirus</a></li>
-	
-	<li><a href="/blog/a-package-to-download-free-springer-books-during-covid-19-quarantine/">A package to download free Springer books during Covid-19 quarantine</a></li>
-	
-	<li><a href="/blog/covid-19-in-belgium/">COVID-19 in Belgium</a></li>
-	
-	<li><a href="/blog/how-to-deploy-a-shiny-app-an-example-with-shinyapps-io/">How to deploy a Shiny app: an example with shinyapps.io</a></li>
 	
 </ul>
 </div>
@@ -262,15 +216,11 @@
                                 <div class="col-12 col-md-6">
                                     
                                         <div class="mx-0 mx-md-4 mt-4 text-left">
-                                            <a href="/blog/one-proportion-and-goodness-of-fit-test-in-r-and-by-hand/">« One-proportion and goodness of fit test (in R and by hand)</a>
+                                            <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">« Correlation coefficient and correlation test in R</a>
                                         </div>
                                     
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    
-                                        <div class="mx-0 mx-md-4 mt-4 text-right">
-                                            <a href="/blog/how-to-upload-r-code-on-github-example-with-an-r-script-on-mac-os/">How to upload your R code on GitHub: example with an R script on MacOS »</a>
-                                        </div>
                                     
                                 </div>
                             </div>
@@ -337,7 +287,7 @@
 
 
 
-<a href='https://github.com/AntoineSoetewey/statsandr/edit/master/content/blog/2020-05-22-covid-19-in-belgium-is-it-over-yet.Rmd' target="_blank">Edit</a>
+<a href='https://github.com/AntoineSoetewey/statsandr/edit/master/content/blog/2020-05-29-how-to-deploy-a-shiny-app-an-example-with-shinyapps-io.Rmd' target="_blank">Edit</a>
 
 
 
