@@ -53,4 +53,8 @@ Absolutely! To share your post on this blog, please send it via the [contributio
 
 You can support the development of this blog via the [support page](/support/). Thanks in advance for your support, any help is greatly appreciated!
 
+## 8. Why did you launch this blog?
+
+See why on the [about](/about/) page.
+
 [&uarr; Back to top](#top)
