@@ -11,6 +11,7 @@ description: "Frequently asked questions. Feel free to contact me if you have an
 1. I have a question or I would like to collaborate with you, how can I contact you?
 1. Is it possible to contribute to this blog?
 1. How can I support you and support this blog?
+1. Why did you launch this blog?
 
 This FAQ may be updated with new questions. Feel free to [contact me](/contact/) if you have any other questions.
 
