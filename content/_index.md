@@ -9,7 +9,7 @@ Welcome to the blog [Stats and R](/). As the name suggests, this blog is about [
 
 From time to time, I also present some work related to data science using R and news about my research.
 
-If you are new to this blog, I invite you to:
+**If you are new to this blog**, I invite you to:
 
 * See [all articles](/blog/) or [articles by categories](/tags/)
 * Learn more about [who is behind this blog](/about/)
