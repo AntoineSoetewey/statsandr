@@ -6,10 +6,236 @@
     <description>Recent content in Hypothesis test on Stats and R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 13 May 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 07 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/hypothesis-test/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Wilcoxon test in R: how to compare 2 groups under the non-normality assumption</title>
+      <link>/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/</link>
+      <pubDate>Sun, 07 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#different-scenarios&#34;&gt;2 different scenarios&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#independent-samples&#34;&gt;Independent samples&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#paired-samples&#34;&gt;Paired samples&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&#34;/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption.jpeg&#34; style=&#34;width:100.0%&#34; /&gt;&lt;/p&gt;
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;In a previous article, we showed how to &lt;a href=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/&#34;&gt;compare two groups under different scenarios using the Student’s t-test&lt;/a&gt;. The Student’s t-test requires that the distributions follow a &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/&#34;&gt;normal distribution&lt;/a&gt;&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;. In this article, we show how to compare two groups when the normality assumption is violated, using the Wilcoxon test.&lt;/p&gt;
+&lt;p&gt;The Wilcoxon test (also referred as the Mann-Withney-Wilcoxon test) is a non-parametric test, meaning that it does not rely on data belonging to any particular parametric family of probability distributions. Non-parametric tests have the same objective as their parametric counterparts. However, they have an advantage over parametric tests: they &lt;strong&gt;do not&lt;/strong&gt; require the assumption of normality of distributions. A Student’s t-test for instance is only applicable if the data are Gaussian or if the sample size is large enough (usually &lt;span class=&#34;math inline&#34;&gt;\(n \ge 30\)&lt;/span&gt;). A non-parametric should be used in other cases.&lt;/p&gt;
+&lt;p&gt;One may wonder why we would not always use a non-parametric test so we do not have to bother about testing for normality. The reason is that non-parametric tests are usually less powerful than corresponding parametric tests when the normality assumption holds. Therefore, all else being equal, with a non-parametric test you are less likely to reject the null hypothesis when it is false if the data follows a normal distribution. It is thus preferred to use the parametric version of a statistical test when the assumptions are met.&lt;/p&gt;
+&lt;p&gt;In the remaining of the article, we present the two scenarios of the Wilcoxon test and how to perform them in R through two examples.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;different-scenarios&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;2 different scenarios&lt;/h1&gt;
+&lt;p&gt;As for the Student’s t-test, the Wilcoxon test is used to compare two groups and see whether they are significantly different from each other. The 2 groups to be compared are either:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;independent, or&lt;/li&gt;
+&lt;li&gt;paired (i.e., dependent)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div id=&#34;independent-samples&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Independent samples&lt;/h2&gt;
+&lt;p&gt;For the Wilcoxon test with independent samples, suppose that we want to test whether grades at the statistics exam differ between female and male students.&lt;/p&gt;
+&lt;p&gt;We have collected grades for 24 students (12 girls and 12 boys):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat &amp;lt;- data.frame(
+  Sex = as.factor(c(rep(&amp;quot;Girl&amp;quot;, 12), rep(&amp;quot;Boy&amp;quot;, 12))),
+  Grade = c(
+    19, 18, 9, 17, 8, 7, 16, 19, 20, 9, 11, 18,
+    16, 5, 15, 2, 14, 15, 4, 7, 15, 6, 7, 14
+  )
+)
+
+dat&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##     Sex Grade
+## 1  Girl    19
+## 2  Girl    18
+## 3  Girl     9
+## 4  Girl    17
+## 5  Girl     8
+## 6  Girl     7
+## 7  Girl    16
+## 8  Girl    19
+## 9  Girl    20
+## 10 Girl     9
+## 11 Girl    11
+## 12 Girl    18
+## 13  Boy    16
+## 14  Boy     5
+## 15  Boy    15
+## 16  Boy     2
+## 17  Boy    14
+## 18  Boy    15
+## 19  Boy     4
+## 20  Boy     7
+## 21  Boy    15
+## 22  Boy     6
+## 23  Boy     7
+## 24  Boy    14&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here are the distributions of the grades by sex:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+
+ggplot(dat) +
+  aes(x = Sex, y = Grade) +
+  geom_boxplot(fill = &amp;quot;#0c4c8a&amp;quot;) +
+  theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We first check whether the 2 samples follow a normal distribution via a histogram and the Shapiro-Wilk test:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;hist(subset(dat, Sex == &amp;quot;Girl&amp;quot;)$Grade,
+  main = &amp;quot;Grades for girls&amp;quot;,
+  xlab = &amp;quot;Grades&amp;quot;
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;hist(subset(dat, Sex == &amp;quot;Boy&amp;quot;)$Grade,
+  main = &amp;quot;Grades for boys&amp;quot;,
+  xlab = &amp;quot;Grades&amp;quot;
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/figure-html/unnamed-chunk-3-2.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;shapiro.test(subset(dat, Sex == &amp;quot;Girl&amp;quot;)$Grade)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Shapiro-Wilk normality test
+## 
+## data:  subset(dat, Sex == &amp;quot;Girl&amp;quot;)$Grade
+## W = 0.84548, p-value = 0.0323&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;shapiro.test(subset(dat, Sex == &amp;quot;Boy&amp;quot;)$Grade)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Shapiro-Wilk normality test
+## 
+## data:  subset(dat, Sex == &amp;quot;Boy&amp;quot;)$Grade
+## W = 0.84313, p-value = 0.03023&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The histograms show that both distributions do not seem to follow a normal distribution and the &lt;em&gt;p&lt;/em&gt;-values of the Shapiro-Wilk tests confirm it (since we reject the null hypothesis of normality for both distributions at the 5% significance level).&lt;/p&gt;
+&lt;p&gt;We just showed that normality assumption is violated for both groups so it is now time to see how to perform the Wilcoxon test in R.&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt; Remember that the null and alternative hypothesis of the Wilcoxon test are as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;: the 2 groups are similar&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt;: the 2 groups are different&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- wilcox.test(dat$Grade ~ dat$Sex)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Wilcoxon rank sum test with continuity correction
+## 
+## data:  dat$Grade by dat$Sex
+## W = 31.5, p-value = 0.02056
+## alternative hypothesis: true location shift is not equal to 0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We obtain the test statistic, the &lt;em&gt;p&lt;/em&gt;-value and a reminder of the hypothesis tested.&lt;a href=&#34;#fn3&#34; class=&#34;footnote-ref&#34; id=&#34;fnref3&#34;&gt;&lt;sup&gt;3&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.021. Therefore, at the 5% significance level, we reject the null hypothesis and we conclude that grades are significantly different between girls and boys.&lt;/p&gt;
+&lt;p&gt;Given the boxplot presented above showing the grades by sex, one may see that girls seem to perform better than boys. This can be tested formally by adding the &lt;code&gt;alternative = &#34;less&#34;&lt;/code&gt; argument to the &lt;code&gt;wilcox.test()&lt;/code&gt; function:&lt;a href=&#34;#fn4&#34; class=&#34;footnote-ref&#34; id=&#34;fnref4&#34;&gt;&lt;sup&gt;4&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- wilcox.test(dat$Grade ~ dat$Sex,
+  alternative = &amp;quot;less&amp;quot;
+)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Wilcoxon rank sum test with continuity correction
+## 
+## data:  dat$Grade by dat$Sex
+## W = 31.5, p-value = 0.01028
+## alternative hypothesis: true location shift is less than 0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.01. Therefore, at the 5% significance level, we reject the null hypothesis and we conclude that boys performed significantly worse than girls (which is equivalent than concluding that girls performed significantly better than boys).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;paired-samples&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Paired samples&lt;/h2&gt;
+&lt;p&gt;For this second scenario, consider that we administered a math test in a class of 12 students at the beginning of a semester, and that we administered a similar test at the end of the semester to the exact same students. We have the following data:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat &amp;lt;- data.frame(
+  Beginning = c(16, 5, 15, 2, 14, 15, 4, 7, 15, 6, 7, 14),
+  End = c(19, 18, 9, 17, 8, 7, 16, 19, 20, 9, 11, 18)
+)
+
+dat&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##    Beginning End
+## 1         16  19
+## 2          5  18
+## 3         15   9
+## 4          2  17
+## 5         14   8
+## 6         15   7
+## 7          4  16
+## 8          7  19
+## 9         15  20
+## 10         6   9
+## 11         7  11
+## 12        14  18&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We transform the dataset to have it in a &lt;a href=&#34;/blog/how-to-import-an-excel-file-in-rstudio/#introduction&#34;&gt;tidy format&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat2 &amp;lt;- data.frame(
+  Time = c(rep(&amp;quot;Before&amp;quot;, 12), rep(&amp;quot;After&amp;quot;, 12)),
+  Grade = c(dat$Beginning, dat$End)
+)
+dat2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##      Time Grade
+## 1  Before    16
+## 2  Before     5
+## 3  Before    15
+## 4  Before     2
+## 5  Before    14
+## 6  Before    15
+## 7  Before     4
+## 8  Before     7
+## 9  Before    15
+## 10 Before     6
+## 11 Before     7
+## 12 Before    14
+## 13  After    19
+## 14  After    18
+## 15  After     9
+## 16  After    17
+## 17  After     8
+## 18  After     7
+## 19  After    16
+## 20  After    19
+## 21  After    20
+## 22  After     9
+## 23  After    11
+## 24  After    18&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The distribution of the grades at the beginning and after the semester:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Reordering dat2$Time
+dat2$Time &amp;lt;- factor(dat2$Time,
+  levels = c(&amp;quot;Before&amp;quot;, &amp;quot;After&amp;quot;)
+)
+
+ggplot(dat2) +
+  aes(x = Time, y = Grade) +
+  geom_boxplot(fill = &amp;quot;#0c4c8a&amp;quot;) +
+  theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;(See the &lt;a href=&#34;/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/&#34;&gt;&lt;code&gt;{esquisse}&lt;/code&gt; and &lt;code&gt;{questionr}&lt;/code&gt; addins&lt;/a&gt; to help you reorder levels of a factor variable and to easily draw plots with the &lt;code&gt;{ggplot2}&lt;/code&gt; package.)&lt;/p&gt;
+&lt;p&gt;In this example, it is clear that the two samples are not independent since the same 12 students took the exam before and after the semester. Supposing also that the normality assumption is violated, we thus use the Wilcoxon test for &lt;strong&gt;paired samples&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;The R code for this test is similar than for independent samples, except that we add the &lt;code&gt;paired = TRUE&lt;/code&gt; argument to the &lt;code&gt;wilcox.test()&lt;/code&gt; function to take into consideration the dependency between the 2 samples:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;test &amp;lt;- wilcox.test(dat2$Grade ~ dat2$Time,
+  paired = TRUE
+)
+test&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Wilcoxon signed rank test with continuity correction
+## 
+## data:  dat2$Grade by dat2$Time
+## V = 21, p-value = 0.1692
+## alternative hypothesis: true location shift is not equal to 0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We obtain the test statistic, the &lt;em&gt;p&lt;/em&gt;-value and a reminder of the hypothesis tested.&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value is 0.169. Therefore, at the 5% significance level, we do not reject the null hypothesis that the grades are similar before and after the semester.&lt;/p&gt;
+&lt;p&gt;Thanks for reading. I hope this article helped you to compare two groups that do not follow a normal distribution in R using the Wilcoxon test. See the &lt;a href=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/&#34;&gt;Student’s t-test&lt;/a&gt; if you need to perform the parametric version of the Wilcoxon test.&lt;/p&gt;
+&lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Remember that the normality assumption can be tested via 3 complementary methods: (i) histogram, (ii) QQ-plot and (iii) normality tests (with the most common being the Shapiro-Wilk test). See &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/&#34;&gt;how to determine if a distribution follows a normal distribution&lt;/a&gt; if you need a refresh.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Note that in order to use the Student’s t-test (the parametric version of the Wilcoxon test), it is required that &lt;strong&gt;both samples follow a normal distribution&lt;/strong&gt;. Therefore, even if one sample follows a normal distribution (and the other does not follow a normal distribution), it is recommended to use the non-parametric test.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;Note that the presence of equal elements (ties) prevents an exact &lt;em&gt;p&lt;/em&gt;-value calculation.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn4&#34;&gt;&lt;p&gt;We add &lt;code&gt;alternative = &#34;less&#34;&lt;/code&gt; (and not &lt;code&gt;alternative = &#34;greater&#34;&lt;/code&gt;) because we want to test that grades for boys are &lt;strong&gt;less&lt;/strong&gt; than grade for girls. Using &lt;code&gt;&#34;less&#34;&lt;/code&gt; or &lt;code&gt;&#34;greater&#34;&lt;/code&gt; can be deducted from the reference level in the dataset.&lt;a href=&#34;#fnref4&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>One-proportion and goodness of fit test (in R and by hand)</title>

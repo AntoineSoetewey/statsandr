@@ -1,0 +1,167 @@
+---
+title: 'Wilcoxon test in R: how to compare 2 groups under the non-normality assumption'
+author: Antoine Soetewey
+date: '2020-06-07'
+slug: wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption
+categories: []
+tags:
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: /blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption.jpeg
+description: Learn how to perform the Wilcoxon test in R. The Wilcoxon test is used to compare 2 groups when the normality assumption is violated
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+# draft: true
+# bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "100%",
+  tidy = 'styler',
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+![](/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption.jpeg){width=100%}
+
+# Introduction
+
+In a previous article, we showed how to [compare two groups under different scenarios using the Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/). The Student's t-test requires that the distributions follow a [normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/)^[Remember that the normality assumption can be tested via 3 complementary methods: (i) histogram, (ii) QQ-plot and (iii) normality tests (with the most common being the Shapiro-Wilk test). See [how to determine if a distribution follows a normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) if you need a refresh.]. In this article, we show how to compare two groups when the normality assumption is violated, using the Wilcoxon test.
+
+The Wilcoxon test (also referred as the Mann-Withney-Wilcoxon test) is a non-parametric test, meaning that it does not rely on data belonging to any particular parametric family of probability distributions. Non-parametric tests have the same objective as their parametric counterparts. However, they have an advantage over parametric tests: they **do not** require the assumption of normality of distributions. A Student's t-test for instance is only applicable if the data are Gaussian or if the sample size is large enough (usually $n \ge 30$). A non-parametric should be used in other cases.
+
+One may wonder why we would not always use a non-parametric test so we do not have to bother about testing for normality. The reason is that non-parametric tests are usually less powerful than corresponding parametric tests when the normality assumption holds. Therefore, all else being equal, with a non-parametric test you are less likely to reject the null hypothesis when it is false if the data follows a normal distribution. It is thus preferred to use the parametric version of a statistical test when the assumptions are met.
+
+In the remaining of the article, we present the two scenarios of the Wilcoxon test and how to perform them in R through two examples.
+
+# 2 different scenarios
+
+As for the Student's t-test, the Wilcoxon test is used to compare two groups and see whether they are significantly different from each other. The 2 groups to be compared are either:
+
+1. independent, or
+1. paired (i.e., dependent)
+
+## Independent samples
+
+For the Wilcoxon test with independent samples, suppose that we want to test whether grades at the statistics exam differ between female and male students.
+
+We have collected grades for 24 students (12 girls and 12 boys):
+
+```{r}
+dat <- data.frame(Sex = as.factor(c(rep("Girl", 12), rep("Boy", 12))),
+                  Grade = c(19, 18, 9, 17, 8, 7, 16, 19, 20, 9, 11, 18,
+                            16, 5, 15, 2, 14, 15, 4, 7, 15, 6, 7, 14))
+
+dat
+```
+
+Here are the distributions of the grades by sex:
+
+```{r}
+library(ggplot2)
+
+ggplot(dat) +
+ aes(x = Sex, y = Grade) +
+ geom_boxplot(fill = "#0c4c8a") +
+ theme_minimal()
+```
+
+We first check whether the 2 samples follow a normal distribution via a histogram and the Shapiro-Wilk test:
+
+```{r}
+hist(subset(dat, Sex == "Girl")$Grade,
+     main = "Grades for girls",
+     xlab = "Grades")
+hist(subset(dat, Sex == "Boy")$Grade,
+     main = "Grades for boys",
+     xlab = "Grades")
+
+shapiro.test(subset(dat, Sex == "Girl")$Grade)
+shapiro.test(subset(dat, Sex == "Boy")$Grade)
+```
+
+The histograms show that both distributions do not seem to follow a normal distribution and the *p*-values of the Shapiro-Wilk tests confirm it (since we reject the null hypothesis of normality for both distributions at the 5% significance level).
+
+We just showed that normality assumption is violated for both groups so it is now time to see how to perform the Wilcoxon test in R.^[Note that in order to use the Student's t-test (the parametric version of the Wilcoxon test), it is required that **both samples follow a normal distribution**. Therefore, even if one sample follows a normal distribution (and the other does not follow a normal distribution), it is recommended to use the non-parametric test.] Remember that the null and alternative hypothesis of the Wilcoxon test are as follows:
+
+* $H_0$: the 2 groups are similar
+* $H_1$: the 2 groups are different
+
+```{r}
+test <- wilcox.test(dat$Grade ~ dat$Sex)
+test
+```
+
+We obtain the test statistic, the *p*-value and a reminder of the hypothesis tested.^[Note that the presence of equal elements (ties) prevents an exact *p*-value calculation.]
+
+The *p*-value is `r round(test$p.value, 3)`. Therefore, at the 5% significance level, we reject the null hypothesis and we conclude that grades are significantly different between girls and boys.
+
+Given the boxplot presented above showing the grades by sex, one may see that girls seem to perform better than boys. This can be tested formally by adding the `alternative = "less"` argument to the `wilcox.test()` function:^[We add `alternative = "less"` (and not `alternative = "greater"`) because we want to test that grades for boys are **less** than grade for girls. Using `"less"` or `"greater"` can be deducted from the reference level in the dataset.]
+
+```{r}
+test <- wilcox.test(dat$Grade ~ dat$Sex,
+                    alternative = "less")
+test
+```
+
+The *p*-value is `r round(test$p.value, 3)`. Therefore, at the 5% significance level, we reject the null hypothesis and we conclude that boys performed significantly worse than girls (which is equivalent than concluding that girls performed significantly better than boys).
+
+## Paired samples
+
+For this second scenario, consider that we administered a math test in a class of 12 students at the beginning of a semester, and that we administered a similar test at the end of the semester to the exact same students. We have the following data:
+
+```{r}
+dat <- data.frame(Beginning = c(16, 5, 15, 2, 14, 15, 4, 7, 15, 6, 7, 14),
+                  End = c(19, 18, 9, 17, 8, 7, 16, 19, 20, 9, 11, 18))
+
+dat
+```
+
+We transform the dataset to have it in a [tidy format](/blog/how-to-import-an-excel-file-in-rstudio/#introduction):
+
+```{r}
+dat2 <- data.frame(Time = c(rep("Before", 12), rep("After", 12)),
+                  Grade = c(dat$Beginning, dat$End))
+dat2
+```
+
+The distribution of the grades at the beginning and after the semester:
+
+```{r}
+# Reordering dat2$Time
+dat2$Time <- factor(dat2$Time,
+  levels = c("Before", "After")
+)
+
+ggplot(dat2) +
+ aes(x = Time, y = Grade) +
+ geom_boxplot(fill = "#0c4c8a") +
+ theme_minimal()
+```
+
+(See the [`{esquisse}` and `{questionr}` addins](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/) to help you reorder levels of a factor variable and to easily draw plots with the `{ggplot2}` package.)
+
+In this example, it is clear that the two samples are not independent since the same 12 students took the exam before and after the semester. Supposing also that the normality assumption is violated, we thus use the Wilcoxon test for **paired samples**.
+
+The R code for this test is similar than for independent samples, except that we add the `paired = TRUE` argument to the `wilcox.test()` function to take into consideration the dependency between the 2 samples:
+
+```{r}
+test <- wilcox.test(dat2$Grade ~ dat2$Time,
+                    paired = TRUE)
+test
+```
+
+We obtain the test statistic, the *p*-value and a reminder of the hypothesis tested.
+
+The *p*-value is `r round(test$p.value, 3)`. Therefore, at the 5% significance level, we do not reject the null hypothesis that the grades are similar before and after the semester.
+
+Thanks for reading. I hope this article helped you to compare two groups that do not follow a normal distribution in R using the Wilcoxon test. See the [Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) if you need to perform the parametric version of the Wilcoxon test.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
