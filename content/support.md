@@ -4,7 +4,7 @@ date: "2020-01-21"
 description: "See the different ways you can support this blog so I can continue to provide free content. Any help is greatly appreciated. Thanks in advance!"
 ---
 
-1. [GitHub sponsor](#github)
+1. [GitHub](#github)
 1. [Donation](#donation)
 1. [Share](#share)
 1. [Follow](#follow)
@@ -14,7 +14,7 @@ description: "See the different ways you can support this blog so I can continue
 Running and maintaining a blog is not free unfortunately. There are several ways you can support to this blog. Any help will be greatly appreciated!
 
 <a name="github"></a>
-## GitHub sponsor
+## GitHub
 
 If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via the [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey).
 
