@@ -19,7 +19,7 @@ This FAQ may be updated with new questions. Feel free to [contact me](/contact/)
 
 This blog is written in R using the [`{blogdown}` package](https://bookdown.org/yihui/blogdown/) and Hugo, and deployed and hosted via Netlify.
 
-Regarding the theme, I wanted to focus on the information I provide in my articles and did not want to distract readers with too many features, so I chose the [Renga](https://github.com/nanxstats/hugo-renga) theme, which is a minimalist theme for Hugo/blogdown. As the blog evolved, I slightly edited the code and added some extra features that I considered important.
+Regarding the theme, I wanted to focus on the information I provide in my articles and did not want to distract readers with too many features, so I chose the [Renga](https://github.com/nanxstats/hugo-renga) theme, which is a minimalist theme for Hugo/blogdown. As the blog evolved, I made minor changes to the code that I considered important.
 
 The code can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr).
 
