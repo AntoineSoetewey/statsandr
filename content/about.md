@@ -26,7 +26,7 @@ With this blog, I realized that in order to learn and fully understand something
 * clearly communicate it
 * *and* more importantly, be able to write it down in a precise and concise manner
 
-So although this blog was first launched to share statistical concepts I am most familiar with, I now also use it to learn by writing. I think that this additional way of learning is actually as powerful as teaching.
+So although this blog was first launched to share statistical concepts I am most familiar with (hoping that it would be valuable to some people), I now also use it to learn by writing. I think that this additional way of learning is actually as powerful as teaching.
 
 Last but not least, valuable feedback from people all over the world makes the whole journey even more interesting and enriching.
 
