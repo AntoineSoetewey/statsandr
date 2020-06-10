@@ -4,7 +4,7 @@ date: "2020-03-02"
 description: "Frequently asked questions. Feel free to contact me if you have any other questions."
 ---
 
-1. What technology do you use to write this blog and the articles?
+1. What technology and theme do you use to write this blog and the articles?
 1. I am new to this blog, to R or to statistics, from where can I start?
 1. I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?
 1. I believe there is mistake/bug, what is the best way to report it?
@@ -15,9 +15,13 @@ description: "Frequently asked questions. Feel free to contact me if you have an
 
 This FAQ may be updated with new questions. Feel free to [contact me](/contact/) if you have any other questions.
 
-## 1. What technology do you use to write this blog and the articles?
+## 1. What technology and theme do you use to write this blog and the articles?
 
-This blog is written in R using the [`{blogdown}` package](https://bookdown.org/yihui/blogdown/) and Hugo, and deployed and hosted via Netlify. The code can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr).
+This blog is written in R using the [`{blogdown}` package](https://bookdown.org/yihui/blogdown/) and Hugo, and deployed and hosted via Netlify.
+
+Regarding the theme, I wanted to focus on the information I provide in my articles and did not want to distract readers with too many features, so I chose the [Renga](https://github.com/nanxstats/hugo-renga) theme, which is a minimalist theme for Hugo/blogdown. As the blog evolved, I slightly edited the code and added some extra features that I considered important.
+
+The code can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr).
 
 ## 2. I am new to this blog, to R or to statistics, from where can I start?
 
