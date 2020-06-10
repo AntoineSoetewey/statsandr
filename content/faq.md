@@ -42,7 +42,7 @@ If you find a mistake or a bug, you can [raise an issue on Github](https://githu
 
 In order for me to answer you as soon as possible, here are the best communication methods:
 
-* If you have a question or a suggestion related to a specific article, please add it as a comment so other readers can benefit from the discussion
+* If you have a question or a suggestion **related to a specific article**, please **add it as a comment** so other readers can benefit from the discussion
 * For mistakes or bugs, please inform me about them by [raising an issue on GitHub](https://github.com/AntoineSoetewey/statsandr/issues). Note that the code for all articles and pages of this blog can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog)
 * For all other requests, please use the contact form on the [contact page](/contact/)
 
