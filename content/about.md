@@ -34,4 +34,6 @@ Last but not least, valuable feedback from people all over the world makes the w
 
 Thanks in advance for reading and feel free to [contact me](/contact/) if you have any questions, remarks or inquiries.
 
+You can also reach me out on [Twitter](https://twitter.com/statsandr) or [Medium](https://medium.com/@ant.soetewey).
+
 [&uarr; Back to top](#top)
