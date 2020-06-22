@@ -16,3 +16,4 @@ From time to time, I also present some work related to data science using R and 
 * Follow me on [Twitter](https://twitter.com/statsandr) or [Medium](https://medium.com/@ant.soetewey)
 * [Subscribe to the newsletter](/subscribe/) to receive updates by email every time a new article is published
 * Contribute by writing a [guest post](/contribute/)
+* [Support the blog](/support/)
