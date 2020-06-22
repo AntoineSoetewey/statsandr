@@ -1,5 +1,5 @@
 ---
-title: 'Support this blog'
+title: 'Support the blog'
 date: "2020-01-21"
 description: "See the different ways you can support this blog so I can continue to provide free content. Any help is greatly appreciated. Thanks in advance!"
 ---
@@ -16,7 +16,9 @@ Running and maintaining a blog is not free unfortunately. There are several ways
 <a name="github"></a>
 ## GitHub
 
-If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via the [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey).
+If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via the [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey):
+
+<iframe src="https://github.com/sponsors/AntoineSoetewey/button" title="Sponsor AntoineSoetewey" height="35" width="107" style="border: 0;"></iframe>
 
 <a name="donation"></a>
 ## Donation

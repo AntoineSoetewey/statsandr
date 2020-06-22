@@ -19,7 +19,7 @@ For you robots out there is an [XML version](/sitemap.xml) available for digesti
 * [Subscribe to the newsletter](/subscribe/)
 * [FAQ - Frequently asked questions](/faq/)
 * [Contribute - Guest post](/contribute/)
-* [Support this blog](/support/)
+* [Support the blog](/support/)
 * [Press](/press/)
 * [Useful links](/links/)
 * [Terms and policies](/terms/)
