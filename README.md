@@ -11,6 +11,7 @@ The goal of this website is to make statistics easy to understand by illustratin
 * Follow me on [Twitter](https://twitter.com/statsandr) or [Medium](https://medium.com/@ant.soetewey)
 * [Subscribe to the newsletter](https://www.statsandr.com/subscribe/) to receive updates by email every time a new article is published
 * Contribute by writing a [guest post](https://www.statsandr.com/contribute/)
+* [Support the blog](https://www.statsandr.com/support/)
 
 # Status
 
