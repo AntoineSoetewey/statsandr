@@ -525,7 +525,52 @@ round(res$P, 3)&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;combination-of-correlation-coefficients-and-correlation-tests&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Combination of correlation coefficients and correlation tests&lt;/h1&gt;
-&lt;p&gt;Now that we covered the concepts of correlation coefficients and correlation tests, let see if it is possible to combine these two concepts in one single visualization.&lt;/p&gt;
+&lt;p&gt;Now that we covered the concepts of correlation coefficients and correlation tests, let see if we can combine the two concepts.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;correlation&lt;/code&gt; function from the &lt;a href=&#34;https://easystats.github.io/correlation/&#34; target=&#34;_blank&#34;&gt;easystats &lt;code&gt;{correlation}&lt;/code&gt; package&lt;/a&gt; allows to combine correlation coefficients and correlation tests in a single table:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(correlation)
+
+correlation::correlation(dat,
+  include_factors = TRUE, method = &amp;quot;auto&amp;quot;
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Parameter1 | Parameter2 |     r |         95% CI |     t | df |      p |  Method | n_Obs
+## ----------------------------------------------------------------------------------------
+## mpg        |        cyl | -0.85 | [-0.93, -0.72] | -8.92 | 30 | &amp;lt; .001 | Pearson |    32
+## mpg        |       disp | -0.85 | [-0.92, -0.71] | -8.75 | 30 | &amp;lt; .001 | Pearson |    32
+## mpg        |         hp | -0.78 | [-0.89, -0.59] | -6.74 | 30 | &amp;lt; .001 | Pearson |    32
+## mpg        |       drat |  0.68 | [ 0.44,  0.83] |  5.10 | 30 | &amp;lt; .001 | Pearson |    32
+## mpg        |         wt | -0.87 | [-0.93, -0.74] | -9.56 | 30 | &amp;lt; .001 | Pearson |    32
+## mpg        |       qsec |  0.42 | [ 0.08,  0.67] |  2.53 | 30 | 0.137  | Pearson |    32
+## mpg        |       gear |  0.48 | [ 0.16,  0.71] |  3.00 | 30 | 0.065  | Pearson |    32
+## mpg        |       carb | -0.55 | [-0.75, -0.25] | -3.62 | 30 | 0.016  | Pearson |    32
+## cyl        |       disp |  0.90 | [ 0.81,  0.95] | 11.45 | 30 | &amp;lt; .001 | Pearson |    32
+## cyl        |         hp |  0.83 | [ 0.68,  0.92] |  8.23 | 30 | &amp;lt; .001 | Pearson |    32
+## cyl        |       drat | -0.70 | [-0.84, -0.46] | -5.37 | 30 | &amp;lt; .001 | Pearson |    32
+## cyl        |         wt |  0.78 | [ 0.60,  0.89] |  6.88 | 30 | &amp;lt; .001 | Pearson |    32
+## cyl        |       qsec | -0.59 | [-0.78, -0.31] | -4.02 | 30 | 0.007  | Pearson |    32
+## cyl        |       gear | -0.49 | [-0.72, -0.17] | -3.10 | 30 | 0.054  | Pearson |    32
+## cyl        |       carb |  0.53 | [ 0.22,  0.74] |  3.40 | 30 | 0.027  | Pearson |    32
+## disp       |         hp |  0.79 | [ 0.61,  0.89] |  7.08 | 30 | &amp;lt; .001 | Pearson |    32
+## disp       |       drat | -0.71 | [-0.85, -0.48] | -5.53 | 30 | &amp;lt; .001 | Pearson |    32
+## disp       |         wt |  0.89 | [ 0.78,  0.94] | 10.58 | 30 | &amp;lt; .001 | Pearson |    32
+## disp       |       qsec | -0.43 | [-0.68, -0.10] | -2.64 | 30 | 0.131  | Pearson |    32
+## disp       |       gear | -0.56 | [-0.76, -0.26] | -3.66 | 30 | 0.015  | Pearson |    32
+## disp       |       carb |  0.39 | [ 0.05,  0.65] |  2.35 | 30 | 0.177  | Pearson |    32
+## hp         |       drat | -0.45 | [-0.69, -0.12] | -2.75 | 30 | 0.110  | Pearson |    32
+## hp         |         wt |  0.66 | [ 0.40,  0.82] |  4.80 | 30 | &amp;lt; .001 | Pearson |    32
+## hp         |       qsec | -0.71 | [-0.85, -0.48] | -5.49 | 30 | &amp;lt; .001 | Pearson |    32
+## hp         |       gear | -0.13 | [-0.45,  0.23] | -0.69 | 30 | 1.000  | Pearson |    32
+## hp         |       carb |  0.75 | [ 0.54,  0.87] |  6.21 | 30 | &amp;lt; .001 | Pearson |    32
+## drat       |         wt | -0.71 | [-0.85, -0.48] | -5.56 | 30 | &amp;lt; .001 | Pearson |    32
+## drat       |       qsec |  0.09 | [-0.27,  0.43] |  0.50 | 30 | 1.000  | Pearson |    32
+## drat       |       gear |  0.70 | [ 0.46,  0.84] |  5.36 | 30 | &amp;lt; .001 | Pearson |    32
+## drat       |       carb | -0.09 | [-0.43,  0.27] | -0.50 | 30 | 1.000  | Pearson |    32
+## wt         |       qsec | -0.17 | [-0.49,  0.19] | -0.97 | 30 | 1.000  | Pearson |    32
+## wt         |       gear | -0.58 | [-0.77, -0.29] | -3.93 | 30 | 0.008  | Pearson |    32
+## wt         |       carb |  0.43 | [ 0.09,  0.68] |  2.59 | 30 | 0.132  | Pearson |    32
+## qsec       |       gear | -0.21 | [-0.52,  0.15] | -1.19 | 30 | 1.000  | Pearson |    32
+## qsec       |       carb | -0.66 | [-0.82, -0.40] | -4.76 | 30 | &amp;lt; .001 | Pearson |    32
+## gear       |       carb |  0.27 | [-0.08,  0.57] |  1.56 | 30 | 0.774  | Pearson |    32&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As you can see, it gives, among other useful information, the correlation coefficients (column &lt;code&gt;r&lt;/code&gt;) and the result of the correlation test (column &lt;code&gt;95% CI&lt;/code&gt; for the confidence interval or &lt;code&gt;p&lt;/code&gt; for the &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;-value) for all pairs of variables. This table is very useful and informative, but let see if it is possible to combine the concepts of correlation coefficients and correlations test in one single visualization. A visualization that would be easy to read and interpret.&lt;/p&gt;
 &lt;p&gt;Ideally, we would like to have a concise overview of correlations between all possible pairs of variables present in a dataset, with a clear distinction for correlations that are significantly different from 0.&lt;/p&gt;
 &lt;p&gt;The figure below, known as a &lt;a href=&#34;/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/#correlogram&#34;&gt;correlogram&lt;/a&gt; and adapted from the &lt;code&gt;corrplot()&lt;/code&gt; function, does precisely this:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;corrplot2 &amp;lt;- function(data,
@@ -580,7 +625,7 @@ corrplot2(
   type = &amp;quot;upper&amp;quot;,
   tl.srt = 75
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;The correlogram shows correlation coefficients for all pairs of variables (with more intense colors for more extreme correlations), and correlations not significantly different from 0 are represented by a white box.&lt;/p&gt;
 &lt;p&gt;To learn more about this plot and the code used, I invite you to read the article entitled “&lt;a href=&#34;/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/&#34;&gt;Correlogram in R: how to highlight the most correlated variables in a dataset&lt;/a&gt;”.&lt;/p&gt;
 &lt;p&gt;Thanks for reading. I hope this article helped you to compute correlations and perform correlation tests in R.&lt;/p&gt;
