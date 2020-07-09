@@ -9,8 +9,6 @@ Hello, my name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a P
 
 In parallel with my doctoral thesis, I am [teaching assistant](https://www.antoinesoetewey.com/teaching/) for several courses in statistics and probability at bachelor and master’s level. From time to time, I also provide trainings and workshops in statistics and R programming for a Belgian consulting company. See my [CV](https://www.antoinesoetewey.com/cv/) to have a more detailed overview of my academic and professional background.
 
-*Note that this is a personal site. The opinions expressed here represent my own and not those of my employer.*
-
 ## Blog - What?
 
 This blog is, as its name suggests, about [statistics](/tags/statistics/) and [R](/tags/r/). More specifically, it aims at helping academics and professionals working with data to grasp important statistical concepts using examples and plain English.
@@ -37,5 +35,7 @@ Last but not least, valuable feedback from people all over the world makes the w
 Thanks in advance for reading and feel free to [contact me](/contact/) if you have any questions, remarks or inquiries.
 
 You can also reach me out on [Twitter](https://twitter.com/statsandr) or [Medium](https://medium.com/@ant.soetewey).
+
+*Note that this is a personal site. The opinions expressed here represent my own and not those of my employer.*
 
 [&uarr; Back to top](#top)
