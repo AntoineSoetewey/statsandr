@@ -40,7 +40,7 @@ output:
 <p><img src="/blog/2020-08-11-outliers-detection-in-r_files/outliers-detection-in-R.jpeg" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>An outlier is a value or an observation that is distant from other observations, that is to say, a data point that differs significantly from other data points. An observation must always be compared to other observations made on the same phenomenon before actually calling it an outlier. Indeed, someone who is 200 cm tall (6’7" in US) will most likely be considered as an outlier compared to the general population, but that same person may not be considered as an outlier if we measured the height of basketball players.</p>
+<p>An <strong>outlier</strong> is a value or an <strong>observation that is distant from other observations</strong>, that is to say, a data point that differs significantly from other data points. An observation must always be compared to other observations made on the same phenomenon before actually calling it an outlier. Indeed, someone who is 200 cm tall (6’7" in US) will most likely be considered as an outlier compared to the general population, but that same person may not be considered as an outlier if we measured the height of basketball players.</p>
 <p>An outlier may be due to the variability inherent in the observed phenomenon. For example, it is often the case that there are outliers when collecting data on salaries, as some people make much more money than the rest. Outliers can also arise due to an experimental, measurement or encoding error. For instance, a human weighting 786 kg (1733 pounds) is clearly an error when encoding the weight of the subject. Her or his weight is most probably 78.6 kg (173 pounds) or 7.86 kg (17 pounds) depending on whether weights of adults or babies have been measured.</p>
 <p>In this article, I present several approaches to detect outliers in R, from simple techniques such as <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> (including minimum, maximum, histogram, boxplot and percentiles) to more formal techniques such as the Hampel filter, the Grubbs, the Dixon and the Rosner tests for outliers.</p>
 <p>Although there is no strict or unique rule whether outliers should be removed or not from the dataset before doing statistical analyses, it is quite common to, at least, remove outliers that are due to an experimental or measurement error (like the weight of 786 kg (1733 pounds) for a human). Some statistical tests require the absence of outliers in order to draw sound conclusions, but removing outliers is not recommended in all cases and must be done with caution.</p>
@@ -48,7 +48,7 @@ output:
 <ol style="list-style-type: decimal">
 <li>The domain and context of your analyses. In some domains, it is common to remove outliers as they often occur due to a malfunctioning process. In other fields, outliers are kept because they contain valuable information. It also happens that analyses are performed twice, once with and once without outliers to evaluate their impact on the conclusions.</li>
 <li>Whether the tests you are going to apply are robust to the presence of outliers or not. For instance, the slope of a simple linear regression may significantly vary with just one outlier, whereas non-parametric tests such as the <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/">Wilcoxon test</a> are usually robust to outliers.</li>
-<li>How distant are the outliers from other observations. Some observations considered as outliers (according to the techniques presented below) are actually not really extreme compared to all other observations, while other potential outliers may be really distant from the rest of the observations.</li>
+<li>How distant are the outliers from other observations? Some observations considered as outliers (according to the techniques presented below) are actually not really extreme compared to all other observations, while other potential outliers may be really distant from the rest of the observations.</li>
 </ol>
 <p>The dataset <code>mpg</code> from the <code>{ggplot2}</code> package will be used to illustrate the different approaches of outliers detection in R, and in particular we will focus on the variable <code>hwy</code> (highway miles per gallon).</p>
 </div>
@@ -134,7 +134,7 @@ mtext(paste(&quot;Outliers: &quot;, paste(out, collapse = &quot;, &quot;)))</cod
 </div>
 <div id="percentiles" class="section level2">
 <h2>Percentiles</h2>
-<p>This method of outliers detection is based on the percentiles. With the percentiles method, all observations that lie outside the interval formed by the 2.5 and 97.5 percentiles will be considered as potential outliers. Other percentiles such as the 1 and 99, or the 5 and 95 percentiles can also be considered to construct the interval.</p>
+<p>This method of outliers detection is based on the <a href="/blog/descriptive-statistics-by-hand/#a-note-on-deciles-and-percentiles">percentiles</a>. With the percentiles method, all observations that lie outside the interval formed by the 2.5 and 97.5 percentiles will be considered as potential outliers. Other percentiles such as the 1 and 99, or the 5 and 95 percentiles can also be considered to construct the interval.</p>
 <p>The values of the lower and upper percentiles (and thus the lower and upper limits of the interval) can be computed with the <code>quantile()</code> function:</p>
 <pre class="r"><code>lower_bound &lt;- quantile(dat$hwy, 0.025)
 lower_bound</code></pre>
@@ -239,7 +239,7 @@ outlier_ind</code></pre>
 <li><span class="math inline">\(H_1\)</span>: The <em>lowest</em> value is an outlier</li>
 </ul>
 <p>if we want to test the lowest value.</p>
-<p>As for any statistical test, if the <strong><em>p</em>-value is less</strong> than the chosen <strong>significance threshold</strong> (generally <span class="math inline">\(\alpha = 0.05\)</span>) then the null hypothesis is rejected and we will conclude that the <strong>lowest/highest value is an outlier</strong>. On the contrary, if the <strong><em>p</em>-value is greater or equal</strong> than the significance level, the null hypothesis is not rejected, and we will conclude that, based on the data, we do not reject the hypothesis that the <strong>lowest/highest value is not an outlier</strong>.</p>
+<p>As for any statistical test, if the <strong><a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha"><em>p</em>-value</a> is less</strong> than the chosen <strong>significance threshold</strong> (generally <span class="math inline">\(\alpha = 0.05\)</span>) then the null hypothesis is rejected and we will conclude that the <strong>lowest/highest value is an outlier</strong>. On the contrary, if the <strong><em>p</em>-value is greater or equal</strong> than the significance level, the null hypothesis is not rejected, and we will conclude that, based on the data, we do not reject the hypothesis that the <strong>lowest/highest value is not an outlier</strong>.</p>
 <p>Note that the Grubbs test is not appropriate for sample size of 6 or less (<span class="math inline">\(n \le 6\)</span>).</p>
 <p>To perform the Grubbs test in R, we use the <code>grubbs.test()</code> function from the <code>{outliers}</code> package:</p>
 <pre class="r"><code># install.packages(&quot;outliers&quot;)
@@ -281,7 +281,7 @@ test</code></pre>
 <h2>Dixon’s test</h2>
 <p>Similar to the Grubbs test, Dixon test is used to test whether a single low or high value is an outlier. So if more than one outliers is suspected, the test has to be performed on these suspected outliers individually.</p>
 <p>Note that Dixon test is most useful for small sample size (usually <span class="math inline">\(n \le 25\)</span>).</p>
-<p>To perform the Dixon’s test in R, we use the <code>dixon.test()</code> function from the <code>{outliers}</code> package. However, we restrict our dataset to the 20 first observations as the Dixon test can only be done on small sample size (R will throw an error and accepts only dataset of 3 to 30 observations):</p>
+<p>To perform the Dixon’s test in R, we use the <code>dixon.test()</code> function from the <code>{outliers}</code> package. However, we <a href="/blog/data-manipulation-in-r/#subset-a-dataset">restrict our dataset</a> to the 20 first observations as the Dixon test can only be done on small sample size (R will throw an error and accepts only dataset of 3 to 30 observations):</p>
 <pre class="r"><code>subdat &lt;- dat[1:20, ]
 test &lt;- dixon.test(subdat$hwy)
 test</code></pre>
@@ -336,7 +336,7 @@ test</code></pre>
 </ol>
 <p>Unlike Dixon test, note that Rosner test is most appropriate when the sample size is large (<span class="math inline">\(n \ge 20\)</span>). We therefore use again the initial dataset <code>dat</code>, which includes 234 observations.</p>
 <p>To perform the Rosner test we use the <code>rosnerTest()</code> function from the <code>{EnvStats}</code> package. This function requires at least 2 arguments: the data and the number of suspected outliers <code>k</code> (with <code>k = 3</code> as the default number of suspected outliers).</p>
-<p>For this example, we set the number of suspected outliers to be equal to 3, as suggested by the number of potential outliers outlined in the boxplot.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>For this example, we set the number of suspected outliers to be equal to 3, as suggested by the number of potential outliers outlined in the boxplot at the beginning of the article.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
 <pre class="r"><code>library(EnvStats)
 test &lt;- rosnerTest(dat$hwy,
   k = 3
@@ -420,7 +420,7 @@ test</code></pre>
 <li>in the <code>{OutlierDetection}</code> package.</li>
 </ol>
 <p>Note also that some transformations may “naturally” eliminate outliers. The natural log or square root of a value reduces the variation caused by extreme values, so in some cases applying these transformations will eliminate the outliers.</p>
-<p>Thanks for reading. I hope this article helped you to detect outliers in R via several descriptive statistics (including minimum, maximum, histogram, boxplot and percentiles) or thanks to more formal techniques of outliers detection (including Hampel filter, Grubbs, Dixon and Rosner test). It is now your turn to verify them, and if they are correct, decide how to treat them (i.e., keeping, removing or imputing them) before conducting your analyses.</p>
+<p>Thanks for reading. I hope this article helped you to detect outliers in R via several <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> (including minimum, maximum, histogram, boxplot and percentiles) or thanks to more formal techniques of outliers detection (including Hampel filter, Grubbs, Dixon and Rosner test). It is now your turn to verify them, and if they are correct, decide how to treat them (i.e., keeping, removing or imputing them) before conducting your analyses.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
 <div class="footnotes">
