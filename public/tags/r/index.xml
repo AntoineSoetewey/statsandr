@@ -6,10 +6,519 @@
     <description>Recent content in R on Stats and R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 14 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 21 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Graphics in R with ggplot2</title>
+      <link>/blog/graphics-in-r-with-ggplot2/</link>
+      <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/graphics-in-r-with-ggplot2/</guid>
+      <description>
+&lt;script src=&#34;/rmarkdown-libs/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/plotly-binding/plotly.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/typedarray/typedarray.min.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/jquery/jquery.min.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/crosstalk/css/crosstalk.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/crosstalk/js/crosstalk.min.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/plotly-main/plotly-latest.min.js&#34;&gt;&lt;/script&gt;
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#data&#34;&gt;Data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#basic-principles-of-ggplot2&#34;&gt;Basic principles of &lt;code&gt;{ggplot2}&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#create-plots-with-ggplot2&#34;&gt;Create plots with &lt;code&gt;{ggplot2}&lt;/code&gt;&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#scatter-plot&#34;&gt;Scatter plot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#line-plot&#34;&gt;Line plot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#combination-of-line-and-points&#34;&gt;Combination of line and points&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#histogram&#34;&gt;Histogram&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#density-plot&#34;&gt;Density plot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#combination-of-histogram-and-densities&#34;&gt;Combination of histogram and densities&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#boxplot&#34;&gt;Boxplot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#barplot&#34;&gt;Barplot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#further-personalization&#34;&gt;Further personalization&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#labels&#34;&gt;Labels&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#axis-ticks&#34;&gt;Axis ticks&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#log-transformations&#34;&gt;Log transformations&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#limits&#34;&gt;Limits&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#legend&#34;&gt;Legend&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#shape-color-size-and-transparency&#34;&gt;Shape, color, size and transparency&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#smooth-and-regression-lines&#34;&gt;Smooth and regression lines&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#facets&#34;&gt;Facets&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#themes&#34;&gt;Themes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#interactive-plot-with-plotly&#34;&gt;Interactive plot with &lt;code&gt;{plotly}&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#combine-plots-with-patchwork&#34;&gt;Combine plots with &lt;code&gt;{patchwork}&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#flip-coordinates&#34;&gt;Flip coordinates&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#save-plot&#34;&gt;Save plot&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#to-go-further&#34;&gt;To go further&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;center&gt;
+&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/graphics-in-r-with-ggplot2.png&#34; style=&#34;width:50.0%&#34; /&gt;
+&lt;/center&gt;
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;R is known to be a really powerful programming language when it comes to graphics and visualizations (in addition to &lt;a href=&#34;/tags/statistics/&#34;&gt;statistics&lt;/a&gt; and data science of course!).&lt;/p&gt;
+&lt;p&gt;To keep it short, graphics in R can be done in two ways, via the:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;code&gt;{graphics}&lt;/code&gt; package (the base graphics in R, loaded by default)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;{ggplot2}&lt;/code&gt; package (which needs to be &lt;a href=&#34;/blog/an-efficient-way-to-install-and-load-r-packages/&#34;&gt;installed and loaded&lt;/a&gt; beforehand)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The &lt;code&gt;{graphics}&lt;/code&gt; package comes with a large choice of plots (such as &lt;code&gt;plot&lt;/code&gt;, &lt;code&gt;hist&lt;/code&gt;, &lt;code&gt;barplot&lt;/code&gt;, &lt;code&gt;boxplot&lt;/code&gt;, &lt;code&gt;pie&lt;/code&gt;, &lt;code&gt;mosaicplot&lt;/code&gt;, etc.) and additional related features (e.g., &lt;code&gt;abline&lt;/code&gt;, &lt;code&gt;lines&lt;/code&gt;, &lt;code&gt;legend&lt;/code&gt;, &lt;code&gt;mtext&lt;/code&gt;, &lt;code&gt;rect&lt;/code&gt;, etc.). It is often the preferred way to draw plots for most R users, and in particular for beginners to intermediate users.&lt;/p&gt;
+&lt;p&gt;Since its creation in 2005 by Hadley Wickham, &lt;strong&gt;&lt;code&gt;{ggplot2}&lt;/code&gt;&lt;/strong&gt; has grown in use to become one of the most popular R packages and the &lt;strong&gt;most popular package for graphics and data visualizations&lt;/strong&gt;. The &lt;code&gt;{ggplot2}&lt;/code&gt; package is a much more modern approach to creating professional-quality graphics. More information about the package can be found at &lt;a href=&#34;https://ggplot2.tidyverse.org/&#34; target=&#34;_blank&#34;&gt;ggplot2.tidyverse.org&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In this article, we will see how to create common plots such as scatter plots, line plots, histograms, boxplots, barplots, density plots in R with this package. If you are unfamiliar with any of these types of graph, you will find more information about each one (when to use it, its purpose, what does it show, etc.) in my article about &lt;a href=&#34;/blog/descriptive-statistics-in-r/&#34;&gt;descriptive statistics in R&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Data&lt;/h1&gt;
+&lt;p&gt;To illustrate plots with the &lt;code&gt;{ggplot2}&lt;/code&gt; package we will use the &lt;code&gt;mpg&lt;/code&gt; dataset available in the package. The dataset contains observations collected by the US Environmental Protection Agency on fuel economy from 1999 to 2008 for 38 popular models of cars (run &lt;code&gt;?mpg&lt;/code&gt; for more information about the data):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+dat &amp;lt;- ggplot2::mpg&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Before going further, let’s transform the &lt;code&gt;cyl&lt;/code&gt;, &lt;code&gt;drv&lt;/code&gt;, &lt;code&gt;fl&lt;/code&gt;, &lt;code&gt;year&lt;/code&gt; and &lt;code&gt;class&lt;/code&gt; variables in &lt;a href=&#34;/blog/data-types-in-r/#factor&#34;&gt;factor&lt;/a&gt; with the &lt;code&gt;transform()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dat &amp;lt;- transform(dat,
+  cyl = factor(cyl),
+  drv = factor(drv),
+  fl = factor(fl),
+  year = factor(year),
+  class = factor(class)
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;basic-principles-of-ggplot2&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Basic principles of &lt;code&gt;{ggplot2}&lt;/code&gt;&lt;/h1&gt;
+&lt;p&gt;The &lt;code&gt;{ggplot2}&lt;/code&gt; package is based on the principles of “The Grammar of Graphics” (hence “gg” in the name of &lt;code&gt;{ggplot2}&lt;/code&gt;), that is, a coherent system for describing and building graphs. The main idea is to &lt;strong&gt;design a graphic as a succession of layers&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;The main layers are:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;The &lt;strong&gt;dataset&lt;/strong&gt; that contains the variables that we want to represent. This is done with the &lt;code&gt;ggplot()&lt;/code&gt; function and comes first.&lt;/li&gt;
+&lt;li&gt;The &lt;strong&gt;variable(s)&lt;/strong&gt; to represent on the x and/or y-axis, and the aesthetic elements (such as color, size, fill, shape and transparency) of the objects to be represented. This is done with the &lt;code&gt;aes()&lt;/code&gt; function (abbreviation of aesthetic).&lt;/li&gt;
+&lt;li&gt;The &lt;strong&gt;type of graphical representation&lt;/strong&gt; (scatter plot, line plot, barplot, histogram, boxplot, etc.). This is done with the functions &lt;code&gt;geom_point()&lt;/code&gt;, &lt;code&gt;geom_line()&lt;/code&gt;, &lt;code&gt;geom_bar()&lt;/code&gt;, &lt;code&gt;geom_histogram()&lt;/code&gt;, &lt;code&gt;geom_boxplot()&lt;/code&gt;, etc.&lt;/li&gt;
+&lt;li&gt;If needed, additional layers (such as labels, annotations, scales, axis ticks, legends, themes, facets, etc.) can be added to personalize the plot.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;To create a plot, we thus first need to specify the data in the &lt;code&gt;ggplot()&lt;/code&gt; function and then add the required layers such as the variables, the aesthetic elements and the type of plot:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(data) +
+  aes(x = var_x, y = var_y) +
+  geom_x()&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;data&lt;/code&gt; in &lt;code&gt;ggplot()&lt;/code&gt; is the name of the data frame which contains the variables &lt;code&gt;var_x&lt;/code&gt; and &lt;code&gt;var_y&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;+&lt;/code&gt; symbol is used to indicate the different layers that will be added to the plot. Make sure to write the &lt;code&gt;+&lt;/code&gt; &lt;em&gt;symbol at the end of the line&lt;/em&gt; of code and not at the beginning of the line, otherwise R throws an error.&lt;/li&gt;
+&lt;li&gt;The layer &lt;code&gt;aes()&lt;/code&gt; indicates what variables will be used in the plot and more generally, the aesthetic elements of the plot.&lt;/li&gt;
+&lt;li&gt;Finally, &lt;code&gt;x&lt;/code&gt; in &lt;code&gt;geom_x()&lt;/code&gt; represents the type of plot.&lt;/li&gt;
+&lt;li&gt;Other layers are usually not required unless we want to personalize the plot further.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note that it is a good practice to write one line of code per layer to improve code readibility.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;create-plots-with-ggplot2&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Create plots with &lt;code&gt;{ggplot2}&lt;/code&gt;&lt;/h1&gt;
+&lt;p&gt;In the following sections we will show how to draw the following plots:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;scatter plot&lt;/li&gt;
+&lt;li&gt;line plot&lt;/li&gt;
+&lt;li&gt;histogram&lt;/li&gt;
+&lt;li&gt;density plot&lt;/li&gt;
+&lt;li&gt;boxplot&lt;/li&gt;
+&lt;li&gt;barplot&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In order to focus on the construction of the different plots and the use of &lt;code&gt;{ggplot2}&lt;/code&gt;, we will restrict ourselves to drawing basic (yet beautiful) plots without unnecessary layers. For the sake of completeness, we will briefly discuss and illustrate different layers to further personalize a plot at the end of the article (see this &lt;a href=&#34;/blog/graphics-in-r-with-ggplot2/#further-personalization&#34;&gt;section&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Note that if you still struggle to create plots with &lt;code&gt;{ggplot2}&lt;/code&gt; after reading this tutorial, you may find the &lt;a href=&#34;/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse&#34;&gt;{esquisse} addin&lt;/a&gt; useful. This addin allows you to &lt;strong&gt;interactively&lt;/strong&gt; (that is, by dragging and dropping variables) create plots with the &lt;code&gt;{ggplot2}&lt;/code&gt; package. Give it a try!&lt;/p&gt;
+&lt;div id=&#34;scatter-plot&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Scatter plot&lt;/h2&gt;
+&lt;p&gt;We start by creating a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#scatterplot&#34;&gt;scatter plot&lt;/a&gt; using &lt;code&gt;geom_point&lt;/code&gt;. Remember that a scatter plot is used to visualize the relation between two &lt;a href=&#34;/blog/variable-types-and-examples/#quantitative&#34;&gt;quantitative variables&lt;/a&gt;.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;We start by specifying the data:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) # data&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;ol start=&#34;2&#34; style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Then we add the variables to be represented with the &lt;code&gt;aes()&lt;/code&gt; function:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) + # data
+  aes(x = displ, y = hwy) # variables&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;ol start=&#34;3&#34; style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Finally, we indicate the type of plot:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) + # data
+  aes(x = displ, y = hwy) + # variables
+  geom_point() # type of plot&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;You will also sometimes see the aesthetic elements (&lt;code&gt;aes()&lt;/code&gt; with the variables) inside the &lt;code&gt;ggplot()&lt;/code&gt; function in addition to the dataset:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This second method gives the exact same plot than the first method. I tend to prefer the first method over the second for better readability, but this is more a matter of taste so the choice is up to you.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;line-plot&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Line plot&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;/blog/descriptive-statistics-in-r/#line-plot&#34;&gt;Line plots&lt;/a&gt;, particularly useful in time series or finance, can be created similarly but by using &lt;code&gt;geom_line()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_line()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;combination-of-line-and-points&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Combination of line and points&lt;/h2&gt;
+&lt;p&gt;An advantage of &lt;code&gt;{ggplot2}&lt;/code&gt; is the ability to combine several types of plots and its flexibility in designing it. For instance, we can add a line to a scatter plot by simply adding a layer to the initial scatter plot:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point() +
+  geom_line() # add line&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;histogram&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Histogram&lt;/h2&gt;
+&lt;p&gt;A &lt;a href=&#34;/blog/descriptive-statistics-in-r/#histogram&#34;&gt;histogram&lt;/a&gt; (useful to visualize distributions) can be plotted using &lt;code&gt;geom_histogram()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = hwy) +
+  geom_histogram()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;By default, the number of bins is equal to 30. You can change this value using the &lt;code&gt;bins&lt;/code&gt; argument inside the &lt;code&gt;geom_histogram()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = hwy) +
+  geom_histogram(bins = sqrt(nrow(dat)))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Here I specify the number of bins to be equal to the square root of the number of observations (following Sturge’s rule) but you can specify any numeric value.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;density-plot&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Density plot&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;/blog/descriptive-statistics-in-r/#density-plot&#34;&gt;Density plots&lt;/a&gt; can be created using &lt;code&gt;geom_density()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = hwy) +
+  geom_density()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;combination-of-histogram-and-densities&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Combination of histogram and densities&lt;/h2&gt;
+&lt;p&gt;We can also superimpose a histogram and a density curve on the same plot:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = hwy, y = ..density..) +
+  geom_histogram() +
+  geom_density()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Or superimpose several densities:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = hwy, color = drv, fill = drv) +
+  geom_density(alpha = 0.25) # add transparency&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-14-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The argument &lt;code&gt;alpha = 0.25&lt;/code&gt; has been added for some transparency. More information about this argument can be found in this &lt;a href=&#34;/blog/graphics-in-r-with-ggplot2/#further-personalization&#34;&gt;section&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;boxplot&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Boxplot&lt;/h2&gt;
+&lt;p&gt;A &lt;a href=&#34;/blog/descriptive-statistics-in-r/#boxplot&#34;&gt;boxplot&lt;/a&gt; (also very useful to visualize distributions) can be plotted using &lt;code&gt;geom_boxplot()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Boxplot for one variable
+ggplot(dat) +
+  aes(x = &amp;quot;&amp;quot;, y = hwy) +
+  geom_boxplot()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Boxplot by factor
+ggplot(dat) +
+  aes(x = drv, y = hwy) +
+  geom_boxplot()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-15-2.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;It is also possible to plot the points on the boxplot with &lt;code&gt;geom_jitter()&lt;/code&gt;, and to vary the width of the boxes according to the size (i.e., the number of observations) of each level with &lt;code&gt;varwidth = TRUE&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = drv, y = hwy) +
+  geom_boxplot(varwidth = TRUE) + # vary boxes width according to n obs.
+  geom_jitter(alpha = 0.25, width = 0.2) # adds random noise and limit its width&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;geom_jitter()&lt;/code&gt; layer adds some random variation to each point in order to prevent them from overlapping (an issue known as overplotting).&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt; Moreover, the &lt;code&gt;alpha&lt;/code&gt; argument adds some transparency to the points (see more in this &lt;a href=&#34;/blog/graphics-in-r-with-ggplot2/#further-personalization&#34;&gt;section&lt;/a&gt;) to keep the focus on the boxes and not on the points.&lt;/p&gt;
+&lt;p&gt;Finally, it is also possible to divide boxplots into several panels according to the levels of a &lt;a href=&#34;/blog/variable-types-and-examples/#qualitative&#34;&gt;qualitative variable&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = drv, y = hwy) +
+  geom_boxplot(varwidth = TRUE) + # vary boxes width according to n obs.
+  geom_jitter(alpha = 0.25, width = 0.2) + # adds random noise and limit its width
+  facet_wrap(~year) # divide into 2 panels&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;For a visually more appealing plot, it is also possible to use some colors for the boxes depending on the x variable:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = drv, y = hwy, fill = drv) + # add color to boxes with fill
+  geom_boxplot(varwidth = TRUE) + # vary boxes width according to n obs.
+  geom_jitter(alpha = 0.25, width = 0.2) + # adds random noise and limit its width
+  facet_wrap(~year) + # divide into 2 panels
+  theme(legend.position = &amp;quot;none&amp;quot;) # remove legend&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In that case, it best to remove the legend as it becomes redundant. See more information about the legend in this &lt;a href=&#34;/blog/graphics-in-r-with-ggplot2/#legend&#34;&gt;section&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;barplot&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Barplot&lt;/h2&gt;
+&lt;p&gt;A &lt;a href=&#34;/blog/descriptive-statistics-in-r/#barplot&#34;&gt;barplot&lt;/a&gt; (useful to visualize qualitative variables) can be plotted using &lt;code&gt;geom_bar()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = drv) +
+  geom_bar()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;By default, the heights of the bars correspond to the observed frequencies for each level of the variable of interest (&lt;code&gt;drv&lt;/code&gt; in our case).&lt;/p&gt;
+&lt;p&gt;Again, for a more appealing plot, we can add some colors to the bars with the &lt;code&gt;fill&lt;/code&gt; argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = drv, fill = drv) + # add colors to bars
+  geom_bar() +
+  theme(legend.position = &amp;quot;none&amp;quot;) # remove legend&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We can also create a barplot with two qualitative variables:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = drv, fill = year) + # fill by years
+  geom_bar()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In order to compare proportions across groups, it is best to make each bar the same height using &lt;code&gt;position = &#34;fill&#34;&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  geom_bar(aes(x = drv, fill = year), position = &amp;quot;fill&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-22-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;To draw the bars next to each other for each group, use &lt;code&gt;position = &#34;dodge&#34;&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  geom_bar(aes(x = drv, fill = year), position = &amp;quot;dodge&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;further-personalization&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Further personalization&lt;/h2&gt;
+&lt;div id=&#34;labels&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Labels&lt;/h3&gt;
+&lt;p&gt;The first things to personalize in a plot is the labels to make the plot more informative to the audience. We can easily add a title, subtitle, caption and edit axis titles with the &lt;code&gt;labs()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p &amp;lt;- ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point()
+
+p + labs(
+  title = &amp;quot;Fuel efficiency for 38 popular models of car&amp;quot;,
+  subtitle = &amp;quot;Period 1999-2008&amp;quot;,
+  caption = &amp;quot;Data: ggplot2::mpg. See more at www.statsandr.com&amp;quot;,
+  x = &amp;quot;Engine displacement (litres)&amp;quot;,
+  y = &amp;quot;Highway miles per gallon (mpg)&amp;quot;
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;As you can see in the above code, you can save one or more layers of the plot in an object for later use. This way, you can save your “main” plot, and add more layers of personalization until you get the desired output. Here we saved the main scatter plot in an object called &lt;code&gt;p&lt;/code&gt; and we will refer to it for the subsequent personalizations.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;axis-ticks&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Axis ticks&lt;/h3&gt;
+&lt;p&gt;Axis ticks can be adjusted using &lt;code&gt;scale_x_continuous()&lt;/code&gt; and &lt;code&gt;scale_y_continuous()&lt;/code&gt; for the x and y-axis, respectively:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Adjust ticks
+p + scale_x_continuous(breaks = seq(from = 1, to = 7, by = 0.5)) + # x-axis
+  scale_y_continuous(breaks = seq(from = 10, to = 45, by = 5)) # y-axis&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-25-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;log-transformations&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Log transformations&lt;/h3&gt;
+&lt;p&gt;In some cases, it is useful to plot the log transformation of the variables. This can be done with the &lt;code&gt;scale_x_log10()&lt;/code&gt; and &lt;code&gt;scale_y_log10()&lt;/code&gt; functions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p + scale_x_log10() +
+  scale_y_log10()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;limits&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Limits&lt;/h3&gt;
+&lt;p&gt;The most convenient way to control the limits of the plot is to use again the &lt;code&gt;scale_x_continuous()&lt;/code&gt; and &lt;code&gt;scale_y_continuous()&lt;/code&gt; functions in addition to the &lt;code&gt;limits&lt;/code&gt; argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p + scale_x_continuous(limits = c(3, 6)) +
+  scale_y_continuous(limits = c(20, 30))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-27-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;It is also possible to simply take a subset of the dataset with the &lt;code&gt;subset()&lt;/code&gt; or &lt;code&gt;filter()&lt;/code&gt; function. See how to &lt;a href=&#34;/blog/data-manipulation-in-r/#subset-a-dataset&#34;&gt;subset a dataset&lt;/a&gt; if you need a reminder.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;legend&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Legend&lt;/h3&gt;
+&lt;p&gt;By default, the legend is located to the right side of the plot (when there is a legend to be displayed of course). To control the position of the legend, we need to use the &lt;code&gt;theme()&lt;/code&gt; function in addition to the &lt;code&gt;legend.position&lt;/code&gt; argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p + aes(color = class) +
+  theme(legend.position = &amp;quot;top&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Replace &lt;code&gt;&#34;top&#34;&lt;/code&gt; by &lt;code&gt;&#34;left&#34;&lt;/code&gt; or &lt;code&gt;&#34;bottom&#34;&lt;/code&gt; to change its position and by &lt;code&gt;&#34;none&#34;&lt;/code&gt; to remove it.&lt;/p&gt;
+&lt;p&gt;The title of the legend can be removed with &lt;code&gt;legend.title = element_blank()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p + aes(color = class) +
+  theme(
+    legend.title = element_blank(),
+    legend.position = &amp;quot;bottom&amp;quot;
+  )&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The legend now appears at the bottom of the plot, without the legend title.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;shape-color-size-and-transparency&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Shape, color, size and transparency&lt;/h3&gt;
+&lt;p&gt;There are a very large number of options to improve the quality of the plot or to add additional information. These include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;shape,&lt;/li&gt;
+&lt;li&gt;size,&lt;/li&gt;
+&lt;li&gt;color, and&lt;/li&gt;
+&lt;li&gt;alpha (transparency).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We can for instance change the shape of all points in a scatter plot by adding &lt;code&gt;shape&lt;/code&gt; to &lt;code&gt;geom_point()&lt;/code&gt;, or vary the shape according to the values taken by another variable (in that case, the &lt;code&gt;shape&lt;/code&gt; argument must be inside &lt;code&gt;aes()&lt;/code&gt;):&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Change shape of all points
+ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point(shape = 4)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Change shape of points based on a categorical variable
+ggplot(dat) +
+  aes(x = displ, y = hwy, shape = drv) +
+  geom_point()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-30-2.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Following the same principle, we can modify the color, size and transparency of the points based on a &lt;a href=&#34;/blog/variable-types-and-examples/#qualitative&#34;&gt;qualitative&lt;/a&gt; or &lt;a href=&#34;/blog/variable-types-and-examples/#quantitative&#34;&gt;quantitative&lt;/a&gt; variable. Here are some examples:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p &amp;lt;- ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point()
+
+# Change color for all points
+p + geom_point(color = &amp;quot;steelblue&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Change color based on a qualitative variable
+p + aes(color = drv)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-2.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Change color based on a quantitative variable
+p + aes(color = cty)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-3.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Change color based on a criterion (median of cty variable)
+p + aes(color = cty &amp;gt; median(cty))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-4.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Change size of all points
+p + geom_point(size = 4)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-5.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Change size of points based on a quantitative variable
+p + aes(size = cty)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-6.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Change transparency based on a quantitative variable
+p + aes(alpha = cty)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-7.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We can of course mix several options (shape, color, size, alpha) to build more complex graphics:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p + geom_point(size = 0.5) +
+  aes(color = drv, shape = year, alpha = cty)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-32-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;smooth-and-regression-lines&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Smooth and regression lines&lt;/h3&gt;
+&lt;p&gt;In a scatter plot, it is possible to add a smooth line fitted to the data:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p + geom_smooth()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-33-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In the context of simple linear regression, it is often the case that the regression line is displayed on the plot. This can be done by adding &lt;code&gt;method = lm&lt;/code&gt; (&lt;code&gt;lm&lt;/code&gt; stands for linear model) in the &lt;code&gt;geom_smooth()&lt;/code&gt; layer:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p + geom_smooth(method = lm)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-34-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;It is also possible to draw a regression line for each level of a categorical variable:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p + aes(color = drv, shape = drv) +
+  geom_smooth(method = lm, se = FALSE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-35-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;se = FALSE&lt;/code&gt; argument removes the confidence interval around the regression lines.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;facets&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Facets&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;facet_grid&lt;/code&gt; allows you to divide the same graphic into several panels according to the values of one or two qualitative variables:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# According to one variable
+p + facet_grid(. ~ drv)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-36-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# According to 2 variables
+p + facet_grid(drv ~ year)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-36-2.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;It is then possible to add a regression line to each facet:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p + facet_grid(. ~ drv) +
+  geom_smooth(method = lm)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-37-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;facet_wrap()&lt;/code&gt; can also be used, as illustrated in this &lt;a href=&#34;/blog/graphics-in-r-with-ggplot2/#boxplot&#34;&gt;section&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;themes&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Themes&lt;/h3&gt;
+&lt;p&gt;Several functions are available in the &lt;code&gt;{ggplot2}&lt;/code&gt; package to change the theme of the plot. The most common themes after the default theme (i.e., &lt;code&gt;theme_gray()&lt;/code&gt;) are the black and white (&lt;code&gt;theme_bw()&lt;/code&gt;), minimal (&lt;code&gt;theme_minimal()&lt;/code&gt;) and classic (&lt;code&gt;theme_classic()&lt;/code&gt;) themes:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Black and white theme
+p + theme_bw()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Minimal theme
+p + theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-38-2.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Classic theme
+p + theme_classic()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-38-3.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;I tend to use the minimal theme for most of my &lt;a href=&#34;/blog/getting-started-in-r-markdown/&#34;&gt;R Markdown&lt;/a&gt; reports as it brings out the patterns and points and not the layout of the plot, but again this is a matter of personal taste. See more themes at &lt;a href=&#34;https://ggplot2.tidyverse.org/reference/ggtheme.html&#34; target=&#34;_blank&#34;&gt;ggplot2.tidyverse.org/reference/ggtheme.html&lt;/a&gt; and in the &lt;code&gt;{ggthemes}&lt;/code&gt; package.&lt;/p&gt;
+&lt;p&gt;In order to avoid having to change the theme for each plot you create, you can change the theme for the current R session using the &lt;code&gt;theme_set()&lt;/code&gt; function as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;theme_set(theme_minimal())&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;interactive-plot-with-plotly&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Interactive plot with &lt;code&gt;{plotly}&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;You can easily make your plots created with &lt;code&gt;{ggplot2}&lt;/code&gt; interactive with the &lt;code&gt;{plotly}&lt;/code&gt; package:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(plotly)
+ggplotly(p + aes(color = year))&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;htmlwidget-1&#34; style=&#34;width:100%;height:480px;&#34; class=&#34;plotly html-widget&#34;&gt;&lt;/div&gt;
+&lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-1&#34;&gt;{&#34;x&#34;:{&#34;data&#34;:[{&#34;x&#34;:[1.8,1.8,2.8,2.8,1.8,1.8,2.8,2.8,2.8,5.7,5.7,5.7,5.7,6.5,2.4,3.1,2.4,3,3.3,3.3,3.8,3.8,3.9,3.9,5.2,5.2,3.9,5.2,5.9,5.2,5.2,5.9,4.6,5.4,4,4,4,5,4.2,4.2,4.6,4.6,5.4,3.8,3.8,4.6,4.6,1.6,1.6,1.6,1.6,1.6,2.4,2.4,2.5,2.5,2,2,4,4.7,4,4.6,5.4,5.4,4,5,2.4,2.4,3,3,3.3,3.3,3.1,3.8,3.8,2.5,2.5,2.2,2.2,2.5,2.5,2.7,2.7,3.4,3.4,2.2,2.2,3,3,2.2,2.2,3,3,1.8,1.8,1.8,4.7,2.7,2.7,3.4,3.4,2,2,2.8,1.9,2,2,2.8,2.8,1.9,1.9,2,2,1.8,1.8,2.8,2.8],&#34;y&#34;:[29,29,26,26,26,25,25,25,24,17,26,23,15,17,27,26,24,24,22,22,22,21,17,17,17,15,17,16,15,15,16,15,17,17,17,19,17,17,17,17,16,16,15,26,25,21,22,33,32,32,29,32,26,27,26,26,26,29,20,17,15,15,17,16,17,17,29,27,26,25,17,17,26,26,27,25,24,26,26,26,26,20,20,19,17,29,27,26,26,27,29,26,26,30,33,35,15,20,20,17,19,29,26,24,44,29,26,23,24,44,41,29,26,29,29,26,26],&#34;text&#34;:[&#34;year: 1999&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.8&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.8&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 25&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.8&lt;br /&gt;hwy: 25&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.8&lt;br /&gt;hwy: 25&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.8&lt;br /&gt;hwy: 24&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.7&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.7&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.7&lt;br /&gt;hwy: 23&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.7&lt;br /&gt;hwy: 15&#34;,&#34;year: 1999&lt;br /&gt;displ: 6.5&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 27&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.1&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 24&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.0&lt;br /&gt;hwy: 24&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.3&lt;br /&gt;hwy: 22&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.3&lt;br /&gt;hwy: 22&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.8&lt;br /&gt;hwy: 22&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.8&lt;br /&gt;hwy: 21&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.9&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.9&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.2&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.2&lt;br /&gt;hwy: 15&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.9&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.2&lt;br /&gt;hwy: 16&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.9&lt;br /&gt;hwy: 15&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.2&lt;br /&gt;hwy: 15&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.2&lt;br /&gt;hwy: 16&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.9&lt;br /&gt;hwy: 15&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.4&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 19&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.0&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.2&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.2&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 16&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 16&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.4&lt;br /&gt;hwy: 15&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.8&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.8&lt;br /&gt;hwy: 25&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 21&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 22&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.6&lt;br /&gt;hwy: 33&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.6&lt;br /&gt;hwy: 32&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.6&lt;br /&gt;hwy: 32&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.6&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.6&lt;br /&gt;hwy: 32&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 27&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 20&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 15&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 15&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.4&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.4&lt;br /&gt;hwy: 16&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 5.0&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 27&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.0&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.0&lt;br /&gt;hwy: 25&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.3&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.3&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.1&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.8&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.8&lt;br /&gt;hwy: 27&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 25&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 24&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.2&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.2&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.7&lt;br /&gt;hwy: 20&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.7&lt;br /&gt;hwy: 20&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.4&lt;br /&gt;hwy: 19&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.4&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.2&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.2&lt;br /&gt;hwy: 27&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.0&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.0&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.2&lt;br /&gt;hwy: 27&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.2&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.0&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.0&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 30&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 33&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 35&#34;,&#34;year: 1999&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 15&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.7&lt;br /&gt;hwy: 20&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.7&lt;br /&gt;hwy: 20&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.4&lt;br /&gt;hwy: 17&#34;,&#34;year: 1999&lt;br /&gt;displ: 3.4&lt;br /&gt;hwy: 19&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.8&lt;br /&gt;hwy: 24&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.9&lt;br /&gt;hwy: 44&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.8&lt;br /&gt;hwy: 23&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.8&lt;br /&gt;hwy: 24&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.9&lt;br /&gt;hwy: 44&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.9&lt;br /&gt;hwy: 41&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 29&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.8&lt;br /&gt;hwy: 26&#34;,&#34;year: 1999&lt;br /&gt;displ: 2.8&lt;br /&gt;hwy: 26&#34;],&#34;type&#34;:&#34;scatter&#34;,&#34;mode&#34;:&#34;markers&#34;,&#34;marker&#34;:{&#34;autocolorscale&#34;:false,&#34;color&#34;:&#34;rgba(248,118,109,1)&#34;,&#34;opacity&#34;:1,&#34;size&#34;:5.66929133858268,&#34;symbol&#34;:&#34;circle&#34;,&#34;line&#34;:{&#34;width&#34;:1.88976377952756,&#34;color&#34;:&#34;rgba(248,118,109,1)&#34;}},&#34;hoveron&#34;:&#34;points&#34;,&#34;name&#34;:&#34;1999&#34;,&#34;legendgroup&#34;:&#34;1999&#34;,&#34;showlegend&#34;:true,&#34;xaxis&#34;:&#34;x&#34;,&#34;yaxis&#34;:&#34;y&#34;,&#34;hoverinfo&#34;:&#34;text&#34;,&#34;frame&#34;:null},{&#34;x&#34;:[2,2,3.1,2,2,3.1,3.1,3.1,4.2,5.3,5.3,5.3,6,6.2,6.2,7,5.3,5.3,2.4,3.5,3.6,3.3,3.3,3.3,3.8,4,3.7,3.7,4.7,4.7,4.7,4.7,4.7,4.7,5.7,4.7,4.7,4.7,4.7,4.7,4.7,5.7,5.4,4,4.6,4.6,5.4,4,4,4.6,4.6,5.4,1.8,1.8,1.8,2,2.4,2.4,3.3,2,2,2.7,2.7,2.7,3,3.7,4.7,4.7,5.7,6.1,4.2,4.4,5.4,4,4.6,2.5,2.5,3.5,3.5,3.5,4,5.6,3.8,5.3,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,4,4.7,2.4,2.4,3.5,2.4,2.4,3.3,1.8,1.8,5.7,2.7,4,4,2,2,2,2,2.5,2.5,2.5,2.5,2,2,3.6],&#34;y&#34;:[31,30,27,28,27,25,25,25,23,20,15,20,17,26,25,24,19,14,30,29,26,24,24,17,23,23,19,18,19,19,12,17,12,17,18,16,12,17,17,16,12,17,18,19,19,17,17,26,24,23,22,20,34,36,36,29,30,31,28,28,27,24,24,24,22,19,12,19,18,14,18,18,18,19,19,31,32,27,26,25,20,18,28,25,27,25,26,23,25,27,25,27,20,17,31,31,28,31,31,27,37,35,18,22,18,20,29,29,29,29,29,29,28,29,28,29,26],&#34;text&#34;:[&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 31&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 30&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.1&lt;br /&gt;hwy: 27&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 28&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 27&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.1&lt;br /&gt;hwy: 25&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.1&lt;br /&gt;hwy: 25&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.1&lt;br /&gt;hwy: 25&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.2&lt;br /&gt;hwy: 23&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.3&lt;br /&gt;hwy: 20&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.3&lt;br /&gt;hwy: 15&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.3&lt;br /&gt;hwy: 20&#34;,&#34;year: 2008&lt;br /&gt;displ: 6.0&lt;br /&gt;hwy: 17&#34;,&#34;year: 2008&lt;br /&gt;displ: 6.2&lt;br /&gt;hwy: 26&#34;,&#34;year: 2008&lt;br /&gt;displ: 6.2&lt;br /&gt;hwy: 25&#34;,&#34;year: 2008&lt;br /&gt;displ: 7.0&lt;br /&gt;hwy: 24&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.3&lt;br /&gt;hwy: 19&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.3&lt;br /&gt;hwy: 14&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 30&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.5&lt;br /&gt;hwy: 29&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.6&lt;br /&gt;hwy: 26&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.3&lt;br /&gt;hwy: 24&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.3&lt;br /&gt;hwy: 24&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.3&lt;br /&gt;hwy: 17&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.8&lt;br /&gt;hwy: 23&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 23&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.7&lt;br /&gt;hwy: 19&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.7&lt;br /&gt;hwy: 18&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 19&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 19&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 12&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 17&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 12&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 17&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.7&lt;br /&gt;hwy: 18&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 16&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 12&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 17&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 17&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 16&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 12&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.7&lt;br /&gt;hwy: 17&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.4&lt;br /&gt;hwy: 18&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 19&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 19&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 17&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.4&lt;br /&gt;hwy: 17&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 26&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 24&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 23&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 22&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.4&lt;br /&gt;hwy: 20&#34;,&#34;year: 2008&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 34&#34;,&#34;year: 2008&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 36&#34;,&#34;year: 2008&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 36&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 29&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 30&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 31&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.3&lt;br /&gt;hwy: 28&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 28&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 27&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.7&lt;br /&gt;hwy: 24&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.7&lt;br /&gt;hwy: 24&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.7&lt;br /&gt;hwy: 24&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.0&lt;br /&gt;hwy: 22&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.7&lt;br /&gt;hwy: 19&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 12&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 19&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.7&lt;br /&gt;hwy: 18&#34;,&#34;year: 2008&lt;br /&gt;displ: 6.1&lt;br /&gt;hwy: 14&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.2&lt;br /&gt;hwy: 18&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.4&lt;br /&gt;hwy: 18&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.4&lt;br /&gt;hwy: 18&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 19&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.6&lt;br /&gt;hwy: 19&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 31&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 32&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.5&lt;br /&gt;hwy: 27&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.5&lt;br /&gt;hwy: 26&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.5&lt;br /&gt;hwy: 25&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 20&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.6&lt;br /&gt;hwy: 18&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.8&lt;br /&gt;hwy: 28&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.3&lt;br /&gt;hwy: 25&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 27&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 25&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 26&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 23&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 25&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 27&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 25&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 27&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 20&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.7&lt;br /&gt;hwy: 17&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 31&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 31&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.5&lt;br /&gt;hwy: 28&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 31&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.4&lt;br /&gt;hwy: 31&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.3&lt;br /&gt;hwy: 27&#34;,&#34;year: 2008&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 37&#34;,&#34;year: 2008&lt;br /&gt;displ: 1.8&lt;br /&gt;hwy: 35&#34;,&#34;year: 2008&lt;br /&gt;displ: 5.7&lt;br /&gt;hwy: 18&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.7&lt;br /&gt;hwy: 22&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 18&#34;,&#34;year: 2008&lt;br /&gt;displ: 4.0&lt;br /&gt;hwy: 20&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 29&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 29&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 29&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 29&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 29&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 29&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 28&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.5&lt;br /&gt;hwy: 29&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 28&#34;,&#34;year: 2008&lt;br /&gt;displ: 2.0&lt;br /&gt;hwy: 29&#34;,&#34;year: 2008&lt;br /&gt;displ: 3.6&lt;br /&gt;hwy: 26&#34;],&#34;type&#34;:&#34;scatter&#34;,&#34;mode&#34;:&#34;markers&#34;,&#34;marker&#34;:{&#34;autocolorscale&#34;:false,&#34;color&#34;:&#34;rgba(0,191,196,1)&#34;,&#34;opacity&#34;:1,&#34;size&#34;:5.66929133858268,&#34;symbol&#34;:&#34;circle&#34;,&#34;line&#34;:{&#34;width&#34;:1.88976377952756,&#34;color&#34;:&#34;rgba(0,191,196,1)&#34;}},&#34;hoveron&#34;:&#34;points&#34;,&#34;name&#34;:&#34;2008&#34;,&#34;legendgroup&#34;:&#34;2008&#34;,&#34;showlegend&#34;:true,&#34;xaxis&#34;:&#34;x&#34;,&#34;yaxis&#34;:&#34;y&#34;,&#34;hoverinfo&#34;:&#34;text&#34;,&#34;frame&#34;:null}],&#34;layout&#34;:{&#34;margin&#34;:{&#34;t&#34;:26.2283105022831,&#34;r&#34;:7.30593607305936,&#34;b&#34;:40.1826484018265,&#34;l&#34;:37.2602739726027},&#34;plot_bgcolor&#34;:&#34;rgba(235,235,235,1)&#34;,&#34;paper_bgcolor&#34;:&#34;rgba(255,255,255,1)&#34;,&#34;font&#34;:{&#34;color&#34;:&#34;rgba(0,0,0,1)&#34;,&#34;family&#34;:&#34;&#34;,&#34;size&#34;:14.6118721461187},&#34;xaxis&#34;:{&#34;domain&#34;:[0,1],&#34;automargin&#34;:true,&#34;type&#34;:&#34;linear&#34;,&#34;autorange&#34;:false,&#34;range&#34;:[1.33,7.27],&#34;tickmode&#34;:&#34;array&#34;,&#34;ticktext&#34;:[&#34;2&#34;,&#34;3&#34;,&#34;4&#34;,&#34;5&#34;,&#34;6&#34;,&#34;7&#34;],&#34;tickvals&#34;:[2,3,4,5,6,7],&#34;categoryorder&#34;:&#34;array&#34;,&#34;categoryarray&#34;:[&#34;2&#34;,&#34;3&#34;,&#34;4&#34;,&#34;5&#34;,&#34;6&#34;,&#34;7&#34;],&#34;nticks&#34;:null,&#34;ticks&#34;:&#34;outside&#34;,&#34;tickcolor&#34;:&#34;rgba(51,51,51,1)&#34;,&#34;ticklen&#34;:3.65296803652968,&#34;tickwidth&#34;:0.66417600664176,&#34;showticklabels&#34;:true,&#34;tickfont&#34;:{&#34;color&#34;:&#34;rgba(77,77,77,1)&#34;,&#34;family&#34;:&#34;&#34;,&#34;size&#34;:11.689497716895},&#34;tickangle&#34;:-0,&#34;showline&#34;:false,&#34;linecolor&#34;:null,&#34;linewidth&#34;:0,&#34;showgrid&#34;:true,&#34;gridcolor&#34;:&#34;rgba(255,255,255,1)&#34;,&#34;gridwidth&#34;:0.66417600664176,&#34;zeroline&#34;:false,&#34;anchor&#34;:&#34;y&#34;,&#34;title&#34;:{&#34;text&#34;:&#34;displ&#34;,&#34;font&#34;:{&#34;color&#34;:&#34;rgba(0,0,0,1)&#34;,&#34;family&#34;:&#34;&#34;,&#34;size&#34;:14.6118721461187}},&#34;hoverformat&#34;:&#34;.2f&#34;},&#34;yaxis&#34;:{&#34;domain&#34;:[0,1],&#34;automargin&#34;:true,&#34;type&#34;:&#34;linear&#34;,&#34;autorange&#34;:false,&#34;range&#34;:[10.4,45.6],&#34;tickmode&#34;:&#34;array&#34;,&#34;ticktext&#34;:[&#34;20&#34;,&#34;30&#34;,&#34;40&#34;],&#34;tickvals&#34;:[20,30,40],&#34;categoryorder&#34;:&#34;array&#34;,&#34;categoryarray&#34;:[&#34;20&#34;,&#34;30&#34;,&#34;40&#34;],&#34;nticks&#34;:null,&#34;ticks&#34;:&#34;outside&#34;,&#34;tickcolor&#34;:&#34;rgba(51,51,51,1)&#34;,&#34;ticklen&#34;:3.65296803652968,&#34;tickwidth&#34;:0.66417600664176,&#34;showticklabels&#34;:true,&#34;tickfont&#34;:{&#34;color&#34;:&#34;rgba(77,77,77,1)&#34;,&#34;family&#34;:&#34;&#34;,&#34;size&#34;:11.689497716895},&#34;tickangle&#34;:-0,&#34;showline&#34;:false,&#34;linecolor&#34;:null,&#34;linewidth&#34;:0,&#34;showgrid&#34;:true,&#34;gridcolor&#34;:&#34;rgba(255,255,255,1)&#34;,&#34;gridwidth&#34;:0.66417600664176,&#34;zeroline&#34;:false,&#34;anchor&#34;:&#34;x&#34;,&#34;title&#34;:{&#34;text&#34;:&#34;hwy&#34;,&#34;font&#34;:{&#34;color&#34;:&#34;rgba(0,0,0,1)&#34;,&#34;family&#34;:&#34;&#34;,&#34;size&#34;:14.6118721461187}},&#34;hoverformat&#34;:&#34;.2f&#34;},&#34;shapes&#34;:[{&#34;type&#34;:&#34;rect&#34;,&#34;fillcolor&#34;:null,&#34;line&#34;:{&#34;color&#34;:null,&#34;width&#34;:0,&#34;linetype&#34;:[]},&#34;yref&#34;:&#34;paper&#34;,&#34;xref&#34;:&#34;paper&#34;,&#34;x0&#34;:0,&#34;x1&#34;:1,&#34;y0&#34;:0,&#34;y1&#34;:1}],&#34;showlegend&#34;:true,&#34;legend&#34;:{&#34;bgcolor&#34;:&#34;rgba(255,255,255,1)&#34;,&#34;bordercolor&#34;:&#34;transparent&#34;,&#34;borderwidth&#34;:1.88976377952756,&#34;font&#34;:{&#34;color&#34;:&#34;rgba(0,0,0,1)&#34;,&#34;family&#34;:&#34;&#34;,&#34;size&#34;:11.689497716895},&#34;y&#34;:0.913385826771654},&#34;annotations&#34;:[{&#34;text&#34;:&#34;year&#34;,&#34;x&#34;:1.02,&#34;y&#34;:1,&#34;showarrow&#34;:false,&#34;ax&#34;:0,&#34;ay&#34;:0,&#34;font&#34;:{&#34;color&#34;:&#34;rgba(0,0,0,1)&#34;,&#34;family&#34;:&#34;&#34;,&#34;size&#34;:14.6118721461187},&#34;xref&#34;:&#34;paper&#34;,&#34;yref&#34;:&#34;paper&#34;,&#34;textangle&#34;:-0,&#34;xanchor&#34;:&#34;left&#34;,&#34;yanchor&#34;:&#34;bottom&#34;,&#34;legendTitle&#34;:true}],&#34;hovermode&#34;:&#34;closest&#34;,&#34;barmode&#34;:&#34;relative&#34;},&#34;config&#34;:{&#34;doubleClick&#34;:&#34;reset&#34;,&#34;showSendToCloud&#34;:false},&#34;source&#34;:&#34;A&#34;,&#34;attrs&#34;:{&#34;17a88a68aa8b&#34;:{&#34;colour&#34;:{},&#34;x&#34;:{},&#34;y&#34;:{},&#34;type&#34;:&#34;scatter&#34;}},&#34;cur_data&#34;:&#34;17a88a68aa8b&#34;,&#34;visdat&#34;:{&#34;17a88a68aa8b&#34;:[&#34;function (y) &#34;,&#34;x&#34;]},&#34;highlight&#34;:{&#34;on&#34;:&#34;plotly_click&#34;,&#34;persistent&#34;:false,&#34;dynamic&#34;:false,&#34;selectize&#34;:false,&#34;opacityDim&#34;:0.2,&#34;selected&#34;:{&#34;opacity&#34;:1},&#34;debounce&#34;:0},&#34;shinyEvents&#34;:[&#34;plotly_hover&#34;,&#34;plotly_click&#34;,&#34;plotly_selected&#34;,&#34;plotly_relayout&#34;,&#34;plotly_brushed&#34;,&#34;plotly_brushing&#34;,&#34;plotly_clickannotation&#34;,&#34;plotly_doubleclick&#34;,&#34;plotly_deselect&#34;,&#34;plotly_afterplot&#34;,&#34;plotly_sunburstclick&#34;],&#34;base_url&#34;:&#34;https://plot.ly&#34;},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
+&lt;p&gt;You can now hover over a point to display more information about that point. There is also the possibility to zoom in and out, to download the plot, to select some observations, etc. More information about &lt;code&gt;{plotly}&lt;/code&gt; for R can be found &lt;a href=&#34;https://plotly.com/r/&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;combine-plots-with-patchwork&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Combine plots with &lt;code&gt;{patchwork}&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;There are several ways to combine plots made in &lt;code&gt;{ggplot2}&lt;/code&gt;. In my opinion, the most convenient way is with the &lt;code&gt;{patchwork}&lt;/code&gt; package using symbols such as &lt;code&gt;+&lt;/code&gt;, &lt;code&gt;/&lt;/code&gt; and parentheses.&lt;/p&gt;
+&lt;p&gt;We first need to create some plots and save them:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p_a &amp;lt;- ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point()
+
+p_b &amp;lt;- ggplot(dat) +
+  aes(x = hwy) +
+  geom_histogram()
+
+p_c &amp;lt;- ggplot(dat) +
+  aes(x = drv, y = hwy) +
+  geom_boxplot()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now that we have 3 plots saved in our environment, we can combine them. To have plots &lt;strong&gt;next to each other&lt;/strong&gt; simply use the &lt;code&gt;+&lt;/code&gt; symbol:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(patchwork)
+p_a + p_b + p_c&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-42-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;To display them &lt;strong&gt;above each other&lt;/strong&gt; simply use the &lt;code&gt;/&lt;/code&gt; symbol:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p_a / p_b / p_c&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-43-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;And finally, to combine them &lt;strong&gt;above and next&lt;/strong&gt; to each other, mix &lt;code&gt;+&lt;/code&gt;, &lt;code&gt;/&lt;/code&gt; and parentheses:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p_a + p_b / p_c&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-44-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;(p_a + p_b) / p_c&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-44-2.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;flip-coordinates&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Flip coordinates&lt;/h3&gt;
+&lt;p&gt;Flipping coordinates of your plot is useful to create horizontal boxplots, or when labels of a variable are so long that they overlap each other on the x-axis. See with and without flipping coordinates below:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# without flipping coordinates
+p1 &amp;lt;- ggplot(dat) +
+  aes(x = class, y = hwy) +
+  geom_boxplot()
+
+# with flipping coordinates
+p2 &amp;lt;- ggplot(dat) +
+  aes(x = class, y = hwy) +
+  geom_boxplot() +
+  coord_flip()
+
+library(patchwork)
+p1 + p2 # left: without flipping, right: with flipping&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-45-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This can be done with many types of plot, not only with boxplots. For instance, if a categorical variable has many levels or the labels are long, it is usually best to flip the coordinates for a better visual:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = class) +
+  geom_bar() +
+  coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-46-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;save-plot&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Save plot&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;ggsave()&lt;/code&gt; function will save the most recent plot in your current &lt;a href=&#34;/blog/how-to-import-an-excel-file-in-rstudio/#r-working-directory&#34;&gt;working directory&lt;/a&gt; unless you specify a path to another folder:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point()
+
+ggsave(&amp;quot;plot1.pdf&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;to-go-further&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;To go further&lt;/h1&gt;
+&lt;p&gt;By now you have seen that &lt;code&gt;{ggplot2}&lt;/code&gt; is a very powerful and complete package to create plots in R. This article illustrated only the tip of the iceberg, and you will find many tutorials on how to create more advanced plots and visualizations with &lt;code&gt;{ggplot2}&lt;/code&gt; online. If you want to learn more than what is described in the present article, I highly recommend starting with:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the chapters &lt;a href=&#34;https://r4ds.had.co.nz/data-visualisation.html&#34; target=&#34;_blank&#34;&gt;Data visualisation&lt;/a&gt; and &lt;a href=&#34;https://r4ds.had.co.nz/graphics-for-communication.html&#34; target=&#34;_blank&#34;&gt;Graphics for communication&lt;/a&gt; from the book &lt;a href=&#34;https://r4ds.had.co.nz/&#34; target=&#34;_blank&#34;&gt;R for Data Science&lt;/a&gt; from Garrett Grolemund and Hadley Wickham&lt;/li&gt;
+&lt;li&gt;the book &lt;a href=&#34;https://ggplot2-book.org/&#34; target=&#34;_blank&#34;&gt;ggplot2: Elegant Graphics for Data Analysis&lt;/a&gt; from Hadley Wickham&lt;/li&gt;
+&lt;li&gt;the &lt;a href=&#34;https://exts.ggplot2.tidyverse.org/gallery/&#34; target=&#34;_blank&#34;&gt;ggplot2 extensions guide&lt;/a&gt; which lists many of the packages that extend &lt;code&gt;{ggplot2}&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;the &lt;a href=&#34;/blog/files/ggplot2-cheatsheet.pdf&#34;&gt;&lt;code&gt;{ggplot2}&lt;/code&gt; cheat sheet&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Thanks for reading. I hope this article helped you to create your first plots with the &lt;code&gt;{ggplot2}&lt;/code&gt; package. As a reminder, for simple graphs, it is sometimes easier to draw them via the &lt;a href=&#34;/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse&#34;&gt;{esquisse} addin&lt;/a&gt;. After some time, you will quickly learn how to create them by yourselves and in no time you will be able to build complex and sophisticated data visualizations.&lt;/p&gt;
+&lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Use the &lt;code&gt;geom_jitter()&lt;/code&gt; layer with caution because, although it makes a plot more revealing at large scales, it also makes it slightly less accurate at small scales since some randomness is added to the points.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;There are (at the time of writing) 26 shapes accepted in the &lt;code&gt;shape&lt;/code&gt; argument. See this &lt;a href=&#34;https://ggplot2.tidyverse.org/reference/aes_linetype_size_shape.html&#34; target=&#34;_blank&#34;&gt;documentation&lt;/a&gt; for all available shapes.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Mortgage calculator in R Shiny</title>
@@ -8881,7 +9390,7 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;blockquote&gt;
 &lt;p&gt;This addin allows you to interactively explore your data by visualizing it with the ggplot2 package. It allows you to draw bar plots, curves, scatter plots, histograms, boxplot and sf objects, then export the graph or retrieve the code to reproduce the graph.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;With this addin you can easily create beautiful graphs from the &lt;code&gt;{ggplot2}&lt;/code&gt; package and the best part according to me is that you can retrieve the code to reproduce the graph. Compared to the default &lt;code&gt;{graphics}&lt;/code&gt; package, it is true that graphs from the &lt;code&gt;{ggplot2}&lt;/code&gt; package look usually better but the code is also longer and more complex. With this addin, you can draw graphs from the &lt;code&gt;{ggplot2}&lt;/code&gt; package by dragging and dropping variables of interest in an user-friendly and interactive window, and then use the generated code in your script.&lt;/p&gt;
+&lt;p&gt;With this addin you can easily create beautiful graphs from the &lt;a href=&#34;/blog/graphics-in-r-with-ggplot2/&#34;&gt;&lt;code&gt;{ggplot2}&lt;/code&gt; package&lt;/a&gt; and the best part according to me is that you can retrieve the code to reproduce the graph. Compared to the default &lt;code&gt;{graphics}&lt;/code&gt; package, it is true that graphs from the &lt;code&gt;{ggplot2}&lt;/code&gt; package look usually better but the code is also longer and more complex. With this addin, you can draw graphs from the &lt;code&gt;{ggplot2}&lt;/code&gt; package by dragging and dropping variables of interest in an user-friendly and interactive window, and then use the generated code in your script.&lt;/p&gt;
 &lt;p&gt;For the sake of illustration, let’s say wee want to create a scatter plot of the variables &lt;code&gt;Sepal.Length&lt;/code&gt; and &lt;code&gt;Petal.Length&lt;/code&gt; of the dataset &lt;code&gt;iris&lt;/code&gt; and color the points by the variable &lt;code&gt;Species&lt;/code&gt;. For this, follow these steps:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
 &lt;li&gt;load the dataset and rename it:&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/li&gt;
@@ -9104,6 +9613,7 @@ library(ViewPipeSteps)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;&lt;a href=&#34;#histogram&#34;&gt;Histogram&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#boxplot&#34;&gt;Boxplot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#scatterplot&#34;&gt;Scatterplot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#line-plot&#34;&gt;Line plot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#qq-plot&#34;&gt;QQ-plot&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#for-a-single-variable&#34;&gt;For a single variable&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#by-groups&#34;&gt;By groups&lt;/a&gt;&lt;/li&gt;
@@ -9508,12 +10018,19 @@ ggplot(dat) +
   aes(x = Sepal.Length, y = Petal.Length) +
   geom_point()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-41-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;As boxplots, scatterplots are even more informative when differentiating the points according to a factor, in this case the species:&lt;/p&gt;
+&lt;p&gt;Like boxplots, scatterplots are even more informative when differentiating the points according to a factor, in this case the species:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
   aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
   geom_point() +
   scale_color_hue()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-42-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;line-plot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Line plot&lt;/h1&gt;
+&lt;p&gt;Line plots, particularly useful in time series or finance, can be created by adding the &lt;code&gt;type = &#34;l&#34;&lt;/code&gt; argument in the &lt;code&gt;plot()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(dat$Sepal.Length,
+     type = &amp;quot;l&amp;quot;) # &amp;quot;l&amp;quot; for line&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;qq-plot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;QQ-plot&lt;/h1&gt;
@@ -9524,29 +10041,29 @@ ggplot(dat) +
 qqnorm(dat$Sepal.Length)
 # Draw the reference line:
 qqline(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Or a QQ-plot with confidence bands with the &lt;code&gt;qqPlot()&lt;/code&gt; function from the &lt;code&gt;{car}&lt;/code&gt; package:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(car) # package must be installed first
 qqPlot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 132 118&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;If points are close to the reference line (sometimes referred as Henry’s line) and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The variable &lt;code&gt;Sepal.Length&lt;/code&gt; does not seem to follow a normal distribution because several points lie outside the confidence bands. When facing a non-normal distribution, the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. Applying the logarithm transformation can be done with the &lt;code&gt;log()&lt;/code&gt; function.&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggpubr}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggpubr)
 ggqqplot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-46-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;by-groups&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;By groups&lt;/h2&gt;
 &lt;p&gt;For some statistical tests, the normality assumption is required in all groups. One solution is to draw a QQ-plot for each group by manually splitting the dataset into different groups and then draw a QQ-plot for each subset of the data (with the methods shown above). Another (easier) solution is to draw a QQ-plot for each group automatically with the argument &lt;code&gt;groups =&lt;/code&gt; in the function &lt;code&gt;qqPlot()&lt;/code&gt; from the &lt;code&gt;{car}&lt;/code&gt; package:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;qqPlot(dat$Sepal.Length, groups = dat$size)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-46-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;qplot(
   sample = Sepal.Length, data = dat,
   col = size, shape = size
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-48-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;It is also possible to differentiate groups by only shape or color. For this, remove one of the argument &lt;code&gt;col&lt;/code&gt; or &lt;code&gt;shape&lt;/code&gt; in the &lt;code&gt;qplot()&lt;/code&gt; function above.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -9554,12 +10071,12 @@ ggqqplot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
 &lt;h1&gt;Density plot&lt;/h1&gt;
 &lt;p&gt;Density plot is a smoothed version of the histogram and is used in the same concept, that is, to represent the distribution of a numeric variable. The functions &lt;code&gt;plot()&lt;/code&gt; and &lt;code&gt;density()&lt;/code&gt; are used together to draw a density plot:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(density(dat$Sepal.Length))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-48-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-49-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
   aes(x = Sepal.Length) +
   geom_density()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-49-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-50-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;correlation-plot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Correlation plot&lt;/h1&gt;

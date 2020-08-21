@@ -191,6 +191,7 @@
 <li><a href="#histogram">Histogram</a></li>
 <li><a href="#boxplot">Boxplot</a></li>
 <li><a href="#scatterplot">Scatterplot</a></li>
+<li><a href="#line-plot">Line plot</a></li>
 <li><a href="#qq-plot">QQ-plot</a><ul>
 <li><a href="#for-a-single-variable">For a single variable</a></li>
 <li><a href="#by-groups">By groups</a></li>
@@ -595,12 +596,19 @@ ggplot(dat) +
   aes(x = Sepal.Length, y = Petal.Length) +
   geom_point()</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-41-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<p>As boxplots, scatterplots are even more informative when differentiating the points according to a factor, in this case the species:</p>
+<p>Like boxplots, scatterplots are even more informative when differentiating the points according to a factor, in this case the species:</p>
 <pre class="r"><code>ggplot(dat) +
   aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
   geom_point() +
   scale_color_hue()</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-42-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="line-plot" class="section level1">
+<h1>Line plot</h1>
+<p>Line plots, particularly useful in time series or finance, can be created by adding the <code>type = "l"</code> argument in the <code>plot()</code> function:</p>
+<pre class="r"><code>plot(dat$Sepal.Length,
+     type = &quot;l&quot;) # &quot;l&quot; for line</code></pre>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="qq-plot" class="section level1">
 <h1>QQ-plot</h1>
@@ -611,29 +619,29 @@ ggplot(dat) +
 qqnorm(dat$Sepal.Length)
 # Draw the reference line:
 qqline(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Or a QQ-plot with confidence bands with the <code>qqPlot()</code> function from the <code>{car}</code> package:</p>
 <pre class="r"><code>library(car) # package must be installed first
 qqPlot(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 132 118</code></pre>
 <p>If points are close to the reference line (sometimes referred as Henry’s line) and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The variable <code>Sepal.Length</code> does not seem to follow a normal distribution because several points lie outside the confidence bands. When facing a non-normal distribution, the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. Applying the logarithm transformation can be done with the <code>log()</code> function.</p>
 <p>In <code>{ggpubr}</code>:</p>
 <pre class="r"><code>library(ggpubr)
 ggqqplot(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-46-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="by-groups" class="section level2">
 <h2>By groups</h2>
 <p>For some statistical tests, the normality assumption is required in all groups. One solution is to draw a QQ-plot for each group by manually splitting the dataset into different groups and then draw a QQ-plot for each subset of the data (with the methods shown above). Another (easier) solution is to draw a QQ-plot for each group automatically with the argument <code>groups =</code> in the function <code>qqPlot()</code> from the <code>{car}</code> package:</p>
 <pre class="r"><code>qqPlot(dat$Sepal.Length, groups = dat$size)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-46-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>qplot(
   sample = Sepal.Length, data = dat,
   col = size, shape = size
 )</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-48-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>It is also possible to differentiate groups by only shape or color. For this, remove one of the argument <code>col</code> or <code>shape</code> in the <code>qplot()</code> function above.</p>
 </div>
 </div>
@@ -641,12 +649,12 @@ ggqqplot(dat$Sepal.Length)</code></pre>
 <h1>Density plot</h1>
 <p>Density plot is a smoothed version of the histogram and is used in the same concept, that is, to represent the distribution of a numeric variable. The functions <code>plot()</code> and <code>density()</code> are used together to draw a density plot:</p>
 <pre class="r"><code>plot(density(dat$Sepal.Length))</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-48-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-49-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>ggplot(dat) +
   aes(x = Sepal.Length) +
   geom_density()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-49-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-50-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="correlation-plot" class="section level1">
 <h1>Correlation plot</h1>

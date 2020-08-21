@@ -2438,7 +2438,7 @@ ggqqplot(dat_hist$value)&lt;/code&gt;&lt;/pre&gt;
 &lt;blockquote&gt;
 &lt;p&gt;This addin allows you to interactively explore your data by visualizing it with the ggplot2 package. It allows you to draw bar plots, curves, scatter plots, histograms, boxplot and sf objects, then export the graph or retrieve the code to reproduce the graph.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;With this addin you can easily create beautiful graphs from the &lt;code&gt;{ggplot2}&lt;/code&gt; package and the best part according to me is that you can retrieve the code to reproduce the graph. Compared to the default &lt;code&gt;{graphics}&lt;/code&gt; package, it is true that graphs from the &lt;code&gt;{ggplot2}&lt;/code&gt; package look usually better but the code is also longer and more complex. With this addin, you can draw graphs from the &lt;code&gt;{ggplot2}&lt;/code&gt; package by dragging and dropping variables of interest in an user-friendly and interactive window, and then use the generated code in your script.&lt;/p&gt;
+&lt;p&gt;With this addin you can easily create beautiful graphs from the &lt;a href=&#34;/blog/graphics-in-r-with-ggplot2/&#34;&gt;&lt;code&gt;{ggplot2}&lt;/code&gt; package&lt;/a&gt; and the best part according to me is that you can retrieve the code to reproduce the graph. Compared to the default &lt;code&gt;{graphics}&lt;/code&gt; package, it is true that graphs from the &lt;code&gt;{ggplot2}&lt;/code&gt; package look usually better but the code is also longer and more complex. With this addin, you can draw graphs from the &lt;code&gt;{ggplot2}&lt;/code&gt; package by dragging and dropping variables of interest in an user-friendly and interactive window, and then use the generated code in your script.&lt;/p&gt;
 &lt;p&gt;For the sake of illustration, let’s say wee want to create a scatter plot of the variables &lt;code&gt;Sepal.Length&lt;/code&gt; and &lt;code&gt;Petal.Length&lt;/code&gt; of the dataset &lt;code&gt;iris&lt;/code&gt; and color the points by the variable &lt;code&gt;Species&lt;/code&gt;. For this, follow these steps:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
 &lt;li&gt;load the dataset and rename it:&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;&lt;/li&gt;
@@ -2661,6 +2661,7 @@ library(ViewPipeSteps)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;&lt;a href=&#34;#histogram&#34;&gt;Histogram&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#boxplot&#34;&gt;Boxplot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#scatterplot&#34;&gt;Scatterplot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#line-plot&#34;&gt;Line plot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#qq-plot&#34;&gt;QQ-plot&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;#for-a-single-variable&#34;&gt;For a single variable&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#by-groups&#34;&gt;By groups&lt;/a&gt;&lt;/li&gt;
@@ -3065,12 +3066,19 @@ ggplot(dat) +
   aes(x = Sepal.Length, y = Petal.Length) +
   geom_point()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-41-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;As boxplots, scatterplots are even more informative when differentiating the points according to a factor, in this case the species:&lt;/p&gt;
+&lt;p&gt;Like boxplots, scatterplots are even more informative when differentiating the points according to a factor, in this case the species:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
   aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
   geom_point() +
   scale_color_hue()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-42-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;line-plot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Line plot&lt;/h1&gt;
+&lt;p&gt;Line plots, particularly useful in time series or finance, can be created by adding the &lt;code&gt;type = &#34;l&#34;&lt;/code&gt; argument in the &lt;code&gt;plot()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(dat$Sepal.Length,
+     type = &amp;quot;l&amp;quot;) # &amp;quot;l&amp;quot; for line&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;qq-plot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;QQ-plot&lt;/h1&gt;
@@ -3081,29 +3089,29 @@ ggplot(dat) +
 qqnorm(dat$Sepal.Length)
 # Draw the reference line:
 qqline(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Or a QQ-plot with confidence bands with the &lt;code&gt;qqPlot()&lt;/code&gt; function from the &lt;code&gt;{car}&lt;/code&gt; package:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(car) # package must be installed first
 qqPlot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 132 118&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;If points are close to the reference line (sometimes referred as Henry’s line) and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The variable &lt;code&gt;Sepal.Length&lt;/code&gt; does not seem to follow a normal distribution because several points lie outside the confidence bands. When facing a non-normal distribution, the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. Applying the logarithm transformation can be done with the &lt;code&gt;log()&lt;/code&gt; function.&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggpubr}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggpubr)
 ggqqplot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-46-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;by-groups&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;By groups&lt;/h2&gt;
 &lt;p&gt;For some statistical tests, the normality assumption is required in all groups. One solution is to draw a QQ-plot for each group by manually splitting the dataset into different groups and then draw a QQ-plot for each subset of the data (with the methods shown above). Another (easier) solution is to draw a QQ-plot for each group automatically with the argument &lt;code&gt;groups =&lt;/code&gt; in the function &lt;code&gt;qqPlot()&lt;/code&gt; from the &lt;code&gt;{car}&lt;/code&gt; package:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;qqPlot(dat$Sepal.Length, groups = dat$size)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-46-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;qplot(
   sample = Sepal.Length, data = dat,
   col = size, shape = size
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-48-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;It is also possible to differentiate groups by only shape or color. For this, remove one of the argument &lt;code&gt;col&lt;/code&gt; or &lt;code&gt;shape&lt;/code&gt; in the &lt;code&gt;qplot()&lt;/code&gt; function above.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -3111,12 +3119,12 @@ ggqqplot(dat$Sepal.Length)&lt;/code&gt;&lt;/pre&gt;
 &lt;h1&gt;Density plot&lt;/h1&gt;
 &lt;p&gt;Density plot is a smoothed version of the histogram and is used in the same concept, that is, to represent the distribution of a numeric variable. The functions &lt;code&gt;plot()&lt;/code&gt; and &lt;code&gt;density()&lt;/code&gt; are used together to draw a density plot:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(density(dat$Sepal.Length))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-48-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-49-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;{ggplot2}&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dat) +
   aes(x = Sepal.Length) +
   geom_density()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-49-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-50-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;correlation-plot&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Correlation plot&lt;/h1&gt;

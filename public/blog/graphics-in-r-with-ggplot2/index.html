@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title> Graphics in R with ggplot2 - Stats and R </title>
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="Learn how to create professional graphics and plots in R (histogram, barplot, boxplot, scatter plot, QQ-plot, density plot, etc.) with the ggplot2 package" />
+    <meta property="og:site_name" content="Stats and R" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="/blog/graphics-in-r-with-ggplot2/" />
+    <meta property="og:title" content="Graphics in R with ggplot2" />
+    <meta property="og:image" content="//blog/2020-08-21-graphics-in-r-with-ggplot2_files/graphics-in-r-with-ggplot2.png" />
+    <meta property="og:description" content="Learn how to create professional graphics and plots in R (histogram, barplot, boxplot, scatter plot, QQ-plot, density plot, etc.) with the ggplot2 package" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <meta name="twitter:site" content="@statsandr">
+    <meta name="twitter:creator" content="@statsandr">
+    
+    <meta name="twitter:title" content="Graphics in R with ggplot2" />
+    <meta name="twitter:description" content="Learn how to create professional graphics and plots in R (histogram, barplot, boxplot, scatter plot, QQ-plot, density plot, etc.) with the ggplot2 package" />
+    <meta name="twitter:image" content="//blog/2020-08-21-graphics-in-r-with-ggplot2_files/graphics-in-r-with-ggplot2.png" />
+
+    <link rel="canonical" href="/blog/graphics-in-r-with-ggplot2/">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha256-aAr2Zpq8MZ+YA/D6JtRD3xtrwpEz2IqOS+pWD/7XKIw=" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="/css/custom.css" />
+
+    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/tomorrow.min.css" integrity="sha256-0QU8ry64q+N6YBIEF/6XF6vUeF15gbNO4tLS6ikk0FI=" crossorigin="anonymous" />
+    
+
+    
+
+    <link rel="shortcut icon"
+        href="/image/favicon.png">
+
+    
+        <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Stats and R" />
+    
+</head>
+
+<body>
+    
+    <div class="my-4 my-md-5 header">
+    <div class="container">
+        <div class="row">
+            <div class="col-auto offset-md-1 d-none d-md-block">
+                
+                    <a href="/">
+                        <img class="ml-md-4 logo img-fluid d-block rounded-circle" src="/image/avatar.jpg" alt="logo">
+                    </a>
+                
+            </div>
+            <div class="col-auto align-self-center mr-auto">
+                <a href="/">
+                    <h1 class="name">Stats and R</h1>
+                </a>
+
+                <ul class="nav nav-primary">
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-blog" href="/blog/">
+                                
+                                Blog
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-tags" href="/tags/">
+                                
+                                Tags
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-about" href="/about/">
+                                
+                                About
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-newsletter" href="/subscribe/">
+                                
+                                Newsletter
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="text-uppercase nav-link text-contact" href="/contact/">
+                                
+                                Contact
+                            </a>
+                        </li>
+                    
+
+                    
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-12 col-md-10">
+                    <h1 class="mx-0 mx-md-4 blog-post-title">Graphics in R with ggplot2</h1>
+
+                    <div class="mb-md-4 meta">
+                        
+                            
+                                <span class="author" title="Antoine Soetewey">
+                                    Antoine Soetewey
+                                </span>
+                            
+                        
+
+                        <span class="date middot" title='Fri Aug 21 2020 00:00:00 UTC'>
+                            2020-08-21
+                        </span>
+
+                        <span class="reading-time middot">
+                            22 minute read
+                        </span>
+
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/descriptive-statistics">Descriptive statistics</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/r">R</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/package">Package</a>
+                                    </li>
+                                
+                                    <li class="d-inline middot">
+                                        <a href="/tags/visualization">Visualization</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+
+                        <div class="d-none d-md-inline tags">
+                            <ul class="list-unstyled d-inline">
+                                
+                                
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="markdown">
+                        
+    
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/plotly-binding/plotly.js"></script>
+<script src="/rmarkdown-libs/typedarray/typedarray.min.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/crosstalk/js/crosstalk.min.js"></script>
+<link href="/rmarkdown-libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/plotly-main/plotly-latest.min.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#data">Data</a></li>
+<li><a href="#basic-principles-of-ggplot2">Basic principles of <code>{ggplot2}</code></a></li>
+<li><a href="#create-plots-with-ggplot2">Create plots with <code>{ggplot2}</code></a><ul>
+<li><a href="#scatter-plot">Scatter plot</a></li>
+<li><a href="#line-plot">Line plot</a></li>
+<li><a href="#combination-of-line-and-points">Combination of line and points</a></li>
+<li><a href="#histogram">Histogram</a></li>
+<li><a href="#density-plot">Density plot</a></li>
+<li><a href="#combination-of-histogram-and-densities">Combination of histogram and densities</a></li>
+<li><a href="#boxplot">Boxplot</a></li>
+<li><a href="#barplot">Barplot</a></li>
+<li><a href="#further-personalization">Further personalization</a><ul>
+<li><a href="#labels">Labels</a></li>
+<li><a href="#axis-ticks">Axis ticks</a></li>
+<li><a href="#log-transformations">Log transformations</a></li>
+<li><a href="#limits">Limits</a></li>
+<li><a href="#legend">Legend</a></li>
+<li><a href="#shape-color-size-and-transparency">Shape, color, size and transparency</a></li>
+<li><a href="#smooth-and-regression-lines">Smooth and regression lines</a></li>
+<li><a href="#facets">Facets</a></li>
+<li><a href="#themes">Themes</a></li>
+<li><a href="#interactive-plot-with-plotly">Interactive plot with <code>{plotly}</code></a></li>
+<li><a href="#combine-plots-with-patchwork">Combine plots with <code>{patchwork}</code></a></li>
+<li><a href="#flip-coordinates">Flip coordinates</a></li>
+<li><a href="#save-plot">Save plot</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#to-go-further">To go further</a></li>
+</ul>
+</div>
+
+<center>
+<img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/graphics-in-r-with-ggplot2.png" style="width:50.0%" />
+</center>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>R is known to be a really powerful programming language when it comes to graphics and visualizations (in addition to <a href="/tags/statistics/">statistics</a> and data science of course!).</p>
+<p>To keep it short, graphics in R can be done in two ways, via the:</p>
+<ol style="list-style-type: decimal">
+<li><code>{graphics}</code> package (the base graphics in R, loaded by default)</li>
+<li><code>{ggplot2}</code> package (which needs to be <a href="/blog/an-efficient-way-to-install-and-load-r-packages/">installed and loaded</a> beforehand)</li>
+</ol>
+<p>The <code>{graphics}</code> package comes with a large choice of plots (such as <code>plot</code>, <code>hist</code>, <code>barplot</code>, <code>boxplot</code>, <code>pie</code>, <code>mosaicplot</code>, etc.) and additional related features (e.g., <code>abline</code>, <code>lines</code>, <code>legend</code>, <code>mtext</code>, <code>rect</code>, etc.). It is often the preferred way to draw plots for most R users, and in particular for beginners to intermediate users.</p>
+<p>Since its creation in 2005 by Hadley Wickham, <strong><code>{ggplot2}</code></strong> has grown in use to become one of the most popular R packages and the <strong>most popular package for graphics and data visualizations</strong>. The <code>{ggplot2}</code> package is a much more modern approach to creating professional-quality graphics. More information about the package can be found at <a href="https://ggplot2.tidyverse.org/" target="_blank">ggplot2.tidyverse.org</a>.</p>
+<p>In this article, we will see how to create common plots such as scatter plots, line plots, histograms, boxplots, barplots, density plots in R with this package. If you are unfamiliar with any of these types of graph, you will find more information about each one (when to use it, its purpose, what does it show, etc.) in my article about <a href="/blog/descriptive-statistics-in-r/">descriptive statistics in R</a>.</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>To illustrate plots with the <code>{ggplot2}</code> package we will use the <code>mpg</code> dataset available in the package. The dataset contains observations collected by the US Environmental Protection Agency on fuel economy from 1999 to 2008 for 38 popular models of cars (run <code>?mpg</code> for more information about the data):</p>
+<pre class="r"><code>library(ggplot2)
+dat &lt;- ggplot2::mpg</code></pre>
+<p>Before going further, let’s transform the <code>cyl</code>, <code>drv</code>, <code>fl</code>, <code>year</code> and <code>class</code> variables in <a href="/blog/data-types-in-r/#factor">factor</a> with the <code>transform()</code> function:</p>
+<pre class="r"><code>dat &lt;- transform(dat,
+  cyl = factor(cyl),
+  drv = factor(drv),
+  fl = factor(fl),
+  year = factor(year),
+  class = factor(class)
+)</code></pre>
+</div>
+<div id="basic-principles-of-ggplot2" class="section level1">
+<h1>Basic principles of <code>{ggplot2}</code></h1>
+<p>The <code>{ggplot2}</code> package is based on the principles of “The Grammar of Graphics” (hence “gg” in the name of <code>{ggplot2}</code>), that is, a coherent system for describing and building graphs. The main idea is to <strong>design a graphic as a succession of layers</strong>.</p>
+<p>The main layers are:</p>
+<ol style="list-style-type: decimal">
+<li>The <strong>dataset</strong> that contains the variables that we want to represent. This is done with the <code>ggplot()</code> function and comes first.</li>
+<li>The <strong>variable(s)</strong> to represent on the x and/or y-axis, and the aesthetic elements (such as color, size, fill, shape and transparency) of the objects to be represented. This is done with the <code>aes()</code> function (abbreviation of aesthetic).</li>
+<li>The <strong>type of graphical representation</strong> (scatter plot, line plot, barplot, histogram, boxplot, etc.). This is done with the functions <code>geom_point()</code>, <code>geom_line()</code>, <code>geom_bar()</code>, <code>geom_histogram()</code>, <code>geom_boxplot()</code>, etc.</li>
+<li>If needed, additional layers (such as labels, annotations, scales, axis ticks, legends, themes, facets, etc.) can be added to personalize the plot.</li>
+</ol>
+<p>To create a plot, we thus first need to specify the data in the <code>ggplot()</code> function and then add the required layers such as the variables, the aesthetic elements and the type of plot:</p>
+<pre class="r"><code>ggplot(data) +
+  aes(x = var_x, y = var_y) +
+  geom_x()</code></pre>
+<ul>
+<li><code>data</code> in <code>ggplot()</code> is the name of the data frame which contains the variables <code>var_x</code> and <code>var_y</code>.</li>
+<li>The <code>+</code> symbol is used to indicate the different layers that will be added to the plot. Make sure to write the <code>+</code> <em>symbol at the end of the line</em> of code and not at the beginning of the line, otherwise R throws an error.</li>
+<li>The layer <code>aes()</code> indicates what variables will be used in the plot and more generally, the aesthetic elements of the plot.</li>
+<li>Finally, <code>x</code> in <code>geom_x()</code> represents the type of plot.</li>
+<li>Other layers are usually not required unless we want to personalize the plot further.</li>
+</ul>
+<p>Note that it is a good practice to write one line of code per layer to improve code readibility.</p>
+</div>
+<div id="create-plots-with-ggplot2" class="section level1">
+<h1>Create plots with <code>{ggplot2}</code></h1>
+<p>In the following sections we will show how to draw the following plots:</p>
+<ul>
+<li>scatter plot</li>
+<li>line plot</li>
+<li>histogram</li>
+<li>density plot</li>
+<li>boxplot</li>
+<li>barplot</li>
+</ul>
+<p>In order to focus on the construction of the different plots and the use of <code>{ggplot2}</code>, we will restrict ourselves to drawing basic (yet beautiful) plots without unnecessary layers. For the sake of completeness, we will briefly discuss and illustrate different layers to further personalize a plot at the end of the article (see this <a href="/blog/graphics-in-r-with-ggplot2/#further-personalization">section</a>).</p>
+<p>Note that if you still struggle to create plots with <code>{ggplot2}</code> after reading this tutorial, you may find the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse">{esquisse} addin</a> useful. This addin allows you to <strong>interactively</strong> (that is, by dragging and dropping variables) create plots with the <code>{ggplot2}</code> package. Give it a try!</p>
+<div id="scatter-plot" class="section level2">
+<h2>Scatter plot</h2>
+<p>We start by creating a <a href="/blog/descriptive-statistics-in-r/#scatterplot">scatter plot</a> using <code>geom_point</code>. Remember that a scatter plot is used to visualize the relation between two <a href="/blog/variable-types-and-examples/#quantitative">quantitative variables</a>.</p>
+<ol style="list-style-type: decimal">
+<li>We start by specifying the data:</li>
+</ol>
+<pre class="r"><code>ggplot(dat) # data</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Then we add the variables to be represented with the <code>aes()</code> function:</li>
+</ol>
+<pre class="r"><code>ggplot(dat) + # data
+  aes(x = displ, y = hwy) # variables</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Finally, we indicate the type of plot:</li>
+</ol>
+<pre class="r"><code>ggplot(dat) + # data
+  aes(x = displ, y = hwy) + # variables
+  geom_point() # type of plot</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>You will also sometimes see the aesthetic elements (<code>aes()</code> with the variables) inside the <code>ggplot()</code> function in addition to the dataset:</p>
+<pre class="r"><code>ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>This second method gives the exact same plot than the first method. I tend to prefer the first method over the second for better readability, but this is more a matter of taste so the choice is up to you.</p>
+</div>
+<div id="line-plot" class="section level2">
+<h2>Line plot</h2>
+<p><a href="/blog/descriptive-statistics-in-r/#line-plot">Line plots</a>, particularly useful in time series or finance, can be created similarly but by using <code>geom_line()</code>:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_line()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="combination-of-line-and-points" class="section level2">
+<h2>Combination of line and points</h2>
+<p>An advantage of <code>{ggplot2}</code> is the ability to combine several types of plots and its flexibility in designing it. For instance, we can add a line to a scatter plot by simply adding a layer to the initial scatter plot:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point() +
+  geom_line() # add line</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="histogram" class="section level2">
+<h2>Histogram</h2>
+<p>A <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> (useful to visualize distributions) can be plotted using <code>geom_histogram()</code>:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = hwy) +
+  geom_histogram()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>By default, the number of bins is equal to 30. You can change this value using the <code>bins</code> argument inside the <code>geom_histogram()</code> function:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = hwy) +
+  geom_histogram(bins = sqrt(nrow(dat)))</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Here I specify the number of bins to be equal to the square root of the number of observations (following Sturge’s rule) but you can specify any numeric value.</p>
+</div>
+<div id="density-plot" class="section level2">
+<h2>Density plot</h2>
+<p><a href="/blog/descriptive-statistics-in-r/#density-plot">Density plots</a> can be created using <code>geom_density()</code>:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = hwy) +
+  geom_density()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="combination-of-histogram-and-densities" class="section level2">
+<h2>Combination of histogram and densities</h2>
+<p>We can also superimpose a histogram and a density curve on the same plot:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = hwy, y = ..density..) +
+  geom_histogram() +
+  geom_density()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Or superimpose several densities:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = hwy, color = drv, fill = drv) +
+  geom_density(alpha = 0.25) # add transparency</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The argument <code>alpha = 0.25</code> has been added for some transparency. More information about this argument can be found in this <a href="/blog/graphics-in-r-with-ggplot2/#further-personalization">section</a>.</p>
+</div>
+<div id="boxplot" class="section level2">
+<h2>Boxplot</h2>
+<p>A <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> (also very useful to visualize distributions) can be plotted using <code>geom_boxplot()</code>:</p>
+<pre class="r"><code># Boxplot for one variable
+ggplot(dat) +
+  aes(x = &quot;&quot;, y = hwy) +
+  geom_boxplot()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Boxplot by factor
+ggplot(dat) +
+  aes(x = drv, y = hwy) +
+  geom_boxplot()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-15-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>It is also possible to plot the points on the boxplot with <code>geom_jitter()</code>, and to vary the width of the boxes according to the size (i.e., the number of observations) of each level with <code>varwidth = TRUE</code>:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = drv, y = hwy) +
+  geom_boxplot(varwidth = TRUE) + # vary boxes width according to n obs.
+  geom_jitter(alpha = 0.25, width = 0.2) # adds random noise and limit its width</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The <code>geom_jitter()</code> layer adds some random variation to each point in order to prevent them from overlapping (an issue known as overplotting).<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> Moreover, the <code>alpha</code> argument adds some transparency to the points (see more in this <a href="/blog/graphics-in-r-with-ggplot2/#further-personalization">section</a>) to keep the focus on the boxes and not on the points.</p>
+<p>Finally, it is also possible to divide boxplots into several panels according to the levels of a <a href="/blog/variable-types-and-examples/#qualitative">qualitative variable</a>:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = drv, y = hwy) +
+  geom_boxplot(varwidth = TRUE) + # vary boxes width according to n obs.
+  geom_jitter(alpha = 0.25, width = 0.2) + # adds random noise and limit its width
+  facet_wrap(~year) # divide into 2 panels</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>For a visually more appealing plot, it is also possible to use some colors for the boxes depending on the x variable:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = drv, y = hwy, fill = drv) + # add color to boxes with fill
+  geom_boxplot(varwidth = TRUE) + # vary boxes width according to n obs.
+  geom_jitter(alpha = 0.25, width = 0.2) + # adds random noise and limit its width
+  facet_wrap(~year) + # divide into 2 panels
+  theme(legend.position = &quot;none&quot;) # remove legend</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>In that case, it best to remove the legend as it becomes redundant. See more information about the legend in this <a href="/blog/graphics-in-r-with-ggplot2/#legend">section</a>.</p>
+</div>
+<div id="barplot" class="section level2">
+<h2>Barplot</h2>
+<p>A <a href="/blog/descriptive-statistics-in-r/#barplot">barplot</a> (useful to visualize qualitative variables) can be plotted using <code>geom_bar()</code>:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = drv) +
+  geom_bar()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>By default, the heights of the bars correspond to the observed frequencies for each level of the variable of interest (<code>drv</code> in our case).</p>
+<p>Again, for a more appealing plot, we can add some colors to the bars with the <code>fill</code> argument:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = drv, fill = drv) + # add colors to bars
+  geom_bar() +
+  theme(legend.position = &quot;none&quot;) # remove legend</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We can also create a barplot with two qualitative variables:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = drv, fill = year) + # fill by years
+  geom_bar()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>In order to compare proportions across groups, it is best to make each bar the same height using <code>position = "fill"</code>:</p>
+<pre class="r"><code>ggplot(dat) +
+  geom_bar(aes(x = drv, fill = year), position = &quot;fill&quot;)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>To draw the bars next to each other for each group, use <code>position = "dodge"</code>:</p>
+<pre class="r"><code>ggplot(dat) +
+  geom_bar(aes(x = drv, fill = year), position = &quot;dodge&quot;)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-23-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="further-personalization" class="section level2">
+<h2>Further personalization</h2>
+<div id="labels" class="section level3">
+<h3>Labels</h3>
+<p>The first things to personalize in a plot is the labels to make the plot more informative to the audience. We can easily add a title, subtitle, caption and edit axis titles with the <code>labs()</code> function:</p>
+<pre class="r"><code>p &lt;- ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point()
+
+p + labs(
+  title = &quot;Fuel efficiency for 38 popular models of car&quot;,
+  subtitle = &quot;Period 1999-2008&quot;,
+  caption = &quot;Data: ggplot2::mpg. See more at www.statsandr.com&quot;,
+  x = &quot;Engine displacement (litres)&quot;,
+  y = &quot;Highway miles per gallon (mpg)&quot;
+)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-24-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>As you can see in the above code, you can save one or more layers of the plot in an object for later use. This way, you can save your “main” plot, and add more layers of personalization until you get the desired output. Here we saved the main scatter plot in an object called <code>p</code> and we will refer to it for the subsequent personalizations.</p>
+</div>
+<div id="axis-ticks" class="section level3">
+<h3>Axis ticks</h3>
+<p>Axis ticks can be adjusted using <code>scale_x_continuous()</code> and <code>scale_y_continuous()</code> for the x and y-axis, respectively:</p>
+<pre class="r"><code># Adjust ticks
+p + scale_x_continuous(breaks = seq(from = 1, to = 7, by = 0.5)) + # x-axis
+  scale_y_continuous(breaks = seq(from = 10, to = 45, by = 5)) # y-axis</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-25-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="log-transformations" class="section level3">
+<h3>Log transformations</h3>
+<p>In some cases, it is useful to plot the log transformation of the variables. This can be done with the <code>scale_x_log10()</code> and <code>scale_y_log10()</code> functions:</p>
+<pre class="r"><code>p + scale_x_log10() +
+  scale_y_log10()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="limits" class="section level3">
+<h3>Limits</h3>
+<p>The most convenient way to control the limits of the plot is to use again the <code>scale_x_continuous()</code> and <code>scale_y_continuous()</code> functions in addition to the <code>limits</code> argument:</p>
+<pre class="r"><code>p + scale_x_continuous(limits = c(3, 6)) +
+  scale_y_continuous(limits = c(20, 30))</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>It is also possible to simply take a subset of the dataset with the <code>subset()</code> or <code>filter()</code> function. See how to <a href="/blog/data-manipulation-in-r/#subset-a-dataset">subset a dataset</a> if you need a reminder.</p>
+</div>
+<div id="legend" class="section level3">
+<h3>Legend</h3>
+<p>By default, the legend is located to the right side of the plot (when there is a legend to be displayed of course). To control the position of the legend, we need to use the <code>theme()</code> function in addition to the <code>legend.position</code> argument:</p>
+<pre class="r"><code>p + aes(color = class) +
+  theme(legend.position = &quot;top&quot;)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Replace <code>"top"</code> by <code>"left"</code> or <code>"bottom"</code> to change its position and by <code>"none"</code> to remove it.</p>
+<p>The title of the legend can be removed with <code>legend.title = element_blank()</code>:</p>
+<pre class="r"><code>p + aes(color = class) +
+  theme(
+    legend.title = element_blank(),
+    legend.position = &quot;bottom&quot;
+  )</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The legend now appears at the bottom of the plot, without the legend title.</p>
+</div>
+<div id="shape-color-size-and-transparency" class="section level3">
+<h3>Shape, color, size and transparency</h3>
+<p>There are a very large number of options to improve the quality of the plot or to add additional information. These include:</p>
+<ul>
+<li>shape,</li>
+<li>size,</li>
+<li>color, and</li>
+<li>alpha (transparency).</li>
+</ul>
+<p>We can for instance change the shape of all points in a scatter plot by adding <code>shape</code> to <code>geom_point()</code>, or vary the shape according to the values taken by another variable (in that case, the <code>shape</code> argument must be inside <code>aes()</code>):<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<pre class="r"><code># Change shape of all points
+ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point(shape = 4)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Change shape of points based on a categorical variable
+ggplot(dat) +
+  aes(x = displ, y = hwy, shape = drv) +
+  geom_point()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-30-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Following the same principle, we can modify the color, size and transparency of the points based on a <a href="/blog/variable-types-and-examples/#qualitative">qualitative</a> or <a href="/blog/variable-types-and-examples/#quantitative">quantitative</a> variable. Here are some examples:</p>
+<pre class="r"><code>p &lt;- ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point()
+
+# Change color for all points
+p + geom_point(color = &quot;steelblue&quot;)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Change color based on a qualitative variable
+p + aes(color = drv)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Change color based on a quantitative variable
+p + aes(color = cty)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-3.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Change color based on a criterion (median of cty variable)
+p + aes(color = cty &gt; median(cty))</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-4.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Change size of all points
+p + geom_point(size = 4)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-5.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Change size of points based on a quantitative variable
+p + aes(size = cty)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-6.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Change transparency based on a quantitative variable
+p + aes(alpha = cty)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-31-7.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We can of course mix several options (shape, color, size, alpha) to build more complex graphics:</p>
+<pre class="r"><code>p + geom_point(size = 0.5) +
+  aes(color = drv, shape = year, alpha = cty)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-32-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="smooth-and-regression-lines" class="section level3">
+<h3>Smooth and regression lines</h3>
+<p>In a scatter plot, it is possible to add a smooth line fitted to the data:</p>
+<pre class="r"><code>p + geom_smooth()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-33-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>In the context of simple linear regression, it is often the case that the regression line is displayed on the plot. This can be done by adding <code>method = lm</code> (<code>lm</code> stands for linear model) in the <code>geom_smooth()</code> layer:</p>
+<pre class="r"><code>p + geom_smooth(method = lm)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-34-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>It is also possible to draw a regression line for each level of a categorical variable:</p>
+<pre class="r"><code>p + aes(color = drv, shape = drv) +
+  geom_smooth(method = lm, se = FALSE)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The <code>se = FALSE</code> argument removes the confidence interval around the regression lines.</p>
+</div>
+<div id="facets" class="section level3">
+<h3>Facets</h3>
+<p><code>facet_grid</code> allows you to divide the same graphic into several panels according to the values of one or two qualitative variables:</p>
+<pre class="r"><code># According to one variable
+p + facet_grid(. ~ drv)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-36-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># According to 2 variables
+p + facet_grid(drv ~ year)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-36-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>It is then possible to add a regression line to each facet:</p>
+<pre class="r"><code>p + facet_grid(. ~ drv) +
+  geom_smooth(method = lm)</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-37-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><code>facet_wrap()</code> can also be used, as illustrated in this <a href="/blog/graphics-in-r-with-ggplot2/#boxplot">section</a>.</p>
+</div>
+<div id="themes" class="section level3">
+<h3>Themes</h3>
+<p>Several functions are available in the <code>{ggplot2}</code> package to change the theme of the plot. The most common themes after the default theme (i.e., <code>theme_gray()</code>) are the black and white (<code>theme_bw()</code>), minimal (<code>theme_minimal()</code>) and classic (<code>theme_classic()</code>) themes:</p>
+<pre class="r"><code># Black and white theme
+p + theme_bw()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-38-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Minimal theme
+p + theme_minimal()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-38-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Classic theme
+p + theme_classic()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-38-3.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>I tend to use the minimal theme for most of my <a href="/blog/getting-started-in-r-markdown/">R Markdown</a> reports as it brings out the patterns and points and not the layout of the plot, but again this is a matter of personal taste. See more themes at <a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" target="_blank">ggplot2.tidyverse.org/reference/ggtheme.html</a> and in the <code>{ggthemes}</code> package.</p>
+<p>In order to avoid having to change the theme for each plot you create, you can change the theme for the current R session using the <code>theme_set()</code> function as follows:</p>
+<pre class="r"><code>theme_set(theme_minimal())</code></pre>
+</div>
+<div id="interactive-plot-with-plotly" class="section level3">
+<h3>Interactive plot with <code>{plotly}</code></h3>
+<p>You can easily make your plots created with <code>{ggplot2}</code> interactive with the <code>{plotly}</code> package:</p>
+<pre class="r"><code>library(plotly)
+ggplotly(p + aes(color = year))</code></pre>
+<div id="htmlwidget-1" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"data":[{"x":[1.8,1.8,2.8,2.8,1.8,1.8,2.8,2.8,2.8,5.7,5.7,5.7,5.7,6.5,2.4,3.1,2.4,3,3.3,3.3,3.8,3.8,3.9,3.9,5.2,5.2,3.9,5.2,5.9,5.2,5.2,5.9,4.6,5.4,4,4,4,5,4.2,4.2,4.6,4.6,5.4,3.8,3.8,4.6,4.6,1.6,1.6,1.6,1.6,1.6,2.4,2.4,2.5,2.5,2,2,4,4.7,4,4.6,5.4,5.4,4,5,2.4,2.4,3,3,3.3,3.3,3.1,3.8,3.8,2.5,2.5,2.2,2.2,2.5,2.5,2.7,2.7,3.4,3.4,2.2,2.2,3,3,2.2,2.2,3,3,1.8,1.8,1.8,4.7,2.7,2.7,3.4,3.4,2,2,2.8,1.9,2,2,2.8,2.8,1.9,1.9,2,2,1.8,1.8,2.8,2.8],"y":[29,29,26,26,26,25,25,25,24,17,26,23,15,17,27,26,24,24,22,22,22,21,17,17,17,15,17,16,15,15,16,15,17,17,17,19,17,17,17,17,16,16,15,26,25,21,22,33,32,32,29,32,26,27,26,26,26,29,20,17,15,15,17,16,17,17,29,27,26,25,17,17,26,26,27,25,24,26,26,26,26,20,20,19,17,29,27,26,26,27,29,26,26,30,33,35,15,20,20,17,19,29,26,24,44,29,26,23,24,44,41,29,26,29,29,26,26],"text":["year: 1999<br />displ: 1.8<br />hwy: 29","year: 1999<br />displ: 1.8<br />hwy: 29","year: 1999<br />displ: 2.8<br />hwy: 26","year: 1999<br />displ: 2.8<br />hwy: 26","year: 1999<br />displ: 1.8<br />hwy: 26","year: 1999<br />displ: 1.8<br />hwy: 25","year: 1999<br />displ: 2.8<br />hwy: 25","year: 1999<br />displ: 2.8<br />hwy: 25","year: 1999<br />displ: 2.8<br />hwy: 24","year: 1999<br />displ: 5.7<br />hwy: 17","year: 1999<br />displ: 5.7<br />hwy: 26","year: 1999<br />displ: 5.7<br />hwy: 23","year: 1999<br />displ: 5.7<br />hwy: 15","year: 1999<br />displ: 6.5<br />hwy: 17","year: 1999<br />displ: 2.4<br />hwy: 27","year: 1999<br />displ: 3.1<br />hwy: 26","year: 1999<br />displ: 2.4<br />hwy: 24","year: 1999<br />displ: 3.0<br />hwy: 24","year: 1999<br />displ: 3.3<br />hwy: 22","year: 1999<br />displ: 3.3<br />hwy: 22","year: 1999<br />displ: 3.8<br />hwy: 22","year: 1999<br />displ: 3.8<br />hwy: 21","year: 1999<br />displ: 3.9<br />hwy: 17","year: 1999<br />displ: 3.9<br />hwy: 17","year: 1999<br />displ: 5.2<br />hwy: 17","year: 1999<br />displ: 5.2<br />hwy: 15","year: 1999<br />displ: 3.9<br />hwy: 17","year: 1999<br />displ: 5.2<br />hwy: 16","year: 1999<br />displ: 5.9<br />hwy: 15","year: 1999<br />displ: 5.2<br />hwy: 15","year: 1999<br />displ: 5.2<br />hwy: 16","year: 1999<br />displ: 5.9<br />hwy: 15","year: 1999<br />displ: 4.6<br />hwy: 17","year: 1999<br />displ: 5.4<br />hwy: 17","year: 1999<br />displ: 4.0<br />hwy: 17","year: 1999<br />displ: 4.0<br />hwy: 19","year: 1999<br />displ: 4.0<br />hwy: 17","year: 1999<br />displ: 5.0<br />hwy: 17","year: 1999<br />displ: 4.2<br />hwy: 17","year: 1999<br />displ: 4.2<br />hwy: 17","year: 1999<br />displ: 4.6<br />hwy: 16","year: 1999<br />displ: 4.6<br />hwy: 16","year: 1999<br />displ: 5.4<br />hwy: 15","year: 1999<br />displ: 3.8<br />hwy: 26","year: 1999<br />displ: 3.8<br />hwy: 25","year: 1999<br />displ: 4.6<br />hwy: 21","year: 1999<br />displ: 4.6<br />hwy: 22","year: 1999<br />displ: 1.6<br />hwy: 33","year: 1999<br />displ: 1.6<br />hwy: 32","year: 1999<br />displ: 1.6<br />hwy: 32","year: 1999<br />displ: 1.6<br />hwy: 29","year: 1999<br />displ: 1.6<br />hwy: 32","year: 1999<br />displ: 2.4<br />hwy: 26","year: 1999<br />displ: 2.4<br />hwy: 27","year: 1999<br />displ: 2.5<br />hwy: 26","year: 1999<br />displ: 2.5<br />hwy: 26","year: 1999<br />displ: 2.0<br />hwy: 26","year: 1999<br />displ: 2.0<br />hwy: 29","year: 1999<br />displ: 4.0<br />hwy: 20","year: 1999<br />displ: 4.7<br />hwy: 17","year: 1999<br />displ: 4.0<br />hwy: 15","year: 1999<br />displ: 4.6<br />hwy: 15","year: 1999<br />displ: 5.4<br />hwy: 17","year: 1999<br />displ: 5.4<br />hwy: 16","year: 1999<br />displ: 4.0<br />hwy: 17","year: 1999<br />displ: 5.0<br />hwy: 17","year: 1999<br />displ: 2.4<br />hwy: 29","year: 1999<br />displ: 2.4<br />hwy: 27","year: 1999<br />displ: 3.0<br />hwy: 26","year: 1999<br />displ: 3.0<br />hwy: 25","year: 1999<br />displ: 3.3<br />hwy: 17","year: 1999<br />displ: 3.3<br />hwy: 17","year: 1999<br />displ: 3.1<br />hwy: 26","year: 1999<br />displ: 3.8<br />hwy: 26","year: 1999<br />displ: 3.8<br />hwy: 27","year: 1999<br />displ: 2.5<br />hwy: 25","year: 1999<br />displ: 2.5<br />hwy: 24","year: 1999<br />displ: 2.2<br />hwy: 26","year: 1999<br />displ: 2.2<br />hwy: 26","year: 1999<br />displ: 2.5<br />hwy: 26","year: 1999<br />displ: 2.5<br />hwy: 26","year: 1999<br />displ: 2.7<br />hwy: 20","year: 1999<br />displ: 2.7<br />hwy: 20","year: 1999<br />displ: 3.4<br />hwy: 19","year: 1999<br />displ: 3.4<br />hwy: 17","year: 1999<br />displ: 2.2<br />hwy: 29","year: 1999<br />displ: 2.2<br />hwy: 27","year: 1999<br />displ: 3.0<br />hwy: 26","year: 1999<br />displ: 3.0<br />hwy: 26","year: 1999<br />displ: 2.2<br />hwy: 27","year: 1999<br />displ: 2.2<br />hwy: 29","year: 1999<br />displ: 3.0<br />hwy: 26","year: 1999<br />displ: 3.0<br />hwy: 26","year: 1999<br />displ: 1.8<br />hwy: 30","year: 1999<br />displ: 1.8<br />hwy: 33","year: 1999<br />displ: 1.8<br />hwy: 35","year: 1999<br />displ: 4.7<br />hwy: 15","year: 1999<br />displ: 2.7<br />hwy: 20","year: 1999<br />displ: 2.7<br />hwy: 20","year: 1999<br />displ: 3.4<br />hwy: 17","year: 1999<br />displ: 3.4<br />hwy: 19","year: 1999<br />displ: 2.0<br />hwy: 29","year: 1999<br />displ: 2.0<br />hwy: 26","year: 1999<br />displ: 2.8<br />hwy: 24","year: 1999<br />displ: 1.9<br />hwy: 44","year: 1999<br />displ: 2.0<br />hwy: 29","year: 1999<br />displ: 2.0<br />hwy: 26","year: 1999<br />displ: 2.8<br />hwy: 23","year: 1999<br />displ: 2.8<br />hwy: 24","year: 1999<br />displ: 1.9<br />hwy: 44","year: 1999<br />displ: 1.9<br />hwy: 41","year: 1999<br />displ: 2.0<br />hwy: 29","year: 1999<br />displ: 2.0<br />hwy: 26","year: 1999<br />displ: 1.8<br />hwy: 29","year: 1999<br />displ: 1.8<br />hwy: 29","year: 1999<br />displ: 2.8<br />hwy: 26","year: 1999<br />displ: 2.8<br />hwy: 26"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"1999","legendgroup":"1999","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,2,3.1,2,2,3.1,3.1,3.1,4.2,5.3,5.3,5.3,6,6.2,6.2,7,5.3,5.3,2.4,3.5,3.6,3.3,3.3,3.3,3.8,4,3.7,3.7,4.7,4.7,4.7,4.7,4.7,4.7,5.7,4.7,4.7,4.7,4.7,4.7,4.7,5.7,5.4,4,4.6,4.6,5.4,4,4,4.6,4.6,5.4,1.8,1.8,1.8,2,2.4,2.4,3.3,2,2,2.7,2.7,2.7,3,3.7,4.7,4.7,5.7,6.1,4.2,4.4,5.4,4,4.6,2.5,2.5,3.5,3.5,3.5,4,5.6,3.8,5.3,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,4,4.7,2.4,2.4,3.5,2.4,2.4,3.3,1.8,1.8,5.7,2.7,4,4,2,2,2,2,2.5,2.5,2.5,2.5,2,2,3.6],"y":[31,30,27,28,27,25,25,25,23,20,15,20,17,26,25,24,19,14,30,29,26,24,24,17,23,23,19,18,19,19,12,17,12,17,18,16,12,17,17,16,12,17,18,19,19,17,17,26,24,23,22,20,34,36,36,29,30,31,28,28,27,24,24,24,22,19,12,19,18,14,18,18,18,19,19,31,32,27,26,25,20,18,28,25,27,25,26,23,25,27,25,27,20,17,31,31,28,31,31,27,37,35,18,22,18,20,29,29,29,29,29,29,28,29,28,29,26],"text":["year: 2008<br />displ: 2.0<br />hwy: 31","year: 2008<br />displ: 2.0<br />hwy: 30","year: 2008<br />displ: 3.1<br />hwy: 27","year: 2008<br />displ: 2.0<br />hwy: 28","year: 2008<br />displ: 2.0<br />hwy: 27","year: 2008<br />displ: 3.1<br />hwy: 25","year: 2008<br />displ: 3.1<br />hwy: 25","year: 2008<br />displ: 3.1<br />hwy: 25","year: 2008<br />displ: 4.2<br />hwy: 23","year: 2008<br />displ: 5.3<br />hwy: 20","year: 2008<br />displ: 5.3<br />hwy: 15","year: 2008<br />displ: 5.3<br />hwy: 20","year: 2008<br />displ: 6.0<br />hwy: 17","year: 2008<br />displ: 6.2<br />hwy: 26","year: 2008<br />displ: 6.2<br />hwy: 25","year: 2008<br />displ: 7.0<br />hwy: 24","year: 2008<br />displ: 5.3<br />hwy: 19","year: 2008<br />displ: 5.3<br />hwy: 14","year: 2008<br />displ: 2.4<br />hwy: 30","year: 2008<br />displ: 3.5<br />hwy: 29","year: 2008<br />displ: 3.6<br />hwy: 26","year: 2008<br />displ: 3.3<br />hwy: 24","year: 2008<br />displ: 3.3<br />hwy: 24","year: 2008<br />displ: 3.3<br />hwy: 17","year: 2008<br />displ: 3.8<br />hwy: 23","year: 2008<br />displ: 4.0<br />hwy: 23","year: 2008<br />displ: 3.7<br />hwy: 19","year: 2008<br />displ: 3.7<br />hwy: 18","year: 2008<br />displ: 4.7<br />hwy: 19","year: 2008<br />displ: 4.7<br />hwy: 19","year: 2008<br />displ: 4.7<br />hwy: 12","year: 2008<br />displ: 4.7<br />hwy: 17","year: 2008<br />displ: 4.7<br />hwy: 12","year: 2008<br />displ: 4.7<br />hwy: 17","year: 2008<br />displ: 5.7<br />hwy: 18","year: 2008<br />displ: 4.7<br />hwy: 16","year: 2008<br />displ: 4.7<br />hwy: 12","year: 2008<br />displ: 4.7<br />hwy: 17","year: 2008<br />displ: 4.7<br />hwy: 17","year: 2008<br />displ: 4.7<br />hwy: 16","year: 2008<br />displ: 4.7<br />hwy: 12","year: 2008<br />displ: 5.7<br />hwy: 17","year: 2008<br />displ: 5.4<br />hwy: 18","year: 2008<br />displ: 4.0<br />hwy: 19","year: 2008<br />displ: 4.6<br />hwy: 19","year: 2008<br />displ: 4.6<br />hwy: 17","year: 2008<br />displ: 5.4<br />hwy: 17","year: 2008<br />displ: 4.0<br />hwy: 26","year: 2008<br />displ: 4.0<br />hwy: 24","year: 2008<br />displ: 4.6<br />hwy: 23","year: 2008<br />displ: 4.6<br />hwy: 22","year: 2008<br />displ: 5.4<br />hwy: 20","year: 2008<br />displ: 1.8<br />hwy: 34","year: 2008<br />displ: 1.8<br />hwy: 36","year: 2008<br />displ: 1.8<br />hwy: 36","year: 2008<br />displ: 2.0<br />hwy: 29","year: 2008<br />displ: 2.4<br />hwy: 30","year: 2008<br />displ: 2.4<br />hwy: 31","year: 2008<br />displ: 3.3<br />hwy: 28","year: 2008<br />displ: 2.0<br />hwy: 28","year: 2008<br />displ: 2.0<br />hwy: 27","year: 2008<br />displ: 2.7<br />hwy: 24","year: 2008<br />displ: 2.7<br />hwy: 24","year: 2008<br />displ: 2.7<br />hwy: 24","year: 2008<br />displ: 3.0<br />hwy: 22","year: 2008<br />displ: 3.7<br />hwy: 19","year: 2008<br />displ: 4.7<br />hwy: 12","year: 2008<br />displ: 4.7<br />hwy: 19","year: 2008<br />displ: 5.7<br />hwy: 18","year: 2008<br />displ: 6.1<br />hwy: 14","year: 2008<br />displ: 4.2<br />hwy: 18","year: 2008<br />displ: 4.4<br />hwy: 18","year: 2008<br />displ: 5.4<br />hwy: 18","year: 2008<br />displ: 4.0<br />hwy: 19","year: 2008<br />displ: 4.6<br />hwy: 19","year: 2008<br />displ: 2.5<br />hwy: 31","year: 2008<br />displ: 2.5<br />hwy: 32","year: 2008<br />displ: 3.5<br />hwy: 27","year: 2008<br />displ: 3.5<br />hwy: 26","year: 2008<br />displ: 3.5<br />hwy: 25","year: 2008<br />displ: 4.0<br />hwy: 20","year: 2008<br />displ: 5.6<br />hwy: 18","year: 2008<br />displ: 3.8<br />hwy: 28","year: 2008<br />displ: 5.3<br />hwy: 25","year: 2008<br />displ: 2.5<br />hwy: 27","year: 2008<br />displ: 2.5<br />hwy: 25","year: 2008<br />displ: 2.5<br />hwy: 26","year: 2008<br />displ: 2.5<br />hwy: 23","year: 2008<br />displ: 2.5<br />hwy: 25","year: 2008<br />displ: 2.5<br />hwy: 27","year: 2008<br />displ: 2.5<br />hwy: 25","year: 2008<br />displ: 2.5<br />hwy: 27","year: 2008<br />displ: 4.0<br />hwy: 20","year: 2008<br />displ: 4.7<br />hwy: 17","year: 2008<br />displ: 2.4<br />hwy: 31","year: 2008<br />displ: 2.4<br />hwy: 31","year: 2008<br />displ: 3.5<br />hwy: 28","year: 2008<br />displ: 2.4<br />hwy: 31","year: 2008<br />displ: 2.4<br />hwy: 31","year: 2008<br />displ: 3.3<br />hwy: 27","year: 2008<br />displ: 1.8<br />hwy: 37","year: 2008<br />displ: 1.8<br />hwy: 35","year: 2008<br />displ: 5.7<br />hwy: 18","year: 2008<br />displ: 2.7<br />hwy: 22","year: 2008<br />displ: 4.0<br />hwy: 18","year: 2008<br />displ: 4.0<br />hwy: 20","year: 2008<br />displ: 2.0<br />hwy: 29","year: 2008<br />displ: 2.0<br />hwy: 29","year: 2008<br />displ: 2.0<br />hwy: 29","year: 2008<br />displ: 2.0<br />hwy: 29","year: 2008<br />displ: 2.5<br />hwy: 29","year: 2008<br />displ: 2.5<br />hwy: 29","year: 2008<br />displ: 2.5<br />hwy: 28","year: 2008<br />displ: 2.5<br />hwy: 29","year: 2008<br />displ: 2.0<br />hwy: 28","year: 2008<br />displ: 2.0<br />hwy: 29","year: 2008<br />displ: 3.6<br />hwy: 26"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"2008","legendgroup":"2008","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.2283105022831,"r":7.30593607305936,"b":40.1826484018265,"l":37.2602739726027},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1.33,7.27],"tickmode":"array","ticktext":["2","3","4","5","6","7"],"tickvals":[2,3,4,5,6,7],"categoryorder":"array","categoryarray":["2","3","4","5","6","7"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"displ","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[10.4,45.6],"tickmode":"array","ticktext":["20","30","40"],"tickvals":[20,30,40],"categoryorder":"array","categoryarray":["20","30","40"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"hwy","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.913385826771654},"annotations":[{"text":"year","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"17a88a68aa8b":{"colour":{},"x":{},"y":{},"type":"scatter"}},"cur_data":"17a88a68aa8b","visdat":{"17a88a68aa8b":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>You can now hover over a point to display more information about that point. There is also the possibility to zoom in and out, to download the plot, to select some observations, etc. More information about <code>{plotly}</code> for R can be found <a href="https://plotly.com/r/" target="_blank">here</a>.</p>
+</div>
+<div id="combine-plots-with-patchwork" class="section level3">
+<h3>Combine plots with <code>{patchwork}</code></h3>
+<p>There are several ways to combine plots made in <code>{ggplot2}</code>. In my opinion, the most convenient way is with the <code>{patchwork}</code> package using symbols such as <code>+</code>, <code>/</code> and parentheses.</p>
+<p>We first need to create some plots and save them:</p>
+<pre class="r"><code>p_a &lt;- ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point()
+
+p_b &lt;- ggplot(dat) +
+  aes(x = hwy) +
+  geom_histogram()
+
+p_c &lt;- ggplot(dat) +
+  aes(x = drv, y = hwy) +
+  geom_boxplot()</code></pre>
+<p>Now that we have 3 plots saved in our environment, we can combine them. To have plots <strong>next to each other</strong> simply use the <code>+</code> symbol:</p>
+<pre class="r"><code>library(patchwork)
+p_a + p_b + p_c</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-42-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>To display them <strong>above each other</strong> simply use the <code>/</code> symbol:</p>
+<pre class="r"><code>p_a / p_b / p_c</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-43-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>And finally, to combine them <strong>above and next</strong> to each other, mix <code>+</code>, <code>/</code> and parentheses:</p>
+<pre class="r"><code>p_a + p_b / p_c</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-44-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>(p_a + p_b) / p_c</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-44-2.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="flip-coordinates" class="section level3">
+<h3>Flip coordinates</h3>
+<p>Flipping coordinates of your plot is useful to create horizontal boxplots, or when labels of a variable are so long that they overlap each other on the x-axis. See with and without flipping coordinates below:</p>
+<pre class="r"><code># without flipping coordinates
+p1 &lt;- ggplot(dat) +
+  aes(x = class, y = hwy) +
+  geom_boxplot()
+
+# with flipping coordinates
+p2 &lt;- ggplot(dat) +
+  aes(x = class, y = hwy) +
+  geom_boxplot() +
+  coord_flip()
+
+library(patchwork)
+p1 + p2 # left: without flipping, right: with flipping</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-45-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>This can be done with many types of plot, not only with boxplots. For instance, if a categorical variable has many levels or the labels are long, it is usually best to flip the coordinates for a better visual:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = class) +
+  geom_bar() +
+  coord_flip()</code></pre>
+<p><img src="/blog/2020-08-21-graphics-in-r-with-ggplot2_files/figure-html/unnamed-chunk-46-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="save-plot" class="section level3">
+<h3>Save plot</h3>
+<p>The <code>ggsave()</code> function will save the most recent plot in your current <a href="/blog/how-to-import-an-excel-file-in-rstudio/#r-working-directory">working directory</a> unless you specify a path to another folder:</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = displ, y = hwy) +
+  geom_point()
+
+ggsave(&quot;plot1.pdf&quot;)</code></pre>
+</div>
+</div>
+</div>
+<div id="to-go-further" class="section level1">
+<h1>To go further</h1>
+<p>By now you have seen that <code>{ggplot2}</code> is a very powerful and complete package to create plots in R. This article illustrated only the tip of the iceberg, and you will find many tutorials on how to create more advanced plots and visualizations with <code>{ggplot2}</code> online. If you want to learn more than what is described in the present article, I highly recommend starting with:</p>
+<ul>
+<li>the chapters <a href="https://r4ds.had.co.nz/data-visualisation.html" target="_blank">Data visualisation</a> and <a href="https://r4ds.had.co.nz/graphics-for-communication.html" target="_blank">Graphics for communication</a> from the book <a href="https://r4ds.had.co.nz/" target="_blank">R for Data Science</a> from Garrett Grolemund and Hadley Wickham</li>
+<li>the book <a href="https://ggplot2-book.org/" target="_blank">ggplot2: Elegant Graphics for Data Analysis</a> from Hadley Wickham</li>
+<li>the <a href="https://exts.ggplot2.tidyverse.org/gallery/" target="_blank">ggplot2 extensions guide</a> which lists many of the packages that extend <code>{ggplot2}</code></li>
+<li>the <a href="/blog/files/ggplot2-cheatsheet.pdf"><code>{ggplot2}</code> cheat sheet</a></li>
+</ul>
+<p>Thanks for reading. I hope this article helped you to create your first plots with the <code>{ggplot2}</code> package. As a reminder, for simple graphs, it is sometimes easier to draw them via the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse">{esquisse} addin</a>. After some time, you will quickly learn how to create them by yourselves and in no time you will be able to build complex and sophisticated data visualizations.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Use the <code>geom_jitter()</code> layer with caution because, although it makes a plot more revealing at large scales, it also makes it slightly less accurate at small scales since some randomness is added to the points.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>There are (at the time of writing) 26 shapes accepted in the <code>shape</code> argument. See this <a href="https://ggplot2.tidyverse.org/reference/aes_linetype_size_shape.html" target="_blank">documentation</a> for all available shapes.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+
+
+                    </div>
+
+<br>                    
+
+      <div class="related">
+
+<h3>Related articles</h3>
+<ul>
+	
+	<li><a href="/blog/correlation-coefficient-and-correlation-test-in-r/">Correlation coefficient and correlation test in R</a></li>
+	
+	<li><a href="/blog/covid-19-in-belgium-is-it-over-yet/">COVID-19 in Belgium: is it over yet?</a></li>
+	
+	<li><a href="/blog/a-package-to-download-free-springer-books-during-covid-19-quarantine/">A package to download free Springer books during Covid-19 quarantine</a></li>
+	
+	<li><a href="/blog/how-to-create-a-simple-coronavirus-dashboard-specific-to-your-country-in-r/">How to create a simple Coronavirus dashboard specific to your country in R</a></li>
+	
+	<li><a href="/blog/top-r-resources-on-covid-19-coronavirus/">Top 100 R resources on Novel COVID-19 Coronavirus</a></li>
+	
+</ul>
+</div>
+      
+      
+      <br>
+      <h3>Liked this post?</h3> <b>Get updates</b> every time a new article is published.
+      <br>
+      <small><i>No spam and unsubscribe anytime.</i></small>
+      
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-10_7.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+	#mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width: 300px;}
+	 
+</style>
+<div id="mc_embed_signup">
+<form action="https://statsandr.us4.list-manage.com/subscribe/post?u=dbadb70b4f121c714d12c9fc5&amp;id=f8729988c2" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	
+<div class="mc-field-group">
+	<input type="email" placeholder="Email address" value="" name="EMAIL" class="required email" id="mce-EMAIL">
+</div>
+<div class="mc-field-group">
+	<input type="text" placeholder="First name" value="" name="FNAME" class="required" id="mce-FNAME">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_dbadb70b4f121c714d12c9fc5_f8729988c2" tabindex="-1" value="">
+    </div>
+    
+    <div class="clear"><input type="submit" value="Receive new posts by email" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+
+<br>
+
+<ul class="share-buttons">
+  Share on:
+  <li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.statsandr.com%2F&quote=" title="Share on Facebook" target="_blank" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(document.URL) + '&quote=' + encodeURIComponent(document.URL)); return false;"><img alt="Share on Facebook" src="img/facebook-f-brands.svg" width="28" height="28" /></a></li>
+  <li><a href="https://twitter.com/intent/tweet?source=https%3A%2F%2Fwww.statsandr.com%2F&text=:%20https%3A%2F%2Fwww.statsandr.com%2F&via=statsandr" target="_blank" title="Tweet" onclick="window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(document.title) + ':%20'  + encodeURIComponent(document.URL)); return false;"><img alt="Tweet" src="img/twitter.svg" width="28" height="28" /></a></li>
+  <li><a href="http://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwww.statsandr.com%2F&title=&summary=&source=https%3A%2F%2Fwww.statsandr.com%2F" target="_blank" title="Share on LinkedIn" onclick="window.open('http://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(document.URL) + '&title=' +  encodeURIComponent(document.title)); return false;"><img alt="Share on LinkedIn" src="img/linkedin-in-brands.svg" width="28" height="28" /></a></li>
+  <li><a href="mailto:?subject=&body=:%20https%3A%2F%2Fwww.statsandr.com%2F" target="_blank" title="Send email" onclick="window.open('mailto:?subject=' + encodeURIComponent(document.title) + '&body=' +  encodeURIComponent(document.URL)); return false;"><img alt="Send email" src="img/envelope-solid.svg" width="28" height="28" /></a></li>
+</ul>
+
+      
+      <br>
+      <p><a href="#top">&uarr; Back to top</a></p>
+      <br>
+      
+      <script defer src="https://cdn.commento.io/js/commento.js"></script>
+<div id="commento"></div>
+
+                    
+                        <div class="navigation">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    
+                                        <div class="mx-0 mx-md-4 mt-4 text-left">
+                                            <a href="/blog/mortgage-calculator-r-shiny/">« Mortgage calculator in R Shiny</a>
+                                        </div>
+                                    
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="comments">
+
+      <div class="py-3 content">
+            <div class="container">
+                  <div class="row justify-content-center">
+                        <div class="col-sm-12 col-md-10">
+                              <div class="comments">
+                                    <div id="disqus_thread"></div>
+                              </div>
+                        </div>
+                  </div>
+            </div>
+      </div>
+
+      <script type="text/javascript">
+            (function () {
+                  
+                  
+                  if (window.location.hostname == "localhost")
+                        return;
+
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  var disqus_shortname = '';
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+      </script>
+      <noscript>
+            Please enable JavaScript to view the
+            <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+</section>
+    <div class="my-4 footer">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-5">
+                
+                    <div class="mx-0 mx-md-4 text-left">
+                        
+                            <p>
+                              <a href="/subscribe/">Newsletter</a>
+                              <a href="/faq/">FAQ</a>
+                              <a href="/contribute/">Contribute</a>
+                              <a href="/support/">Support</a>
+                              <a href="/sitemap/">Sitemap</a>
+                              
+                              
+
+
+
+
+  
+
+
+
+<a href='https://github.com/AntoineSoetewey/statsandr/edit/master/content/blog/2020-08-21-graphics-in-r-with-ggplot2.Rmd' target="_blank">Edit</a>
+
+
+
+                              
+                            </p>
+                            <p>
+                              <a href="/">&copy; <script>document.write(new Date().getFullYear())</script> Antoine Soetewey</a><a href="/terms/">Terms</a>
+                            </p>
+                        
+                    </div>
+                
+            </div>
+            <div class="col-sm-12 col-md-5">
+                <div class="mx-0 mx-md-4 text-right">
+                  
+                  
+                    <a href="https://twitter.com/statsandr" target="_blank">
+                        <img class="icon" src="/img/twitter.svg" alt="Twitter" title="Twitter"/>
+                    </a>
+                    
+                    
+                    
+                        <a href="https://github.com/AntoineSoetewey" target="_blank">
+                            <img class="icon" src="/img/github.svg" alt="GitHub" title="GitHub"/>
+                        </a>
+                    
+                    
+                    
+                    <a href="https://medium.com/@ant.soetewey" target="_blank">
+                        <img class="icon" src="/img/medium-m-brands.svg" alt="Medium" title="Medium"/>
+                    </a>
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+                    
+                    
+                    <a href="/contact/">
+                        <img class="icon" src="/img/envelope-solid.svg" alt="Contact" title="Contact"/>
+                    </a>
+                    
+
+                    
+                        <a href="/index.xml" class="mr-0">
+                            <img class="icon" src="/img/rss.svg" alt="RSS" title="RSS"/>
+                        </a>
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js" integrity="sha256-sNPiigbfSkqUzMc5rgrdztLnneCMAp6W9wetJUZu9Zw=" crossorigin="anonymous"></script>
+        
+        <script>
+            window.addEventListener('load', function() {
+                hljs.initHighlighting();
+            }, true);
+        </script>
+    
+
+    
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-86997981-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    
+        
+
+    
+</body>
+
+</html>
