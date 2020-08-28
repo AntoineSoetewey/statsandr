@@ -22,11 +22,10 @@ output:
 <div id="TOC">
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#example">Example</a><ul>
 <li><a href="#data">Data</a></li>
 <li><a href="#chi-square-test-of-independence-in-r">Chi-square test of independence in R</a></li>
 <li><a href="#conclusion-and-interpretation">Conclusion and interpretation</a></li>
-</ul></li>
+<li><a href="#combination-of-plot-and-statistical-test">Combination of plot and statistical test</a></li>
 </ul>
 </div>
 
@@ -34,23 +33,21 @@ output:
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>This article explains how to perform the Chi-square test of independence in R and how to interpret its results. To learn more about how the test works and how to do it by hand, I invite you to read the article “<a href="/blog/chi-square-test-of-independence-by-hand/">Chi-square test of independence by hand</a>”.</p>
-<p>To briefly recap what have been said in that article, the Chi-square test of independence tests whether there is a relationship between two categorical variables. The null and alternative hypotheses are:</p>
+<p>To briefly recap what have been said in that article, the Chi-square test of independence tests whether there is a relationship between two <a href="/blog/variable-types-and-examples/#qualitative">categorical variables</a>. The null and alternative hypotheses are:</p>
 <ul>
 <li><span class="math inline">\(H_0\)</span> : the variables are independent, there is <strong>no</strong> relationship between the two categorical variables. Knowing the value of one variable does not help to predict the value of the other variable</li>
 <li><span class="math inline">\(H_1\)</span> : the variables are dependent, there is a relationship between the two categorical variables. Knowing the value of one variable helps to predict the value of the other variable</li>
 </ul>
 <p>The Chi-square test of independence works by comparing the observed frequencies (so the frequencies observed in your sample) to the expected frequencies if there was no relationship between the two categorical variables (so the expected frequencies if the null hypothesis was true).</p>
 </div>
-<div id="example" class="section level1">
-<h1>Example</h1>
-<div id="data" class="section level2">
-<h2>Data</h2>
-<p>For our example, let’s reuse the dataset introduced in the article “<a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>”. This dataset is the well-known <code>iris</code> dataset slightly enhanced. Since there is only one categorical variable and the Chi-square test requires two categorical variables, we added the variable <code>size</code> which corresponds to <code>small</code> if the length of the petal is smaller than the median of all flowers, <code>big</code> otherwise:</p>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>For our example, let’s reuse the dataset introduced in the article “<a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a>”. This dataset is the well-known <code>iris</code> dataset slightly enhanced. Since there is only one categorical variable and the Chi-square test requires two categorical variables, we add the variable <code>size</code> which corresponds to <code>small</code> if the length of the petal is smaller than the median of all flowers, <code>big</code> otherwise:</p>
 <pre class="r"><code>dat &lt;- iris
 dat$size &lt;- ifelse(dat$Sepal.Length &lt; median(dat$Sepal.Length),
   &quot;small&quot;, &quot;big&quot;
 )</code></pre>
-<p>We now create a contingency table of the two variables <code>Species</code> and <code>size</code> with the <code>table()</code> function:</p>
+<p>We now create a <a href="/blog/descriptive-statistics-in-r/#contingency-table">contingency table</a> of the two variables <code>Species</code> and <code>size</code> with the <code>table()</code> function:</p>
 <pre class="r"><code>table(dat$Species, dat$size)</code></pre>
 <pre><code>##             
 ##              big small
@@ -58,7 +55,7 @@ dat$size &lt;- ifelse(dat$Sepal.Length &lt; median(dat$Sepal.Length),
 ##   versicolor  29    21
 ##   virginica   47     3</code></pre>
 <p>The contingency table gives the observed number of cases in each subgroup. For instance, there is only one big setosa flower, while there are 49 small setosa flowers in the dataset.</p>
-<p>It is also a good practice to draw a barplot to visually represent the data:</p>
+<p>It is also a good practice to draw a <a href="/blog/descriptive-statistics-in-r/#barplot">barplot</a> to visually represent the data:</p>
 <pre class="r"><code>library(ggplot2)
 
 ggplot(dat) +
@@ -69,8 +66,8 @@ ggplot(dat) +
 <p><img src="/blog/chi-square-test-of-independence-in-r_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>See the article “<a href="/blog/graphics-in-r-with-ggplot2/">Graphics in R with ggplot2</a>” to learn how to create this kind of barplot in <code>{ggplot2}</code>.</p>
 </div>
-<div id="chi-square-test-of-independence-in-r" class="section level2">
-<h2>Chi-square test of independence in R</h2>
+<div id="chi-square-test-of-independence-in-r" class="section level1">
+<h1>Chi-square test of independence in R</h1>
 <p>For this example, we are going to test in R if there is a relationship between the variables <code>Species</code> and <code>size</code>. For this, the <code>chisq.test()</code> function is used:</p>
 <pre class="r"><code>test &lt;- chisq.test(table(dat$Species, dat$size))
 test</code></pre>
@@ -92,12 +89,41 @@ test</code></pre>
 <li>use the Fisher’s exact test</li>
 </ul>
 <p>The Fisher’s exact test does not require the assumption of a minimum of 5 expected counts. It can be applied in R thanks to the function <code>fisher.test()</code>. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results. Learn more about this test in this <a href="/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/">article</a> dedicated to this type of test.</p>
+<p>For your information, there are two other methods to perform the Chi-square test of independence. One with the <code>summary()</code> function and one with the <code>assocstats()</code> function from the <code>{vcd}</code> package:</p>
+<pre class="r"><code># second method:
+summary(table(dat$Species, dat$size))</code></pre>
+<pre><code>## Number of cases in table: 150 
+## Number of factors: 2 
+## Test for independence of all factors:
+##  Chisq = 86.03, df = 2, p-value = 2.079e-19</code></pre>
+<pre class="r"><code># third method:
+library(vcd)
+assocstats(table(dat$Species, dat$size))</code></pre>
+<pre><code>##                      X^2 df P(&gt; X^2)
+## Likelihood Ratio 107.308  2        0
+## Pearson           86.035  2        0
+## 
+## Phi-Coefficient   : NA 
+## Contingency Coeff.: 0.604 
+## Cramer&#39;s V        : 0.757</code></pre>
+<p>All three methods give the same results.</p>
 </div>
-<div id="conclusion-and-interpretation" class="section level2">
-<h2>Conclusion and interpretation</h2>
+<div id="conclusion-and-interpretation" class="section level1">
+<h1>Conclusion and interpretation</h1>
 <p>From the output and from <code>test$p.value</code> we see that the <span class="math inline">\(p\)</span>-value is less than the significance level of 5%. Like any other statistical test, if the <span class="math inline">\(p\)</span>-value is less than the significance level, we can reject the null hypothesis. If you are not familiar with <span class="math inline">\(p\)</span>-values, I invite you to read this <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha">section</a>.</p>
 <p><span class="math inline">\(\Rightarrow\)</span> In our context, rejecting the null hypothesis for the Chi-square test of independence means that there is a significant relationship between the species and the size. Therefore, knowing the value of one variable helps to predict the value of the other variable.</p>
+</div>
+<div id="combination-of-plot-and-statistical-test" class="section level1">
+<h1>Combination of plot and statistical test</h1>
+<p>I recently discovered the <code>mosaic()</code> function from the <code>{vcd}</code> package. This function has the advantage that it combines a <a href="/blog/descriptive-statistics-in-r/#mosaic-plot">mosaic plot</a> (to visualize a contingency table) and the result of the Chi-square test of independence:</p>
+<pre class="r"><code>library(vcd)
+mosaic(~ Species + size,
+       direction = c(&quot;v&quot;, &quot;h&quot;),
+       data = dat,
+       shade = TRUE)</code></pre>
+<p><img src="/blog/chi-square-test-of-independence-in-r_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>As you can see, the mosaic plot is similar to the barplot presented above, but the <em>p</em>-value of the Chi-square test is also displayed at the bottom right.</p>
+<p>Moreover, this mosaic plot with colored cases shows where the observed frequencies deviates from the expected frequencies if the variables were independent. The red cases means that the observed frequencies are <em>smaller</em> than the expected frequencies, whereas the blue cases means that the observed frequencies are <em>larger</em> than the expected frequencies.</p>
 <p>Thanks for reading. I hope the article helped you to perform the Chi-square test of independence in R and interpret its results. If you would like to learn how to do this test by hand and how it works, read the article “<a href="/blog/chi-square-test-of-independence-by-hand/">Chi-square test of independence by hand</a>”.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
-</div>
 </div>
