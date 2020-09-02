@@ -32,6 +32,8 @@ So although this blog was first launched to share statistical concepts I am most
 
 Last but not least, valuable feedback from people all over the world makes the whole journey even more interesting and enriching.
 
+If you are interested in learning more, see the main [benefits of maintaining a technical blog](/blog/7-benefits-of-sharing-your-code-in-a-data-science-blog/).
+
 ## Contact
 
 Thanks in advance for reading and feel free to [contact me](/contact/) if you have any questions, remarks or inquiries.
