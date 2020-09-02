@@ -21,14 +21,14 @@ When possible, for all statistical concepts covered in this blog, I try to write
 
 [Stats and R](/) was launched in December 2019. Friends, family, colleagues and even some readers often ask why I started this blog. I really enjoy learning new things. I learn (and I am still learning) a lot by teaching statistics to students from diverse backgrounds.
 
-So far, I believed that I understood a statistical concept only if I was able to teach it to my students. If I was not able to explain it in a clear and understandable way, it meant that I needed to study it more thoroughly because I actually did not fully understand it.
+So far, I believed that I understood a statistical concept as soon as I was able to *teach* it to my students. If I was not able to explain it in a clear and understandable way, it meant that I needed to study it more thoroughly because I actually did not fully understand it.
 
-With this blog, I realized that in order to learn and fully understand something new, one must be able to:
+Throughout this blog, I realized that in order to learn and **fully understand something new**, one must:
 
-* clearly communicate it
-* *and* more importantly, be able to write it down in a precise and concise manner
+* be able to clearly communicate it and teach it,
+* but more importantly, *also* be able to **write it down in a precise and concise manner**
 
-So although this blog was first launched to share statistical concepts I am most familiar with (hoping that it would be useful to some people), I now also use it to learn by writing. I think that this additional way of learning is actually as powerful as teaching.
+So although this blog was first launched to share statistical concepts I am most familiar with (hoping that it would be useful to some people), I now also use it to **learn by writing**. I think that this additional way of learning is actually **as powerful as teaching**.
 
 Last but not least, valuable feedback from people all over the world makes the whole journey even more interesting and enriching.
 
