@@ -60,6 +60,6 @@ You can support the development of this blog via the [support page](/support/). 
 
 ## 8. Why did you launch this blog?
 
-See why on the [about](/about/) page.
+See why I launched this blog in my article about the [main benefits of having a technical blog](/blog/7-benefits-of-sharing-your-code-in-a-data-science-blog/).
 
 [&uarr; Back to top](#top)
