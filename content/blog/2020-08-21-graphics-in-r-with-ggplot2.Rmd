@@ -604,6 +604,60 @@ ggplot(dat) +
 ggsave("plot1.pdf")
 ```
 
+### Managing dates
+
+If the time variable in your dataset is in date format, the `{ggplot2}` package recognizes the date format and automatically uses a specific type for the axis ticks.
+
+There is no time variable with a date format in our dataset, so let's create a new variable of this type thanks to the `as.Date()` function:
+
+```{r}
+dat$date <- as.Date("2020-08-21") - 0:(nrow(dat)-1)
+```
+
+See the first 6 observations of this date variable and its class:
+
+```{r}
+head(dat$date)
+str(dat$date)
+```
+
+The new variable `date` is correctly specified in a date format.
+
+Most of the time, with a time variable, we want to create a line plot with the date on the X-axis and another continuous variable on the Y-axis, like the following plot for example:
+
+```{r}
+p <- ggplot(dat) +
+  aes(x = date, y = hwy) +
+  geom_line()
+p
+```
+
+As soon as the time variable is recognized as a date, we can use the `scale_x_date()` layer to change the format displayed on the X-axis. The following table shows the most frequent date formats:
+
+![Source: www.statmethods.net](/blog/2020-08-21-graphics-in-r-with-ggplot2_files/date formats in R.png)
+
+Run `?strptime()` to see many more date formats available in R.
+
+For this example, let's add the year in addition to the unabbreviated month:
+
+```{r}
+p + scale_x_date(date_labels = "%B %Y")
+```
+
+It also possible to control the breaks to display on the X-axis with the `date_breaks` argument. For this example, let's say we want to display the day as number and the abbreviated month for each interval of 10 days:
+
+```{r}
+p + scale_x_date(date_breaks = "10 days", date_labels = "%d %b")
+```
+
+If labels displayed on the X-axis are unreadable because they overlap each other, you can rotate them with the `theme()` layer and the `angle` argument:
+
+```{r}
+p + scale_x_date(date_breaks = "10 days", date_labels = "%d %b") +
+  theme(axis.text.x=element_text(angle = 60, hjust = 1))
+```
+
+
 # To go further
 
 By now you have seen that `{ggplot2}` is a very powerful and complete package to create plots in R. This article illustrated only the tip of the iceberg, and you will find many tutorials on how to create more advanced plots and visualizations with `{ggplot2}` online. If you want to learn more than what is described in the present article, I highly recommend starting with:
