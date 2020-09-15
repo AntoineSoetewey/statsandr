@@ -23,7 +23,7 @@ output:
 knitr::opts_chunk$set(
   fig.align = "center",
   out.width = "100%",
-  tidy = 'styler',
+  tidy = "styler",
   warning = FALSE,
   message = FALSE
 )
@@ -62,12 +62,12 @@ Before going further, let's transform the `cyl`, `drv`, `fl`, `year` and `class`
 
 ```{r}
 dat <- transform(dat,
-                 cyl = factor(cyl),
-                 drv = factor(drv),
-                 fl = factor(fl),
-                 year = factor(year),
-                 class = factor(class)
-                 )
+  cyl = factor(cyl),
+  drv = factor(drv),
+  fl = factor(fl),
+  year = factor(year),
+  class = factor(class)
+)
 ```
 
 # Basic principles of `{ggplot2}`
@@ -252,7 +252,7 @@ ggplot(dat) +
   aes(x = drv, y = hwy) +
   geom_boxplot(varwidth = TRUE) + # vary boxes width according to n obs.
   geom_jitter(alpha = 0.25, width = 0.2) + # adds random noise and limit its width
-  facet_wrap(~ year) # divide into 2 panels
+  facet_wrap(~year) # divide into 2 panels
 ```
 
 For a visually more appealing plot, it is also possible to use some colors for the boxes depending on the x variable:
@@ -262,7 +262,7 @@ ggplot(dat) +
   aes(x = drv, y = hwy, fill = drv) + # add color to boxes with fill
   geom_boxplot(varwidth = TRUE) + # vary boxes width according to n obs.
   geom_jitter(alpha = 0.25, width = 0.2) + # adds random noise and limit its width
-  facet_wrap(~ year) + # divide into 2 panels
+  facet_wrap(~year) + # divide into 2 panels
   theme(legend.position = "none") # remove legend
 ```
 
@@ -275,7 +275,7 @@ ggplot(dat) +
   aes(x = drv, y = hwy, fill = drv) + # add color to boxes with fill
   geom_boxplot(varwidth = TRUE) + # vary boxes width according to n obs.
   geom_jitter(alpha = 0.25, width = 0.2) + # adds random noise and limit its width
-  facet_wrap(~ year) + # divide into 2 panels
+  facet_wrap(~year) + # divide into 2 panels
   theme(legend.position = "none") + # remove legend
   scale_fill_manual(values = c("darkred", "darkgreen", "steelblue")) # change fill color manually
 ```
@@ -336,11 +336,11 @@ p <- ggplot(dat) +
 
 p + labs(
   title = "Fuel efficiency for 38 popular models of car",
-    subtitle = "Period 1999-2008",
-    caption = "Data: ggplot2::mpg. See more at www.statsandr.com",
-    x = "Engine displacement (litres)",
-    y = "Highway miles per gallon (mpg)"
-    )
+  subtitle = "Period 1999-2008",
+  caption = "Data: ggplot2::mpg. See more at www.statsandr.com",
+  x = "Engine displacement (litres)",
+  y = "Highway miles per gallon (mpg)"
+)
 ```
 
 As you can see in the above code, you can save one or more layers of the plot in an object for later use. This way, you can save your "main" plot, and add more layers of personalization until you get the desired output. Here we saved the main scatter plot in an object called `p` and we will refer to it for the subsequent personalizations.
@@ -350,19 +350,25 @@ You can also edit the alignment, the size and the shape of the title and subtitl
 ```{r}
 p + labs(
   title = "Fuel efficiency for 38 popular models of car",
-    subtitle = "Period 1999-2008",
-    caption = "Data: ggplot2::mpg. See more at www.statsandr.com",
-    x = "Engine displacement (litres)",
-    y = "Highway miles per gallon (mpg)"
-    ) +
-  theme(plot.title = element_text(hjust = 0.5, # center
-                                  size=12,
-                                  color="steelblue",
-                                  face="bold"),
-        plot.subtitle = element_text(hjust = 0.5, # center
-                                     size=10,
-                                     color="gray",
-                                     face="italic"))
+  subtitle = "Period 1999-2008",
+  caption = "Data: ggplot2::mpg. See more at www.statsandr.com",
+  x = "Engine displacement (litres)",
+  y = "Highway miles per gallon (mpg)"
+) +
+  theme(
+    plot.title = element_text(
+      hjust = 0.5, # center
+      size = 12,
+      color = "steelblue",
+      face = "bold"
+    ),
+    plot.subtitle = element_text(
+      hjust = 0.5, # center
+      size = 10,
+      color = "gray",
+      face = "italic"
+    )
+  )
 ```
 
 If the title or subtitle is long and you want to divide it into multiple lines, use `\n`:
@@ -370,19 +376,25 @@ If the title or subtitle is long and you want to divide it into multiple lines, 
 ```{r}
 p + labs(
   title = "Fuel efficiency for 38 popular \n models of car",
-    subtitle = "Period 1999-2008",
-    caption = "Data: ggplot2::mpg. See more at www.statsandr.com",
-    x = "Engine displacement (litres)",
-    y = "Highway miles per gallon (mpg)"
-    ) +
-  theme(plot.title = element_text(hjust = 0.5, # center
-                                  size=12,
-                                  color="steelblue",
-                                  face="bold"),
-        plot.subtitle = element_text(hjust = 0.5, # center
-                                     size=10,
-                                     color="gray",
-                                     face="italic"))
+  subtitle = "Period 1999-2008",
+  caption = "Data: ggplot2::mpg. See more at www.statsandr.com",
+  x = "Engine displacement (litres)",
+  y = "Highway miles per gallon (mpg)"
+) +
+  theme(
+    plot.title = element_text(
+      hjust = 0.5, # center
+      size = 12,
+      color = "steelblue",
+      face = "bold"
+    ),
+    plot.subtitle = element_text(
+      hjust = 0.5, # center
+      size = 10,
+      color = "gray",
+      face = "italic"
+    )
+  )
 ```
 
 ### Axis ticks
@@ -430,8 +442,10 @@ The title of the legend can be removed with `legend.title = element_blank()`:
 
 ```{r}
 p + aes(color = class) +
-  theme(legend.title = element_blank(),
-        legend.position = "bottom")
+  theme(
+    legend.title = element_blank(),
+    legend.position = "bottom"
+  )
 ```
 
 The legend now appears at the bottom of the plot, without the legend title.
@@ -504,10 +518,12 @@ p + aes(color = drv) +
 
 # Change color based on a quantitative variable
 p + aes(color = cty) +
-  scale_colour_gradient2(low = "green",
-                       mid = "gray",
-                       high = "red",
-                       midpoint = median(dat$cty))
+  scale_colour_gradient2(
+    low = "green",
+    mid = "gray",
+    high = "red",
+    midpoint = median(dat$cty)
+  )
 ```
 
 ### Smooth and regression lines
@@ -619,15 +635,15 @@ p_a + p_b + p_c
 To display them **above each other** simply use the `/` symbol:
 
 ```{r}
-p_a/p_b/p_c
+p_a / p_b / p_c
 ```
 
 And finally, to combine them **above and next** to each other, mix `+`, `/` and parentheses:
 
 ```{r}
-p_a + p_b/p_c
+p_a + p_b / p_c
 
-(p_a + p_b)/p_c
+(p_a + p_b) / p_c
 ```
 
 ### Flip coordinates
@@ -678,7 +694,7 @@ If the time variable in your dataset is in date format, the `{ggplot2}` package 
 There is no time variable with a date format in our dataset, so let's create a new variable of this type thanks to the `as.Date()` function:
 
 ```{r}
-dat$date <- as.Date("2020-08-21") - 0:(nrow(dat)-1)
+dat$date <- as.Date("2020-08-21") - 0:(nrow(dat) - 1)
 ```
 
 See the first 6 observations of this date variable and its class:
@@ -721,7 +737,7 @@ If labels displayed on the X-axis are unreadable because they overlap each other
 
 ```{r}
 p + scale_x_date(date_breaks = "10 days", date_labels = "%d %b") +
-  theme(axis.text.x=element_text(angle = 60, hjust = 1))
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
 ```
 
 
