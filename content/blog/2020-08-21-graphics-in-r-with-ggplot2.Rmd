@@ -268,6 +268,18 @@ ggplot(dat) +
 
 In that case, it best to remove the legend as it becomes redundant. See more information about the legend in this [section](/blog/graphics-in-r-with-ggplot2/#legend).
 
+If you are unhappy with the default colors provided in `{ggplot2}`, you can change them manually with the `scale_fill_manual()` layer:
+
+```{r}
+ggplot(dat) +
+  aes(x = drv, y = hwy, fill = drv) + # add color to boxes with fill
+  geom_boxplot(varwidth = TRUE) + # vary boxes width according to n obs.
+  geom_jitter(alpha = 0.25, width = 0.2) + # adds random noise and limit its width
+  facet_wrap(~ year) + # divide into 2 panels
+  theme(legend.position = "none") + # remove legend
+  scale_fill_manual(values = c("darkred", "darkgreen", "steelblue")) # change fill color manually
+```
+
 ## Barplot
 
 A [barplot](/blog/descriptive-statistics-in-r/#barplot) (useful to visualize qualitative variables) can be plotted using `geom_bar()`:
@@ -313,9 +325,9 @@ ggplot(dat) +
 
 ## Further personalization
 
-### Labels
+### Title and labels
 
-The first things to personalize in a plot is the labels to make the plot more informative to the audience. We can easily add a title, subtitle, caption and edit axis titles with the `labs()` function:
+The first things to personalize in a plot is the labels to make the plot more informative to the audience. We can easily add a title, subtitle, caption and edit axis labels with the `labs()` function:
 
 ```{r}
 p <- ggplot(dat) +
@@ -332,6 +344,46 @@ p + labs(
 ```
 
 As you can see in the above code, you can save one or more layers of the plot in an object for later use. This way, you can save your "main" plot, and add more layers of personalization until you get the desired output. Here we saved the main scatter plot in an object called `p` and we will refer to it for the subsequent personalizations.
+
+You can also edit the alignment, the size and the shape of the title and subtitle via the `theme()` layer and the `element_text()` function:
+
+```{r}
+p + labs(
+  title = "Fuel efficiency for 38 popular models of car",
+    subtitle = "Period 1999-2008",
+    caption = "Data: ggplot2::mpg. See more at www.statsandr.com",
+    x = "Engine displacement (litres)",
+    y = "Highway miles per gallon (mpg)"
+    ) +
+  theme(plot.title = element_text(hjust = 0.5, # center
+                                  size=12,
+                                  color="steelblue",
+                                  face="bold"),
+        plot.subtitle = element_text(hjust = 0.5, # center
+                                     size=10,
+                                     color="gray",
+                                     face="italic"))
+```
+
+If the title or subtitle is long and you want to divide it into multiple lines, use `\n`:
+
+```{r}
+p + labs(
+  title = "Fuel efficiency for 38 popular \n models of car",
+    subtitle = "Period 1999-2008",
+    caption = "Data: ggplot2::mpg. See more at www.statsandr.com",
+    x = "Engine displacement (litres)",
+    y = "Highway miles per gallon (mpg)"
+    ) +
+  theme(plot.title = element_text(hjust = 0.5, # center
+                                  size=12,
+                                  color="steelblue",
+                                  face="bold"),
+        plot.subtitle = element_text(hjust = 0.5, # center
+                                     size=10,
+                                     color="gray",
+                                     face="italic"))
+```
 
 ### Axis ticks
 
@@ -441,6 +493,21 @@ We can of course mix several options (shape, color, size, alpha) to build more c
 ```{r}
 p + geom_point(size = 0.5) +
   aes(color = drv, shape = year, alpha = cty)
+```
+
+If you are unhappy with the default colors, you can change them manually with the `scale_colour_manual()` layer (for qualitative variables) and the `scale_coulour_gradient2()` layer (for quantitative variables):
+
+```{r}
+# Change color based on a qualitative variable
+p + aes(color = drv) +
+  scale_colour_manual(values = c("red", "blue", "green"))
+
+# Change color based on a quantitative variable
+p + aes(color = cty) +
+  scale_colour_gradient2(low = "green",
+                       mid = "gray",
+                       high = "red",
+                       midpoint = median(dat$cty))
 ```
 
 ### Smooth and regression lines
