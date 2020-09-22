@@ -325,7 +325,7 @@ ggplot(dat) +
 
 ## Further personalization
 
-### Title and labels
+### Title and axis labels
 
 The first things to personalize in a plot is the labels to make the plot more informative to the audience. We can easily add a title, subtitle, caption and edit axis labels with the `labs()` function:
 
@@ -438,7 +438,16 @@ p + aes(color = class) +
 
 Replace `"top"` by `"left"` or `"bottom"` to change its position and by `"none"` to remove it.
 
-The title of the legend can be removed with `legend.title = element_blank()`:
+The title of the legend can be edited with the `labs()` layer:
+
+```{r}
+p + aes(color = class) +
+  labs(color = "Car's class")
+```
+
+Note that the argument inside `labs()` must match the one inside the `aes()` layer (in this case: `color`).
+
+The title of the legend can also be removed with `legend.title = element_blank()` inside the `theme()` layer:
 
 ```{r}
 p + aes(color = class) +
@@ -526,6 +535,17 @@ p + aes(color = cty) +
   )
 ```
 
+### Add text and labels
+
+To add a label on a point (for example the row numbers), we can use the `geom_text()` and `aes()` functions:
+
+```{r}
+p + geom_text(aes(label = rownames(dat)),
+              check_overlap = TRUE,
+              size = 2,
+              vjust = -1)
+```
+
 ### Smooth and regression lines
 
 In a scatter plot, it is possible to add a smooth line fitted to the data:
@@ -567,7 +587,6 @@ It is then possible to add a regression line to each facet:
 p + facet_grid(. ~ drv) +
   geom_smooth(method = lm)
 ```
-
 
 `facet_wrap()` can also be used, as illustrated in this [section](/blog/graphics-in-r-with-ggplot2/#boxplot).
 
@@ -645,6 +664,11 @@ p_a + p_b / p_c
 
 (p_a + p_b) / p_c
 ```
+
+See more ways to combine plots with:
+
+* `grid.arrange()` from the `{gridExtra}` package
+* `plot_grid()` from the `{cowplot}` package
 
 ### Flip coordinates
 
@@ -739,6 +763,9 @@ If labels displayed on the X-axis are unreadable because they overlap each other
 p + scale_x_date(date_breaks = "10 days", date_labels = "%d %b") +
   theme(axis.text.x = element_text(angle = 60, hjust = 1))
 ```
+
+
+
 
 
 # To go further
