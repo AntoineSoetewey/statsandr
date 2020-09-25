@@ -7,7 +7,7 @@ menu: "main"
 
 Welcome to the blog [Stats and R](/). As the name suggests, this blog is about [statistics](/tags/statistics/) and its applications in [R](/tags/r/) (an open source statistical software program).
 
-From time to time, I also present some work related to data science & [visualization](/tags/visualization/) using R, and news about my research.
+From time to time, I also present some work related to data science & [data visualization](/tags/visualization/) using R, and news about my research.
 
 **If you are new to this blog**, I invite you to:
 
