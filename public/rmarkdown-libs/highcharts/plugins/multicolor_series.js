@@ -1,5 +1,5 @@
 /**
-* Multicolor Series v2.2.4 (2018-03-27)
+* Multicolor Series v2.2.7(2020-06-23)
 *
 * (c) 2012-2016 Black Label
 *
@@ -517,7 +517,35 @@
 		}
 	});
 	
+	H.wrap(H.Series.prototype, 'applyZones', function (proceed) {
+		var series = this,
+			parts = ['area', 'graph'];
+
+		parts.forEach(function (part) {
+			var shape = series[part];
+
+			if (shape && H.isArray(shape)) {
+				shape.show = function () {
+					shape.forEach(function (subGraph) {
+						subGraph.show(true);
+					});
+				};
+				shape.hide = function () {
+					shape.forEach(function (subGraph) {
+						subGraph.hide();
+					});
+				};
+			}
+		});
 	
+		return proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+	});
+
+	H.wrap(seriesTypes.coloredline.prototype, 'destroy', function (proceed) {
+		// destroy all parts
+		this.graph.destroy();
+		proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+	});
 	
 	/**
 	*
