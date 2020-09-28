@@ -538,6 +538,7 @@ library(ViewPipeSteps)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;&lt;a href=&#34;#reformat-code&#34;&gt;Reformat code&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#rstudio-addins&#34;&gt;RStudio addins&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#pander-for-aesthetics&#34;&gt;&lt;code&gt;{pander}&lt;/code&gt; for aesthetics&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#extract-equation-model-with-equatiomatic&#34;&gt;Extract equation model with &lt;code&gt;{equatiomatic}&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#pipe-operator&#34;&gt;Pipe operator &lt;code&gt;%&amp;gt;%&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#others&#34;&gt;Others&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -744,7 +745,8 @@ pander(test)&lt;/code&gt;&lt;/pre&gt;
 &lt;/table&gt;
 &lt;p&gt;All information that you need are displayed in an elegant table. The &lt;code&gt;pander()&lt;/code&gt; function works on many statistical tests (not to say all of them, but I have not tried it on &lt;em&gt;all&lt;/em&gt; available tests in R) and on regression models:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Linear model with lm()
-model &amp;lt;- lm(price ~ carat + x + y + z, data = dat)
+model &amp;lt;- lm(price ~ carat + x + y + z,
+            data = dat)
 model&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
 ## Call:
@@ -811,7 +813,7 @@ model&lt;/code&gt;&lt;/pre&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;The pander function also makes datasets, tables, vectors, etc. more readable in R Markdown output. For example, see the differences below:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(diamonds) # first 6 observations of a dataset&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(dat) # first 6 observations of a dataset&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## # A tibble: 6 x 10
 ##   carat cut       color clarity depth table price     x     y     z
 ##   &amp;lt;dbl&amp;gt; &amp;lt;ord&amp;gt;     &amp;lt;ord&amp;gt; &amp;lt;ord&amp;gt;   &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;int&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
@@ -821,7 +823,7 @@ model&lt;/code&gt;&lt;/pre&gt;
 ## 4 0.290 Premium   I     VS2      62.4    58   334  4.2   4.23  2.63
 ## 5 0.31  Good      J     SI2      63.3    58   335  4.34  4.35  2.75
 ## 6 0.24  Very Good J     VVS2     62.8    57   336  3.94  3.96  2.48&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(head(diamonds))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(head(dat))&lt;/code&gt;&lt;/pre&gt;
 &lt;table style=&#34;width:100%;&#34;&gt;
 &lt;colgroup&gt;
 &lt;col width=&#34;9%&#34; /&gt;
@@ -924,7 +926,7 @@ model&lt;/code&gt;&lt;/pre&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(diamonds) # main descriptive statistics&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(dat) # main descriptive statistics&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##      carat               cut        color        clarity          depth      
 ##  Min.   :0.2000   Fair     : 1610   D: 6775   SI1    :13065   Min.   :43.00  
 ##  1st Qu.:0.4000   Good     : 4906   E: 9797   VS2    :12258   1st Qu.:61.00  
@@ -949,7 +951,7 @@ model&lt;/code&gt;&lt;/pre&gt;
 ##  3rd Qu.: 4.040  
 ##  Max.   :31.800  
 ## &lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(summary(diamonds))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(summary(dat))&lt;/code&gt;&lt;/pre&gt;
 &lt;table&gt;
 &lt;caption&gt;Table continues below&lt;/caption&gt;
 &lt;colgroup&gt;
@@ -1180,9 +1182,79 @@ model&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(names(dat))&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;em&gt;carat&lt;/em&gt;, &lt;em&gt;cut&lt;/em&gt;, &lt;em&gt;color&lt;/em&gt;, &lt;em&gt;clarity&lt;/em&gt;, &lt;em&gt;depth&lt;/em&gt;, &lt;em&gt;table&lt;/em&gt;, &lt;em&gt;price&lt;/em&gt;, &lt;em&gt;x&lt;/em&gt;, &lt;em&gt;y&lt;/em&gt; and &lt;em&gt;z&lt;/em&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rnorm(4) # generates 4 observations from a standard normal distribution&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1]  0.9971690 -2.1524990 -1.0392507 -0.7877388&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -1.8170575  0.2089859  1.0480589  0.1609936&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pander(rnorm(4))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;em&gt;1.245&lt;/em&gt;, &lt;em&gt;1.358&lt;/em&gt;, &lt;em&gt;0.7022&lt;/em&gt; and &lt;em&gt;-0.3512&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;-1.291&lt;/em&gt;, &lt;em&gt;0.1842&lt;/em&gt;, &lt;em&gt;-0.1146&lt;/em&gt; and &lt;em&gt;-1.006&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;extract-equation-model-with-equatiomatic&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Extract equation model with &lt;code&gt;{equatiomatic}&lt;/code&gt;&lt;/h1&gt;
+&lt;p&gt;If you often need to write equations corresponding to statistical models in R Markdown reports, the &lt;a href=&#34;https://CRAN.R-project.org/package=equatiomatic&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;{equatiomatic}&lt;/code&gt;&lt;/a&gt; will help you to save time.&lt;/p&gt;
+&lt;p&gt;Here is a basic example with a multiple linear regression using the same dataset as above (i.e., &lt;code&gt;diamonds&lt;/code&gt; from &lt;code&gt;{ggplot2}&lt;/code&gt;):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# install.packages(&amp;quot;equatiomatic&amp;quot;)
+library(equatiomatic)
+
+# fit a basic multiple linear regression model
+model &amp;lt;- lm(price ~ carat + depth,
+            data = dat)
+
+extract_eq(model,
+           use_coefs = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[
+\operatorname{price} = 4045.33 + 7765.14(\operatorname{carat}) - 102.17(\operatorname{depth}) + \epsilon
+\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;If the equation is long, you can display it on multiple lines by adding the argument &lt;code&gt;wrap = TRUE&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model &amp;lt;- lm(price ~ carat + x + y + z + depth,
+            data = dat)
+
+extract_eq(model,
+           use_coefs = TRUE,
+           wrap = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[
+\begin{aligned}
+\operatorname{price} &amp;amp;= 12196.69 + 10615.5(\operatorname{carat}) - 1369.67(\operatorname{x}) + 97.6(\operatorname{y})\ + \\
+&amp;amp;\quad 64.2(\operatorname{z}) - 156.62(\operatorname{depth}) + \epsilon
+\end{aligned}
+\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Note that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;If you use it in R Markdown, you need to add &lt;code&gt;results = &#39;asis&#39;&lt;/code&gt; for that specific code chunk, otherwise the equation will be rendered as a LaTeX equation&lt;/li&gt;
+&lt;li&gt;At the time of writing, it works only for PDF and HTML output and not for Word&lt;/li&gt;
+&lt;li&gt;The default number of terms per line is 4. You can change that with the &lt;code&gt;terms_per_line&lt;/code&gt; argument:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;extract_eq(model,
+           use_coefs = TRUE,
+           wrap = TRUE,
+           terms_per_line = 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[
+\begin{aligned}
+\operatorname{price} &amp;amp;= 12196.69 + 10615.5(\operatorname{carat})\ - \\
+&amp;amp;\quad 1369.67(\operatorname{x}) + 97.6(\operatorname{y})\ + \\
+&amp;amp;\quad 64.2(\operatorname{z}) - 156.62(\operatorname{depth})\ + \\
+&amp;amp;\quad \epsilon
+\end{aligned}
+\]&lt;/span&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;{equatiomatic}&lt;/code&gt; supports output from logistic regression as well. See all supported models in the &lt;a href=&#34;https://cran.r-project.org/web/packages/equatiomatic/vignettes/intro-equatiomatic.html&#34; target=&#34;_blank&#34;&gt;vignette&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;If you need the theoretical model without the actual parameter estimates, remove the &lt;code&gt;use_coefs&lt;/code&gt; argument:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;extract_eq(model,
+           wrap = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[
+\begin{aligned}
+\operatorname{price} &amp;amp;= \alpha + \beta_{1}(\operatorname{carat}) + \beta_{2}(\operatorname{x}) + \beta_{3}(\operatorname{y})\ + \\
+&amp;amp;\quad \beta_{4}(\operatorname{z}) + \beta_{5}(\operatorname{depth}) + \epsilon
+\end{aligned}
+\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;In that case, I prefer to use &lt;span class=&#34;math inline&#34;&gt;\(\beta_0\)&lt;/span&gt; as intercept instead of &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt;. You can change that with the &lt;code&gt;intercept = &#34;beta&#34;&lt;/code&gt; argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;extract_eq(model,
+           wrap = TRUE,
+           intercept = &amp;quot;beta&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[
+\begin{aligned}
+\operatorname{price} &amp;amp;= \beta_{0} + \beta_{1}(\operatorname{carat}) + \beta_{2}(\operatorname{x}) + \beta_{3}(\operatorname{y})\ + \\
+&amp;amp;\quad \beta_{4}(\operatorname{z}) + \beta_{5}(\operatorname{depth}) + \epsilon
+\end{aligned}
+\]&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;pipe-operator&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Pipe operator &lt;code&gt;%&amp;gt;%&lt;/code&gt;&lt;/h1&gt;

@@ -269,7 +269,8 @@ All information that you need are displayed in an elegant table. The `pander()` 
 
 ```{r}
 # Linear model with lm()
-model <- lm(price ~ carat + x + y + z, data = dat)
+model <- lm(price ~ carat + x + y + z,
+            data = dat)
 model
 
 pander(model)
@@ -278,11 +279,11 @@ pander(model)
 The pander function also makes datasets, tables, vectors, etc. more readable in R Markdown output. For example, see the differences below:
 
 ```{r}
-head(diamonds) # first 6 observations of a dataset
-pander(head(diamonds))
+head(dat) # first 6 observations of a dataset
+pander(head(dat))
 
-summary(diamonds) # main descriptive statistics
-pander(summary(diamonds))
+summary(dat) # main descriptive statistics
+pander(summary(dat))
 
 table(dat$cut, dat$color) # contingency table
 pander(table(dat$cut, dat$color))
@@ -292,6 +293,64 @@ pander(names(dat))
 
 rnorm(4) # generates 4 observations from a standard normal distribution
 pander(rnorm(4))
+```
+
+# Extract equation model with `{equatiomatic}`
+
+If you often need to write equations corresponding to statistical models in R Markdown reports, the [`{equatiomatic}`](https://CRAN.R-project.org/package=equatiomatic){target="_blank"} will help you to save time.
+
+Here is a basic example with a multiple linear regression using the same dataset as above (i.e., `diamonds` from `{ggplot2}`):
+
+```{r, results = 'asis'}
+# install.packages("equatiomatic")
+library(equatiomatic)
+
+# fit a basic multiple linear regression model
+model <- lm(price ~ carat + depth,
+            data = dat)
+
+extract_eq(model,
+           use_coefs = TRUE)
+```
+
+If the equation is long, you can display it on multiple lines by adding the argument `wrap = TRUE`:
+
+```{r, results = 'asis'}
+model <- lm(price ~ carat + x + y + z + depth,
+            data = dat)
+
+extract_eq(model,
+           use_coefs = TRUE,
+           wrap = TRUE)
+```
+
+Note that:
+
+* If you use it in R Markdown, you need to add `results = 'asis'` for that specific code chunk, otherwise the equation will be rendered as a LaTeX equation
+* At the time of writing, it works only for PDF and HTML output and not for Word
+* The default number of terms per line is 4. You can change that with the `terms_per_line` argument:
+
+```{r, results = 'asis'}
+extract_eq(model,
+           use_coefs = TRUE,
+           wrap = TRUE,
+           terms_per_line = 2)
+```
+
+* `{equatiomatic}` supports output from logistic regression as well. See all supported models in the [vignette](https://cran.r-project.org/web/packages/equatiomatic/vignettes/intro-equatiomatic.html){target="_blank"}
+* If you need the theoretical model without the actual parameter estimates, remove the `use_coefs` argument:
+
+```{r, results = 'asis'}
+extract_eq(model,
+           wrap = TRUE)
+```
+
+In that case, I prefer to use $\beta_0$ as intercept instead of $\alpha$. You can change that with the `intercept = "beta"` argument:
+
+```{r, results = 'asis'}
+extract_eq(model,
+           wrap = TRUE,
+           intercept = "beta")
 ```
 
 # Pipe operator `%>%`

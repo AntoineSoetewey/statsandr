@@ -29,6 +29,7 @@ output:
 <li><a href="#reformat-code">Reformat code</a></li>
 <li><a href="#rstudio-addins">RStudio addins</a></li>
 <li><a href="#pander-for-aesthetics"><code>{pander}</code> for aesthetics</a></li>
+<li><a href="#extract-equation-model-with-equatiomatic">Extract equation model with <code>{equatiomatic}</code></a></li>
 <li><a href="#pipe-operator">Pipe operator <code>%&gt;%</code></a></li>
 <li><a href="#others">Others</a></li>
 </ul>
@@ -235,7 +236,8 @@ pander(test)</code></pre>
 </table>
 <p>All information that you need are displayed in an elegant table. The <code>pander()</code> function works on many statistical tests (not to say all of them, but I have not tried it on <em>all</em> available tests in R) and on regression models:</p>
 <pre class="r"><code># Linear model with lm()
-model &lt;- lm(price ~ carat + x + y + z, data = dat)
+model &lt;- lm(price ~ carat + x + y + z,
+            data = dat)
 model</code></pre>
 <pre><code>## 
 ## Call:
@@ -302,7 +304,7 @@ model</code></pre>
 </tbody>
 </table>
 <p>The pander function also makes datasets, tables, vectors, etc. more readable in R Markdown output. For example, see the differences below:</p>
-<pre class="r"><code>head(diamonds) # first 6 observations of a dataset</code></pre>
+<pre class="r"><code>head(dat) # first 6 observations of a dataset</code></pre>
 <pre><code>## # A tibble: 6 x 10
 ##   carat cut       color clarity depth table price     x     y     z
 ##   &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -312,7 +314,7 @@ model</code></pre>
 ## 4 0.290 Premium   I     VS2      62.4    58   334  4.2   4.23  2.63
 ## 5 0.31  Good      J     SI2      63.3    58   335  4.34  4.35  2.75
 ## 6 0.24  Very Good J     VVS2     62.8    57   336  3.94  3.96  2.48</code></pre>
-<pre class="r"><code>pander(head(diamonds))</code></pre>
+<pre class="r"><code>pander(head(dat))</code></pre>
 <table style="width:100%;">
 <colgroup>
 <col width="9%" />
@@ -415,7 +417,7 @@ model</code></pre>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>summary(diamonds) # main descriptive statistics</code></pre>
+<pre class="r"><code>summary(dat) # main descriptive statistics</code></pre>
 <pre><code>##      carat               cut        color        clarity          depth      
 ##  Min.   :0.2000   Fair     : 1610   D: 6775   SI1    :13065   Min.   :43.00  
 ##  1st Qu.:0.4000   Good     : 4906   E: 9797   VS2    :12258   1st Qu.:61.00  
@@ -440,7 +442,7 @@ model</code></pre>
 ##  3rd Qu.: 4.040  
 ##  Max.   :31.800  
 ## </code></pre>
-<pre class="r"><code>pander(summary(diamonds))</code></pre>
+<pre class="r"><code>pander(summary(dat))</code></pre>
 <table>
 <caption>Table continues below</caption>
 <colgroup>
@@ -671,9 +673,79 @@ model</code></pre>
 <pre class="r"><code>pander(names(dat))</code></pre>
 <p><em>carat</em>, <em>cut</em>, <em>color</em>, <em>clarity</em>, <em>depth</em>, <em>table</em>, <em>price</em>, <em>x</em>, <em>y</em> and <em>z</em></p>
 <pre class="r"><code>rnorm(4) # generates 4 observations from a standard normal distribution</code></pre>
-<pre><code>## [1]  0.9971690 -2.1524990 -1.0392507 -0.7877388</code></pre>
+<pre><code>## [1] -1.8170575  0.2089859  1.0480589  0.1609936</code></pre>
 <pre class="r"><code>pander(rnorm(4))</code></pre>
-<p><em>1.245</em>, <em>1.358</em>, <em>0.7022</em> and <em>-0.3512</em></p>
+<p><em>-1.291</em>, <em>0.1842</em>, <em>-0.1146</em> and <em>-1.006</em></p>
+</div>
+<div id="extract-equation-model-with-equatiomatic" class="section level1">
+<h1>Extract equation model with <code>{equatiomatic}</code></h1>
+<p>If you often need to write equations corresponding to statistical models in R Markdown reports, the <a href="https://CRAN.R-project.org/package=equatiomatic" target="_blank"><code>{equatiomatic}</code></a> will help you to save time.</p>
+<p>Here is a basic example with a multiple linear regression using the same dataset as above (i.e., <code>diamonds</code> from <code>{ggplot2}</code>):</p>
+<pre class="r"><code># install.packages(&quot;equatiomatic&quot;)
+library(equatiomatic)
+
+# fit a basic multiple linear regression model
+model &lt;- lm(price ~ carat + depth,
+            data = dat)
+
+extract_eq(model,
+           use_coefs = TRUE)</code></pre>
+<p><span class="math display">\[
+\operatorname{price} = 4045.33 + 7765.14(\operatorname{carat}) - 102.17(\operatorname{depth}) + \epsilon
+\]</span></p>
+<p>If the equation is long, you can display it on multiple lines by adding the argument <code>wrap = TRUE</code>:</p>
+<pre class="r"><code>model &lt;- lm(price ~ carat + x + y + z + depth,
+            data = dat)
+
+extract_eq(model,
+           use_coefs = TRUE,
+           wrap = TRUE)</code></pre>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{price} &amp;= 12196.69 + 10615.5(\operatorname{carat}) - 1369.67(\operatorname{x}) + 97.6(\operatorname{y})\ + \\
+&amp;\quad 64.2(\operatorname{z}) - 156.62(\operatorname{depth}) + \epsilon
+\end{aligned}
+\]</span></p>
+<p>Note that:</p>
+<ul>
+<li>If you use it in R Markdown, you need to add <code>results = 'asis'</code> for that specific code chunk, otherwise the equation will be rendered as a LaTeX equation</li>
+<li>At the time of writing, it works only for PDF and HTML output and not for Word</li>
+<li>The default number of terms per line is 4. You can change that with the <code>terms_per_line</code> argument:</li>
+</ul>
+<pre class="r"><code>extract_eq(model,
+           use_coefs = TRUE,
+           wrap = TRUE,
+           terms_per_line = 2)</code></pre>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{price} &amp;= 12196.69 + 10615.5(\operatorname{carat})\ - \\
+&amp;\quad 1369.67(\operatorname{x}) + 97.6(\operatorname{y})\ + \\
+&amp;\quad 64.2(\operatorname{z}) - 156.62(\operatorname{depth})\ + \\
+&amp;\quad \epsilon
+\end{aligned}
+\]</span></p>
+<ul>
+<li><code>{equatiomatic}</code> supports output from logistic regression as well. See all supported models in the <a href="https://cran.r-project.org/web/packages/equatiomatic/vignettes/intro-equatiomatic.html" target="_blank">vignette</a></li>
+<li>If you need the theoretical model without the actual parameter estimates, remove the <code>use_coefs</code> argument:</li>
+</ul>
+<pre class="r"><code>extract_eq(model,
+           wrap = TRUE)</code></pre>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{price} &amp;= \alpha + \beta_{1}(\operatorname{carat}) + \beta_{2}(\operatorname{x}) + \beta_{3}(\operatorname{y})\ + \\
+&amp;\quad \beta_{4}(\operatorname{z}) + \beta_{5}(\operatorname{depth}) + \epsilon
+\end{aligned}
+\]</span></p>
+<p>In that case, I prefer to use <span class="math inline">\(\beta_0\)</span> as intercept instead of <span class="math inline">\(\alpha\)</span>. You can change that with the <code>intercept = "beta"</code> argument:</p>
+<pre class="r"><code>extract_eq(model,
+           wrap = TRUE,
+           intercept = &quot;beta&quot;)</code></pre>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{price} &amp;= \beta_{0} + \beta_{1}(\operatorname{carat}) + \beta_{2}(\operatorname{x}) + \beta_{3}(\operatorname{y})\ + \\
+&amp;\quad \beta_{4}(\operatorname{z}) + \beta_{5}(\operatorname{depth}) + \epsilon
+\end{aligned}
+\]</span></p>
 </div>
 <div id="pipe-operator" class="section level1">
 <h1>Pipe operator <code>%&gt;%</code></h1>
