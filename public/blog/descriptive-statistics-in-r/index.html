@@ -130,7 +130,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            31 minute read
+                            32 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -190,6 +190,7 @@
 <li><a href="#barplot">Barplot</a></li>
 <li><a href="#histogram">Histogram</a></li>
 <li><a href="#boxplot">Boxplot</a></li>
+<li><a href="#dotplot">Dotplot</a></li>
 <li><a href="#scatterplot">Scatterplot</a></li>
 <li><a href="#line-plot">Line plot</a></li>
 <li><a href="#qq-plot">QQ-plot</a><ul>
@@ -469,7 +470,7 @@ sort(tab, decreasing = TRUE) # sort highest to lowest</code></pre>
 </div>
 <div id="correlation" class="section level1">
 <h1>Correlation</h1>
-<p>Another descriptive statistics is the correlation coefficient. A correlation measures the relationship between two variables.</p>
+<p>Another descriptive statistics is the correlation coefficient. A correlation measures the <em>linear</em> relationship between two variables.</p>
 <p>Computing correlation in R requires a detailed explanation so I wrote an article covering <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation and correlation test</a>.</p>
 </div>
 <div id="contingency-table" class="section level1">
@@ -544,7 +545,7 @@ mosaic(~ Species + size,
 </div>
 <div id="barplot" class="section level1">
 <h1>Barplot</h1>
-<p>Barplots can only be done on qualitative variables (see the difference with a quantitative variable <a href="/blog/variable-types-and-examples/">here</a>). A barplot is a tool to visualize the distribution of a qualitative variable. We draw a barplot on the qualitative variable <code>size</code>:</p>
+<p>Barplots can only be done on qualitative variables (see the difference with a quantitative variable <a href="/blog/variable-types-and-examples/">here</a>). A barplot is a tool to visualize the distribution of a qualitative variable. We draw a barplot of the qualitative variable <code>size</code>:</p>
 <pre class="r"><code>barplot(table(dat$size)) # table() is mandatory</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-33-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>You can also draw a barplot of the relative frequencies instead of the frequencies by adding <code>prop.table()</code> as we did earlier:</p>
@@ -574,7 +575,7 @@ ggplot(dat) +
 </div>
 <div id="boxplot" class="section level1">
 <h1>Boxplot</h1>
-<p>Boxplots are really useful in descriptive statistics and are often underused (mostly because it is not well understood by the public). A boxplot graphically represents the distribution of a quantitative variable by visually displaying five common location summary (minimum, median, first and third quartiles and maximum) and any observation that was classified as a suspected <a href="/blog/outliers-detection-in-r/">outlier</a> using the interquartile range (IQR) criterion. The IQR criterion means that all observations above <span class="math inline">\(q_{0.75} + 1.5 \cdot IQR\)</span> or below <span class="math inline">\(q_{0.25} - 1.5 \cdot IQR\)</span> (where <span class="math inline">\(q_{0.25}\)</span> and <span class="math inline">\(q_{0.75}\)</span> correspond to first and third quartile respectively) are considered as potential outliers by R. The minimum and maximum in the boxplot are represented without these suspected outliers.</p>
+<p>Boxplots are really useful in descriptive statistics and are often underused (mostly because it is not well understood by the public). A boxplot graphically represents the distribution of a quantitative variable by visually displaying five common location summary (minimum, median, first/third quartiles and maximum) and any observation that was classified as a suspected <a href="/blog/outliers-detection-in-r/">outlier</a> using the interquartile range (IQR) criterion. The IQR criterion means that all observations above <span class="math inline">\(q_{0.75} + 1.5 \cdot IQR\)</span> or below <span class="math inline">\(q_{0.25} - 1.5 \cdot IQR\)</span> (where <span class="math inline">\(q_{0.25}\)</span> and <span class="math inline">\(q_{0.75}\)</span> correspond to first and third quartile respectively) are considered as potential outliers by R. The minimum and maximum in the boxplot are represented without these suspected outliers.</p>
 <p>Seeing all these information on the same plot help to have a good first overview of the dispersion and the location of the data. Before drawing a boxplot of our data, see below a graph explaining the information present on a boxplot:</p>
 <div class="figure">
 <img src="/blog/descriptive-statistics-in-r_files/how-to-interpret-boxplot.png" style="width:100.0%" alt="" />
@@ -592,30 +593,38 @@ ggplot(dat) +
   geom_boxplot()</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-40-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
+<div id="dotplot" class="section level1">
+<h1>Dotplot</h1>
+<p>A dotplot is more or less similar than a boxplot, except that observations are represented as points and there is no summary statistics presented on the plot:</p>
+<pre class="r"><code>library(lattice)
+
+dotplot(dat$Sepal.Length ~ dat$Species)</code></pre>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-41-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
 <div id="scatterplot" class="section level1">
 <h1>Scatterplot</h1>
-<p>Scatterplots allow to check whether there is a potential link between two quantitative variables. For instance, when drawing a scatterplot of the length of the sepal and the length of the petal:</p>
+<p>Scatterplots allow to check whether there is a potential link between two quantitative variables. For this reason, scatterplots are often used to visualize a potential <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation</a> between two variables. For instance, when drawing a scatterplot of the length of the sepal and the length of the petal:</p>
 <pre class="r"><code>plot(dat$Sepal.Length, dat$Petal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-41-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-42-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>There seems to be a positive association between the two variables.</p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>ggplot(dat) +
   aes(x = Sepal.Length, y = Petal.Length) +
   geom_point()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-42-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Like boxplots, scatterplots are even more informative when differentiating the points according to a factor, in this case the species:</p>
 <pre class="r"><code>ggplot(dat) +
   aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
   geom_point() +
   scale_color_hue()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-43-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="line-plot" class="section level1">
 <h1>Line plot</h1>
 <p>Line plots, particularly useful in time series or finance, can be created by adding the <code>type = "l"</code> argument in the <code>plot()</code> function:</p>
 <pre class="r"><code>plot(dat$Sepal.Length,
      type = &quot;l&quot;) # &quot;l&quot; for line</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-44-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="qq-plot" class="section level1">
 <h1>QQ-plot</h1>
@@ -626,29 +635,29 @@ ggplot(dat) +
 qqnorm(dat$Sepal.Length)
 # Draw the reference line:
 qqline(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-46-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Or a QQ-plot with confidence bands with the <code>qqPlot()</code> function from the <code>{car}</code> package:</p>
 <pre class="r"><code>library(car) # package must be installed first
 qqPlot(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-46-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 132 118</code></pre>
 <p>If points are close to the reference line (sometimes referred as Henry’s line) and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The variable <code>Sepal.Length</code> does not seem to follow a normal distribution because several points lie outside the confidence bands. When facing a non-normal distribution, the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. Applying the logarithm transformation can be done with the <code>log()</code> function.</p>
 <p>In <code>{ggpubr}</code>:</p>
 <pre class="r"><code>library(ggpubr)
 ggqqplot(dat$Sepal.Length)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-47-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-48-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="by-groups" class="section level2">
 <h2>By groups</h2>
 <p>For some statistical tests, the normality assumption is required in all groups. One solution is to draw a QQ-plot for each group by manually splitting the dataset into different groups and then draw a QQ-plot for each subset of the data (with the methods shown above). Another (easier) solution is to draw a QQ-plot for each group automatically with the argument <code>groups =</code> in the function <code>qqPlot()</code> from the <code>{car}</code> package:</p>
 <pre class="r"><code>qqPlot(dat$Sepal.Length, groups = dat$size)</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-48-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-49-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>qplot(
   sample = Sepal.Length, data = dat,
   col = size, shape = size
 )</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-49-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-50-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>It is also possible to differentiate groups by only shape or color. For this, remove one of the argument <code>col</code> or <code>shape</code> in the <code>qplot()</code> function above.</p>
 </div>
 </div>
@@ -656,12 +665,12 @@ ggqqplot(dat$Sepal.Length)</code></pre>
 <h1>Density plot</h1>
 <p>Density plot is a smoothed version of the histogram and is used in the same concept, that is, to represent the distribution of a numeric variable. The functions <code>plot()</code> and <code>density()</code> are used together to draw a density plot:</p>
 <pre class="r"><code>plot(density(dat$Sepal.Length))</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-50-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-51-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In <code>{ggplot2}</code>:</p>
 <pre class="r"><code>ggplot(dat) +
   aes(x = Sepal.Length) +
   geom_density()</code></pre>
-<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-51-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-52-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="correlation-plot" class="section level1">
 <h1>Correlation plot</h1>
