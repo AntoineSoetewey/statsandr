@@ -6,10 +6,554 @@
     <description>Recent content in R on Stats and R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 21 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 12 Oct 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ANOVA in R</title>
+      <link>/blog/anova-in-r/</link>
+      <pubDate>Mon, 12 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/anova-in-r/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#introduction&#34;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#data&#34;&gt;Data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#aim-and-hypotheses-of-anova&#34;&gt;Aim and hypotheses of ANOVA&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#underlying-assumptions-of-anova&#34;&gt;Underlying assumptions of ANOVA&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#variable-type&#34;&gt;Variable type&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#independence&#34;&gt;Independence&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#normality&#34;&gt;Normality&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#equality-of-variances---homogeneity&#34;&gt;Equality of variances - homogeneity&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#another-method-to-test-normality-and-homogeneity&#34;&gt;Another method to test normality and homogeneity&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#anova&#34;&gt;ANOVA&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#preliminary-analyses&#34;&gt;Preliminary analyses&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#anova-in-r&#34;&gt;ANOVA in R&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#interpretations-of-anova-results&#34;&gt;Interpretations of ANOVA results&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#whats-next&#34;&gt;What’s next?&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#post-hoc-test&#34;&gt;Post-hoc test&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#issue-of-multiple-testing&#34;&gt;Issue of multiple testing&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#post-hoc-tests-in-r-and-their-interpretation&#34;&gt;Post-hoc tests in R and their interpretation&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#tukey-hsd-test&#34;&gt;Tukey HSD test&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#dunnetts-test&#34;&gt;Dunnett’s test&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#visualization-of-anova-and-post-hoc-tests&#34;&gt;Visualization of ANOVA and post-hoc tests&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/anova-in-r.jpeg&#34; style=&#34;width:100.0%&#34; /&gt;&lt;/p&gt;
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;ANOVA (ANalysis Of VAriance) is a statistical test to determine whether two or more population means are different. In other words, it is used to &lt;strong&gt;compare two or more groups&lt;/strong&gt; to see if they are significantly &lt;strong&gt;different&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;In practice, however, the:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/&#34;&gt;&lt;strong&gt;Student t-test&lt;/strong&gt;&lt;/a&gt; is used to compare &lt;strong&gt;2 groups&lt;/strong&gt;;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ANOVA&lt;/strong&gt; generalizes the t-test beyond 2 groups, so it is used to compare &lt;strong&gt;3 or more groups&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note that there are several versions of the ANOVA (e.g., one-way ANOVA, two-way ANOVA, mixed ANOVA, repeated measures ANOVA, etc.). In this article, we present the simplest form only—the &lt;strong&gt;one-way ANOVA&lt;/strong&gt;&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;—and we refer to it as ANOVA in the remaining of the article.&lt;/p&gt;
+&lt;p&gt;Although ANOVA is used to make inference about &lt;a href=&#34;/blog/descriptive-statistics-by-hand/#mean&#34;&gt;means&lt;/a&gt; of different groups, the method is called “analysis of &lt;em&gt;&lt;a href=&#34;/blog/descriptive-statistics-by-hand/#variance&#34;&gt;variance&lt;/a&gt;&lt;/em&gt;”. It is called like this because it compares the “between” variance (the variance between the different groups) and the variance “within” (the variance within each group). If the between variance is significantly larger than the within variance, the group means are declared to be different. Otherwise, we cannot conclude one way or the other. The two variances are compared to each other by taking the ratio (&lt;span class=&#34;math inline&#34;&gt;\(\frac{variance_{between}}{variance_{within}}\)&lt;/span&gt;) and then by comparing this ratio to a threshold from the Fisher &lt;a href=&#34;/blog/a-guide-on-how-to-read-statistical-tables/&#34;&gt;probability distribution&lt;/a&gt; (a threshold based on a specific significance level, usually 5%).&lt;/p&gt;
+&lt;p&gt;This is enough theory regarding the ANOVA method for now. In the remaining of this article, we discuss about it from a more practical point of view, and in particular we will cover the following points:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the aim of the ANOVA, when it should be used and the null/alternative hypothesis&lt;/li&gt;
+&lt;li&gt;the underlying assumptions of the ANOVA and how to check them&lt;/li&gt;
+&lt;li&gt;how to perform the ANOVA in R&lt;/li&gt;
+&lt;li&gt;how to interpret results of the ANOVA&lt;/li&gt;
+&lt;li&gt;understand the notion of post-hoc test and interpret the results&lt;/li&gt;
+&lt;li&gt;how to visualize results of ANOVA and post-hoc tests&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Data&lt;/h1&gt;
+&lt;p&gt;Data for the present article is the &lt;code&gt;penguins&lt;/code&gt; dataset (an alternative to the well-known &lt;code&gt;iris&lt;/code&gt; dataset), accessible via the &lt;a href=&#34;https://github.com/allisonhorst/palmerpenguins&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;{palmerpenguins}&lt;/code&gt; package&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# install.packages(&amp;quot;palmerpenguins&amp;quot;)
+library(palmerpenguins)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The dataset contains data for 344 penguins of 3 different species (Adelie, Chinstrap and Gentoo). The dataset contains 8 variables, but we focus only on the flipper length and the species for this article, so we keep only those 2 variables:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+
+dat &amp;lt;- penguins %&amp;gt;%
+  select(species, flipper_length_mm)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(If you are unfamiliar with the pipe operator (&lt;code&gt;%&amp;gt;%&lt;/code&gt;), you can also &lt;a href=&#34;/blog/data-manipulation-in-r/#subset-a-dataset&#34;&gt;select variables&lt;/a&gt; with &lt;code&gt;penguins[, c(&#34;species&#34;, &#34;flipper_length_mm&#34;)]&lt;/code&gt;. Learn more ways to select variables in the article about &lt;a href=&#34;/blog/data-manipulation-in-r/&#34;&gt;data manipulation&lt;/a&gt;.)&lt;/p&gt;
+&lt;p&gt;Below some basic &lt;a href=&#34;/blog/descriptive-statistics-in-r/&#34;&gt;descriptive statistics&lt;/a&gt; and a plot (made with the &lt;a href=&#34;/blog/graphics-in-r-with-ggplot2/&#34;&gt;&lt;code&gt;{ggplot2}&lt;/code&gt; package&lt;/a&gt;) of our dataset before we proceed to the goal of the ANOVA:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(dat)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##       species    flipper_length_mm
+##  Adelie   :152   Min.   :172.0    
+##  Chinstrap: 68   1st Qu.:190.0    
+##  Gentoo   :124   Median :197.0    
+##                  Mean   :200.9    
+##                  3rd Qu.:213.0    
+##                  Max.   :231.0    
+##                  NA&amp;#39;s   :2&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Flipper length varies from 172 to 231 mm, with a mean of 200.9 mm. There are respectively 152, 68 and 124 penguins of the species Adelie, Chinstrap and Gentoo.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+
+ggplot(dat) +
+  aes(x = species, y = flipper_length_mm, color = species) +
+  geom_jitter() +
+  theme(legend.position = &amp;quot;none&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Here, the &lt;a href=&#34;/blog/data-types-in-r/#factor&#34;&gt;factor&lt;/a&gt; is the &lt;code&gt;species&lt;/code&gt; variable which contains 3 modalities or groups (Adelie, Chinstrap and Gentoo).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;aim-and-hypotheses-of-anova&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Aim and hypotheses of ANOVA&lt;/h1&gt;
+&lt;p&gt;As mentioned in the introduction, the ANOVA is used to compare groups (in practice, 3 or more groups). More generally, it is used to:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;study whether measurements are similar across different modalities (also called levels or treatments in the context of ANOVA) of a &lt;a href=&#34;/blog/variable-types-and-examples/#qualitative&#34;&gt;categorical&lt;/a&gt; variable&lt;/li&gt;
+&lt;li&gt;compare the impact of the different levels of a categorical variable on a &lt;a href=&#34;/blog/variable-types-and-examples/#quantitative&#34;&gt;quantitative&lt;/a&gt; variable&lt;/li&gt;
+&lt;li&gt;explain a quantitative variable based on a qualitative variable&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In this context and as an example, we are going to use an ANOVA to help us answer the question: “&lt;strong&gt;Are flippers length different for the 3 species of penguins?&lt;/strong&gt;”.&lt;/p&gt;
+&lt;p&gt;The null and alternative hypothesis of an ANOVA are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;: &lt;span class=&#34;math inline&#34;&gt;\(\mu_{Adelie} = \mu_{Chinstrap} = \mu_{Gentoo}\)&lt;/span&gt; (&lt;span class=&#34;math inline&#34;&gt;\(\Rightarrow\)&lt;/span&gt; the 3 species are equal in terms of flipper length)&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt;: &lt;em&gt;at least&lt;/em&gt; one mean is different (&lt;span class=&#34;math inline&#34;&gt;\(\Rightarrow\)&lt;/span&gt; at least one species is different from the other 2 species in terms of flipper length)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Be careful that the alternative hypothesis is &lt;strong&gt;&lt;em&gt;not&lt;/em&gt;&lt;/strong&gt; that all means are different. The opposite of all means being equal (&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;) is that &lt;em&gt;at least&lt;/em&gt; one mean is different from the others (&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt;). In this sense, if the null hypothesis is rejected, it means that at least one species is different from the other 2, but not necessarily that all 3 species are different from each other. It could be that flipper length for the species Adelie is different than for the species Chinstrap and Gentoo, but flipper length is similar between Chinstrap and Gentoo. Other types of test (known as post-hoc tests and covered in this &lt;a href=&#34;/blog/anova-in-r/#post-hoc-test&#34;&gt;section&lt;/a&gt;) must be performed to test whether all 3 species differ.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;underlying-assumptions-of-anova&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Underlying assumptions of ANOVA&lt;/h1&gt;
+&lt;p&gt;As for many &lt;a href=&#34;/tags/inferential-statistics/&#34;&gt;statistical tests&lt;/a&gt;, there are some assumptions that need to be met in order to be able to interpret the results. When one or several assumptions are not met, although it is technically possible to perform these tests, it would be incorrect to interpret the results and trust the conclusions.&lt;/p&gt;
+&lt;p&gt;Below are the assumptions of the ANOVA, how to test them and which other tests exist if an assumption is not met:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Variable type&lt;/strong&gt;: ANOVA requires a mix of one &lt;a href=&#34;/blog/variable-types-and-examples/#quantitative&#34;&gt;quantitative&lt;/a&gt; dependent variable (which corresponds to the measurements to which the question relates) and one &lt;a href=&#34;/blog/variable-types-and-examples/#qualitative&#34;&gt;qualitative&lt;/a&gt; independent variable (with at least 2 levels which will determine the groups to compare).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Independence&lt;/strong&gt;: the data, collected from a representative and randomly selected portion of the total population, should be independent. The assumption of independence is most often verified based on the design of the experiment and on the good control of experimental conditions rather than via a formal test. If you are still unsure about independence based on the experiment design, ask yourself if one observation is related to another (if one observation has an impact on another) within each group or between the groups themselves. If not, it is most likely that you have independent samples. If observations between samples (forming the different groups to be compared) are dependent (for example, if three measurements have been collected on the &lt;strong&gt;same individuals&lt;/strong&gt; as it is often the case in medical studies when measuring a metric (i) before, (ii) during and (iii) after a treatment), the repeated measures ANOVA should be preferred in order to take into account the dependency between the samples.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Normality&lt;/strong&gt;: Residuals&lt;a href=&#34;#fn2&#34; class=&#34;footnote-ref&#34; id=&#34;fnref2&#34;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt; should follow approximately a &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/&#34;&gt;&lt;strong&gt;normal distribution&lt;/strong&gt;&lt;/a&gt;. The normality assumption can be tested visually thanks to a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#histogram&#34;&gt;histogram&lt;/a&gt; and a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#qq-plot&#34;&gt;QQ-plot&lt;/a&gt;, and/or formally via a &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test&#34;&gt;normality test&lt;/a&gt; such as the Shapiro-Wilk or Kolmogorov-Smirnov test. If, even after a transformation of your data (e.g., logarithmic transformation, square root, Box-Cox, etc.), the residuals still do not follow approximately a normal distribution, the Kruskal-Wallis test can be applied (&lt;code&gt;kruskal.test(variable ~ group, data = dat&lt;/code&gt; in R). This non-parametric test, robust to non normal distributions, has the same null and alternative hypotheses, and the same interpretations than the ANOVA.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Equality of variances&lt;/strong&gt;: the variances of the different groups should be equal in the populations (an assumption called homogeneity of the variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity if variances are different across groups). This assumption can be tested graphically (by comparing the dispersion in a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#boxplot&#34;&gt;boxplot&lt;/a&gt; or &lt;a href=&#34;/blog/descriptive-statistics-in-r/#dotplot&#34;&gt;dotplot&lt;/a&gt; for instance), or more formally via the Levene’s test (&lt;code&gt;leveneTest(variable ~ group)&lt;/code&gt; from the &lt;code&gt;{car}&lt;/code&gt; package) or Bartlett’s test, among others. If the hypothesis of equal variances is rejected, another version of the ANOVA can be used: the Welch test (&lt;code&gt;oneway.test(variable ~ group, var.equal = FALSE)&lt;/code&gt;). Note that the Welch test does not require homogeneity of the variances, but the distributions should still follow approximately a normal distribution. Note that the Kruskal-Wallis test does not require the assumptions of normality nor homoscedasticity of the variances.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Choosing the appropriate test depending on whether assumptions are met may be confusing so here is a brief summary:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Check that your observations are independent.&lt;/li&gt;
+&lt;li&gt;If they are independent, test the normality of residuals:
+&lt;ul&gt;
+&lt;li&gt;If normality is assumed, test the homogeneity of the variances:
+&lt;ul&gt;
+&lt;li&gt;If variances are equal, use &lt;strong&gt;ANOVA&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;If variances are not equal, use the &lt;strong&gt;Welch test&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;If normality is not assumed, use the &lt;strong&gt;Kruskal-Wallis test&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Now that we have seen the underlying assumptions of the ANOVA, we review them specifically for our dataset before applying the appropriate version of the test.&lt;/p&gt;
+&lt;div id=&#34;variable-type&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Variable type&lt;/h2&gt;
+&lt;p&gt;The dependent variable &lt;code&gt;flipper_length_mm&lt;/code&gt; is a &lt;a href=&#34;/blog/variable-types-and-examples/#quantitative&#34;&gt;quantitative&lt;/a&gt; variable and the independent variable &lt;code&gt;species&lt;/code&gt; is a &lt;a href=&#34;/blog/variable-types-and-examples/#qualitative&#34;&gt;qualitative&lt;/a&gt; one (with 3 levels corresponding to the 3 species). So we have a mix of the two types of variable and this assumption is met.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;independence&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Independence&lt;/h2&gt;
+&lt;p&gt;Independence of the observations is assumed as data have been collected from a randomly selected portion of the population and measurements within and between the 3 samples are not related.&lt;/p&gt;
+&lt;p&gt;The independence assumption is most often verified based on the design of the experiment and on the good control of experimental conditions, as it is the case here. If you really want to test it more formally, you can, however, test it via a statistical test—the Durbin-Watson test (in R: &lt;code&gt;durbinWatsonTest(res_lm)&lt;/code&gt; where &lt;code&gt;res_lm&lt;/code&gt; is a linear model). The null hypothesis of this test specifies an autocorrelation coefficient = 0, while the alternative hypothesis specifies an autocorrelation coefficient &lt;span class=&#34;math inline&#34;&gt;\(\ne\)&lt;/span&gt; 0.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;normality&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Normality&lt;/h2&gt;
+&lt;p&gt;Remember that &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/&#34;&gt;normality&lt;/a&gt; of residuals can be tested visually via a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#histogram&#34;&gt;histogram&lt;/a&gt; and a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#qq-plot&#34;&gt;QQ-plot&lt;/a&gt;, and/or formally via a &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test&#34;&gt;normality test&lt;/a&gt; (Shapiro-Wilk test for instance).&lt;/p&gt;
+&lt;p&gt;Before checking the normality assumption, we first need to compute the ANOVA (more on that in this &lt;a href=&#34;/blog/anova-in-r/#anova-in-r&#34;&gt;section&lt;/a&gt;). We then save the results in &lt;code&gt;res_aov&lt;/code&gt; :&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;res_aov &amp;lt;- aov(flipper_length_mm ~ species,
+  data = dat
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can now check normality visually:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;par(mfrow = c(1, 2)) # combine plots
+
+# histogram
+hist(res_aov$residuals)
+
+# QQ-plot
+library(car)
+qqPlot(res_aov$residuals,
+  id = FALSE # id = FALSE to remove point identification
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;From the histogram and QQ-plot above, we can already see that the normality assumption seems to be met. Indeed, the histogram roughly form a bell curve, indicating that the residuals follow a normal distribution. Furthermore, points in the QQ-plots roughly follow the straight line and most of them are within the confidence bands, also indicating that residuals follow approximately a normal distribution.&lt;/p&gt;
+&lt;p&gt;Some researchers stop here and assume that normality is met, while others also test the assumption via a formal statistical test. It is your choice to test it (i) only visually, (ii) only via a normality test, or (iii) both visually AND via a normality test. Bear in mind, however, the two following points:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;ANOVA is quite robust to small deviations from normality. This means that it is not an issue (from the perspective of the interpretation of the ANOVA results) if a small number of points deviates slightly from the normality,&lt;/li&gt;
+&lt;li&gt;normality tests are sometimes quite conservative, meaning that the null hypothesis of normality may be rejected due to a limited deviation from normality. This is especially the case with large samples as power of the test increases with the sample size.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In practice, I tend to prefer the (i) visual approach only, but again, this is a matter of personal choice and also depends on the context of the analysis.&lt;/p&gt;
+&lt;p&gt;Still for the sake of illustration, we also now test the normality assumption via a normality test. You can use the Shapiro-Wilk test or the Kolmogorov-Smirnov test, among others. Remember that the null and alternative hypothesis are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;: data come from a normal distribution&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt;: data do &lt;strong&gt;&lt;em&gt;not&lt;/em&gt;&lt;/strong&gt; come from a normal distribution&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In R, we can test normality of the residuals with the Shapiro-Wilk test thanks to the &lt;code&gt;shapiro.test()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;shapiro.test(res_aov$residuals)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Shapiro-Wilk normality test
+## 
+## data:  res_aov$residuals
+## W = 0.99452, p-value = 0.2609&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;P&lt;/em&gt;-value of the Shapiro-Wilk test on the residuals is larger than the usual significance level of &lt;span class=&#34;math inline&#34;&gt;\(\alpha = 5\%\)&lt;/span&gt;, so we do not reject the hypothesis that residuals follow a normal distribution (&lt;em&gt;p&lt;/em&gt;-value = 0.261).&lt;/p&gt;
+&lt;p&gt;This result is in line with the visual approach. In our case, the normality assumption is thus met both visually and formally.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Side note: Remind that the p-value is the &lt;a href=&#34;/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/&#34;&gt;probability&lt;/a&gt; of having observations as extreme as the ones we have observed in the sample(s) given that the null hypothesis is true. If the p-value &lt;span class=&#34;math inline&#34;&gt;\(&amp;lt; \alpha\)&lt;/span&gt; (indicating that it is not likely to observe the data we have in the sample given that the null hypothesis is true), the null hypothesis is rejected, otherwise the null hypothesis is not rejected. See more about &lt;a href=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha&#34;&gt;p-value and significance level&lt;/a&gt; if you are unfamiliar with those important statistical concepts.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Remember that if the normality assumption was not reached, some transformation(s) would need to be applied on the raw data in the hope that residuals would better fit a normal distribution, or you would need to use the non-parametric version of the ANOVA—the Kruskal-Wallis test.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;equality-of-variances---homogeneity&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Equality of variances - homogeneity&lt;/h2&gt;
+&lt;p&gt;Assuming residuals follow a normal distribution, it is now time to check whether the variances are equal across species or not. The result will have an impact on whether we use the ANOVA or the Welch test.&lt;/p&gt;
+&lt;p&gt;This can again be verified visually—via a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#boxplot&#34;&gt;boxplot&lt;/a&gt; or &lt;a href=&#34;/blog/descriptive-statistics-in-r/#dotplot&#34;&gt;dotplot&lt;/a&gt;—or more formally via a statistical test (Levene’s test, among others).&lt;/p&gt;
+&lt;p&gt;Visually, we have:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Boxplot
+boxplot(flipper_length_mm ~ species,
+  data = dat
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Dotplot
+library(&amp;quot;lattice&amp;quot;)
+
+dotplot(flipper_length_mm ~ species,
+  data = dat
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-8-2.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Both the boxplot and the dotplot show a similar variance for the different species. In the boxplot, this can be seen by the fact that the boxes and the whiskers have a comparable size for all species. There are a couple of &lt;a href=&#34;/blog/outliers-detection-in-r/&#34;&gt;outliers&lt;/a&gt; as shown by the points outside the whiskers, but this does not change the fact that the &lt;a href=&#34;/blog/descriptive-statistics-by-hand/#dispersion&#34;&gt;dispersion&lt;/a&gt; is more or less the same between the different species.&lt;/p&gt;
+&lt;p&gt;In the dotplot, this can be seen by the fact that points for all 3 species have more or less the same &lt;a href=&#34;/blog/descriptive-statistics-in-r/#range&#34;&gt;range&lt;/a&gt;, a sign of the dispersion and thus the &lt;a href=&#34;/blog/descriptive-statistics-by-hand/#variance&#34;&gt;variance&lt;/a&gt; being similar.&lt;/p&gt;
+&lt;p&gt;Like the normality assumption, if you feel that the visual approach is not sufficient, you can formally test for equality of the variances with a Levene’s or Bartlett’s test. Notice that the Levene’s test is less sensitive to departures from normal distribution than the Bartlett’s test.&lt;/p&gt;
+&lt;p&gt;The null and alternative hypothesis for both tests are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_0\)&lt;/span&gt;: variances are equal&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(H_1\)&lt;/span&gt;: at least one variance is different&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In R, the Levene’s test can be performed thanks to the &lt;code&gt;leveneTest()&lt;/code&gt; function from the &lt;code&gt;{car}&lt;/code&gt; package:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Levene&amp;#39;s test
+library(car)
+
+leveneTest(flipper_length_mm ~ species,
+  data = dat
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Levene&amp;#39;s Test for Homogeneity of Variance (center = median)
+##        Df F value Pr(&amp;gt;F)
+## group   2  0.3306 0.7188
+##       339&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-value being larger than the significance level of 0.05, we do not reject the null hypothesis, so we cannot reject the hypothesis that variances are equal between species (&lt;em&gt;p&lt;/em&gt;-value = 0.719).&lt;/p&gt;
+&lt;p&gt;This result is also in line with the visual approach, so the homogeneity of variances is met both visually and formally.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;another-method-to-test-normality-and-homogeneity&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Another method to test normality and homogeneity&lt;/h2&gt;
+&lt;p&gt;For your information, it is also possible to test the homogeneity of the variances and the normality of the residuals visually (and both at the same time) via the &lt;code&gt;plot()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;par(mfrow = c(1, 2)) # combine plots
+
+# 1. Homogeneity of variances
+plot(res_aov, which = 1)
+
+# 2. Normality
+plot(res_aov, which = 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Plot on the left hand side shows that there is no evident relationships between residuals and fitted values (the mean of each group), so homogeneity of variances is assumed. If homogeneity of variances was violated, the red line would not be flat.&lt;/p&gt;
+&lt;p&gt;Plot on the right hand side shows that residuals follow approximately a normal distribution, so normality is assumed. If normality was violated, points would consistently deviate from the dotted line.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;anova&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;ANOVA&lt;/h1&gt;
+&lt;p&gt;We showed that all assumptions of the ANOVA are met. We can thus proceed to the implementation of the ANOVA in R, but first, let’s do some preliminary analyses to better understand the research question.&lt;/p&gt;
+&lt;div id=&#34;preliminary-analyses&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Preliminary analyses&lt;/h2&gt;
+&lt;p&gt;A good practice before actually performing the ANOVA in R is to &lt;strong&gt;visualize the data&lt;/strong&gt; in relation to the research question. The best way to do so is to draw and compare boxplots of the quantitative variable &lt;code&gt;flipper_length_mm&lt;/code&gt; for each species.&lt;/p&gt;
+&lt;p&gt;This can be done with the &lt;code&gt;boxplot()&lt;/code&gt; function in base R (same code than the visual check of equal variances):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;boxplot(flipper_length_mm ~ species,
+  data = dat
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Or with the &lt;a href=&#34;/blog/graphics-in-r-with-ggplot2/&#34;&gt;&lt;code&gt;{ggplot2}&lt;/code&gt; package&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+
+ggplot(dat) +
+  aes(x = species, y = flipper_length_mm) +
+  geom_boxplot()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The boxplots above show that, at least for our sample, penguins of the species &lt;code&gt;Gentoo&lt;/code&gt; seem to have the biggest flipper, and &lt;code&gt;Adelie&lt;/code&gt; species the smallest flipper.&lt;/p&gt;
+&lt;p&gt;Besides a boxplot for each species, it is also a good practice to compute some &lt;a href=&#34;/blog/descriptive-statistics-in-r/&#34;&gt;&lt;strong&gt;descriptive statistics&lt;/strong&gt;&lt;/a&gt; such as the &lt;a href=&#34;/blog/descriptive-statistics-in-r/#mean&#34;&gt;mean&lt;/a&gt; and &lt;a href=&#34;/blog/descriptive-statistics-in-r/#standard-deviation-and-variance&#34;&gt;standard deviation&lt;/a&gt; by species. This can be done, for instance, with the &lt;code&gt;aggregate()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;aggregate(flipper_length_mm ~ species,
+  data = dat,
+  function(x) round(c(mean = mean(x), sd = sd(x)), 2)
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##     species flipper_length_mm.mean flipper_length_mm.sd
+## 1    Adelie                 189.95                 6.54
+## 2 Chinstrap                 195.82                 7.13
+## 3    Gentoo                 217.19                 6.48&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;or with the &lt;code&gt;summarise()&lt;/code&gt; and &lt;code&gt;group_by()&lt;/code&gt; functions from the &lt;code&gt;{dplyr}&lt;/code&gt; package:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(dplyr)
+
+group_by(dat, species) %&amp;gt;%
+  summarise(
+    mean = mean(flipper_length_mm, na.rm = TRUE),
+    sd = sd(flipper_length_mm, na.rm = TRUE)
+  )&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 3 x 3
+##   species    mean    sd
+##   &amp;lt;fct&amp;gt;     &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
+## 1 Adelie     190.  6.54
+## 2 Chinstrap  196.  7.13
+## 3 Gentoo     217.  6.48&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Mean is also the lowest for &lt;code&gt;Adelie&lt;/code&gt; and highest for &lt;code&gt;Gentoo&lt;/code&gt;. Boxplots and descriptive statistics are, however, not enough to conclude that flippers are significantly different in the 3 populations of penguins.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;anova-in-r&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;ANOVA in R&lt;/h2&gt;
+&lt;p&gt;As you guessed by now, only the ANOVA can help us to make inference about the population given the sample at hand, and help us to answer the initial research question “Are flippers length different for the 3 species of penguins?”.&lt;/p&gt;
+&lt;p&gt;ANOVA in R can be done in several ways, of which two are presented below:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;With the &lt;code&gt;oneway.test()&lt;/code&gt; function:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# 1st method:
+oneway.test(flipper_length_mm ~ species,
+  data = dat,
+  var.equal = TRUE # assuming equal variances
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  One-way analysis of means
+## 
+## data:  flipper_length_mm and species
+## F = 594.8, num df = 2, denom df = 339, p-value &amp;lt; 2.2e-16&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34; style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;With the &lt;code&gt;summary()&lt;/code&gt; and &lt;code&gt;aov()&lt;/code&gt; functions:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# 2nd method:
+res_aov &amp;lt;- aov(flipper_length_mm ~ species,
+  data = dat
+)
+
+summary(res_aov)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##              Df Sum Sq Mean Sq F value Pr(&amp;gt;F)    
+## species       2  52473   26237   594.8 &amp;lt;2e-16 ***
+## Residuals   339  14953      44                   
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 2 observations deleted due to missingness&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As you can see from the two outputs above, the test statistic (&lt;code&gt;F =&lt;/code&gt; in the first method and &lt;code&gt;F value&lt;/code&gt; in the second one) and the &lt;em&gt;p&lt;/em&gt;-value (&lt;code&gt;p-value&lt;/code&gt; in the first method and &lt;code&gt;Pr(&amp;gt;F)&lt;/code&gt; in the second one) are exactly the same for both methods, which means that in case of equal variances, results and conclusions will be unchanged.&lt;/p&gt;
+&lt;p&gt;The advantage of the first method is that it is easy to switch from the ANOVA (used when variances are equal) to the Welch test (used when variances are &lt;strong&gt;un&lt;/strong&gt;equal). This can be done by replacing &lt;code&gt;var.equal = TRUE&lt;/code&gt; by &lt;code&gt;var.equal = FALSE&lt;/code&gt;, as presented below:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;oneway.test(flipper_length_mm ~ species,
+  data = dat,
+  var.equal = FALSE # assuming unequal variances
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  One-way analysis of means (not assuming equal variances)
+## 
+## data:  flipper_length_mm and species
+## F = 614.01, num df = 2.00, denom df = 172.76, p-value &amp;lt; 2.2e-16&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The advantage of the second method, however, is that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the full ANOVA table (with degrees of freedom, mean squares, etc.) is printed, which may be of interest in some (theoritical) cases&lt;/li&gt;
+&lt;li&gt;results of the ANOVA (&lt;code&gt;res_aov&lt;/code&gt;) can be saved for later use (especially useful for &lt;a href=&#34;/blog/anova-in-r/#post-hoc-test&#34;&gt;post-hoc tests&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;interpretations-of-anova-results&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Interpretations of ANOVA results&lt;/h2&gt;
+&lt;p&gt;Given that the &lt;em&gt;p&lt;/em&gt;-value is smaller than 0.05, we reject the null hypothesis, so we reject the hypothesis that all means are equal. Therefore, we can conclude that &lt;strong&gt;at least one species is different than the others in terms of flippers length&lt;/strong&gt; (&lt;em&gt;p&lt;/em&gt;-value &amp;lt; 2.2e-16).&lt;/p&gt;
+&lt;p&gt;(&lt;em&gt;For the sake of illustration&lt;/em&gt;, if the &lt;em&gt;p&lt;/em&gt;-value was larger than 0.05: we cannot reject the null hypothesis that all means are equal, so we cannot reject the hypothesis that the 3 considered species of penguins are equal in terms of flippers length.)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;whats-next&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;What’s next?&lt;/h2&gt;
+&lt;p&gt;If the &lt;strong&gt;null hypothesis is not rejected&lt;/strong&gt; (&lt;em&gt;p&lt;/em&gt;-value &lt;span class=&#34;math inline&#34;&gt;\(\ge\)&lt;/span&gt; 0.05), it means that we do not reject the hypothesis that all groups are equal. The ANOVA more or less stops here. Other types of analyses can be performed of course, but—given the data at hand—we could not prove that at least one group was different so we usually do not go further with the ANOVA.&lt;/p&gt;
+&lt;p&gt;On the contrary, if &lt;em&gt;and only if&lt;/em&gt; the &lt;strong&gt;null hypothesis is rejected&lt;/strong&gt; (as it is our case since the &lt;em&gt;p&lt;/em&gt;-value &amp;lt; 0.05), we proved that at least one group is different. We can decide to stop here if we are only interested to test whether all species are equal in terms of flippers length.&lt;/p&gt;
+&lt;p&gt;But most of the time, when we showed thanks to an ANOVA that at least one group is different, we are also interested in knowing &lt;strong&gt;which&lt;/strong&gt; one(s) is(are) different. Results of an ANOVA, however, does &lt;strong&gt;&lt;em&gt;NOT&lt;/em&gt;&lt;/strong&gt; tell us which group(s) is(are) different from the others. To test this, we need to use other types of test, referred as post-hoc tests or multiple pairwise-comparison tests. This family of statistical tests is the topic of the following sections.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;post-hoc-test&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Post-hoc test&lt;/h1&gt;
+&lt;div id=&#34;issue-of-multiple-testing&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Issue of multiple testing&lt;/h2&gt;
+&lt;p&gt;In order to see which group(s) is(are) different from the others, we need to &lt;strong&gt;compare groups 2 by 2&lt;/strong&gt;. In practice, since there are 3 species, we are going to compare species 2 by 2 as follows:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Chinstrap versus Adelie&lt;/li&gt;
+&lt;li&gt;Gentoo vs. Adelie&lt;/li&gt;
+&lt;li&gt;Gentoo vs. Chinstrap&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In theory, we could compare species thanks to 3 &lt;a href=&#34;/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/&#34;&gt;Student’s t-tests&lt;/a&gt; since we need to compare 2 groups and a t-test is used precisely in that case.&lt;/p&gt;
+&lt;p&gt;However, if several t-tests are performed, the issue of &lt;strong&gt;multiple testing&lt;/strong&gt; (also referred as multiplicity) arises. In short, when several statistical tests are performed, some will have &lt;em&gt;p&lt;/em&gt;-values less than &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; purely by chance, even if all null hypotheses are in fact true.&lt;/p&gt;
+&lt;p&gt;To demonstrate the problem, consider our case where we have 3 hypotheses to test and a desired significance level of 0.05. The probability of observing at least one significant result (at least one &lt;em&gt;p&lt;/em&gt;-value &amp;lt; 0.05) just due to chance is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\begin{equation}
+\begin{split}
+P(\text{at least one significant result}) &amp;amp; = 1 - P(\text{no significant results}) \\
+ &amp;amp; = 1 - (1 - 0.05)^3 \\
+ &amp;amp; = 0.142625
+\end{split}
+\end{equation}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;So, with as few as 3 tests being considered, we already have a 14.26% chance of observing at least one significant result, even if all of the tests are actually not significant. And as the number of groups increases, the number of comparisons increases as well, so the probability of having a significant result simply due to chance keeps increasing.&lt;/p&gt;
+&lt;p&gt;Post-hoc tests take into account that multiple tests are done and deal with the problem by adjusting &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; in some way, so that the probability of observing at least one significant result due to chance remains below our desired significance level.&lt;a href=&#34;#fn3&#34; class=&#34;footnote-ref&#34; id=&#34;fnref3&#34;&gt;&lt;sup&gt;3&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;post-hoc-tests-in-r-and-their-interpretation&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Post-hoc tests in R and their interpretation&lt;/h2&gt;
+&lt;p&gt;Post-hoc tests are a family of statistical tests so there are several of them. The most often used are the &lt;strong&gt;Tukey HSD&lt;/strong&gt; and &lt;strong&gt;Dunnett’s&lt;/strong&gt; tests:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Tukey HSD is used to compare &lt;strong&gt;all groups&lt;/strong&gt; to each other (so all possible comparisons of 2 groups).&lt;/li&gt;
+&lt;li&gt;Dunnett is used to make comparisons with a &lt;strong&gt;reference group&lt;/strong&gt;. For example, consider 2 treatment groups and one control group. If you only want to compare the 2 treatment groups with respect to the control group, and you do not want to compare the 2 treatment groups to each other, the Dunnett’s test is preferred.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Both tests are presented in the next sections.&lt;/p&gt;
+&lt;div id=&#34;tukey-hsd-test&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Tukey HSD test&lt;/h3&gt;
+&lt;p&gt;In our case, since there is no “reference” species and we are interested in comparing all species, we are going to use the Tukey HSD test.&lt;/p&gt;
+&lt;p&gt;In R, the Tukey HSD test is done as follows. This is where the &lt;a href=&#34;/blog/anova-in-r/#anova-in-r&#34;&gt;second method&lt;/a&gt; to perform the ANOVA comes handy because the results (&lt;code&gt;res_aov&lt;/code&gt;) are reused for the post-hoc test:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(multcomp)
+
+# Tukey HSD test:
+post_test &amp;lt;- glht(res_aov,
+  linfct = mcp(species = &amp;quot;Tukey&amp;quot;)
+)
+
+summary(post_test)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##   Simultaneous Tests for General Linear Hypotheses
+## 
+## Multiple Comparisons of Means: Tukey Contrasts
+## 
+## 
+## Fit: aov(formula = flipper_length_mm ~ species, data = dat)
+## 
+## Linear Hypotheses:
+##                         Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052   &amp;lt;1e-08 ***
+## Gentoo - Adelie == 0     27.2333     0.8067  33.760   &amp;lt;1e-08 ***
+## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286   &amp;lt;1e-08 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## (Adjusted p values reported -- single-step method)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the output of the Tukey HSD test, we are interested in the table displayed after &lt;code&gt;Linear Hypotheses:&lt;/code&gt;, and more precisely, in the first and last column of the table. The first column shows the comparisons which have been made; the last column (&lt;code&gt;Pr(&amp;gt;|t|)&lt;/code&gt;) shows the adjusted&lt;a href=&#34;#fn4&#34; class=&#34;footnote-ref&#34; id=&#34;fnref4&#34;&gt;&lt;sup&gt;4&lt;/sup&gt;&lt;/a&gt; &lt;em&gt;p&lt;/em&gt;-values for each comparison (with the null hypothesis being the two groups are equal and the alternative hypothesis being the two groups are different).&lt;/p&gt;
+&lt;p&gt;It is these ajdusted &lt;em&gt;p&lt;/em&gt;-values that are used to test whether two groups are significantly different or not. In our example, we tested:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Chinstrap versus Adelie (line &lt;code&gt;Chinstrap - Adelie == 0&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Gentoo vs. Adelie (line &lt;code&gt;Gentoo - Adelie == 0&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Gentoo vs. Chinstrap (line &lt;code&gt;Gentoo - Chinstrap == 0&lt;/code&gt;)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;All three &lt;em&gt;p&lt;/em&gt;-values are smaller than 0.05, so we reject the null hypothesis for all comparisons, which means that &lt;strong&gt;all species are significantly different&lt;/strong&gt; in terms of flippers length.&lt;/p&gt;
+&lt;p&gt;Note that the Tukey HSD test can also be done in R with the &lt;code&gt;TukeyHSD()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;TukeyHSD(res_aov)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   Tukey multiple comparisons of means
+##     95% family-wise confidence level
+## 
+## Fit: aov(formula = flipper_length_mm ~ species, data = dat)
+## 
+## $species
+##                       diff       lwr       upr p adj
+## Chinstrap-Adelie  5.869887  3.586583  8.153191     0
+## Gentoo-Adelie    27.233349 25.334376 29.132323     0
+## Gentoo-Chinstrap 21.363462 19.000841 23.726084     0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;With this code, it is the column &lt;code&gt;p adj&lt;/code&gt; (also the last column) which is of interest. Notice that the conclusions are the same than above: all species are signficantly different in terms of flippers length.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dunnetts-test&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Dunnett’s test&lt;/h3&gt;
+&lt;p&gt;Now, again for the sake of illustration, consider that the species &lt;code&gt;Adelie&lt;/code&gt; is the reference species and we are only interested in comparing the reference species against the other 2 species. In that scenario, we would use the Dunnett’s test.&lt;/p&gt;
+&lt;p&gt;In R, the Dunnett’s test is done as follows (the only difference with the code for the Tukey HSD test is in the line &lt;code&gt;linfct = mcp(species = &#34;Dunnett&#34;)&lt;/code&gt;):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(multcomp)
+
+# Dunnett&amp;#39;s test:
+post_test &amp;lt;- glht(res_aov,
+  linfct = mcp(species = &amp;quot;Dunnett&amp;quot;)
+)
+
+summary(post_test)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##   Simultaneous Tests for General Linear Hypotheses
+## 
+## Multiple Comparisons of Means: Dunnett Contrasts
+## 
+## 
+## Fit: aov(formula = flipper_length_mm ~ species, data = dat)
+## 
+## Linear Hypotheses:
+##                         Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 7.59e-09 ***
+## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &amp;lt; 1e-10 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## (Adjusted p values reported -- single-step method)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The interpretation is the same as for the Tukey HSD test’s except that in the Dunett’s test we only compare:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Chinstrap versus Adelie (line &lt;code&gt;Chinstrap - Adelie == 0&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Gentoo vs. Adelie (line &lt;code&gt;Gentoo - Adelie == 0&lt;/code&gt;)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Both &lt;em&gt;p&lt;/em&gt;-values (displayed in the last column) are below 0.05, so we reject the null hypothesis for both comparisons. This means that both the &lt;strong&gt;species Chinstrap and Gentoo are significantly different from the reference species Adelie&lt;/strong&gt; in terms of flippers length. (Nothing can be said about the comparison between Chinstrap and Gentoo though.)&lt;/p&gt;
+&lt;p&gt;Note that in R, by default, the reference category for a &lt;a href=&#34;/blog/data-types-in-r/#factor&#34;&gt;factor variable&lt;/a&gt; is the first category in alphabetical order. This is the reason that, by default, the reference species is Adelie.&lt;/p&gt;
+&lt;p&gt;The reference category can be changed with the &lt;code&gt;relevel()&lt;/code&gt; function (or with the &lt;a href=&#34;/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#reordering-factors&#34;&gt;&lt;code&gt;{questionr}&lt;/code&gt; addin&lt;/a&gt;). Considering that we want Gentoo as the reference category instead of Adelie:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Change reference category:
+dat$species &amp;lt;- relevel(dat$species, ref = &amp;quot;Gentoo&amp;quot;)
+
+# Check that Gentoo is the reference category:
+levels(dat$species)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;Gentoo&amp;quot;    &amp;quot;Adelie&amp;quot;    &amp;quot;Chinstrap&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Gentoo now being the first category of the three, it is indeed considered as the reference level.&lt;/p&gt;
+&lt;p&gt;In order to perform the Dunnett’s test with the new reference we first need to rerun the ANOVA to take into account the new reference:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;res_aov2 &amp;lt;- aov(flipper_length_mm ~ species,
+  data = dat
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can then run the Dunett’s test with the new results of the ANOVA:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Dunnett&amp;#39;s test:
+post_test &amp;lt;- glht(res_aov2,
+  linfct = mcp(species = &amp;quot;Dunnett&amp;quot;)
+)
+
+summary(post_test)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##   Simultaneous Tests for General Linear Hypotheses
+## 
+## Multiple Comparisons of Means: Dunnett Contrasts
+## 
+## 
+## Fit: aov(formula = flipper_length_mm ~ species, data = dat)
+## 
+## Linear Hypotheses:
+##                         Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## Adelie - Gentoo == 0    -27.2333     0.8067  -33.76   &amp;lt;1e-10 ***
+## Chinstrap - Gentoo == 0 -21.3635     1.0036  -21.29   &amp;lt;1e-10 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## (Adjusted p values reported -- single-step method)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From the results above we conclude that Adelie and Chinstrap species are significantly different from Gentoo species in terms of flippers length (&lt;em&gt;p&lt;/em&gt;-values &amp;lt; 1e-10).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;visualization-of-anova-and-post-hoc-tests&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Visualization of ANOVA and post-hoc tests&lt;/h1&gt;
+&lt;p&gt;If you are interested in including results of ANOVA and post-hoc tests directly in the boxplots, here is a piece of code which may be of interest to you (edited by myself based on the code found in this &lt;a href=&#34;http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/&#34; target=&#34;_blank&#34;&gt;article&lt;/a&gt;):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Edit from here
+x &amp;lt;- which(names(dat) == &amp;quot;species&amp;quot;) # name of grouping variable
+y &amp;lt;- which(
+  names(dat) == &amp;quot;flipper_length_mm&amp;quot; # names of variables to test
+)
+method1 &amp;lt;- &amp;quot;anova&amp;quot; # one of &amp;quot;anova&amp;quot; or &amp;quot;kruskal.test&amp;quot;
+method2 &amp;lt;- &amp;quot;t.test&amp;quot; # one of &amp;quot;wilcox.test&amp;quot; or &amp;quot;t.test&amp;quot;
+my_comparisons &amp;lt;- list(c(&amp;quot;Chinstrap&amp;quot;, &amp;quot;Adelie&amp;quot;), c(&amp;quot;Gentoo&amp;quot;, &amp;quot;Adelie&amp;quot;), c(&amp;quot;Gentoo&amp;quot;, &amp;quot;Chinstrap&amp;quot;)) # comparisons for post-hoc tests
+# Edit until here
+
+
+# Edit at your own risk
+library(ggpubr)
+for (i in y) {
+  for (j in x) {
+    p &amp;lt;- ggboxplot(dat,
+      x = colnames(dat[j]), y = colnames(dat[i]),
+      color = colnames(dat[j]),
+      legend = &amp;quot;none&amp;quot;,
+      palette = &amp;quot;npg&amp;quot;,
+      add = &amp;quot;jitter&amp;quot;
+    )
+    print(
+      p + stat_compare_means(aes(label = paste0(..method.., &amp;quot;, p-value = &amp;quot;, ..p.format..)),
+        method = method1, label.y = max(dat[, i], na.rm = TRUE)
+      )
+      + stat_compare_means(comparisons = my_comparisons, method = method2, label = &amp;quot;p.format&amp;quot;) # remove if p-value of ANOVA or Kruskal-Wallis test &amp;gt;= alpha
+    )
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;As you can see on the above plot, boxplots by species are presented together with &lt;em&gt;p&lt;/em&gt;-values of the ANOVA and post-hoc tests.&lt;/p&gt;
+&lt;p&gt;Besides the fact that it combines a visual representation and results on the same plot, this code also has the advantage that you can perform multiple ANOVA tests at once. See more information in this &lt;a href=&#34;/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/&#34;&gt;article&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Thanks for reading. I hope this article helped you to understand the goal of an ANOVA, how to do it in R and how to interpret its results.&lt;/p&gt;
+&lt;p&gt;As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Note that it is called &lt;em&gt;one-way&lt;/em&gt; or &lt;em&gt;one-factor&lt;/em&gt; ANOVA because the means relate to the different modalities of a single independent variable, or factor.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn2&#34;&gt;&lt;p&gt;Residuals (denoted &lt;span class=&#34;math inline&#34;&gt;\(\epsilon\)&lt;/span&gt;) are the differences between the observed values of the dependent variable (&lt;span class=&#34;math inline&#34;&gt;\(y\)&lt;/span&gt;) and the predicted values (&lt;span class=&#34;math inline&#34;&gt;\(\hat{y}\)&lt;/span&gt;). In the context of ANOVA, residuals correspond to the differences between the observed values and the mean of all values for that group.&lt;a href=&#34;#fnref2&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;Note that you could in principle apply the Bonferroni correction to all tests. For example, in the example above, with 3 tests and a global desired significance level of &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; = 0.05, we would only reject a null hypothesis if the &lt;em&gt;p&lt;/em&gt;-value is less than &lt;span class=&#34;math inline&#34;&gt;\(\frac{0.05}{3}\)&lt;/span&gt; = 0.0167. This method is, however, known to be quite conservative, leading to a potentially high rate of false negatives.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn4&#34;&gt;&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-values are adjusted to keep the global significance level to the desired level.&lt;a href=&#34;#fnref4&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Graphics in R with ggplot2</title>
@@ -3670,7 +4214,7 @@ for (i in y) {
 &lt;li&gt;When comparing more than two groups, it is only possible to apply an ANOVA or Kruskal-Wallis test at the moment. A major improvement would be to add the possibility to perform a repeated measures ANOVA (i.e., an ANOVA when the samples are dependent). It is currently already possible to do a t-test with two paired samples, but it is not yet possible to do the same with more than two groups.&lt;/li&gt;
 &lt;li&gt;Another less important (yet still nice) feature when comparing more than 2 groups would be to automatically apply post-hoc tests only in the case where the null hypothesis of the ANOVA or Kruskal-Wallis test is rejected (so when there is at least one group different from the others, because if the null hypothesis of equal groups is not rejected we do not apply a post-hoc test). At the present time, I manually add or remove the code that displays the &lt;em&gt;p&lt;/em&gt;-values of post-hoc tests depending on the global &lt;em&gt;p&lt;/em&gt;-value of the ANOVA or Kruskal-Wallis test.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;I will try to add these features in the future, or I would be glad to help if the author of the {ggpubr} package needs help in including these features (I hope he will see this article!).&lt;/p&gt;
+&lt;p&gt;I will try to add these features in the future, or I would be glad to help if the author of the &lt;code&gt;{ggpubr}&lt;/code&gt; package needs help in including these features (I hope he will see this article!).&lt;/p&gt;
 &lt;p&gt;Last but not least, the following packages may be of interest to some readers:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;If you want to report statistical results on a graph, I advise you to check the &lt;a href=&#34;https://indrajeetpatil.github.io/ggstatsplot/&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;{ggstatsplot}&lt;/code&gt; package&lt;/a&gt; and in particular the &lt;a href=&#34;https://indrajeetpatil.github.io/ggstatsplot/articles/web_only/ggbetweenstats.html&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;ggbetweenstats()&lt;/code&gt;&lt;/a&gt; function. This function allows to compare a continuous variable across multiple groups or conditions. Note that many different statistical results are displayed on the graph, not only the name of the test and the &lt;em&gt;p&lt;/em&gt;-value. However, it is still very convenient to be able to include tests results on a graph in order to combine the advantages of a visualization and a sound statistical analysis.&lt;/p&gt;&lt;/li&gt;
@@ -6453,15 +6997,17 @@ test&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;assumptions&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Assumptions&lt;/h1&gt;
-&lt;p&gt;As for many statistical tests, there are some assumptions that need to be met in order to be able to interpret the results. When one or several of them are not met, although it is technically possible to perform these tests, it would be incorrect to interpret the results. Below are the assumptions of the Student’s t-test for two samples, how to test them and which other tests exist if an assumption is not met:&lt;/p&gt;
+&lt;p&gt;As for many statistical tests, there are some assumptions that need to be met in order to be able to interpret the results. When one or several of them are not met, although it is technically possible to perform these tests, it would be incorrect to interpret the results or trust the conclusions.&lt;/p&gt;
+&lt;p&gt;Below are the assumptions of the Student’s t-test for two samples, how to test them and which other tests exist if an assumption is not met:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;The data, collected from a representative and randomly selected portion of the total population, should be &lt;strong&gt;independent&lt;/strong&gt;. The assumption of independence is most often verified based on the design of the experiment rather than via a formal test. If you are still unsure about the independence based on the experiment design, ask yourself if one observation is related to another, or if one observation has an impact on another. If not, it is most likely that you have independent samples. If observations between the two samples are dependent (for example if two measurements have been collected on the &lt;strong&gt;same individual&lt;/strong&gt; as it is often the case in medical studies when measuring a value after and before a treatment), the paired version of the Student’s t-test, called the Student’s t-test for paired samples, should be preferred in order to take into account the dependency between the two groups to be compared.&lt;/li&gt;
-&lt;li&gt;Normality:
+&lt;li&gt;&lt;strong&gt;Variable type&lt;/strong&gt;: A Student’s t-test requires a mix of one &lt;a href=&#34;/blog/variable-types-and-examples/#quantitative&#34;&gt;quantitative&lt;/a&gt; dependent variable (which corresponds to the measurements to which the question relates) and one &lt;a href=&#34;/blog/variable-types-and-examples/#qualitative&#34;&gt;qualitative&lt;/a&gt; independent variable (with exactly 2 levels which will determine the groups to compare).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Independence&lt;/strong&gt;: The data, collected from a representative and randomly selected portion of the total population, should be independent. The assumption of independence is most often verified based on the design of the experiment and on the good control of experimental conditions rather than via a formal test. If you are still unsure about independence based on the experiment design, ask yourself if one observation is related to another (if one observation has an impact on another) within each group or between the groups themselves. If not, it is most likely that you have independent samples. If observations between samples (forming the different groups to be compared) are dependent (for example, if three measurements have been collected on the &lt;strong&gt;same individuals&lt;/strong&gt; as it is often the case in medical studies when measuring a metric (i) before, (ii) during and (iii) after a treatment), the paired version of the Student’s t-test, called the Student’s t-test for paired samples, should be preferred in order to take into account the dependency between the two groups to be compared.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Normality&lt;/strong&gt;:
 &lt;ul&gt;
 &lt;li&gt;With small samples (usually &lt;span class=&#34;math inline&#34;&gt;\(n &amp;lt; 30\)&lt;/span&gt;), when the two samples are independent, observations in &lt;strong&gt;both samples&lt;/strong&gt; should follow a &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/&#34;&gt;&lt;strong&gt;normal distribution&lt;/strong&gt;&lt;/a&gt;. When using the Student’s t-test for paired samples, it is the difference between the observations of the two samples that should follow a normal distribution. The normality assumption can be tested visually thanks to a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#histogram&#34;&gt;histogram&lt;/a&gt; and a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#qq-plot&#34;&gt;QQ-plot&lt;/a&gt;, and/or formally via a &lt;a href=&#34;/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test&#34;&gt;normality test&lt;/a&gt; such as the Shapiro-Wilk or Kolmogorov-Smirnov test. If, even after a transformation (e.g., logarithmic transformation, square root, etc.), your data still do not follow a normal distribution, the &lt;a href=&#34;/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/&#34;&gt;Wilcoxon test&lt;/a&gt; (&lt;code&gt;wilcox.test(variable1 ~ variable2, data = dat&lt;/code&gt; in R) can be applied. This test, robust to non normal distributions, compares the medians instead of the means in order to compare the two populations.&lt;/li&gt;
 &lt;li&gt;With large samples (&lt;span class=&#34;math inline&#34;&gt;\(n \ge 30\)&lt;/span&gt;), &lt;strong&gt;normality of the data is not required&lt;/strong&gt; (this is a common misconception!). By the &lt;a href=&#34;https://en.wikipedia.org/wiki/Central_limit_theorem&#34; target=&#34;_blank&#34;&gt;central limit theorem&lt;/a&gt;, sample means of large samples are often well-approximated by a normal distribution even if the data are not normally distributed. It is therefore not required to test the normality assumption when the number of observations in each group/sample is large.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;When the two samples are independent, the variances of the two groups should be equal in the populations (an assumption called &lt;strong&gt;homogeneity of the variances&lt;/strong&gt;, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity if variances are different across groups). This assumption can be tested graphically (by comparing the dispersion in a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#boxplot&#34;&gt;boxplot&lt;/a&gt; or &lt;a href=&#34;/blog/descriptive-statistics-in-r/#dotplot&#34;&gt;dotplot&lt;/a&gt; for instance), or more formally via the Levene’s test (&lt;code&gt;leveneTest(variable ~ group)&lt;/code&gt; from the &lt;code&gt;{car}&lt;/code&gt; package) or via a F test (&lt;code&gt;var.test(variable ~ group)&lt;/code&gt;). If the hypothesis of equal variances is rejected, another version of the Student’s t-test can be used: the Welch test (&lt;code&gt;t.test(variable ~ group, var.equal = FALSE)&lt;/code&gt;). Note that the Welch test does not require homogeneity of the variances, but the distributions should still follow a normal distribution in case of small sample sizes. If your distributions are not normally distributed or the variances are unequal, the &lt;a href=&#34;/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/&#34;&gt;Wilcoxon test&lt;/a&gt; should be used. This test does not require the assumptions of normality nor homoscedasticity of the variances.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Equality of variances&lt;/strong&gt;: When the two samples are independent, the variances of the two groups should be equal in the populations (an assumption called &lt;strong&gt;homogeneity of the variances&lt;/strong&gt;, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity if variances are different across groups). This assumption can be tested graphically (by comparing the dispersion in a &lt;a href=&#34;/blog/descriptive-statistics-in-r/#boxplot&#34;&gt;boxplot&lt;/a&gt; or &lt;a href=&#34;/blog/descriptive-statistics-in-r/#dotplot&#34;&gt;dotplot&lt;/a&gt; for instance), or more formally via the Levene’s test (&lt;code&gt;leveneTest(variable ~ group)&lt;/code&gt; from the &lt;code&gt;{car}&lt;/code&gt; package) or via a F test (&lt;code&gt;var.test(variable ~ group)&lt;/code&gt;). If the hypothesis of equal variances is rejected, another version of the Student’s t-test can be used: the Welch test (&lt;code&gt;t.test(variable ~ group, var.equal = FALSE)&lt;/code&gt;). Note that the Welch test does not require homogeneity of the variances, but the distributions should still follow a normal distribution in case of small sample sizes. If your distributions are not normally distributed or the variances are unequal, the &lt;a href=&#34;/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/&#34;&gt;Wilcoxon test&lt;/a&gt; should be used. This test does not require the assumptions of normality nor homoscedasticity of the variances.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;This concludes a relatively long article. Thanks for reading it. I hope this article helped you to understand how the different versions of the Student’s t-test for two samples work and how to perform them by hand and in R. If you are interested, here is a &lt;a href=&#34;/blog/a-shiny-app-for-inferential-statistics-by-hand/&#34;&gt;Shiny app&lt;/a&gt; to perform these tests by hand easily (you just need to enter your data and select the appropriate version of the test thanks to the sidebar menu).&lt;/p&gt;
 &lt;p&gt;Moreover, I invite you to read this &lt;a href=&#34;/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/&#34;&gt;article&lt;/a&gt; if you would like to know how to compute the Student’s t-test but this time, for one sample, or this &lt;a href=&#34;/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/&#34;&gt;article&lt;/a&gt; if you would like to compare 2 groups under the non-normality assumption.&lt;/p&gt;
