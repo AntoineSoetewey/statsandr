@@ -130,7 +130,7 @@
                         </span>
 
                         <span class="reading-time middot">
-                            27 minute read
+                            28 minute read
                         </span>
 
                         <div class="d-none d-md-inline tags">
@@ -500,7 +500,8 @@ summary(res_aov)</code></pre>
 <h2>What’s next?</h2>
 <p>If the <strong>null hypothesis is not rejected</strong> (<em>p</em>-value <span class="math inline">\(\ge\)</span> 0.05), it means that we do not reject the hypothesis that all groups are equal. The ANOVA more or less stops here. Other types of analyses can be performed of course, but—given the data at hand—we could not prove that at least one group was different so we usually do not go further with the ANOVA.</p>
 <p>On the contrary, if <em>and only if</em> the <strong>null hypothesis is rejected</strong> (as it is our case since the <em>p</em>-value &lt; 0.05), we proved that at least one group is different. We can decide to stop here if we are only interested to test whether all species are equal in terms of flippers length.</p>
-<p>But most of the time, when we showed thanks to an ANOVA that at least one group is different, we are also interested in knowing <strong>which</strong> one(s) is(are) different. Results of an ANOVA, however, does <strong><em>NOT</em></strong> tell us which group(s) is(are) different from the others. To test this, we need to use other types of test, referred as post-hoc tests or multiple pairwise-comparison tests. This family of statistical tests is the topic of the following sections.</p>
+<p>But most of the time, when we showed thanks to an ANOVA that at least one group is different, we are also interested in knowing <strong>which</strong> one(s) is(are) different. Results of an ANOVA, however, do <strong><em>NOT</em></strong> tell us which group(s) is(are) different from the others.</p>
+<p>To test this, we need to use other types of test, referred as post-hoc tests (in Latin, “after this”, so after obtaining statistically significant ANOVA results) or multiple pairwise-comparison tests. This family of statistical tests is the topic of the following sections.</p>
 </div>
 </div>
 <div id="post-hoc-test" class="section level1">
@@ -523,7 +524,8 @@ P(\text{at least 1 signif. result}) &amp; = 1 - P(\text{no signif. results}) \\
  &amp; = 0.142625
 \end{split}
 \end{equation}\]</span></p>
-<p>So, with as few as 3 tests being considered, we already have a 14.26% chance of observing at least one significant result, even if all of the tests are actually not significant. And as the number of groups increases, the number of comparisons increases as well, so the probability of having a significant result simply due to chance keeps increasing.</p>
+<p>So, with as few as 3 tests being considered, we already have a 14.26% chance of observing at least one significant result, even if all of the tests are actually not significant.</p>
+<p>And as the number of groups increases, the number of comparisons increases as well, so the probability of having a significant result simply due to chance keeps increasing. For example, with 10 groups we need to make 45 comparisons and the probability of having at least one significant result by chance becomes <span class="math inline">\(1 - (1 - 0.05)^{45} = 90\%\)</span>. So it is very likely to observe a significant result just by chance when comparing 10 groups, and when we have 14 groups or more we are almost certain (99%) to have a false positive!</p>
 <p>Post-hoc tests take into account that multiple tests are done and deal with the problem by adjusting <span class="math inline">\(\alpha\)</span> in some way, so that the probability of observing at least one significant result due to chance remains below our desired significance level.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 </div>
 <div id="post-hoc-tests-in-r-and-their-interpretation" class="section level2">
@@ -556,14 +558,15 @@ summary(post_test)</code></pre>
 ## 
 ## Linear Hypotheses:
 ##                         Estimate Std. Error t value Pr(&gt;|t|)    
-## Chinstrap - Adelie == 0   5.8699     0.9699   6.052   &lt;1e-08 ***
-## Gentoo - Adelie == 0     27.2333     0.8067  33.760   &lt;1e-08 ***
-## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286   &lt;1e-08 ***
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 6.44e-09 ***
+## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &lt; 1e-09 ***
+## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286  &lt; 1e-09 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</code></pre>
 <p>In the output of the Tukey HSD test, we are interested in the table displayed after <code>Linear Hypotheses:</code>, and more precisely, in the first and last column of the table. The first column shows the comparisons which have been made; the last column (<code>Pr(&gt;|t|)</code>) shows the adjusted<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> <em>p</em>-values for each comparison (with the null hypothesis being the two groups are equal and the alternative hypothesis being the two groups are different).</p>
-<p>It is these adjusted <em>p</em>-values that are used to test whether two groups are significantly different or not. In our example, we tested:</p>
+<p>It is these adjusted <em>p</em>-values that are used to test whether two groups are significantly different or not, and we can be confident that the entire set of comparisons collectively has an error rate of 0.05.</p>
+<p>In our example, we tested:</p>
 <ol style="list-style-type: decimal">
 <li>Chinstrap versus Adelie (line <code>Chinstrap - Adelie == 0</code>)</li>
 <li>Gentoo vs. Adelie (line <code>Gentoo - Adelie == 0</code>)</li>
@@ -586,6 +589,9 @@ summary(post_test)</code></pre>
 </div>
 <div id="dunnetts-test" class="section level3">
 <h3>Dunnett’s test</h3>
+<p>We have seen that as the number of groups increases, the number of comparisons also increases. And as the number of comparisons increases, the post-hoc analysis must lower the individual significance level even further, which leads to lower statistical power (so a difference between group means is less likely to be detected).</p>
+<p>One method to mitigate this and increase the statistical power is by reducing the number of comparisons. This reduction allows the post-hoc procedure to use a larger individual error rate to achieve the desired global error rate. While comparing all possible groups is the most common approach, many studies have a control group and several treatment groups. For these studies, you may need to compare the treatment groups only to the control group, which reduces the number of comparisons.</p>
+<p>Dunnett’s test does precisely this. It only compares groups to one group taken as the reference.</p>
 <p>Now, again for the sake of illustration, consider that the species <code>Adelie</code> is the reference species and we are only interested in comparing the reference species against the other 2 species. In that scenario, we would use the Dunnett’s test.</p>
 <p>In R, the Dunnett’s test is done as follows (the only difference with the code for the Tukey HSD test is in the line <code>linfct = mcp(species = "Dunnett")</code>):</p>
 <pre class="r"><code>library(multcomp)

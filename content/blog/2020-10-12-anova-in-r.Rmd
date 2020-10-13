@@ -367,7 +367,9 @@ If the **null hypothesis is not rejected** (*p*-value $\ge$ 0.05), it means that
 
 On the contrary, if *and only if* the **null hypothesis is rejected** (as it is our case since the *p*-value < 0.05), we proved that at least one group is different. We can decide to stop here if we are only interested to test whether all species are equal in terms of flippers length.
 
-But most of the time, when we showed thanks to an ANOVA that at least one group is different, we are also interested in knowing **which** one(s) is(are) different. Results of an ANOVA, however, does ***NOT*** tell us which group(s) is(are) different from the others. To test this, we need to use other types of test, referred as post-hoc tests or multiple pairwise-comparison tests. This family of statistical tests is the topic of the following sections.
+But most of the time, when we showed thanks to an ANOVA that at least one group is different, we are also interested in knowing **which** one(s) is(are) different. Results of an ANOVA, however, do ***NOT*** tell us which group(s) is(are) different from the others.
+
+To test this, we need to use other types of test, referred as post-hoc tests (in Latin, "after this", so after obtaining statistically significant ANOVA results) or multiple pairwise-comparison tests. This family of statistical tests is the topic of the following sections.
 
 # Post-hoc test
 
@@ -393,7 +395,9 @@ P(\text{at least 1 signif. result}) & = 1 - P(\text{no signif. results}) \\
 \end{split}
 \end{equation}
 
-So, with as few as 3 tests being considered, we already have a 14.26% chance of observing at least one significant result, even if all of the tests are actually not significant. And as the number of groups increases, the number of comparisons increases as well, so the probability of having a significant result simply due to chance keeps increasing.
+So, with as few as 3 tests being considered, we already have a 14.26% chance of observing at least one significant result, even if all of the tests are actually not significant.
+
+And as the number of groups increases, the number of comparisons increases as well, so the probability of having a significant result simply due to chance keeps increasing. For example, with 10 groups we need to make 45 comparisons and the probability of having at least one significant result by chance becomes $1 - (1 - 0.05)^{45} = 90\%$. So it is very likely to observe a significant result just by chance when comparing 10 groups, and when we have 14 groups or more we are almost certain (99%) to have a false positive!
 
 Post-hoc tests take into account that multiple tests are done and deal with the problem by adjusting $\alpha$ in some way, so that the probability of observing at least one significant result due to chance remains below our desired significance level.^[Note that you could in principle apply the Bonferroni correction to all tests. For example, in the example above, with 3 tests and a global desired significance level of $\alpha$ = 0.05, we would only reject a null hypothesis if the *p*-value is less than $\frac{0.05}{3}$ = 0.0167. This method is, however, known to be quite conservative, leading to a potentially high rate of false negatives.]
 
@@ -425,7 +429,9 @@ summary(post_test)
 
 In the output of the Tukey HSD test, we are interested in the table displayed after `Linear Hypotheses:`, and more precisely, in the first and last column of the table. The first column shows the comparisons which have been made; the last column (`Pr(>|t|)`) shows the adjusted^[The *p*-values are adjusted to keep the global significance level to the desired level.] *p*-values for each comparison (with the null hypothesis being the two groups are equal and the alternative hypothesis being the two groups are different).
 
-It is these adjusted *p*-values that are used to test whether two groups are significantly different or not. In our example, we tested:
+It is these adjusted *p*-values that are used to test whether two groups are significantly different or not, and we can be confident that the entire set of comparisons collectively has an error rate of 0.05.
+
+In our example, we tested:
 
 1. Chinstrap versus Adelie (line `Chinstrap - Adelie == 0`)
 1. Gentoo vs. Adelie (line `Gentoo - Adelie == 0`)
@@ -442,6 +448,12 @@ TukeyHSD(res_aov)
 With this code, it is the column `p adj` (also the last column) which is of interest. Notice that the conclusions are the same than above: all species are significantly different in terms of flippers length.
 
 ### Dunnett's test
+
+We have seen that as the number of groups increases, the number of comparisons also increases. And as the number of comparisons increases, the post-hoc analysis must lower the individual significance level even further, which leads to lower statistical power (so a difference between group means is less likely to be detected).
+
+One method to mitigate this and increase the statistical power is by reducing the number of comparisons. This reduction allows the post-hoc procedure to use a larger individual error rate to achieve the desired global error rate. While comparing all possible groups is the most common approach, many studies have a control group and several treatment groups. For these studies, you may need to compare the treatment groups only to the control group, which reduces the number of comparisons.
+
+Dunnett's test does precisely this. It only compares groups to one group taken as the reference.
 
 Now, again for the sake of illustration, consider that the species `Adelie` is the reference species and we are only interested in comparing the reference species against the other 2 species. In that scenario, we would use the Dunnett's test.
 
