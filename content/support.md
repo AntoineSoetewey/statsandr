@@ -35,9 +35,10 @@ If you have found any of the content on this blog useful please consider linking
 
 You can follow me via the following channels:
 
-* [Twitter](https://twitter.com/statsandr) or [Medium](https://medium.com/@ant.soetewey)
-* Subscribe to this blog to receive new posts by [email](/subscribe/)
+* [Twitter](https://twitter.com/statsandr)
+* [Medium](https://medium.com/@ant.soetewey)
 * [GitHub](https://github.com/AntoineSoetewey)
+* Subscribe to this blog to receive new posts by [email](/subscribe/)
 
 <a name="recommendations"></a>
 ## Recommendations

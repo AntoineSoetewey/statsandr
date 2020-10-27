@@ -40,8 +40,8 @@ If you are interested in learning more why I launched this blog, see the article
 
 Thanks in advance for reading and feel free to [contact me](/contact/) if you have any questions, remarks or inquiries.
 
-You can also reach me out on [Twitter](https://twitter.com/statsandr) or [Medium](https://medium.com/@ant.soetewey).
+You can also reach me out on [Twitter](https://twitter.com/statsandr), [Medium](https://medium.com/@ant.soetewey) or [GitHub](https://github.com/AntoineSoetewey).
 
-*Note that this is a personal site. The opinions expressed here represent my own and not those of my employer.*
+*Note that this is a personal site. The opinions expressed here represent my own and not those of my employer(s).*
 
 [&uarr; Back to top](#top)
