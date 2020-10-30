@@ -1,7 +1,7 @@
 ---
 title: 'Sitemap'
 date: "2019-12-24"
-description: "A list of all the pages and articles found on the blog. Do not hesitate to contact me if you cannot find what you are looking for."
+description: "A list of all the pages and articles found on the blog. Do not hesitate to contact me if you cannot find what you are looking for"
 meta_img: sitemap_files/sitemap-statsandr.com.jpeg
 ---
 

@@ -1,7 +1,7 @@
 ---
-title: "About me"
+title: "About"
 date: "2019-12-16"
-description: "Antoine Soetewey. Learn more about the author of the blog Stats and R."
+description: "Learn more about the author of the blog Stats and R---Antoine Soetewey---and the motivations behind his blog"
 menu: "main"
 ---
 

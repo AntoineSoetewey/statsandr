@@ -1,7 +1,7 @@
 ---
 title: "Stats and R"
 date: "2019-12-16"
-description: "A blog on statistics and R aiming at helping academics and professionals working with data to grasp important concepts in statistics and to apply them in R."
+description: "A blog on statistics and R aiming at helping academics and professionals working with data to grasp important concepts in statistics and to apply them in R"
 menu: "main"
 ---
 

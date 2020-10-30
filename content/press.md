@@ -3,7 +3,7 @@ title: Press
 author: Antoine Soetewey
 date: '2020-05-24'
 meta_img: image/image.png
-description: See the contact details for Antoine Soetewey of the blog Stats and R, and a roll-up of press mentions.
+description: See the contact details for Antoine Soetewey of the blog Stats and R, and a roll-up of press mentions
 ---
 
 ## Contact
