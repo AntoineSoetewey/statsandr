@@ -409,9 +409,9 @@ summary(post_test)</code></pre>
 ## 
 ## Linear Hypotheses:
 ##                         Estimate Std. Error t value Pr(&gt;|t|)    
-## Chinstrap - Adelie == 0   5.8699     0.9699   6.052   &lt;1e-07 ***
-## Gentoo - Adelie == 0     27.2333     0.8067  33.760   &lt;1e-07 ***
-## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286   &lt;1e-07 ***
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 6.02e-09 ***
+## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &lt; 1e-09 ***
+## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286  &lt; 1e-09 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</code></pre>
@@ -441,7 +441,7 @@ summary(post_test)</code></pre>
 <div id="dunnetts-test" class="section level3">
 <h3>Dunnett’s test</h3>
 <p>We have seen in this <a href="/blog/anova-in-r/#issue-of-multiple-testing">section</a> that as the number of groups increases, the number of comparisons also increases. And as the number of <strong>comparisons increases</strong>, the post-hoc analysis must lower the individual significance level even further, which leads to <strong>lower statistical power</strong> (so a difference between group means in the population is less likely to be detected).</p>
-<p>One method to mitigate this and increase the statistical power is by reducing the number of comparisons. This reduction allows the post-hoc procedure to use a larger individual error rate to achieve the desired global error rate. While comparing all possible groups with a Tukey HSD test is the most common approach, many studies have a control group and several treatment groups. For these studies, you may need to compare the treatment groups only to the control group, which reduces the number of comparisons.</p>
+<p>One method to mitigate this and increase the statistical power is by reducing the number of comparisons. This reduction allows the post-hoc procedure to use a larger individual error rate to achieve the desired global error rate. While comparing all possible groups with a Tukey HSD test is a common approach, many studies have a control group and several treatment groups. For these studies, you may need to compare the treatment groups only to the control group, which reduces the number of comparisons.</p>
 <p>Dunnett’s test does precisely this—it only compares a group taken as reference to all other groups, but it does not compare all groups to each others.</p>
 <p>So to recap:</p>
 <ul>
@@ -515,6 +515,7 @@ summary(post_test)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</code></pre>
 <p>From the results above we conclude that Adelie and Chinstrap species are significantly different from Gentoo species in terms of flippers length (<em>p</em>-values &lt; 1e-10).</p>
+<p>Note that even if your study does not have a reference group which you can compare to the other groups, it is still often better to do multiple comparisons determined by some research questions than to do all-pairwise tests. By reducing the number of post-hoc comparisons to what is necessary only, and no more, you maximize the statistical power.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
 </div>
 </div>
 </div>
@@ -571,5 +572,6 @@ for (i in y) {
 <li id="fn3"><p>As long as you use the Kruskal-Wallis test to, <em>in fine</em>, compare groups, homoscedasticity is not required. If you wish to compare medians, the Kruskal-Wallis test requires homoscedasticity. See more information about the difference in this <a href="https://influentialpoints.com/Training/Kruskal-Wallis_ANOVA_use_and_misuse.htm" target="_blank">article</a>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
 <li id="fn4"><p>Note that you could in principle apply the Bonferroni correction to all tests. For example, in the example above, with 3 tests and a global desired significance level of <span class="math inline">\(\alpha\)</span> = 0.05, we would only reject a null hypothesis if the <em>p</em>-value is less than <span class="math inline">\(\frac{0.05}{3}\)</span> = 0.0167. This method is, however, known to be quite conservative, leading to a potentially high rate of false negatives.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
 <li id="fn5"><p>The <em>p</em>-values are adjusted to keep the global significance level to the desired level.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>Thanks Michael Friendly for this suggestion.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

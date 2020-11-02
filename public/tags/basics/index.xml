@@ -407,9 +407,9 @@ summary(post_test)&lt;/code&gt;&lt;/pre&gt;
 ## 
 ## Linear Hypotheses:
 ##                         Estimate Std. Error t value Pr(&amp;gt;|t|)    
-## Chinstrap - Adelie == 0   5.8699     0.9699   6.052   &amp;lt;1e-07 ***
-## Gentoo - Adelie == 0     27.2333     0.8067  33.760   &amp;lt;1e-07 ***
-## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286   &amp;lt;1e-07 ***
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 6.02e-09 ***
+## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &amp;lt; 1e-09 ***
+## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286  &amp;lt; 1e-09 ***
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
 ## (Adjusted p values reported -- single-step method)&lt;/code&gt;&lt;/pre&gt;
@@ -439,7 +439,7 @@ summary(post_test)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;dunnetts-test&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Dunnett’s test&lt;/h3&gt;
 &lt;p&gt;We have seen in this &lt;a href=&#34;/blog/anova-in-r/#issue-of-multiple-testing&#34;&gt;section&lt;/a&gt; that as the number of groups increases, the number of comparisons also increases. And as the number of &lt;strong&gt;comparisons increases&lt;/strong&gt;, the post-hoc analysis must lower the individual significance level even further, which leads to &lt;strong&gt;lower statistical power&lt;/strong&gt; (so a difference between group means in the population is less likely to be detected).&lt;/p&gt;
-&lt;p&gt;One method to mitigate this and increase the statistical power is by reducing the number of comparisons. This reduction allows the post-hoc procedure to use a larger individual error rate to achieve the desired global error rate. While comparing all possible groups with a Tukey HSD test is the most common approach, many studies have a control group and several treatment groups. For these studies, you may need to compare the treatment groups only to the control group, which reduces the number of comparisons.&lt;/p&gt;
+&lt;p&gt;One method to mitigate this and increase the statistical power is by reducing the number of comparisons. This reduction allows the post-hoc procedure to use a larger individual error rate to achieve the desired global error rate. While comparing all possible groups with a Tukey HSD test is a common approach, many studies have a control group and several treatment groups. For these studies, you may need to compare the treatment groups only to the control group, which reduces the number of comparisons.&lt;/p&gt;
 &lt;p&gt;Dunnett’s test does precisely this—it only compares a group taken as reference to all other groups, but it does not compare all groups to each others.&lt;/p&gt;
 &lt;p&gt;So to recap:&lt;/p&gt;
 &lt;ul&gt;
@@ -513,6 +513,7 @@ summary(post_test)&lt;/code&gt;&lt;/pre&gt;
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
 ## (Adjusted p values reported -- single-step method)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;From the results above we conclude that Adelie and Chinstrap species are significantly different from Gentoo species in terms of flippers length (&lt;em&gt;p&lt;/em&gt;-values &amp;lt; 1e-10).&lt;/p&gt;
+&lt;p&gt;Note that even if your study does not have a reference group which you can compare to the other groups, it is still often better to do multiple comparisons determined by some research questions than to do all-pairwise tests. By reducing the number of post-hoc comparisons to what is necessary only, and no more, you maximize the statistical power.&lt;a href=&#34;#fn6&#34; class=&#34;footnote-ref&#34; id=&#34;fnref6&#34;&gt;&lt;sup&gt;6&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -569,6 +570,7 @@ for (i in y) {
 &lt;li id=&#34;fn3&#34;&gt;&lt;p&gt;As long as you use the Kruskal-Wallis test to, &lt;em&gt;in fine&lt;/em&gt;, compare groups, homoscedasticity is not required. If you wish to compare medians, the Kruskal-Wallis test requires homoscedasticity. See more information about the difference in this &lt;a href=&#34;https://influentialpoints.com/Training/Kruskal-Wallis_ANOVA_use_and_misuse.htm&#34; target=&#34;_blank&#34;&gt;article&lt;/a&gt;.&lt;a href=&#34;#fnref3&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;li id=&#34;fn4&#34;&gt;&lt;p&gt;Note that you could in principle apply the Bonferroni correction to all tests. For example, in the example above, with 3 tests and a global desired significance level of &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; = 0.05, we would only reject a null hypothesis if the &lt;em&gt;p&lt;/em&gt;-value is less than &lt;span class=&#34;math inline&#34;&gt;\(\frac{0.05}{3}\)&lt;/span&gt; = 0.0167. This method is, however, known to be quite conservative, leading to a potentially high rate of false negatives.&lt;a href=&#34;#fnref4&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;li id=&#34;fn5&#34;&gt;&lt;p&gt;The &lt;em&gt;p&lt;/em&gt;-values are adjusted to keep the global significance level to the desired level.&lt;a href=&#34;#fnref5&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li id=&#34;fn6&#34;&gt;&lt;p&gt;Thanks Michael Friendly for this suggestion.&lt;a href=&#34;#fnref6&#34; class=&#34;footnote-back&#34;&gt;↩︎&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
 </description>
@@ -4463,8 +4465,8 @@ Below a visual representation of the mean:&lt;/p&gt;
 &lt;img src=&#34;/blog/what-is-the-difference-between-population-and-sample_files/population-sample.png&#34; alt=&#34;&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Population versus sample. Source: towardsdatascience.com&lt;/p&gt;
 &lt;/div&gt;
-&lt;p&gt;A population includes &lt;strong&gt;all members&lt;/strong&gt; from a specified group, all possible outcomes or measurements that are of interest. The exact population will depend on the scope of the study. For example, say you would like to know whether there is an association between job performance and the amount of home working hours per week in the specific case of Belgian data scientists. In this case, the population might be Belgian data scientists. However, if the scope of the study is more narrow (e.g., the study focuses on french-speaking Belgian data scientists who live at least 30km away from their workplace), then the population will be more specific and include only workers who meet the criteria. The point is that the population should only include people to whom the results will apply.&lt;/p&gt;
-&lt;p&gt;A sample consists of some observations drawn from the population, so a part or a &lt;strong&gt;subset of the population&lt;/strong&gt;. The sample is the group of elements who actually participated in the study.&lt;/p&gt;
+&lt;p&gt;A &lt;strong&gt;population&lt;/strong&gt; includes &lt;strong&gt;all members&lt;/strong&gt; from a specified group, all possible outcomes or measurements that are of interest. The exact population will depend on the scope of the study. For example, say you would like to know whether there is an association between job performance and the amount of home working hours per week in the specific case of Belgian data scientists. In this case, the population might be Belgian data scientists. However, if the scope of the study is more narrow (e.g., the study focuses on french-speaking Belgian data scientists who live at least 30km away from their workplace), then the population will be more specific and include only workers who meet the criteria. The point is that the population should only include people to whom the results will apply.&lt;/p&gt;
+&lt;p&gt;A &lt;strong&gt;sample&lt;/strong&gt; consists of some observations drawn from the population, so a part or a &lt;strong&gt;subset of the population&lt;/strong&gt;. The sample is the group of elements who actually participated in the study.&lt;/p&gt;
 &lt;p&gt;Members and elements are defined in the broad sense of the term. It may be human. For instance, the population may be “&lt;strong&gt;all&lt;/strong&gt; people living in Belgium” and the sample may be “&lt;strong&gt;some&lt;/strong&gt; people living in Belgium”. It can be anything else too. Say you are testing the effect of a new fertilizer on crop yield. All the crop fields represent your population, whereas the 10 crop fields you tested correspond to your sample. Since a sample is a subset of a population, a sample is always smaller than the population.&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt; Note that, a population must not necessarily be large. It might be the case that you study such a narrow population (e.g., first-year male bachelor students from your university who passed the statistics exam in June and for whom their parents have been divorced for more than 5 years), that the size of the population is actually rather small.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;why-a-sample&#34; class=&#34;section level1&#34;&gt;
