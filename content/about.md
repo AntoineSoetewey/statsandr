@@ -5,7 +5,7 @@ description: "Learn more about the author of the blog Stats and R---Antoine Soet
 menu: "main"
 ---
 
-Hello, my name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a PhD student in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences. My [research](https://www.antoinesoetewey.com/research/) interests focus on survival analysis and bio-statistical procedures applied to cancer patients.
+Hello, my name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a PhD student in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences ([ISBA](https://uclouvain.be/en/research-institutes/lidam/isba)). My [research](https://www.antoinesoetewey.com/research/) interests focus on survival analysis and bio-statistical procedures applied to cancer patients.
 
 In parallel with my doctoral thesis, I am [teaching assistant](https://www.antoinesoetewey.com/teaching/) for several courses in statistics and probability at bachelor and master’s level. I also provide trainings/workshops and consulting in statistics and R programming as part of UCLouvain's technology platform for Support in Methodology and Statistical Computing ([SMCS](https://sites.uclouvain.be/smcs-gateway/)). See my [CV](https://www.antoinesoetewey.com/cv/) to have a more detailed overview of my academic and professional background.
 
@@ -15,7 +15,7 @@ Given my experience, I also help academics and professionals in performing stati
 
 This blog is, as its name suggests, about [statistics](/tags/statistics/) and [R](/tags/r/). More specifically, it aims at helping academics and professionals working with data to grasp important statistical concepts using examples and plain English.
 
-When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R (and share the code). I also occasionally present some work related to data science using R, news about my research and, to a smaller extent, my journey in the blogging world.
+When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R (and share the code). I also occasionally present some work related to data science & [data visualization](/tags/visualization/) using R, news about my research and, to a smaller extent, my journey in the [blogging](/tags/blogging/) world.
 
 ## Why?
 
@@ -38,7 +38,7 @@ If you are interested in learning more why I launched this blog, see the article
 
 ## Contact
 
-Thanks in advance for reading and feel free to [contact me](/contact/) if you have any questions, remarks or inquiries.
+Thanks in advance for reading. Feel free to [contact me](/contact/) if you have any questions, remarks or inquiries.
 
 You can also reach me out on [Twitter](https://twitter.com/statsandr), [Medium](https://medium.com/@ant.soetewey) or [GitHub](https://github.com/AntoineSoetewey).
 
