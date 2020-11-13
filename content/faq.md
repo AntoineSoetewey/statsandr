@@ -4,26 +4,37 @@ date: "2020-03-02"
 description: "Frequently asked questions. Feel free to contact me if you have any other questions"
 ---
 
+1. Who is behind this blog? What is your background?
+1. Why did you launch this blog?
 1. What technology and theme do you use to write this blog and the articles?
 1. I am new to this blog, to R or to statistics, from where can I start?
+1. Can I use your code or material in my own project?
 1. I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?
 1. I believe there is mistake/bug, what is the best way to report it?
 1. I have a question or I would like to collaborate with you, how can I contact you?
 1. Is it possible to contribute to this blog?
 1. How can I support you and support this blog?
-1. Why did you launch this blog?
+1. I have a question that is not mentioned here.
 
 This FAQ may be updated with new questions. Feel free to [contact me](/contact/) if you have any other questions.
 
-## 1. What technology and theme do you use to write this blog and the articles?
+## 1. Who is behind this blog? What is your background?
+
+Learn who is behind this blog and see more about my background in the [about page](/about/).
+
+## 2. Why did you launch this blog?
+
+See why I launched this blog in my article about the [main benefits of having a technical blog](/blog/7-benefits-of-sharing-your-code-in-a-data-science-blog/).
+
+## 3. What technology and theme do you use to write this blog and the articles?
 
 This blog is written in R using the [`{blogdown}` package](https://bookdown.org/yihui/blogdown/) and Hugo, and deployed and hosted via Netlify.
 
 Regarding the theme, I wanted to focus on the information I provide in my articles and did not want to distract readers with too many features, so I chose the [Renga](https://github.com/nanxstats/hugo-renga) theme, which is a minimalist theme for Hugo/blogdown. As the blog evolved, I made minor changes to the code that I considered important.
 
-The code can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr).
+The code of this website can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr).
 
-## 2. I am new to this blog, to R or to statistics, from where can I start?
+## 4. I am new to this blog, to R or to statistics, from where can I start?
 
 If you are new to this blog, you can start with the following articles:
  
@@ -34,15 +45,35 @@ If you are new to this blog, you can start with the following articles:
 
 Alternatively, you can check all articles with the tag "[Basics](/tags/basics/)".
 
-## 3. I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?
+## 5. Can I use your code or material in my own project?
+
+Yes, but bear in mind that I take no responsibility for the code or the results you obtain from it.
+
+If you use my code or material in your own project, please reference the source, including:
+
+* Name of the author: "Antoine Soetewey"
+* Title of the article or tutorial
+* Name of the website: "Stats and R"
+* URL of the article or tutorial
+* Date you accessed or copied the code
+
+For example:
+
+Antoine Soetewey, *Outliers detection in R*, Stats and R, Available from https://www.statsandr.com/blog/outliers-detection-in-r/, accessed November 3rd, 2020.
+
+If your work is public, feel free to [send it to me](/contact/) so I can check it out.
+
+## 6. I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?
 
 You can see the entire code of all articles on [GitHub](https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog).
 
-## 4. I believe there is mistake/bug, what is the best way to report it?
+## 7. I believe there is mistake/bug, what is the best way to report it?
 
-If you find a mistake or a bug, you can [raise an issue on Github](https://github.com/AntoineSoetewey/statsandr/issues). Thanks in advance for your feedback!
+If you find a mistake or a bug, you can [raise an issue on Github](https://github.com/AntoineSoetewey/statsandr/issues).
 
-## 5. I have a question or I would like to collaborate with you, how can I contact you?
+Thanks in advance for your feedback, I will correct the post as soon as possible!
+
+## 8. I have a question or I would like to collaborate with you, how can I contact you?
 
 In order for me to answer you as soon as possible, here are the best communication methods:
 
@@ -50,16 +81,16 @@ In order for me to answer you as soon as possible, here are the best communicati
 * For mistakes or bugs, please inform me about them by [raising an issue on GitHub](https://github.com/AntoineSoetewey/statsandr/issues). Note that the code for all articles and pages of this blog can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog)
 * For all other requests, please use the contact form on the [contact page](/contact/)
 
-## 6. Is it possible to contribute to this blog?
+## 9. Is it possible to contribute to this blog?
 
 Absolutely! To share your post on this blog, please send it via the [contribution page](/contribute/).
 
-## 7. How can I support you and support this blog?
+## 10. How can I support you and support this blog?
 
 You can support the development of this blog via the [support page](/support/). Thanks in advance for your support, any help is greatly appreciated!
 
-## 8. Why did you launch this blog?
+## 11. I have a question that is not mentioned here.
 
-See why I launched this blog in my article about the [main benefits of having a technical blog](/blog/7-benefits-of-sharing-your-code-in-a-data-science-blog/).
+If you still have questions you can [contact me](/contact/).
 
 [&uarr; Back to top](#top)

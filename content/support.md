@@ -25,10 +25,14 @@ Here are the different ways you can support the blog:
 
 If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via the [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey).
 
+If you cannot afford to donate a small amount each month, you can also consider making a one time donation via [PayPal](https://paypal.me/AntoineSoetewey).
+
 <a name="share"></a>
 ## Share
 
 If you have found any of the content on this blog useful please consider linking to [https://www.statsandr.com/](/).
+
+You can also spread the word by sharing a note on your social media accounts.
 
 <a name="follow"></a>
 ## Follow
