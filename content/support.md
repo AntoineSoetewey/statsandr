@@ -6,7 +6,7 @@ description: "See the different ways you can support this blog so I can continue
 
 On this blog, I provide free articles and tutorials about [statistics](/tags/statistics/) and [R](/tags/r/). My goal with the blog is to help people to understand statistical concepts (through examples and in plain English), and to apply them in R.
 
-All the [articles](/blog/), [Shiny apps](/tags/shiny/) and code are open source and available to everyone. I also try to reply to questions I receive from readers by emails or as comments.
+All the [articles](/blog/), [Shiny apps](/tags/shiny/) and code are open source and available to everyone. I also try to reply to all questions I receive from readers by emails or as comments.
 
 I work on the blog voluntarily in my spare time (when I am not too busy working on my PhD thesis). Your support will help me to:
 
@@ -15,26 +15,23 @@ I work on the blog voluntarily in my spare time (when I am not too busy working 
 
 Here are the different ways you can support the blog:
 
-1. [GitHub](#github)
+1. [GitHub or Paypal](#github-or-paypal)
 1. [Share](#share)
 1. [Follow](#follow)
 1. [Recommendations](#recommendations)
 
-<a name="github"></a>
-## GitHub
+## GitHub or PayPal
 
 If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via the [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey).
 
 If you cannot afford to donate a small amount each month, you can also consider making a one time donation via [PayPal](https://paypal.me/AntoineSoetewey).
 
-<a name="share"></a>
 ## Share
 
 If you have found any of the content on this blog useful please consider linking to [https://www.statsandr.com/](/).
 
 You can also spread the word by sharing a note on your social media accounts.
 
-<a name="follow"></a>
 ## Follow
 
 You can follow me via the following channels:
@@ -44,7 +41,6 @@ You can follow me via the following channels:
 * [GitHub](https://github.com/AntoineSoetewey)
 * Subscribe to this blog to receive new posts by [email](/subscribe/)
 
-<a name="recommendations"></a>
 ## Recommendations
 
 If you know someone who needs help for their statistical analyses, feel free to give my [contact details](/contact/) so the person can reach out to me.
