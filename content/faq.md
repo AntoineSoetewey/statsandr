@@ -14,6 +14,7 @@ description: "Frequently asked questions. Feel free to contact me if you have an
 1. I have a question or I would like to collaborate with you, how can I contact you?
 1. Is it possible to contribute to this blog?
 1. How can I support you and support this blog?
+1. Can you link to my website?
 1. I have a question that is not mentioned here.
 
 This FAQ may be updated with new questions. Feel free to [contact me](/contact/) if you have any other questions.
@@ -89,8 +90,16 @@ Absolutely! To share your post on this blog, please send it via the [contributio
 
 You can support the development of this blog via the [support page](/support/). Thanks in advance for your support, any help is greatly appreciated!
 
-## 11. I have a question that is not mentioned here.
+## 11. Can you link to my website?
 
-If you still have questions you can [contact me](/contact/).
+Thanks for your interest. Unfortunately I don't do link trading.
+
+I link to content that I think will help my readers learn something about statistics or R at the time I write each article.
+
+If you have a relevant contribution to an article, feel free to post it in the comments of that article. It is an excellent way to contribute to the ongoing discussion and readers will be able to check your work.
+
+## 12. I have a question that is not mentioned here.
+
+If you still have a question that is not mentioned here you can [contact me](/contact/).
 
 [&uarr; Back to top](#top)
