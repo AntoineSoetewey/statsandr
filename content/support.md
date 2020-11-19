@@ -15,12 +15,12 @@ I work on the blog voluntarily in my spare time (when I am not too busy working 
 
 Here are the different ways you can support the blog:
 
-1. [GitHub sponsor program or Paypal](#github-or-paypal)
+1. [GitHub sponsor program or Paypal](#github-sponsor-program-or-paypal)
 1. [Link or share](#link-or-share)
 1. [Follow the blog](#follow-the-blog)
 1. [Recommendations](#recommendations)
 
-## GitHub or PayPal
+## GitHub sponsor program or PayPal
 
 If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via the [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey).
 
