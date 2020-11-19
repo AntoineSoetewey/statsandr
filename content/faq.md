@@ -101,6 +101,8 @@ With the exception of a few rare cases, I will not add your link to one of my ar
 
 If you believe you have a relevant contribution to an article, feel free to post it in the comments of that article. It is an excellent way to contribute to the ongoing discussion and readers will be able to check your work.
 
+Thank you for your understanding!
+
 ## 12. I have a question that is not mentioned here
 
 If you still have a question that is not mentioned here you can [contact me](/contact/).
