@@ -15,9 +15,9 @@ I work on the blog voluntarily in my spare time (when I am not too busy working 
 
 Here are the different ways you can support the blog:
 
-1. [GitHub or Paypal](#github-or-paypal)
-1. [Share](#share)
-1. [Follow](#follow)
+1. [GitHub sponsor program or Paypal](#github-or-paypal)
+1. [Link or share](#link-or-share)
+1. [Follow the blog](#follow-the-blog)
 1. [Recommendations](#recommendations)
 
 ## GitHub or PayPal
@@ -26,15 +26,15 @@ If you would like to financially support this blog so I can continue to provide 
 
 If you cannot afford to donate a small amount each month, you can also consider making a one time donation via [PayPal](https://paypal.me/AntoineSoetewey).
 
-## Share
+## Link or share
 
 If you have found any of the content on this blog useful please consider linking to [https://www.statsandr.com/](/).
 
 You can also spread the word by sharing a note on your social media accounts.
 
-## Follow
+## Follow the blog
 
-You can follow me via the following channels:
+You can follow the blog via the following channels:
 
 * [Twitter](https://twitter.com/statsandr)
 * [Medium](https://medium.com/@ant.soetewey)
