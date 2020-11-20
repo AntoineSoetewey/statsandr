@@ -15,7 +15,7 @@ From time to time, I also present some work related to data science & [data visu
   + [all articles](/blog/) or
   + [articles by categories](/tags/)
 * Learn more about [who is behind this blog](/about/)
-* Follow me on:
+* Follow the blog on:
   + [Twitter](https://twitter.com/statsandr),
   + [Medium](https://medium.com/@ant.soetewey) or
   + [GitHub](https://github.com/AntoineSoetewey)
