@@ -37,7 +37,7 @@ You can also spread the word by sharing a note on your social media accounts.
 You can follow the blog via the following channels:
 
 * [Twitter](https://twitter.com/statsandr)
-* [Medium](https://medium.com/@ant.soetewey)
+* [Medium](https://antoinesoetewey.medium.com/)
 * [GitHub](https://github.com/AntoineSoetewey)
 * Subscribe to this blog to receive new posts by [email](/subscribe/)
 

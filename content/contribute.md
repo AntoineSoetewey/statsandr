@@ -35,7 +35,7 @@ Before submitting your article, please bear in mind the following points:
 
 ## After publishing
 
-In addition to be published on this blog, all articles that are accepted will be published on [Medium](https://medium.com/@ant.soetewey) via the [Towards Data Science](https://towardsdatascience.com/@ant.soetewey) publication. Moreover, it will also be published on [R Weekly](https://rweekly.org/live) and, if it is related to R, on [R-Bloggers](https://www.r-bloggers.com/author/r-on-stats-and-r/) as well.
+In addition to be published on this blog, all articles that are accepted will be published on [Medium](https://antoinesoetewey.medium.com/). Moreover, it will also be published on [R Weekly](https://rweekly.org/live) and, if it is related to R, on [R-Bloggers](https://www.r-bloggers.com/author/r-on-stats-and-r/) as well.
 
 Once your post is published, I encourage you to share it with your social media following as you like. Bear in mind that the more popular the guest post is, the more referral traffic your website will receive.
 

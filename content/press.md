@@ -13,7 +13,7 @@ You can contact me [here](/contact/).
 ## Social profiles
 
 * [Twitter](https://twitter.com/statsandr)
-* [Medium](https://medium.com/@ant.soetewey)
+* [Medium](https://antoinesoetewey.medium.com/)
 * [LinkedIn](https://www.linkedin.com/in/antoinesoetewey/)
 * [GitHub](https://github.com/AntoineSoetewey)
 
