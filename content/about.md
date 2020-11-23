@@ -15,7 +15,7 @@ Given my experience, I also help academics and professionals in performing stati
 
 This blog is, as its name suggests, about [statistics](/tags/statistics/) and [R](/tags/r/). More specifically, it aims at helping academics and professionals working with data to grasp important statistical concepts using examples and plain English.
 
-When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R (and share the code). I also occasionally present some work related to data science & [data visualization](/tags/visualization/) using R, news about my research and, to a smaller extent, my journey in the [blogging](/tags/blogging/) world.
+When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R (and share the code). I also occasionally present some work related to data science & [data visualization](/tags/visualization/) using R, news about my [research](/tags/research/) and, to a smaller extent, my journey in the [blogging](/tags/blogging/) world.
 
 ## Why?
 
