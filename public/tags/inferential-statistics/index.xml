@@ -43,8 +43,9 @@
 &lt;li&gt;&lt;a href=&#34;#tukey-hsd-test&#34;&gt;Tukey HSD test&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#dunnetts-test&#34;&gt;Dunnett’s test&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#other-p-values-adjustment-methods&#34;&gt;Other &lt;em&gt;p&lt;/em&gt;-values adjustment methods&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#visualization-of-anova-and-post-hoc-tests&#34;&gt;Visualization of ANOVA and post-hoc tests&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#visualization-of-anova-and-post-hoc-tests-on-the-same-plot&#34;&gt;Visualization of ANOVA and post-hoc tests on the same plot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
@@ -407,9 +408,9 @@ summary(post_test)&lt;/code&gt;&lt;/pre&gt;
 ## 
 ## Linear Hypotheses:
 ##                         Estimate Std. Error t value Pr(&amp;gt;|t|)    
-## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 7.54e-09 ***
-## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &amp;lt; 1e-09 ***
-## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286  &amp;lt; 1e-09 ***
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052   &amp;lt;1e-08 ***
+## Gentoo - Adelie == 0     27.2333     0.8067  33.760   &amp;lt;1e-08 ***
+## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286   &amp;lt;1e-08 ***
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
 ## (Adjusted p values reported -- single-step method)&lt;/code&gt;&lt;/pre&gt;
@@ -422,6 +423,11 @@ summary(post_test)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;Gentoo vs. Chinstrap (line &lt;code&gt;Gentoo - Chinstrap == 0&lt;/code&gt;)&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;All three &lt;em&gt;p&lt;/em&gt;-values are smaller than 0.05, so we reject the null hypothesis for all comparisons, which means that &lt;strong&gt;all species are significantly different&lt;/strong&gt; in terms of flippers length.&lt;/p&gt;
+&lt;p&gt;The results of the post-hoc test can be visualized with the &lt;code&gt;plot()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;par(mar = c(3, 8, 3, 3))
+plot(post_test)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We see that the confidence intervals do not cross the zero line, which indicate that all groups are significantly different.&lt;/p&gt;
 &lt;p&gt;Note that the Tukey HSD test can also be done in R with the &lt;code&gt;TukeyHSD()&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;TukeyHSD(res_aov)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##   Tukey multiple comparisons of means
@@ -435,6 +441,9 @@ summary(post_test)&lt;/code&gt;&lt;/pre&gt;
 ## Gentoo-Adelie    27.233349 25.334376 29.132323     0
 ## Gentoo-Chinstrap 21.363462 19.000841 23.726084     0&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;With this code, it is the column &lt;code&gt;p adj&lt;/code&gt; (also the last column) which is of interest. Notice that the conclusions are the same than above: all species are significantly different in terms of flippers length.&lt;/p&gt;
+&lt;p&gt;The results can also be visualized with the &lt;code&gt;plot()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(TukeyHSD(res_aov))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;dunnetts-test&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Dunnett’s test&lt;/h3&gt;
@@ -477,6 +486,11 @@ summary(post_test)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;Gentoo vs. Adelie (line &lt;code&gt;Gentoo - Adelie == 0&lt;/code&gt;)&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Both &lt;em&gt;p&lt;/em&gt;-values (displayed in the last column) are below 0.05, so we reject the null hypothesis for both comparisons. This means that both the &lt;strong&gt;species Chinstrap and Gentoo are significantly different from the reference species Adelie&lt;/strong&gt; in terms of flippers length. (Nothing can be said about the comparison between Chinstrap and Gentoo though.)&lt;/p&gt;
+&lt;p&gt;Again, the results of the post-hoc test can be visualized with the &lt;code&gt;plot()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;par(mar = c(3, 8, 3, 3))
+plot(post_test)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We see that the confidence intervals do not cross the zero line, which indicate that both the species Gentoo and Chinstrap are significantly different from the reference species Adelie.&lt;/p&gt;
 &lt;p&gt;Note that in R, by default, the reference category for a &lt;a href=&#34;/blog/data-types-in-r/#factor&#34;&gt;factor variable&lt;/a&gt; is the first category in alphabetical order. This is the reason that, by default, the reference species is Adelie.&lt;/p&gt;
 &lt;p&gt;The reference category can be changed with the &lt;code&gt;relevel()&lt;/code&gt; function (or with the &lt;a href=&#34;/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#reordering-factors&#34;&gt;&lt;code&gt;{questionr}&lt;/code&gt; addin&lt;/a&gt;). Considering that we want Gentoo as the reference category instead of Adelie:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Change reference category:
@@ -512,14 +526,35 @@ summary(post_test)&lt;/code&gt;&lt;/pre&gt;
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
 ## (Adjusted p values reported -- single-step method)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;par(mar = c(3, 8, 3, 3))
+plot(post_test)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;From the results above we conclude that Adelie and Chinstrap species are significantly different from Gentoo species in terms of flippers length (&lt;em&gt;p&lt;/em&gt;-values &amp;lt; 1e-10).&lt;/p&gt;
 &lt;p&gt;Note that even if your study does not have a reference group which you can compare to the other groups, it is still often better to do multiple comparisons determined by some research questions than to do all-pairwise tests. By reducing the number of post-hoc comparisons to what is necessary only, and no more, you maximize the statistical power.&lt;a href=&#34;#fn6&#34; class=&#34;footnote-ref&#34; id=&#34;fnref6&#34;&gt;&lt;sup&gt;6&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
+&lt;div id=&#34;other-p-values-adjustment-methods&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Other &lt;em&gt;p&lt;/em&gt;-values adjustment methods&lt;/h2&gt;
+&lt;p&gt;For the interested readers, note that you can use other &lt;em&gt;p&lt;/em&gt;-values adjustment methods by using the &lt;code&gt;pairwise.t.test()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pairwise.t.test(dat$flipper_length_mm, dat$species,
+  p.adjust.method = &amp;quot;holm&amp;quot;
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  dat$flipper_length_mm and dat$species 
+## 
+##           Gentoo  Adelie 
+## Adelie    &amp;lt; 2e-16 -      
+## Chinstrap &amp;lt; 2e-16 3.8e-09
+## 
+## P value adjustment method: holm&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;By default, the Holm method is applied but other methods exist. See &lt;code&gt;?p.adjust&lt;/code&gt; for all available options.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div id=&#34;visualization-of-anova-and-post-hoc-tests&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Visualization of ANOVA and post-hoc tests&lt;/h1&gt;
-&lt;p&gt;If you are interested in including results of ANOVA and post-hoc tests directly in the boxplots, here is a piece of code which may be of interest to you (edited by myself based on the code found in this &lt;a href=&#34;http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/&#34; target=&#34;_blank&#34;&gt;article&lt;/a&gt;):&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;visualization-of-anova-and-post-hoc-tests-on-the-same-plot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Visualization of ANOVA and post-hoc tests on the same plot&lt;/h1&gt;
+&lt;p&gt;If you are interested in including results of ANOVA and post-hoc tests on the same plot (directly on the boxplots), here is a piece of code which may be of interest to you (edited by myself based on the code found in this &lt;a href=&#34;http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/&#34; target=&#34;_blank&#34;&gt;article&lt;/a&gt;):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Edit from here
 x &amp;lt;- which(names(dat) == &amp;quot;species&amp;quot;) # name of grouping variable
 y &amp;lt;- which(
@@ -550,7 +585,7 @@ for (i in y) {
     )
   }
 }&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;100%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;As you can see on the above plot, boxplots by species are presented together with &lt;em&gt;p&lt;/em&gt;-values of the ANOVA and post-hoc tests.&lt;/p&gt;
 &lt;p&gt;Besides the fact that it combines a visual representation and results on the same plot, this code also has the advantage that you can perform multiple ANOVA tests at once. See more information in this &lt;a href=&#34;/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/&#34;&gt;article&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;

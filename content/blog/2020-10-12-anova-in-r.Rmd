@@ -439,6 +439,15 @@ In our example, we tested:
 
 All three *p*-values are smaller than 0.05, so we reject the null hypothesis for all comparisons, which means that **all species are significantly different** in terms of flippers length.
 
+The results of the post-hoc test can be visualized with the `plot()` function:
+
+```{r}
+par(mar=c(3,8,3,3))
+plot(post_test)
+```
+
+We see that the confidence intervals do not cross the zero line, which indicate that all groups are significantly different.
+
 Note that the Tukey HSD test can also be done in R with the `TukeyHSD()` function:
 
 ```{r}
@@ -446,6 +455,12 @@ TukeyHSD(res_aov)
 ```
 
 With this code, it is the column `p adj` (also the last column) which is of interest. Notice that the conclusions are the same than above: all species are significantly different in terms of flippers length.
+
+The results can also be visualized with the `plot()` function:
+
+```{r}
+plot(TukeyHSD(res_aov))
+```
 
 ### Dunnett's test
 
@@ -482,6 +497,15 @@ The interpretation is the same as for the Tukey HSD test's except that in the Du
 
 Both *p*-values (displayed in the last column) are below 0.05, so we reject the null hypothesis for both comparisons. This means that both the **species Chinstrap and Gentoo are significantly different from the reference species Adelie** in terms of flippers length. (Nothing can be said about the comparison between Chinstrap and Gentoo though.)
 
+Again, the results of the post-hoc test can be visualized with the `plot()` function:
+
+```{r}
+par(mar=c(3,8,3,3))
+plot(post_test)
+```
+
+We see that the confidence intervals do not cross the zero line, which indicate that both the species Gentoo and Chinstrap are significantly different from the reference species Adelie.
+
 Note that in R, by default, the reference category for a [factor variable](/blog/data-types-in-r/#factor) is the first category in alphabetical order. This is the reason that, by default, the reference species is Adelie.
 
 The reference category can be changed with the `relevel()` function (or with the [`{questionr}` addin](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#reordering-factors)). Considering that we want Gentoo as the reference category instead of Adelie:
@@ -512,15 +536,29 @@ linfct = mcp(species = "Dunnett")
 )
 
 summary(post_test)
+
+par(mar=c(3,8,3,3))
+plot(post_test)
 ```
 
 From the results above we conclude that Adelie and Chinstrap species are significantly different from Gentoo species in terms of flippers length (*p*-values < 1e-10).
 
 Note that even if your study does not have a reference group which you can compare to the other groups, it is still often better to do multiple comparisons determined by some research questions than to do all-pairwise tests. By reducing the number of post-hoc comparisons to what is necessary only, and no more, you maximize the statistical power.^[Thanks Michael Friendly for this suggestion.]
 
-# Visualization of ANOVA and post-hoc tests
+## Other *p*-values adjustment methods
 
-If you are interested in including results of ANOVA and post-hoc tests directly in the boxplots, here is a piece of code which may be of interest to you (edited by myself based on the code found in this [article](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/){target="_blank"}):
+For the interested readers, note that you can use other *p*-values adjustment methods by using the `pairwise.t.test()` function:
+
+```{r}
+pairwise.t.test(dat$flipper_length_mm, dat$species,
+                p.adjust.method = "holm")
+```
+
+By default, the Holm method is applied but other methods exist. See `?p.adjust` for all available options.
+
+# Visualization of ANOVA and post-hoc tests on the same plot
+
+If you are interested in including results of ANOVA and post-hoc tests on the same plot (directly on the boxplots), here is a piece of code which may be of interest to you (edited by myself based on the code found in this [article](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/){target="_blank"}):
 
 ```{r}
 # Edit from here
