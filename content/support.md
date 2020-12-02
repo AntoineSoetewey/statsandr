@@ -15,7 +15,7 @@ I work on the blog voluntarily in my spare time (when I am not too busy working 
 
 Here are the different ways you can support the blog:
 
-1. [GitHub sponsor program, Paypal or Buy me a book](#github-sponsor-program-or-paypal-or-buy-me-a-book)
+1. [GitHub sponsor program, Paypal or Buy me a book](#github-sponsor-program-paypal-or-buy-me-a-book)
 1. [Link or share](#link-or-share)
 1. [Follow the blog](#follow-the-blog)
 1. [Recommendations](#recommendations)
