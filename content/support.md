@@ -15,16 +15,16 @@ I work on the blog voluntarily in my spare time (when I am not too busy working 
 
 Here are the different ways you can support the blog:
 
-1. [GitHub sponsor program or Paypal](#github-sponsor-program-or-paypal-or-buy-me-a-coffee)
+1. [GitHub sponsor program, Paypal or Buy me a book](#github-sponsor-program-or-paypal-or-buy-me-a-book)
 1. [Link or share](#link-or-share)
 1. [Follow the blog](#follow-the-blog)
 1. [Recommendations](#recommendations)
 
-## GitHub sponsor program, PayPal or Buy me a coffee
+## GitHub sponsor program, PayPal or Buy me a book
 
 If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via the [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey).
 
-If you cannot afford to donate a small amount each month, you can also consider making a one time donation via [PayPal](https://paypal.me/AntoineSoetewey), or by [buying me a coffee](https://www.buymeacoffee.com/statsandr).
+If you cannot afford to donate a small amount each month, you can also consider making a one time donation via [PayPal](https://paypal.me/AntoineSoetewey), or by [buying me a book](https://www.buymeacoffee.com/statsandr).
 
 ## Link or share
 
