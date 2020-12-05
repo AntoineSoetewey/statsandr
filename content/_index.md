@@ -20,6 +20,7 @@ From time to time, I also present some work related to data science & [data visu
   + [Medium](https://antoinesoetewey.medium.com/)
   + [GitHub](https://github.com/AntoineSoetewey)
 * [Subscribe to the newsletter](/subscribe/) to receive updates by email every time a new article is published
-* Contribute by writing a [guest post](/contribute/)
+* Contribute by writing a [guest post](/contribute/) (collaborations are also welcome)
 * [Support the blog](/support/) so I can keep providing free content on an ad-free blog
+* See [press mentions](/press/)
 * [Contact me](/contact/) if you have any questions
