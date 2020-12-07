@@ -9,7 +9,12 @@ Hello, my name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a P
 
 In parallel with my doctoral thesis, I am [teaching assistant](https://www.antoinesoetewey.com/teaching/) for several courses in statistics and probability at bachelor and master’s level. I also provide trainings/workshops and consulting in statistics and R programming as part of UCLouvain's technology platform for Support in Methodology and Statistical Computing ([SMCS](https://sites.uclouvain.be/smcs-gateway/)). See my [CV](https://www.antoinesoetewey.com/cv/) for a more detailed overview of my academic and professional background.
 
-Given my experience, I also help academics and professionals in performing statistical data analyses for their academic or work related projects. Feel free to [contact me](/contact/) if you need help for your statistical analyses.
+Given my experience, I also support:
+
+* **Professionals** in their research, data analysis and informed decision-making by bringing a statistical dimension to their projects, regardless of the sector or core business.
+* **University students** and academics in their studies through the success of their exam or the statistical part of their thesis, thanks to tailor-made courses and personalized support in statistics and probabilities.
+
+Feel free to [contact me](/contact/) if you need help in statistics for your academic or work related projects.
 
 ## Blog - What?
 
