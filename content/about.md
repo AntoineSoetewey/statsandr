@@ -12,7 +12,7 @@ In parallel with my doctoral thesis, I am [teaching assistant](https://www.antoi
 Given my experience, I also support:
 
 * **Professionals** in their research, data analysis and informed decision-making by bringing a statistical dimension to their projects, regardless of the sector or core business.
-* **University students** and academics in their studies through the success of their exam or the statistical part of their thesis, thanks to tailor-made courses and personalized support in statistics and probabilities.
+* **University students** and academics in their studies through the success of their exam or the statistical part of their thesis, thanks to tailor-made courses and personalized support in statistics and probability.
 
 Feel free to [contact me](/contact/) if you need help in statistics for your academic or work related projects.
 
