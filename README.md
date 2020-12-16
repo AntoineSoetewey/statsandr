@@ -6,12 +6,19 @@ The goal of this website is to make statistics easy to understand by illustratin
 
 **If you are new to this blog**, I invite you to:
 
-* See [all articles](https://www.statsandr.com/blog/) or [articles by categories](https://www.statsandr.com/tags/)
+* See:
+  + [all articles](https://www.statsandr.com/blog/)
+  + [articles by categories](https://www.statsandr.com/tags/)
 * Learn more about [who is behind this blog](https://www.statsandr.com/about/)
-* Follow me on [Twitter](https://twitter.com/statsandr) or [Medium](https://medium.com/@ant.soetewey)
+* Follow the blog on:
+  + [Twitter](https://twitter.com/statsandr)
+  + [Medium](https://antoinesoetewey.medium.com/)
+  + [GitHub](https://github.com/AntoineSoetewey)
 * [Subscribe to the newsletter](https://www.statsandr.com/subscribe/) to receive updates by email every time a new article is published
-* Contribute by writing a [guest post](https://www.statsandr.com/contribute/)
+* Contribute by writing a [guest post](https://www.statsandr.com/contribute/) ([collaborations](https://www.statsandr.com/tags/collaboration/) are also welcome)
 * [Support the blog](https://www.statsandr.com/support/) so I can keep providing free content on an ad-free blog
+* See [press mentions](https://www.statsandr.com/press/)
+* [Contact me](https://www.statsandr.com/contact/) if you have any questions
 
 # Status
 
