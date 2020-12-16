@@ -1,22 +1,10 @@
-(function(factory) {
-	"use strict";
+﻿(function (factory) {
+    "use strict";
 
-	if (typeof module === "object" && module.exports) {
+    if (typeof module === "object" && module.exports) {
         module.exports = factory;
     } else {
-		if(typeof define === "function" && define.amd){
-			define(function() {
-				return factory
-			});
-		}
-		else{
-			if(typeof Highcharts !== "undefined"){
-				factory(Highcharts);
-			}
-			else{
-				void 0;
-			}
-		}
+        factory(Highcharts);
     }
 }(function (H) {
     var processSerie = function (s, method, chart) {
@@ -64,23 +52,19 @@
             }
 
             if (regressionType == "linear") {
-                var extrapolate = s.regressionSettings.extrapolate || 0;
-                regression = _linear(mergedData, s.regressionSettings.decimalPlaces, extrapolate);
+                regression = _linear(mergedData, s.regressionSettings.decimalPlaces);
                 extraSerie.type = "line";
             } else if (regressionType == "exponential") {
-                var extrapolate = s.regressionSettings.extrapolate || 0;
-                regression = _exponential(mergedData, extrapolate);
+                regression = _exponential(mergedData);
             }
             else if (regressionType == "polynomial") {
                 var order = s.regressionSettings.order || 2;
                 var extrapolate = s.regressionSettings.extrapolate || 0;
                 regression = _polynomial(mergedData, order, extrapolate);
             } else if (regressionType == "power") {
-                var extrapolate = s.regressionSettings.extrapolate || 0;
-                regression = _power(mergedData, extrapolate);
+                regression = _power(mergedData);
             } else if (regressionType == "logarithmic") {
-                var extrapolate = s.regressionSettings.extrapolate || 0;
-                regression = _logarithmic(mergedData, extrapolate);
+                regression = _logarithmic(mergedData);
             } else if (regressionType == "loess") {
                 var loessSmooth = s.regressionSettings.loessSmooth || 25;
                 regression = _loess(mergedData, loessSmooth / 100);
@@ -90,33 +74,21 @@
             }
 
             regression.rSquared = coefficientOfDetermination(mergedData, regression.points);
-            regression.rValue = _round(Math.sqrt(regression.rSquared), s.regressionSettings.decimalPlaces);
-            regression.rSquared = _round(regression.rSquared, s.regressionSettings.decimalPlaces);
-            regression.standardError = _round(standardError(mergedData, regression.points), s.regressionSettings.decimalPlaces);
+            regression.rValue = Math.sqrt(regression.rSquared).toFixed(s.regressionSettings.decimalPlaces);
+            regression.rSquared = regression.rSquared.toFixed(s.regressionSettings.decimalPlaces);
+            regression.standardError = standardError(mergedData, regression.points).toFixed(s.regressionSettings.decimalPlaces);
             extraSerie.data = regression.points;
-            extraSerie.name = replaceRegressionPlaceholders(extraSerie.name, regression);
+            extraSerie.name = extraSerie.name.replace("%r2", regression.rSquared);
+            extraSerie.name = extraSerie.name.replace("%r", regression.rValue);
+            extraSerie.name = extraSerie.name.replace("%eq", regression.string);
+            extraSerie.name = extraSerie.name.replace("%se", regression.standardError);
 
-            if (s.regressionSettings.dataLabels !== undefined) {
-                for (let i = 0; i < s.regressionSettings.dataLabels.length; i++) {
-                    var dataLabel = s.regressionSettings.dataLabels[i]
-                    var dataLabelPoint = extraSerie.data[dataLabel.pointIndex];
-                    var dataLabelFormat = replaceRegressionPlaceholders(dataLabel.format, regression);
-
-                    if (dataLabelPoint !== undefined) {
-                        extraSerie.data[dataLabel.pointIndex] = {
-                            x: dataLabelPoint[0],
-                            y: dataLabelPoint[1],
-                            dataLabels: {
-                                enabled: true,
-                                format: dataLabelFormat
-                            }
-                        };
-                    }
-                }
+            if (extraSerie.visible === false) {
+                extraSerie.visible = false;
             }
-
             extraSerie.regressionOutputs = regression;
             return extraSerie;
+
         }
     }
 
@@ -124,14 +96,12 @@
         var series = arguments[1].series;
         var extraSeries = [];
         var i = 0;
-        if (series) {
-            for (i = 0; i < series.length; i++) {
-                var s = series[i];
-                if (s.regression) {
-                    var extraSerie = processSerie(s, 'init', this);
-                    extraSeries.push(extraSerie);
-                    arguments[1].series[i].rendered = true;
-                }
+        for (i = 0; i < series.length; i++) {
+            var s = series[i];
+            if (s.regression) {
+                var extraSerie = processSerie(s, 'init', this);
+                extraSeries.push(extraSerie);
+                arguments[1].series[i].rendered = true;
             }
         }
 
@@ -158,7 +128,7 @@
     /**
      * Code extracted from https://github.com/Tom-Alexander/regression-js/
      */
-    function _exponential(data, extrapolate) {
+    function _exponential(data) {
         var sum = [0, 0, 0, 0, 0, 0], n = 0, results = [];
 
         for (len = data.length; n < len; n++) {
@@ -180,18 +150,8 @@
         var A = Math.pow(Math.E, (sum[2] * sum[3] - sum[5] * sum[4]) / denominator);
         var B = (sum[1] * sum[4] - sum[5] * sum[3]) / denominator;
 
-        var resultLength = data.length + extrapolate;
-        var step = data[data.length - 1][0] - data[data.length - 2][0];
-
-        for (var i = 0, len = resultLength; i < len; i++) {
-            var answer = 0;
-            if(typeof data[i] !== 'undefined') {
-                var x = data[i][0];
-            } else {
-                var x = data[data.length - 1][0] + (i - data.length) * step;
-            }
-
-            var coordinate = [x, A * Math.pow(Math.E, B * x)];
+        for (var i = 0, len = data.length; i < len; i++) {
+            var coordinate = [data[i][0], A * Math.pow(Math.E, B * data[i][0])];
             results.push(coordinate);
         }
 
@@ -222,7 +182,7 @@
      * correlation = N * Σ(XY) - Σ(X) * Σ (Y) / √ (  N * Σ(X^2) - Σ(X) ) * ( N * Σ(Y^2) - Σ(Y)^2 ) ) )
      *
      */
-    function _linear(data, decimalPlaces, extrapolate) {
+    function _linear(data, decimalPlaces) {
         var sum = [0, 0, 0, 0, 0], n = 0, results = [], N = data.length;
 
         for (; n < data.length; n++) {
@@ -245,21 +205,11 @@
         var intercept = (sum[1] / N) - (gradient * sum[0]) / N;
         // var correlation = (N * sum[3] - sum[0] * sum[1]) / Math.sqrt((N * sum[2] - sum[0] * sum[0]) * (N * sum[4] - sum[1] * sum[1]));
 
-        var resultLength = data.length + extrapolate;
-        var step = data[data.length - 1][0] - data[data.length - 2][0];
-
-        for (var i = 0, len = resultLength; i < len; i++) {
-            var answer = 0;
-            if(typeof data[i] !== 'undefined') {
-                var x = data[i][0];
-            } else {
-                var x = data[data.length - 1][0] + (i - data.length) * step;
-            }
-
-            var coorY = x * gradient + intercept;
+        for (var i = 0, len = data.length; i < len; i++) {
+            var coorY = data[i][0] * gradient + intercept;
             if (decimalPlaces)
                 coorY = parseFloat(coorY.toFixed(decimalPlaces));
-            var coordinate = [x, coorY];
+            var coordinate = [data[i][0], coorY];
             results.push(coordinate);
         }
 
@@ -280,7 +230,7 @@
     /**
      *  Code extracted from https://github.com/Tom-Alexander/regression-js/
      */
-    function _logarithmic(data, extrapolate) {
+    function _logarithmic(data) {
         var sum = [0, 0, 0, 0], n = 0, results = [], mean = 0;
 
 
@@ -300,18 +250,8 @@
         var B = (n * sum[1] - sum[2] * sum[0]) / (n * sum[3] - sum[0] * sum[0]);
         var A = (sum[2] - B * sum[0]) / n;
 
-        var resultLength = data.length + extrapolate;
-        var step = data[data.length - 1][0] - data[data.length - 2][0];
-
-        for (var i = 0, len = resultLength; i < len; i++) {
-            var answer = 0;
-            if(typeof data[i] !== 'undefined') {
-                var x = data[i][0];
-            } else {
-                var x = data[data.length - 1][0] + (i - data.length) * step;
-            }
-
-            var coordinate = [x, A + B * Math.log(x)];
+        for (var i = 0, len = data.length; i < len; i++) {
+            var coordinate = [data[i][0], A + B * Math.log(data[i][0])];
             results.push(coordinate);
         }
 
@@ -333,7 +273,7 @@
     /**
      * Code extracted from https://github.com/Tom-Alexander/regression-js/
      */
-    function _power(data, extrapolate) {
+    function _power(data) {
         var sum = [0, 0, 0, 0], n = 0, results = [];
 
         for (len = data.length; n < len; n++) {
@@ -352,18 +292,8 @@
         var B = (n * sum[1] - sum[2] * sum[0]) / (n * sum[3] - sum[0] * sum[0]);
         var A = Math.pow(Math.E, (sum[2] - B * sum[0]) / n);
 
-        var resultLength = data.length + extrapolate;
-        var step = data[data.length - 1][0] - data[data.length - 2][0];
-
-        for (var i = 0, len = resultLength; i < len; i++) {
-            var answer = 0;
-            if(typeof data[i] !== 'undefined') {
-                var x = data[i][0];
-            } else {
-                var x = data[data.length - 1][0] + (i - data.length) * step;
-            }
-
-            var coordinate = [x, A * Math.pow(x, B)];
+        for (var i = 0, len = data.length; i < len; i++) {
+            var coordinate = [data[i][0], A * Math.pow(data[i][0], B)];
             results.push(coordinate);
         }
 
@@ -467,7 +397,7 @@
         bandwidth = bandwidth || 0.25;
 
         var xval = data.map(function (pair) {
-            return pair.x || pair[0];
+            return pair[0];
         });
         var distinctX = array_unique(xval);
         if (2 / distinctX.length > bandwidth) {
@@ -476,7 +406,7 @@
         }
 
         var yval = data.map(function (pair) {
-            return pair.y || pair[1];
+            return pair[1];
         });
 
         function array_unique(values) {
@@ -647,17 +577,5 @@
         SE = Math.sqrt(SE / (N - 2));
 
         return SE;
-    }
-
-    function _round(number, decimalPlaces) {
-        var decimalFactor = Math.pow(10, decimalPlaces);
-        return Math.round(number * decimalFactor) / decimalFactor;
-    }
-    function replaceRegressionPlaceholders(text, regression) {
-        return text
-            .replace("%r2", regression.rSquared)
-            .replace("%r", regression.rValue)
-            .replace("%eq", regression.string)
-            .replace("%se", regression.standardError);
     }
 }));
