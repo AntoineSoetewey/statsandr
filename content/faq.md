@@ -11,7 +11,7 @@ description: "Frequently asked questions. Feel free to contact me if you have an
 1. [Can I use your code or material in my own project?](#5-can-i-use-your-code-or-material-in-my-own-project)
 1. [I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?](#6-i-would-like-to-replicate-an-analysis-you-have-done-in-one-of-your-article-can-i-have-access-to-the-entire-code)
 1. [I believe there is mistake/bug, what is the best way to report it?](#7-i-believe-there-is-mistakebug-what-is-the-best-way-to-report-it)
-1. [I have a question or I would like to collaborate with you, how can I contact you?](#8-i-have-a-question-or-i-would-like-to-collaborate-with-you-how-can-i-contact-you)
+1. [I have a question, how can I contact you?](#8-i-have-a-question-how-can-i-contact-you)
 1. [Is it possible to contribute to this blog?](#9-is-it-possible-to-contribute-to-this-blog)
 1. [How can I support you and support this blog?](#10-how-can-i-support-you-and-support-this-blog)
 1. [Can you link to my website?](#11-can-you-link-to-my-website)
@@ -74,7 +74,7 @@ If you find a mistake or a bug, you can [raise an issue on Github](https://githu
 
 Thanks in advance for your feedback, I will correct the post as soon as possible!
 
-## 8. I have a question or I would like to collaborate with you, how can I contact you?
+## 8. I have a question, how can I contact you?
 
 In order for me to answer you as soon as possible, here are the best communication methods:
 
@@ -85,6 +85,8 @@ In order for me to answer you as soon as possible, here are the best communicati
 ## 9. Is it possible to contribute to this blog?
 
 Absolutely! To share your post on this blog, please send it via the [contribution page](/contribute/).
+
+I am open to other forms of collaborations too. See more information in [this section](/blog/track-blog-performance-in-r/#future-plans).
 
 ## 10. How can I support you and support this blog?
 
