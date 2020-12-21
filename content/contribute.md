@@ -16,7 +16,7 @@ Once your guest post is received, I will review it and inform you about the deci
 
 ## Submission rules and guidelines
 
-Before submitting your article, please bear in mind the following points:
+Before submitting your article, please read the following points:
 
 * **I only accept articles that are in line with this blog**, i.e., articles about **statistics and/or applications in R.** See examples of what I write about through my [articles](/blog/) or see the different [topics](/tags/).
 * Even if your article is about one of these topics, it's not guaranteed that it will be published: quality of the post is the most important determining factor.
