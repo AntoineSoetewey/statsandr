@@ -28,7 +28,7 @@ If you cannot afford to donate a small amount each month, you can also consider 
 
 ## Link or share
 
-If you have found any of the content on this blog useful please consider linking to [https://www.statsandr.com/](/).
+If you have found any of the content on this blog useful please consider linking to [statsandr.com](/).
 
 You can also spread the word by sharing a note on your social media accounts.
 

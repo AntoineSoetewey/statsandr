@@ -10,7 +10,7 @@ Stats and R welcomes guest posts that provides unique insight into statistics an
 
 ## How can you contribute?
 
-If you want to contribute and write for [www.statsandr.com](/), please **submit your article through this [contribution form](https://antoine233987.typeform.com/to/nlWzhn)**.
+If you want to contribute and write for [statsandr.com](/), please **submit your article through this [contribution form](https://antoine233987.typeform.com/to/nlWzhn)**.
 
 Once your guest post is received, I will review it and inform you about the decision (i.e., accepted, rejected, or accepted with minor changes).
 

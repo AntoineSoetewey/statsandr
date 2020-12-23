@@ -60,7 +60,7 @@ If you use my code or material in your own project, please reference the source,
 
 For example:
 
-Antoine Soetewey, *Outliers detection in R*, Stats and R. Retrieved from https://www.statsandr.com/blog/outliers-detection-in-r/, accessed on November 3rd, 2020.
+Antoine Soetewey, *Outliers detection in R*, Stats and R. Retrieved from https://statsandr.com/blog/outliers-detection-in-r/, accessed on November 3rd, 2020.
 
 If your work is public, feel free to [send it to me](/contact/) so I can check it out.
 
