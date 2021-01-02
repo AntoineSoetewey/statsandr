@@ -67,5 +67,3 @@ All original content (e.g. articles, blog posts, codes, files, illustrations, ar
 ### Attribution
 
 If you're inclined to give credit --- a link back to the source attributed to either [Antoine Soetewey](/) or [statsandr.com](/) is good enough for me. Talking about credits, thanks [Michael Rose](https://mademistakes.com) for the template of this page.
-
-[&uarr; Back to top](#top)

@@ -48,5 +48,3 @@ If you know someone who needs help for their statistical analyses, feel free to 
 **Thanks in advance for your support**, it is greatly appreciated and every contribution counts!
 
 Don't hesitate to [contact me](/contact/) if you have any questions or remarks.
-
-[&uarr; Back to top](#top)

@@ -108,5 +108,3 @@ Thank you for your understanding!
 ## 12. I have a question that is not mentioned here
 
 If you still have a question that is not mentioned here you can [contact me](/contact/).
-
-[&uarr; Back to top](#top)

@@ -45,5 +45,3 @@ You are also more than welcome and encouraged to **respond to any comments** tha
 Thanks in advance for your interest!
 
 Do not hesitate to [contact me](/contact/) if you have any questions or if you are having an issue with the contribution form.
-
-[&uarr; Back to top](#top)
