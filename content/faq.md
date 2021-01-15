@@ -110,7 +110,7 @@ Thank you for your understanding!
 
 Suggestions about specific topics are always welcome. As written in this [post](/blog/track-blog-performance-in-r/#finding-topics), I only write about subjects I am familiar with in order to be as precise and complete as possible.
 
-So if I am familiar with the topic you suggest and I have some free time, I will definitely write about it. However, if I am not an expert in the field, I will let you know and I will try to redirect you to more knowledgeable persons.
+So if I am familiar with the topic you suggested and I have some free time, I will definitely write about it. However, if I am not an expert in the field, I will let you know and I will try to redirect you to more knowledgeable persons.
 
 ## 13. I have a question that is not mentioned here
 
