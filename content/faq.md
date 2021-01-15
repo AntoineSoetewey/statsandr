@@ -15,7 +15,8 @@ description: "Frequently asked questions. Feel free to contact me if you have an
 1. [Is it possible to contribute to this blog?](#9-is-it-possible-to-contribute-to-this-blog)
 1. [How can I support you and support this blog?](#10-how-can-i-support-you-and-support-this-blog)
 1. [Can you link to my website?](#11-can-you-link-to-my-website)
-1. [I have a question that is not mentioned here](#12-i-have-a-question-that-is-not-mentioned-here)
+1. [Can you write about this specific topic?](#12-can-you-write-about-this-specific-topic)
+1. [I have a question that is not mentioned here](#13-i-have-a-question-that-is-not-mentioned-here)
 
 This FAQ may be updated with new questions. Feel free to [contact me](/contact/) if you have any other questions.
 
@@ -105,6 +106,12 @@ If you believe you have a relevant contribution to an article, feel free to post
 
 Thank you for your understanding!
 
-## 12. I have a question that is not mentioned here
+## 12. Can you write about this specific topic?
+
+Suggestions about specific topics are always welcome. As written in this [post](/blog/track-blog-performance-in-r/#finding-topics), I only write about subjects I am familiar with in order to be as precise and complete as possible.
+
+So if I am familiar with the topic you suggest and I have some free time, I will definitely write about it. However, if I am not an expert in the field, I will let you know and I will try to redirect you to more knowledgeable persons.
+
+## 13. I have a question that is not mentioned here
 
 If you still have a question that is not mentioned here you can [contact me](/contact/).
