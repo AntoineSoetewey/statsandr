@@ -248,11 +248,11 @@ The addin I use most often is probably the [`{esquisse}` addin](/blog/rstudio-ad
 
 RStudio addins are quite diverse and require a more detailed explanation, so I wrote an article focusing on these addins. See the article [here](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/).
 
-# `{pander}` for aesthetics
+# `{pander}` and `{report}` for aesthetics
 
-The `pander()` function from the `{pander}` package is very useful for R Markdown documents and reporting. It is not actually a shortcut but it greatly improves the aesthetics of R outputs.
+The `pander()` function from the `{pander}` package is very useful for [R Markdown](/blog/getting-started-in-r-markdown/) documents and reporting. It is not actually a shortcut but it greatly improves the aesthetics of R outputs.
 
-For instance, see below the difference between the default output of a [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/) and the output from the same test with the `pander()` function (using the `diamonds` dataset from the `{ggplot2}` package):
+For instance, see below the difference between the default output of a [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/) and the output from the same test with the `pander()` function (using the `diamonds` dataset from the [`{ggplot2}` package](/blog/graphics-in-r-with-ggplot2/)):
 
 ```{r}
 library(ggplot2)
@@ -294,6 +294,24 @@ pander(names(dat))
 rnorm(4) # generates 4 observations from a standard normal distribution
 pander(rnorm(4))
 ```
+
+This trick is particularly useful when writing in [R Markdown](/blog/getting-started-in-r-markdown/), as the generated document will look much nicer.
+
+Another trick for the aesthetics is the `report()` function from the `{report}` package.
+
+Similar to `pander()`, the `report()` function allows to report test results in a more readable way---but it also interprets results for you. See for example with a [correlation test](/blog/correlation-coefficient-and-correlation-test-in-r/):
+
+```{r, message = FALSE, warning = FALSE}
+# install.packages("remotes")
+# remotes::install_github("easystats/report") # You only need to do that once
+library("report") # Load the package every time you start R
+
+report(cor.test(dat$price, dat$carat))
+```
+
+Result of the test is displayed and interpreted for you, together with the *p*-value and the correlation coefficient. 
+
+Note that the `report()` function can be used for other analyses. See more examples in the package's [documentation](https://easystats.github.io/report/){target="_blank"}.
 
 # Extract equation model with `{equatiomatic}`
 

@@ -16,7 +16,8 @@ description: "Frequently asked questions. Feel free to contact me if you have an
 1. [How can I support you and support this blog?](#10-how-can-i-support-you-and-support-this-blog)
 1. [Can you link to my website?](#11-can-you-link-to-my-website)
 1. [Can you write about this specific topic?](#12-can-you-write-about-this-specific-topic)
-1. [I have a question that is not mentioned here](#13-i-have-a-question-that-is-not-mentioned-here)
+1. [Would you do one-on-one teaching or consulting?](#13-would-you-do-one-on-one-teaching-or-consulting)
+1. [I have a question that is not mentioned here](#14-i-have-a-question-that-is-not-mentioned-here)
 
 This FAQ may be updated with new questions. Feel free to [contact me](/contact/) if you have any other questions.
 
@@ -112,6 +113,15 @@ Suggestions about specific topics are always welcome. As written in this [post](
 
 So if I am familiar with the topic you suggested and I have some free time, I will definitely write about it. However, if I am not an expert in the field, I will let you know and I will try to redirect you to more knowledgeable persons.
 
-## 13. I have a question that is not mentioned here
+## 13. Would you do one-on-one teaching or consulting?
+
+Yes, I am open to one-on-one teaching or consulting to help:
+
+* professionals in their research or project, and
+* university students in their classes or thesis
+
+Do not hesitate to [contact me](/contact/) if you have any questions (e.g., availabilities, rates, etc.).
+
+## 14. I have a question that is not mentioned here
 
 If you still have a question that is not mentioned here you can [contact me](/contact/).

@@ -28,7 +28,7 @@ output:
 <li><a href="#new-code-chunk-in-r-markdown">New code chunk in R Markdown</a></li>
 <li><a href="#reformat-code">Reformat code</a></li>
 <li><a href="#rstudio-addins">RStudio addins</a></li>
-<li><a href="#pander-for-aesthetics"><code>{pander}</code> for aesthetics</a></li>
+<li><a href="#pander-and-report-for-aesthetics"><code>{pander}</code> and <code>{report}</code> for aesthetics</a></li>
 <li><a href="#extract-equation-model-with-equatiomatic">Extract equation model with <code>{equatiomatic}</code></a></li>
 <li><a href="#pipe-operator">Pipe operator <code>%&gt;%</code></a></li>
 <li><a href="#others">Others</a></li>
@@ -196,10 +196,10 @@ for (i in 1:10) {
 <p>The addin I use most often is probably the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse"><code>{esquisse}</code> addin</a>, which allows to draw plots with the <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code> package</a> in a user-friendly and interactive way, and without having to write the code myself.</p>
 <p>RStudio addins are quite diverse and require a more detailed explanation, so I wrote an article focusing on these addins. See the article <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/">here</a>.</p>
 </div>
-<div id="pander-for-aesthetics" class="section level1">
-<h1><code>{pander}</code> for aesthetics</h1>
-<p>The <code>pander()</code> function from the <code>{pander}</code> package is very useful for R Markdown documents and reporting. It is not actually a shortcut but it greatly improves the aesthetics of R outputs.</p>
-<p>For instance, see below the difference between the default output of a <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a> and the output from the same test with the <code>pander()</code> function (using the <code>diamonds</code> dataset from the <code>{ggplot2}</code> package):</p>
+<div id="pander-and-report-for-aesthetics" class="section level1">
+<h1><code>{pander}</code> and <code>{report}</code> for aesthetics</h1>
+<p>The <code>pander()</code> function from the <code>{pander}</code> package is very useful for <a href="/blog/getting-started-in-r-markdown/">R Markdown</a> documents and reporting. It is not actually a shortcut but it greatly improves the aesthetics of R outputs.</p>
+<p>For instance, see below the difference between the default output of a <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a> and the output from the same test with the <code>pander()</code> function (using the <code>diamonds</code> dataset from the <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code> package</a>):</p>
 <pre class="r"><code>library(ggplot2)
 dat &lt;- diamonds
 
@@ -673,9 +673,22 @@ model</code></pre>
 <pre class="r"><code>pander(names(dat))</code></pre>
 <p><em>carat</em>, <em>cut</em>, <em>color</em>, <em>clarity</em>, <em>depth</em>, <em>table</em>, <em>price</em>, <em>x</em>, <em>y</em> and <em>z</em></p>
 <pre class="r"><code>rnorm(4) # generates 4 observations from a standard normal distribution</code></pre>
-<pre><code>## [1] -1.8170575  0.2089859  1.0480589  0.1609936</code></pre>
+<pre><code>## [1] -0.336006627  0.007981993  0.192289317 -0.854022799</code></pre>
 <pre class="r"><code>pander(rnorm(4))</code></pre>
-<p><em>-1.291</em>, <em>0.1842</em>, <em>-0.1146</em> and <em>-1.006</em></p>
+<p><em>0.904</em>, <em>0.3382</em>, <em>0.538</em> and <em>-1.322</em></p>
+<p>This trick is particularly useful when writing in <a href="/blog/getting-started-in-r-markdown/">R Markdown</a>, as the generated document will look much nicer.</p>
+<p>Another trick for the aesthetics is the <code>report()</code> function from the <code>{report}</code> package.</p>
+<p>Similar to <code>pander()</code>, the <code>report()</code> function allows to report test results in a more readable way—but it also interprets results for you. See for example with a <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation test</a>:</p>
+<pre class="r"><code># install.packages(&quot;remotes&quot;)
+# remotes::install_github(&quot;easystats/report&quot;) # You only need to do that once
+library(&quot;report&quot;) # Load the package every time you start R
+
+report(cor.test(dat$price, dat$carat))</code></pre>
+<pre><code>## Effect sizes were labelled following Funder&#39;s (2019) recommendations.
+## 
+## The Pearson&#39;s product-moment correlation between dat$price and dat$carat is positive, significant and very large (r = 0.92, 95% CI [0.92, 0.92], t(53938) = 551.41, p &lt; .001)</code></pre>
+<p>Result of the test is displayed and interpreted for you, together with the <em>p</em>-value and the correlation coefficient.</p>
+<p>Note that the <code>report()</code> function can be used for other analyses. See more examples in the package’s <a href="https://easystats.github.io/report/" target="_blank">documentation</a>.</p>
 </div>
 <div id="extract-equation-model-with-equatiomatic" class="section level1">
 <h1>Extract equation model with <code>{equatiomatic}</code></h1>
