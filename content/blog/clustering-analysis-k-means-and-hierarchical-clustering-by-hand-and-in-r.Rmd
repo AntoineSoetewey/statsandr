@@ -312,14 +312,33 @@ Based on all 30 indices, the best number of clusters is 3 clusters.
 
 ### Visualizations
 
-It is also possible to plot clusters by using the `fviz_cluster()` function. Note that a principal component analysis is performed to represent the variables in a 2 dimensions plane.
+To confirm that your number of classes is indeed optimal, there is a way to evaluate the quality of your clustering via the silhouette plot (which shows the silhouette coefficient on the *y* axis).
 
-We visualize the data in 2 clusters, as suggested by the average silhouette method.
+We draw the silhouette plot for 2 clusters, as suggested by the average silhouette method:
+
+```{r}
+library(cluster)
+
+set.seed(42)
+km_res <- kmeans(Eurojobs, centers = 2, nstart = 20)
+
+sil <- silhouette(km_res$cluster, dist(Eurojobs))
+fviz_silhouette(sil)
+```
+
+As a reminder, the interpretation of the silhouette coefficient is as follows:
+
+* $> 0$ means that the observation is well grouped. The closer the coefficient is to 1, the better the observation is grouped.
+* $< 0$ means that the observation has been placed in the wrong cluster.
+* $= 0$ means that the observation is between two clusters.
+
+The silhouette plot above and the average silhouette coefficient indicate that our grouping is good because a very large majority of the silhouette coefficients are positive, indicating that the observations are placed in the correct group. This therefore confirms our choice of the number of classes.
+
+It is also possible to plot clusters by using the `fviz_cluster()` function. Note that a principal component analysis is performed to represent the variables in a 2 dimensions plane.
 
 ```{r, warning = FALSE, message = FALSE}
 library(factoextra)
 
-km_res <- kmeans(Eurojobs, centers = 2, nstart = 20)
 fviz_cluster(km_res, Eurojobs, ellipse.type = "norm")
 ```
 

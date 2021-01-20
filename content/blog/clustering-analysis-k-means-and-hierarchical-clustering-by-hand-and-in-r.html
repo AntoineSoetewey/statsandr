@@ -367,20 +367,38 @@ ggplot(nbclust_plot) +
 </div>
 <div id="visualizations" class="section level3">
 <h3>Visualizations</h3>
+<p>To confirm that your number of classes is indeed optimal, there is a way to evaluate the quality of your clustering via the silhouette plot (which shows the silhouette coefficient on the <em>y</em> axis).</p>
+<p>We draw the silhouette plot for 2 clusters, as suggested by the average silhouette method:</p>
+<pre class="r"><code>library(cluster)
+
+set.seed(42)
+km_res &lt;- kmeans(Eurojobs, centers = 2, nstart = 20)
+
+sil &lt;- silhouette(km_res$cluster, dist(Eurojobs))
+fviz_silhouette(sil)</code></pre>
+<pre><code>##   cluster size ave.sil.width
+## 1       1    5          0.33
+## 2       2   21          0.54</code></pre>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>As a reminder, the interpretation of the silhouette coefficient is as follows:</p>
+<ul>
+<li><span class="math inline">\(&gt; 0\)</span> means that the observation is well grouped. The closer the coefficient is to 1, the better the observation is grouped.</li>
+<li><span class="math inline">\(&lt; 0\)</span> means that the observation has been placed in the wrong cluster.</li>
+<li><span class="math inline">\(= 0\)</span> means that the observation is between two clusters.</li>
+</ul>
+<p>The silhouette plot above and the average silhouette coefficient indicate that our grouping is good because a very large majority of the silhouette coefficients are positive, indicating that the observations are placed in the correct group. This therefore confirms our choice of the number of classes.</p>
 <p>It is also possible to plot clusters by using the <code>fviz_cluster()</code> function. Note that a principal component analysis is performed to represent the variables in a 2 dimensions plane.</p>
-<p>We visualize the data in 2 clusters, as suggested by the average silhouette method.</p>
 <pre class="r"><code>library(factoextra)
 
-km_res &lt;- kmeans(Eurojobs, centers = 2, nstart = 20)
 fviz_cluster(km_res, Eurojobs, ellipse.type = &quot;norm&quot;)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Now that the <em>k</em>-means clustering has been detailed in R, see how to do the algorithm by hand in the following sections.</p>
 </div>
 <div id="manual-application-and-verification-in-r" class="section level3">
 <h3>Manual application and verification in R</h3>
 <p>Perform <strong>by hand</strong> the <em>k</em>-means algorithm for the points shown in the graph below, with <em>k</em> = 2 and with the points <em>i</em> = 5 and <em>i</em> = 6 as initial centers. Compute the quality of the partition you just found and then <strong>check</strong> your answers <strong>in R</strong>.</p>
 <p><em>Assume that the variables have the same units so there is no need to scale the data.</em></p>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <div id="solution-by-hand" class="section level4">
 <h4>Solution by hand</h4>
 <p>Step 1. Here are the coordinates of the 6 points:</p>
@@ -1038,7 +1056,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <div id="data-1" class="section level3">
 <h3>Data</h3>
 <p>Using the data from the graph and the table below, perform <strong>by hand</strong> the 3 algorithms (single, complete and average linkage) and draw the dendrograms. Then <strong>check</strong> your answers <strong>in R</strong>.</p>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-25-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>##      V1    V2
 ## 1  2.03  0.06
 ## 2 -0.64 -0.10
@@ -1290,7 +1308,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>the final combination was between points 1 &amp; 5 and 2 &amp; 3 &amp; 4 with a height of 1.530</li>
 <li>this is exactly what is illustrated in the following dendrogram:</li>
 </ul>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In hierarchical clustering, dendrograms are used to show the sequence of combinations of the clusters. The distances of merge between clusters, called heights, are illustrated on the y-axis.</p>
 </div>
 <div id="complete-linkage" class="section level4">
@@ -1534,7 +1552,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>the final combination was between points 1 &amp; 5 and 2 &amp; 3 &amp; 4 with a height of 2.675</li>
 <li>this is exactly what is illustrated in the following dendrogram:</li>
 </ul>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="average-linkage" class="section level4">
 <h4>Average linkage</h4>
@@ -1778,7 +1796,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>the final combination was between points 1 &amp; 5 and 2 &amp; 3 &amp; 4 with a height of 2.126167</li>
 <li>this is exactly what is illustrated in the following dendrogram:</li>
 </ul>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-31-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-32-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="solution-in-r-1" class="section level3">
@@ -1797,7 +1815,7 @@ hclust &lt;- hclust(dist(X), method = &quot;single&quot;)</code></pre>
 <pre class="r"><code>round(hclust$height, 3)</code></pre>
 <pre><code>## [1] 0.328 0.483 0.942 1.530</code></pre>
 <pre class="r"><code>plot(hclust)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-34-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
 <div id="optimal-number-of-clusters-1" class="section level5">
 <h5>Optimal number of clusters</h5>
@@ -1813,7 +1831,7 @@ rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
   border = &quot;blue&quot;
 )</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-36-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Note that determining the optimal number of clusters via the dendrogram is not specific to the single linkage, it can be applied to other linkage methods too!</p>
 <p>Below another figure explaining how to determine the optimal number of clusters:</p>
 <div class="figure">
@@ -1825,7 +1843,7 @@ rect.hclust(hclust,
 <pre class="r"><code>barplot(hclust$height,
   names.arg = (nrow(X) - 1):1 # show the number of cluster below each bars
 )</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-36-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-37-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.</p>
 <p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the <em>silhouette plot</em>, <em>elbow plot</em> or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better). However, these methods are beyond the scope of this course and the method presented with the dendrogram is generally sufficient.</p>
 </div>
@@ -1840,7 +1858,7 @@ hclust &lt;- hclust(dist(X), method = &quot;complete&quot;)</code></pre>
 <pre class="r"><code>round(hclust$height, 3)</code></pre>
 <pre><code>## [1] 0.328 0.603 0.942 2.675</code></pre>
 <pre class="r"><code>plot(hclust)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-38-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-39-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
 <p>Similar to the single linkage, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
 <pre class="r"><code>plot(hclust)
@@ -1848,7 +1866,7 @@ rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
   border = &quot;blue&quot;
 )</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-39-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-40-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="average-linkage-1" class="section level4">
 <h4>Average linkage</h4>
@@ -1860,7 +1878,7 @@ hclust &lt;- hclust(dist(X), method = &quot;average&quot;)</code></pre>
 <pre class="r"><code>round(hclust$height, 3)</code></pre>
 <pre><code>## [1] 0.328 0.543 0.942 2.126</code></pre>
 <pre class="r"><code>plot(hclust)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-41-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-42-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
 <p>Like the single and complete linkages, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
 <pre class="r"><code>plot(hclust)
@@ -1868,7 +1886,7 @@ rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
   border = &quot;blue&quot;
 )</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-42-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-43-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 </div>
