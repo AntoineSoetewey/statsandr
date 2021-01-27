@@ -1,0 +1,429 @@
+---
+title: Hypothesis test by hand
+author: Antoine Soetewey
+date: '2021-01-27'
+slug: hypothesis-test-by-hand
+categories: []
+tags:
+  - Basics
+  - Confidence interval
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: blog/2021-01-27-hypothesis-test-by-hand_files/hypothesis-test-by-hand.jpeg
+description: Learn the structure of a hypothesis test by hand, illustrated by 4 easy steps using the critical, p-value and confidence interval methods
+draft: true
+---
+
+
+
+<p><img src="/blog/2021-01-27-hypothesis-test-by-hand_files/hypothesis-test-by-hand.jpeg" style="width:100.0%" /></p>
+<div id="descriptive-versus-inferential-statistics" class="section level1">
+<h1>Descriptive versus inferential statistics</h1>
+<p>Remember that <strong><a href="/blog/descriptive-statistics-by-hand/">descriptive statistics</a></strong> is the branch of statistics aiming at <strong>describing and summarizing a set of data</strong> in the best possible manner, that is, by reducing it down to a few meaningful key measures and visualizations—with as little loss of information as possible. In other words, the branch of <a href="/blog/descriptive-statistics-by-hand/">descriptive statistics</a> helps to have a better understanding and a clear image about a set of observations thanks to summary statistics and graphics. With descriptive statistics, there is no uncertainty because we describe only the group of observations that we decided to work on and no attempt is made to generalize the observed characteristics to another or to a larger group of observations.</p>
+<p><strong><a href="/tags/inferential-statistics/">Inferential statistics</a></strong>, one the other hand, is the branch of statistics that uses a random sample of data taken from a population to make inferences, i.e., to <strong>draw conclusions about the population of interest</strong> (see the <a href="/blog/what-is-the-difference-between-population-and-sample/">difference between population and sample</a> if you need a refresh of the two concepts). In other words, information from the sample is used to make generalizations about the parameter of interest in the population.</p>
+<p>The two most important tools used in the domain of inferential statistics are:</p>
+<ul>
+<li>hypothesis test (which is the main subject of the present article), and</li>
+<li>confidence interval (which is briefly discussed in this <a href="xxx">section</a>)</li>
+</ul>
+</div>
+<div id="motivations-and-limitations" class="section level1">
+<h1>Motivations and limitations</h1>
+<p>Via my <a href="https://www.antoinesoetewey.com/teaching/" target="_blank">teaching</a> tasks, I realized that many students (especially in introductory statistic classes) struggle to perform hypothesis tests and interpret the results. It seems to me that these students often encounter difficulties mainly because hypothesis testing is rather unclear and abstract to them. One of the reason it looks abstract to them is because they do not understand the final goal of hypothesis testing—the “why” behind this tool. They often do inferential statistics without understanding the reasoning behind it, as if they were following a cooking recipe which does not require any thinking. However, as soon as they understand the principle underlying hypothesis testing, it is much easier for them to apply the concepts and solve the exercises.</p>
+<p>For this reason, I though it would be useful to write an article on the goal of hypothesis tests (the “why?”), in which context they should be used (the “when?”), how they work (the “how?”) and how to interpret the results (the “so what?”). Like anything else in statistics, it becomes much easier to apply a concept in practice when we understand what we are testing or what we are trying to demonstrate beforehand.</p>
+<p>In this article, I present—as comprehensibly as possible—the different <strong>steps required to perform and conclude a hypothesis test by hand</strong>. These steps are illustrated with a basic example. This will build the theoretical foundations of hypothesis testing, which will in turn be of great help for the understanding of most statistical tests.</p>
+<p>Hypothesis tests come in many forms and can be used for many parameters or research questions. The steps I present in this article are not applicable to <em>all</em> hypothesis test, unfortunately. They are however, appropriate for <em>at least</em> the most common hypothesis tests—the tests on:</p>
+<ol style="list-style-type: decimal">
+<li>One mean: <span class="math inline">\(\mu\)</span></li>
+<li>Two means:
+<ul>
+<li>independent samples: <span class="math inline">\(\mu_1\)</span> and <span class="math inline">\(\mu_2\)</span></li>
+<li>paired samples: <span class="math inline">\(\mu_D\)</span></li>
+</ul></li>
+<li>One proportion: <span class="math inline">\(p\)</span></li>
+<li>Two proportions: <span class="math inline">\(p_1\)</span> and <span class="math inline">\(p_2\)</span></li>
+<li>One variance: <span class="math inline">\(\sigma^2\)</span></li>
+<li>Two variances: <span class="math inline">\(\sigma^2_1\)</span> and <span class="math inline">\(\sigma^2_2\)</span></li>
+</ol>
+<p>The good news is that the principles behind these 6 statistical tests (and many more) are exactly the same. So if you understand the intuition and the process for one of them, all others pretty much follow.</p>
+</div>
+<div id="hypothesis-test" class="section level1">
+<h1>Hypothesis test</h1>
+<div id="why" class="section level2">
+<h2>Why?</h2>
+<p>Unlike <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> where we only describe the data at hand, <strong>hypothesis tests use a subset of observations</strong>, referred as a <a href="/blog/what-is-the-difference-between-population-and-sample/">sample</a>, <strong>to draw conclusions about a population</strong>.</p>
+<p>One may wonder why we would try to “guess” or make inference about a parameter of a population based on a sample, instead of simply collecting data for the entire population, compute statistics we are interested in and take decisions based upon that. The main reason we actually use a sample instead of the entire population is because, most of the time, collecting data on the entire population is practically impossible, too complex, too expensive, it would take too long, or a combination of any of these.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>So the <strong>overall objective of a hypothesis test is to draw conclusions in order to confirm or refute a belief about a population</strong>, based on a smaller group of observations.</p>
+<p>In practice, we take some measurements of the variable of interest—representing the sample(s)—and we check whether our measurements are likely or not given our assumption (our belief). Based on the <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/">probability</a> of observing the sample(s) we have, we decide whether we can trust our belief or not.</p>
+</div>
+<div id="when" class="section level2">
+<h2>When?</h2>
+<p>Hypothesis tests have many practical applications. Here are different situations illustrating when the 6 tests mentioned above would be appropriate:</p>
+<ol style="list-style-type: decimal">
+<li>One mean: suppose that a health professional would like to test whether the mean weight of Belgian adults is different than 80 kg (176.4 lbs).</li>
+<li>Two means:
+<ul>
+<li>Independent samples: suppose that a physiotherapist would like to test whether the mean response time (in seconds) is different between patients in a control group and patients in a treatment group, where patients in the two groups are different.</li>
+<li>Paired samples: suppose that a physiotherapist would like to test whether the mean response time (in seconds) is different before and after a treatment, where patients are measured twice—before and after treatment, so patients are the same in the 2 samples.</li>
+</ul></li>
+<li>One proportion: suppose that a political pundit would like to test whether the proportion of citizens who are going to vote for a specific candidate is smaller than 30%.</li>
+<li>Two proportions: suppose that a doctor would like to test whether the proportion of smokers is different between professional and amateur athletes.</li>
+<li>One variance: suppose that an engineer would like to test whether a voltmeter has a lower variability than what is imposed by the safety standards.</li>
+<li>Two variances: suppose that, in a factory, two production lines work independently from each other. The financial manager would like to test whether the costs of the weekly maintenance of these two machines have the same variance. Note that a test on two variances is also often performed to verify the assumption of equal variances, which is required for several other statistical tests, such as the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test</a> for instance.</li>
+</ol>
+<p>Of course, this is a non-exhaustive list of potential applications and many research questions can be answered thanks to a hypothesis test.</p>
+<p>Usually, <strong>hypothesis tests are used to answer research questions in confirmatory analyses</strong>. Confirmatory analyses refer to statistical analyses where hypotheses—deducted from theory—are defined beforehand (preferably before data collection). In this approach, the researcher has a specific idea about the variables under consideration and she is trying to see if her idea, specified as hypotheses, is supported by data.</p>
+<p>On the other hand, hypothesis tests are rarely used in exploratory analyses.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> Exploratory analyses aims to uncover possible relationships between the variables under investigation. In this approach, the researcher does not have any clear theory-driven assumptions or ideas in mind before data collection. This is the reason exploratory analyses are sometimes referred as hypothesis-generating analyses—they are used to create some hypotheses, which in turn may be tested via confirmatory analyses at a later stage.</p>
+</div>
+<div id="how" class="section level2">
+<h2>How?</h2>
+<p>There are, to my knowledge, 3 different methods to perform a hypothesis tests:</p>
+<ul>
+<li>Method A: Comparing the test statistic with the <strong>critical value</strong></li>
+<li>Method B: Comparing the <strong><em>p</em>-value</strong> with the significance level <span class="math inline">\(\alpha\)</span></li>
+<li>Method C: Comparing the target parameter with the <strong>confidence interval</strong></li>
+</ul>
+<p>xxx add link</p>
+<p>Although the process for these 3 approaches may slightly differ, they all lead to the exact same conclusions. Using one method or another is, therefore, more often than not a matter of personal choice or a matter of context. See this <a href="xxx">section</a> to know which method I use depending on the context.</p>
+<p>I present the 3 methods in the following sections, starting with, in my opinion, the most comprehensive one when it comes to doing it by hand: comparing the test statistic with the critical value.</p>
+<p>For the three methods, I will explain the required steps to perform a hypothesis test from a general point of view and illustrate them with the following situation:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<blockquote>
+<p>Suppose a health professional who would like to test whether the mean weight of Belgian adults is different than 80 kg.</p>
+</blockquote>
+<p>Note that, as for most hypothesis tests, the test we are going to use as example below requires some assumptions. Since the aim of the present article is to explain a hypothesis test, we assume that all assumptions are met. For the interested reader, see the assumptions (and how to verify them) for this type of hypothesis test in the article presenting the <a href="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/#assumptions">one-sample t-test</a>.</p>
+<div id="method-a-comparing-the-test-statistic-with-the-critical-value" class="section level3">
+<h3>Method A: Comparing the test statistic with the critical value</h3>
+<p>Method A, which consists in comparing the test statistic with the critical value, boils down to the following 4 steps:</p>
+<ol style="list-style-type: decimal">
+<li>Stating the <strong>null and alternative hypothesis</strong></li>
+<li>Computing the <strong>test statistic</strong></li>
+<li>Finding the <strong>critical value</strong></li>
+<li><strong>Concluding</strong> and interpreting the results</li>
+</ol>
+<p>Each step is detailed below.</p>
+<div id="step-1-stating-the-null-and-alternative-hypothesis" class="section level4">
+<h4>Step #1: Stating the null and alternative hypothesis</h4>
+<p>As discussed before, a hypothesis test first requires an idea, that is, an assumption about a phenomenon. This assumption, referred as hypothesis, is derived from the theory and/or the research question.</p>
+<p>Since a hypothesis test is used to confirm or refute a prior belief, we need to <strong>formulate our belief so that there is a null and an alternative hypothesis</strong>. Those hypotheses must be <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#union-of-two-events">mutually exclusive</a>, which means that they cannot be true at the same time. This is step #1.</p>
+<p>In the context of our scenario, the null and alternative hypothesis are thus:</p>
+<ul>
+<li>Null hypothesis <span class="math inline">\(H_0: \mu = 80\)</span></li>
+<li>Alternative hypothesis <span class="math inline">\(H_1: \mu \ne 80\)</span></li>
+</ul>
+<p>When stating the null and alternative hypothesis, bear in mind the following two points:</p>
+<ol style="list-style-type: decimal">
+<li><em>The assumption we would like to test is often the alternative hypothesis.</em> If the researcher wanted to test whether the mean weight of Belgian adults was less than 80 kg, she would have stated <span class="math inline">\(H_0: \mu = 80\)</span> (or equivalently, <span class="math inline">\(H_0: \mu \ge 80\)</span>) and <span class="math inline">\(H_1: \mu &lt; 80\)</span>.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> Do not mix the null with the alternative hypothesis, or the conclusions will be diametrically opposed!</li>
+<li><em>The null hypothesis is often the status quo.</em> For instance, suppose that a doctor wants to test whether the new treatment A is more efficient than the old treatment B. The status quo is that the new and old treatments are equally efficient. Assuming a larger value is better, she will then write <span class="math inline">\(H_0: \mu_A = \mu_B\)</span> (or equivalently, <span class="math inline">\(H_0: \mu_A - \mu_B = 0\)</span>) and <span class="math inline">\(H_1: \mu_A &gt; \mu_B\)</span> (or equivalently, <span class="math inline">\(H_0: \mu_A - \mu_B &gt; 0\)</span>). On the opposite, if the lower the better, she would have written <span class="math inline">\(H_0: \mu_A = \mu_B\)</span> (or equivalently, <span class="math inline">\(H_0: \mu_A - \mu_B = 0\)</span>) and <span class="math inline">\(H_1: \mu_A &lt; \mu_B\)</span> (or equivalently, <span class="math inline">\(H_0: \mu_A - \mu_B &lt; 0\)</span>).</li>
+</ol>
+</div>
+<div id="step-2-computing-the-test-statistic" class="section level4">
+<h4>Step #2: Computing the test statistic</h4>
+<p>The <strong>test statistic</strong> (often called <strong>t-stat</strong>) is, in some sense, a metric indicating <strong>how extreme the observations are compared to the null hypothesis</strong>. The higher the t-stat (in absolute value), the more extreme the observations are.</p>
+<p>There are several formulas to compute the t-stat, with one formula for each type of hypothesis test—one or two means, one or two proportions, one or two variances. This means that there is a formula to compute the t-stat for a hypothesis test on one mean, another formula for a test on two means, another for a test on one proportion, etc.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> The only difficulty in this second step is to choose the appropriate formula. As soon as you know which formula to use based on the type of test, you simply have to apply it to the data. For the interested reader, see the different formulas to compute the t-stat for the most common tests in this <a href="https://antoinesoetewey.shinyapps.io/statistics-201/" target="_blank">Shiny app</a>.</p>
+<p>Luckily, formulas for hypothesis tests on one and two means, and one and two proportions follow the same structure. Computing the test statistic for these tests is similar than <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#probabilities-and-standard-normal-distribution">scaling</a> a random variable (a process also knows as “standardization” or “normalization”) which consists in subtracting the mean from that random variable, and dividing the result by the standard deviation:</p>
+<p><span class="math display">\[Z = \frac{X - \mu}{\sigma}\]</span></p>
+<p>For these 4 hypothesis tests (one/two means and one/two proportions), computing the test statistic is like scaling the estimator (computed from the sample) corresponding to the parameter of interest (in the population). So we basically subtract the target parameter from the point estimator and then divide the result by the standard error (which is equivalent to the standard deviation but for an estimator).</p>
+<p>If this is unclear, here is how the test statistic (denoted <span class="math inline">\(t_{obs}\)</span>) is computed in our scenario (assuming that the variance of the population is unknown):</p>
+<p><span class="math display">\[t_{obs} = \frac{\bar{x} - \mu}{\frac{s}{\sqrt{n}}}\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\bar{x}\)</span> is the sample mean (i.e., the estimator)</li>
+<li><span class="math inline">\(\mu\)</span> is the mean under the null hypothesis (i.e., the target parameter)</li>
+<li><span class="math inline">\(s\)</span> is the sample standard deviation</li>
+<li><span class="math inline">\(n\)</span> is the sample size</li>
+<li>(<span class="math inline">\(\frac{s}{\sqrt{n}}\)</span> is the standard error)</li>
+</ul>
+<p>Notice the similarity between the formula of this test statistic and the formula used to standardize a random variable. This structure is the same for a test on two means, one proportion and two proportions, except that the estimator, the parameter and the standard error are, of course, slightly different for each type of test.</p>
+<p>Suppose that in our case we have a sample mean of 71 kg (<span class="math inline">\(\bar{x}\)</span> = 71), a sample standard deviation of 13 kg (<span class="math inline">\(s\)</span> = 13) and a sample size of 10 adults (<span class="math inline">\(n\)</span> = 10). Remember that the population mean (the mean under the null hypothesis) is 80 kg (<span class="math inline">\(\mu\)</span> = 80).</p>
+<p>The t-stat is thus:</p>
+<p><span class="math display">\[t_{obs} = \frac{\bar{x} - \mu}{\frac{s}{\sqrt{n}}} = \frac{71 - 80}{\frac{13}{\sqrt{10}}} = -2.189\]</span></p>
+<p>Although formulas are different depending on which parameter you are testing, the value found for the test statistic gives us an indication on how extreme our observations are.</p>
+<p>We keep this value of -2.189 in mind because it will be used again in step #4.</p>
+</div>
+<div id="step-3-finding-the-critical-value" class="section level4">
+<h4>Step #3: Finding the critical value</h4>
+<p>Although the t-stat gives us an indication of how extreme our observations are, we cannot tell whether this “score of extremity” is <em>too</em> extreme or not based on its value only. So, at this point, we cannot yet tell whether our data are too extreme or not. For this, we need to compare our t-stat with a threshold—referred as <strong>critical value</strong>—given by the <a href="/blog/a-guide-on-how-to-read-statistical-tables/">probability distribution</a> tables (and which can, of course, also be found with R).</p>
+<p>In the same way that the formula to compute the t-stat is different for each parameter of interest, the underlying probability distribution—and thus the statistical table—on which the critical value is based is also different for each target parameter. This means that, in addition to choosing the appropriate formula to compute the t-stat, we also need to select the appropriate probability distribution depending on the parameter we are testing.</p>
+<p>Luckily, there are only 4 different probability distributions for the 6 hypothesis tests covered in this article (one/two means, one/two proportions and one/two variances):</p>
+<ol style="list-style-type: decimal">
+<li><a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#probabilities-and-standard-normal-distribution">Standard Normal distribution</a>:
+<ul>
+<li>test on one and two means with known population variance(s)</li>
+<li>test on two paired samples where the variance of the difference between the 2 samples <span class="math inline">\(\sigma^2_D\)</span> is known</li>
+<li>test on one and two proportions (given that some assumptions are met)</li>
+</ul></li>
+<li>Student distribution:
+<ul>
+<li>test on one and two means with <em>un</em>known population variance(s)</li>
+<li>test on two paired samples where the variance of the difference between the 2 samples <span class="math inline">\(\sigma^2_D\)</span> is <em>un</em>known</li>
+</ul></li>
+<li>Chi-square distribution:
+<ul>
+<li>test on one variance</li>
+</ul></li>
+<li>Fisher distribution:
+<ul>
+<li>test on two variances</li>
+</ul></li>
+</ol>
+<p>Each probability distribution also has its own parameters (up to two parameters for the 4 distribution considered here), defining its shape and/or location. Parameter(s) of a probability distribution can be seen as its DNA; meaning that the distribution is entirely defined by its parameter(s).</p>
+<p>Taking our initial scenario—a health professional who would like to test whether the mean weight of Belgian adults is different than 80 kg—as example. The underlying probability distribution of a test on one mean is either the standard Normal or the Student distribution, depending on whether the variance of the <em>population</em> (not sample variance!) is known or unknown:<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
+<ul>
+<li>If the population variance is known <span class="math inline">\(\rightarrow\)</span> the standard Normal distribution is used</li>
+<li>If the population variance is <em>un</em>known <span class="math inline">\(\rightarrow\)</span> the Student distribution is used</li>
+</ul>
+<p>If no population variance is explicitly given, you can assume that it is unknown since you cannot compute it based on a sample. If you could compute it, that would mean you have access to the entire population and there is, in this case, no point in performing a hypothesis test (you could simply use some <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> to confirm or refute your belief). In our example, no population variance is specified so it is assumed to be unknown. We therefore use the Student distribution.</p>
+<p>The Student distribution has one parameter which defines it; the number of degrees of freedom. The number of degrees of freedom depends on the type of hypothesis test. For instance, the number of degrees of freedom for a test on one mean is equal to the number of observations minus one (<span class="math inline">\(n\)</span> - 1). Without going too far into the details, the - 1 comes from the fact that there is one quantity which is estimated (i.e., the mean).<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a> The sample size being equal to 10 in our example, the degrees of freedom is equal to <span class="math inline">\(n\)</span> - 1 = 10 - 1 = 9.</p>
+<p>There is only one last element missing to find the critical value: the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha">significance level</a>. The <strong>significance level</strong>, denoted <span class="math inline">\(\alpha\)</span>, is the probability of wrongly rejecting the null hypothesis, so the <strong>probability of rejecting the null hypothesis although it is in reality true</strong>. In this sense, it is an error (type I error, as opposed to the type II error<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>) that we accept to deal with, in order to be able to draw conclusions about a population based on a subset of it.</p>
+<p>As you may have read in many statistical textbooks, the significance level is very often set to 5%.<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a> In some fields (such as medicine or engineering, among others), the significance level is also sometimes set to 1% to decrease the error rate. It is best to specify the significance level <em>before</em> performing a hypothesis test to avoid the temptation to set the significance level in accordance to the results (the temptation is even bigger when the results are on the edge of being significant). As I always tell my students, you cannot “guess” nor compute the significance level. Therefore, if it is not explicitly specified, you can safely assume it is 5%. In our case, we did not indicate it, so we take <span class="math inline">\(\alpha\)</span> = 5% = 0.05.</p>
+<p>Furthermore, in our example, we want to test whether the mean weight of Belgian adults is <strong>different</strong> than 80 kg. Since we do not specify the direction of the test, it is a <strong>two-sided test</strong>. If we wanted to test that the mean weight was less than 80 kg (<span class="math inline">\(H_1: \mu &lt;\)</span> 80) or greater than 80 kg (<span class="math inline">\(H_1: \mu &gt;\)</span> 80), we would have done a one-sided test. Make sure that you perform the correct test (two-sided or one-sided) because it has an impact on how to find the critical value (see more in the following paragraphs).</p>
+<p>So now that we know the appropriate distribution (Student distribution), its parameter (degrees of freedom (df) = 9), the significance level (<span class="math inline">\(\alpha\)</span> = 0.05) and the direction (two-sided), we have all we need to find the critical value in the <a href="/blog/a-guide-on-how-to-read-statistical-tables/">statistical tables</a>:</p>
+<p><img src="critical_value_student_distribution.png" /></p>
+<p>xxx add image: critical_value_student_distribution</p>
+<p>By looking at the row df = 9 and the column <span class="math inline">\(t_.025\)</span> in the Student’s distribution table, we find a critical value of:</p>
+<p><span class="math display">\[t_{n-1; \alpha / 2} = t_{9; 0.025} = 2.262\]</span></p>
+<p>One may wonder why we take <span class="math inline">\(t_{\alpha/2} = t_.025\)</span> and not <span class="math inline">\(t_\alpha = t_.05\)</span> since the significance level is 0.05. The reason is that we are doing a two-sided test (<span class="math inline">\(H_1: \mu \ne\)</span> 80), so the error rate of 0.05 must be divided in 2 to find the critical value to the right of the distribution. Since the Student’s distribution is symmetric, the critical value to the left of the distribution is simply: -2.262.</p>
+<p>Visually, the error rate of 0.05 is partitioned into two parts:</p>
+<ul>
+<li>0.025 to the left of -2.262 and</li>
+<li>0.025 to the right of 2.262</li>
+</ul>
+<p><img src="/blog/2021-01-27-hypothesis-test-by-hand_files/figure-html/unnamed-chunk-1-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We keep in mind these critical values of -2.262 and 2.262 for the fourth and last step.</p>
+<p>Note that the red shaded areas in the previous plot are also known as the rejection regions. More on that in the following section.</p>
+<p>These critical values can also be found in R, thanks to the <code>qt()</code> function:</p>
+<pre class="r"><code>qt(0.025, df = 9, lower.tail = TRUE)</code></pre>
+<pre><code>## [1] -2.262157</code></pre>
+<pre class="r"><code>qt(0.025, df = 9, lower.tail = FALSE)</code></pre>
+<pre><code>## [1] 2.262157</code></pre>
+<p>The <code>qt()</code> function is used for the Student’s distribution (<code>q</code> stands for quantile and <code>t</code> for Student). There are other functions accompanying the different distributions:</p>
+<ul>
+<li><code>qnorm()</code> for the Normal distribution</li>
+<li><code>qchisq()</code> for the Chi-square distribution</li>
+<li><code>qf()</code> for the Fisher distribution</li>
+</ul>
+</div>
+<div id="step-4-concluding-and-interpreting-the-results" class="section level4">
+<h4>Step #4: Concluding and interpreting the results</h4>
+<p>In this fourth and last step, all we have to do is to <strong>compare the test statistic</strong> (computed in step #2) <strong>with the critical values</strong> (found in step #3) in order to <strong>conclude the hypothesis test</strong>.</p>
+<p>The only two possibilities when concluding a hypothesis test are:</p>
+<ol style="list-style-type: decimal">
+<li>Rejection of the null hypothesis</li>
+<li>Non-rejection of the null hypothesis</li>
+</ol>
+<p>In our example of adult weight, remember that:</p>
+<ul>
+<li>the t-stat is -2.189</li>
+<li>the critical values are -2.262 and 2.262</li>
+</ul>
+<p>Also remember that:</p>
+<ul>
+<li>the <strong>t-stat gives an indication on how extreme our sample is</strong> compared to the null hypothesis</li>
+<li>the <strong>critical values are the threshold from which the t-stat is considered as <em>too</em> extreme</strong></li>
+</ul>
+<p>To compare the t-stat with the critical values, I always recommend to plot them:</p>
+<p><img src="/blog/2021-01-27-hypothesis-test-by-hand_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>These two critical values form the rejection regions (the red shaded areas):</p>
+<ul>
+<li>from <span class="math inline">\(- \infty\)</span> to -2.262, and</li>
+<li>from 2.262 to <span class="math inline">\(\infty\)</span></li>
+</ul>
+<p>If the <strong>t-stat lies within one of the rejection region, we reject the null hypothesis</strong>. On the contrary, if the <strong>t-stat does <em>not</em> lie within any of the rejection region, we do <em>not</em> reject the null hypothesis</strong>.</p>
+<p>As we can see from the above plot, the t-stat is less extreme than the critical value and therefore does not lie within any of the rejection region. In conclusion, we do not reject the null hypothesis that <span class="math inline">\(\mu = 80\)</span>.</p>
+<p>This is the conclusion in statistical terms but they are meaningless without proper interpretation. So it is a good practice to also interpret the result in the context of the problem:</p>
+<blockquote>
+<p>At the 5% significance level, we do not reject the hypothesis that the mean weight of Belgian adults is 80 kg.</p>
+</blockquote>
+<div id="why-dont-we-accept-h_0" class="section level5">
+<h5>Why don’t we accept <span class="math inline">\(H_0\)</span>?</h5>
+<p>From a more philosophical (but still very important) perspective, note that we wrote “we <em>do not reject</em> the null hypothesis” and “we <em>do not reject</em> the hypothesis that the mean weight of Belgian adults is equal to 80 kg”. We did not write “we <em>accept</em> the null hypothesis” nor “the mean weight of Belgian adults is 80 kg”.</p>
+<p>The reason is due to the fact that, in hypothesis testing, we conclude something about the population based on a sample. There is, therefore, always some uncertainty and we cannot be 100% sure that our conclusion is correct.</p>
+<p>Perhaps it is the case that the mean weight of Belgian adults is in reality different than 80 kg, but <strong>we failed to prove it</strong> based on the data at hand. It may be the case that if we had more observations, we would have rejected the null hypothesis (since all else being equal, a larger sample size implies a more extreme t-stat). Or, it may be the case that even with more observations, we would not have rejected the null hypothesis because the mean weight of Belgian adults is in reality close to 80 kg. We cannot distinguish between the two. So we can just say that we did not find enough evidence against the hypothesis that the mean weight of Belgian adults is 80 kg, but we do not conclude that the mean is equal to 80 kg.</p>
+<p>If the difference is still not clear to you, the following example may help. Suppose a person is suspected of having committed a crime. This person is either innocent—the null hypothesis—or guilty—the alternative hypothesis. In the attempt to know if the suspect committed the crime, the police collects as much information and proof as possible. This is similar to the researcher collecting data to form a sample. And then the judge, based on the collected evidence, decides whether the suspect is considered as innocent or guilty. If there is enough evidence that the suspect committed the crime, the judge will conclude that the suspect is guilty. In other words, she will reject the null hypothesis of the suspect being innocent because there are enough evidence that the suspect committed the crime. This is similar to the t-stat being more extreme than the critical value: we have enough information (based on the sample) to say that the null hypothesis is unlikely because our data would be too extreme if the null hypothesis were true. Since the sample cannot be “wrong” (it corresponds to the collected data), the only remaining possibility is that the null hypothesis is in fact wrong. This is the reason we write “we reject the null hypothesis”.</p>
+<p>On the other hand, if there is not enough evidence that the suspect committed the crime (or no evidence at all), the judge will conclude that the suspect is considered as innocent. In other words, she will not reject the null hypothesis of the suspect being innocent. But even if she concludes that the suspect is considered as innocent, she will never be 100% sure that he is really innocent. It may be the case that:</p>
+<ol style="list-style-type: decimal">
+<li>the suspect did not commit the crime, or</li>
+<li>the suspect committed the crime but the police was not able to collect enough information against the suspect.</li>
+</ol>
+<p>In the former case the suspect is really innocent, whereas in the latter case the suspect is guilty but the police and the judge failed to prove it because they failed to find enough evidence. Similar to hypothesis testing, the judge has to conclude the case by considering the suspect innocent, without being able to distinguish between the two.</p>
+<p>This is the main reason we write “we do not reject the null hypothesis” or “we fail to reject the null hypothesis” (you may even read in some textbooks conclusion such as “there is no sufficient evidence in the data to reject the null hypothesis”), and we do not write “we accept the null hypothesis”.</p>
+<p>I hope this metaphor helped you to understand the reason why we reject the null hypothesis instead of accepting it.</p>
+<p>In the following sections, we present two other methods used in hypothesis testing. These methods will result in the exact same conclusion: non-rejection of the null hypothesis, that is, we do not reject the hypothesis that the mean weight of Belgian adults is 80 kg. It is thus presented only if you prefer to use these methods over the first one.</p>
+</div>
+</div>
+</div>
+<div id="method-b-comparing-the-p-value-with-the-significance-level-alpha" class="section level3">
+<h3>Method B: Comparing the <em>p</em>-value with the significance level <span class="math inline">\(\alpha\)</span></h3>
+<p>Method B, which consists in computing the <em>p</em>-value and comparing this <em>p</em>-value with the significance level <span class="math inline">\(\alpha\)</span>, boils down to the following 4 steps:</p>
+<ol style="list-style-type: decimal">
+<li>Stating the <strong>null and alternative hypothesis</strong></li>
+<li>Computing the <strong>test statistic</strong></li>
+<li>Computing the <strong><em>p</em>-value</strong></li>
+<li><strong>Concluding</strong> and interpreting the results</li>
+</ol>
+<p>In this second method which uses the <em>p</em>-value, the first and second steps are similar than in the first method.</p>
+<div id="step-1-stating-the-null-and-alternative-hypothesis-1" class="section level4">
+<h4>Step #1: Stating the null and alternative hypothesis</h4>
+<p>The null and alternative hypotheses remain the same:</p>
+<ul>
+<li><span class="math inline">\(H_0: \mu = 80\)</span></li>
+<li><span class="math inline">\(H_1: \mu \ne 80\)</span></li>
+</ul>
+</div>
+<div id="step-2-computing-the-test-statistic-1" class="section level4">
+<h4>Step #2: Computing the test statistic</h4>
+<p>Remember that the formula for the t-stat is different depending on the type of hypothesis test (one or two means, one or two proportions, one or two variances). In our case of one mean with unknown variance, we have:</p>
+<p><span class="math display">\[t_{obs} = \frac{\bar{x} - \mu}{\frac{s}{\sqrt{n}}} = \frac{71 - 80}{\frac{13}{\sqrt{10}}} = -2.189\]</span></p>
+</div>
+<div id="step-3-computing-the-p-value" class="section level4">
+<h4>Step #3: Computing the <em>p</em>-value</h4>
+<p>The <strong><em>p</em>-value</strong> is the <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/">probability</a> (so it goes from 0 to 1) of observing a sample at least as extreme as the one we observed if the null hypothesis were true. In some sense, it <strong>gives you an indication on how likely your null hypothesis is</strong>. It is also defined as the smallest level of significance for which the data indicate rejection of the null hypothesis.</p>
+<p>For more information about the <em>p</em>-value, I recommend reading this <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha">note about the <em>p</em>-value and the significance level <span class="math inline">\(\alpha\)</span></a>.</p>
+<p>Formally, the <em>p</em>-value is the area beyond the test statistic. Since we are doing a two-sided test, the <em>p</em>-value is thus the sum of the area above 2.189 and below -2.189.</p>
+<p>Visually, the <em>p</em>-value is the sum of the two blue shaded areas in the following plot:</p>
+<p><img src="/blog/2021-01-27-hypothesis-test-by-hand_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The <em>p</em>-value can computed with precision in R with the <code>pt()</code> function:</p>
+<pre class="r"><code>p_val &lt;- pt(-2.189, df = 9, lower.tail = TRUE) + pt(2.189, df = 9, lower.tail = FALSE)
+p_val</code></pre>
+<pre><code>## [1] 0.05634202</code></pre>
+<pre class="r"><code># which is equivalent than:
+p_val &lt;- 2 * pt(2.189, df = 9, lower.tail = FALSE)
+p_val</code></pre>
+<pre><code>## [1] 0.05634202</code></pre>
+<p>The <em>p</em>-value is 0.0563, which indicates that there is a 5.63% chance to observe a sample at least as extreme as the one observed if the null hypothesis were true. This already gives us a hint on whether our t-stat is too extreme or not (and thus whether our null hypothesis is likely or not), but we formally conclude in step #4.</p>
+<p>Like the <code>qt()</code> function to find the critical value, we use <code>pt()</code> to find the <em>p</em>-value because the underlying distribution is the Student’s distribution. Use <code>pnorm()</code>, <code>pchisq()</code> and <code>pf()</code> for the Normal, Chi-square and Fisher distribution, respectively. See also this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank">Shiny app</a> to compute the <em>p</em>-value given a certain t-stat for most probability distributions.</p>
+<p>If you do not have access to a computer (during exams for example) you will not be able to compute the <em>p</em>-value precisely, but you can bound it using the statistical table referring to your test. In our case, we use the Student distribution and we look at the row df = 9 (since df = <em>n</em> - 1):</p>
+<p><img src="p-value-student-distribution.png" /></p>
+<p>xxx add image</p>
+<ol style="list-style-type: decimal">
+<li>The critical value is -2.189</li>
+<li>We take the absolute value, which gives 2.189</li>
+<li>The value 2.189 is between 2.132 and 2.776 (blue rectangle in the above table)</li>
+<li>From the column names <span class="math inline">\(t_{.50}\)</span> and <span class="math inline">\(t_{.025}\)</span> related to 2.132 and 2.776, we know that:
+<ul>
+<li>the area to the right of 2.132 is 0.05</li>
+<li>the area to the right of 2.776 is 0.025</li>
+</ul></li>
+<li>So we know that the area to the right of 2.189 must be between 0.025 and 0.05</li>
+<li>Since the Student distribution is symmetric, we know that the area to the left of -2.189 must also be between 0.025 and 0.05</li>
+<li>Therefore, the sum of the two areas must be between 0.05 and 0.10</li>
+<li>In other words, the <em>p</em>-value is between 0.05 and 0.10 (i.e., (0.05 &lt; <em>p</em>-value &lt; 0.10))</li>
+</ol>
+<p>Although we could not compute it precisely, it is enough to conclude our hypothesis test in the last step.</p>
+</div>
+<div id="step-4-concluding-and-interpreting-the-results-1" class="section level4">
+<h4>Step #4: Concluding and interpreting the results</h4>
+<p>The final step is now to simply compare the <em>p</em>-value (computed in step #3) with the significance level <span class="math inline">\(\alpha\)</span>. As for all statistical tests:</p>
+<ul>
+<li>If the <strong><em>p</em>-value is smaller</strong> than <span class="math inline">\(\alpha\)</span> (<em>p</em>-value &lt; 0.05) <span class="math inline">\(\rightarrow H_0\)</span> is unlikely <span class="math inline">\(\rightarrow\)</span> we <strong>reject</strong> the null hypothesis</li>
+<li>If the <strong><em>p</em>-value is greater</strong> than or equal to <span class="math inline">\(\alpha\)</span> (<em>p</em>-value <span class="math inline">\(\ge\)</span> 0.05) <span class="math inline">\(\rightarrow H_0\)</span> is likely <span class="math inline">\(\rightarrow\)</span> we do <strong>not reject</strong> the null hypothesis</li>
+</ul>
+<p>No matter if we take into consideration the exact <em>p</em>-value (i.e., 0.0563) or the bounded one (0.05 &lt; <em>p</em>-value &lt; 0.10), it is larger than 0.05, so we do not reject the null hypothesis.<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a> In the context of the problem, we do not reject the null hypothesis that the mean weight of Belgian adults is 80 kg.</p>
+<p>Remember that rejecting (or not rejecting) a null hypothesis at the significance level <span class="math inline">\(\alpha\)</span> using the critical value method (method A) is equivalent to rejecting (or not rejecting) the null hypothesis when the <em>p</em>-value is lower (equal or greater) than <span class="math inline">\(\alpha\)</span> (method B). This is the reason we find the exact same conclusion than with method A, and why you should too if you use both methods on the same data and with the same significance level.</p>
+</div>
+</div>
+<div id="method-c-comparing-the-target-parameter-with-the-confidence-interval" class="section level3">
+<h3>Method C: Comparing the target parameter with the confidence interval</h3>
+<p>Method C, which consists in computing the confidence interval and comparing this confidence interval with the target parameter (the parameter under the null hypothesis), boils down to the following 3 steps:</p>
+<ol style="list-style-type: decimal">
+<li>Stating the <strong>null and alternative hypothesis</strong></li>
+<li>Computing the <strong>confidence interval</strong></li>
+<li><strong>Concluding</strong> and interpreting the results</li>
+</ol>
+<p>In this last method which uses the confidence interval, the first step is similar than in the first two methods.</p>
+<div id="step-1-stating-the-null-and-alternative-hypothesis-2" class="section level4">
+<h4>Step #1: Stating the null and alternative hypothesis</h4>
+<p>The null and alternative hypotheses remain the same:</p>
+<ul>
+<li><span class="math inline">\(H_0: \mu = 80\)</span></li>
+<li><span class="math inline">\(H_1: \mu \ne 80\)</span></li>
+</ul>
+</div>
+<div id="step-2-computing-the-confidence-interval" class="section level4">
+<h4>Step #2: Computing the confidence interval</h4>
+<p>Like hypothesis testing, confidence intervals are a well-known tool in inferential statistics.</p>
+<p><strong>Confidence interval is</strong> an estimation procedure which produces <strong>an interval</strong> (i.e., a range of values) <strong>containing the true parameter with a certain</strong>—usually high—<strong>probability</strong>.</p>
+<p>In the same way that there is a formula for each type of hypothesis test when computing the test statistics, there exists a formula for each type of confidence interval. Formulas for the different types of confidence intervals can be found in this <a href="https://antoinesoetewey.shinyapps.io/statistics-201/" target="_blank">Shiny app</a>.</p>
+<p>Here is the formula for a confidence interval on one mean <span class="math inline">\(\mu\)</span> (with unknown population variance):</p>
+<p><span class="math display">\[
+(1-\alpha)\text{% CI for } \mu = \bar{x} \pm t_{\alpha/2, n - 1} \frac{s}{\sqrt{n}}
+\]</span></p>
+<p>where <span class="math inline">\(t_{\alpha/2, n - 1}\)</span> is found in the Student distribution table (and is similar to the critical value found in step #3 of method A).</p>
+<p>Given our data and with <span class="math inline">\(\alpha\)</span> = 0.05, we have:</p>
+<p><span class="math display">\[
+\begin{aligned}
+ 95\text{% CI for } \mu &amp;= \bar{x} \pm t_{\alpha/2, n - 1} \frac{s}{\sqrt{n}} \\
+ &amp;= 71 \pm 2.262 \frac{13}{\sqrt{10}} \\
+ &amp;= [61.70; 80.30]
+\end{aligned}
+\]</span></p>
+<p>The 95% confidence interval for <span class="math inline">\(\mu\)</span> is [61.70; 80.30] kg. But <strong>what does a 95% confidence interval mean?</strong></p>
+<p>We know that this estimation procedure has a 95% probability of producing an interval containing the true mean <span class="math inline">\(\mu\)</span>. In other words, <strong>if we construct many confidence intervals</strong> (with different samples of the same size), <strong>95% of them will</strong>, on average, <strong>include the mean of the population</strong> (the true parameter). So on average, 5% of these confidence intervals will not cover the true mean.</p>
+<p>If you wish to decrease this last percentage, you can decrease the significance level (set <span class="math inline">\(\alpha\)</span> = 0.01 or 0.02 for instance). All else being equal, this will increase the range of the confidence interval and thus increase the probability that it includes the true parameter.</p>
+</div>
+<div id="step-3-concluding-and-interpreting-the-results" class="section level4">
+<h4>Step #3: Concluding and interpreting the results</h4>
+<p>The final step is simply to compare the confidence interval (constructed in step #2) with the value of the target parameter (the value under the null hypothesis, mentioned in step #1):</p>
+<ul>
+<li>If the <strong>confidence interval does not include</strong> the hypothesized value <span class="math inline">\(\rightarrow H_0\)</span> is unlikely <span class="math inline">\(\rightarrow\)</span> we <strong>reject</strong> the null hypothesis</li>
+<li>If the <strong>confidence interval includes</strong> the hypothesized value <span class="math inline">\(\rightarrow H_0\)</span> is likely <span class="math inline">\(\rightarrow\)</span> we do <strong>not reject</strong> the null hypothesis</li>
+</ul>
+<p>In our example:</p>
+<ul>
+<li>the hypothesized value is 80 (since <span class="math inline">\(H_0: \mu\)</span> = 80)</li>
+<li>80 is included in the 95% confidence interval since it goes from 61.70 to 80.30 kg</li>
+<li>So we do not reject the null hypothesis</li>
+</ul>
+<p>In the terms of the problem, we do not reject the hypothesis that the mean weight of Belgian adults is 80 kg.</p>
+<p>As you can see, the conclusion is equivalent than with the critical value method (method A) and the <em>p</em>-value method (method B). Again, this must be the case since we use the same data and the same significance level <span class="math inline">\(\alpha\)</span> for all three methods.</p>
+</div>
+</div>
+</div>
+<div id="which-method-to-choose" class="section level2">
+<h2>Which method to choose?</h2>
+<p><strong>All three methods give the same conclusion.</strong> However, each method has its own advantage so I usually select the most convenient one depending on the situation:</p>
+<ul>
+<li>Method A (comparing the test statistic with the critical value):
+<ul>
+<li>It is, in my opinion, the <strong>easiest and most straightforward method</strong> of the three when I do not have access to R.</li>
+</ul></li>
+<li>Method B (comparing the <em>p</em>-value with the significance level <span class="math inline">\(\alpha\)</span>):
+<ul>
+<li>In addition to being able to know whether the null hypothesis is rejected or not, computing the <strong>exact <em>p</em>-value can be very convenient</strong> so I tend to use this method if I have access to R.</li>
+</ul></li>
+<li>Method C (comparing the target parameter with the confidence interval):
+<ul>
+<li>If I need to test <strong>several hypothesized values</strong>, I tend to choose this method because I can construct one single confidence interval and compare it to as many values as I want. For example, with our 95% confidence interval [61.70; 80.30], I know that any value below 61.70 kg and above 80.30 kg will be rejected, without testing it for each value.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>In this article, we reviewed the <a href="/blog/hypothesis-test-by-hand/#why">goals</a> and <a href="/blog/hypothesis-test-by-hand/#when">when</a> hypothesis testing is used. We then showed <a href="/blog/hypothesis-test-by-hand/#how">how to do a hypothesis test by hand</a> through three different methods (A. <a href="xxx">critical value</a>, B. <a href="xxx"><em>p</em>-value</a> and C. <a href="xxx">confidence interval</a>). We also showed how to <a href="xxx">interpret the results</a> in the context of the initial problem.</p>
+<p>Although all three methods give the exact same conclusion when using the same data and the same significance level (otherwise there is a mistake somewhere), I also presented my personal <a href="xxx">preferences</a> when it comes to choosing one method over the other two.</p>
+<p>Thanks for reading. I hope this article helped you to understand the structure of a hypothesis by hand. I remind you that, at least for the 6 hypothesis tests covered in this article, the formulas are different, but the structure and the reasoning behind it remain the same. So you basically have to know which formulas to use, and simply follow the steps mentioned in this article.</p>
+<p>For the interested reader, I created two accompanying Shiny apps:</p>
+<ol style="list-style-type: decimal">
+<li><a href="https://antoinesoetewey.shinyapps.io/statistics-201/" target="_blank">Hypothesis testing and confidence intervals</a>: after entering your data, the app illustrates all the steps in order to conclude the test and compute a confidence interval. See more information in this <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand/">article</a>.</li>
+<li><a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank">How to read statistical tables</a>: the app helps you to compute the <em>p</em>-value given a t-stat for most probability distributions. See more information in this <a href="/blog/a-guide-on-how-to-read-statistical-tables/">article</a>.</li>
+</ol>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Suppose a researcher wants to test whether Belgian women are taller than French women. Suppose a health professional would like to know whether the proportion of smokers is different among athletes and non-athletes. It would take way too long to measure the height of all Belgian and French women and to ask all athletes and non-athletes their smoking habits. So most of the time, decisions are based on a representative sample of the population and not on the whole population. If we could measure the entire population in a reasonable time frame, we would not do any inferential statistics.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Don’t get me wrong, this does not mean that hypothesis tests are <em>never</em> used in exploratory analyses. It is just much less frequent in exploratory research than in confirmatory research.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>You may see more or less steps in other articles or textbooks, depending on whether these steps are detailed or concise. Hypothesis testing should, however, follows the same process regardless of the number of steps.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>For one-sided tests, writing <span class="math inline">\(H_0: \mu = 80\)</span> or <span class="math inline">\(H_0: \mu \ge 80\)</span> are both correct. The point is that the null and alternative hypothesis must be mutually exclusive since you are testing one hypothesis against the other, so both cannot be true at the same time.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>To be complete, there are even different formulas within each type of test, depending on whether some assumptions are met or not. For the interested reader, see all the different scenarios and thus the different formulas for a test on <a href="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/">one mean</a> and on <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">two means</a>.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>There are more uncertainty if the population variance is unknown than if it is known, and this greater uncertainty is taken into account by using the Student distribution instead of the standard Normal distribution. Also note that as the sample size increases, the degrees of freedom of the Student distribution increases and the two distributions become more and more similar. For large sample size (usually from <span class="math inline">\(n &gt;\)</span> 30), the Student distribution becomes so close to the standard Normal distribution that, even if the population variance is unknown, the standard Normal distribution can be used.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>For a test on two independent samples, the degrees of freedom is <span class="math inline">\(n_1 + n_2 - 2\)</span>, where <span class="math inline">\(n_1\)</span> and <span class="math inline">\(n_2\)</span> are the size of the first and second sample, respectively. Note the - 2 due to the fact that in this case, two quantities are estimated.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>The type II error is the probability of not rejecting the null hypothesis although it is in reality false.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>Whether this is a good or a bad standard is a question that comes up often and is debatable. This is, however, beyond the scope of the article.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p>Again, <em>p</em>-values found via a statistical table or via R must be coherent.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
