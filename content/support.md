@@ -39,7 +39,7 @@ You can follow the blog via the following channels:
 * [Twitter](https://twitter.com/statsandr)
 * [Medium](https://antoinesoetewey.medium.com/)
 * [GitHub](https://github.com/AntoineSoetewey)
-* Subscribe to this blog to receive new posts by [email](/subscribe/)
+* [Subscribe](/subscribe/) to this blog to receive new posts by email
 
 ## Recommendations
 
