@@ -706,6 +706,17 @@ test</code></pre>
 <pre><code>## [1] 0.003866756</code></pre>
 <p>The <em>p</em>-value is 0.004 so at the 5% significance level we reject the null hypothesis of equal means. This result confirms what we found by hand.</p>
 <p>Unlike the first scenario, the <em>p</em>-value in this scenario is below 5% so we reject the null hypothesis. At the 5% significance level, we can conclude that the population 1 is larger than the population 2.</p>
+<p>A nice and easy way to report results of a Student’s t-test in R is with the <code>report()</code> function from the <code>{report}</code> package:</p>
+<pre class="r"><code># install.packages(&quot;remotes&quot;)
+# remotes::install_github(&quot;easystats/report&quot;) # You only need to do that once
+library(&quot;report&quot;) # Load the package every time you start R
+
+report(test)</code></pre>
+<pre><code>## Effect sizes were labelled following Cohen&#39;s (1988) recommendations.
+## 
+## The Two Sample t-test testing the difference between dat2$sample1 and dat2$sample2 (mean of x = 1.25, mean of y = 0.10) suggests that the effect is positive, significant and large (difference = 1.15, 95% CI [0.53, Inf], t(9) = 3.41, p &lt; .01; Cohen&#39;s d = 2.07, 95% CI [0.52, 3.55])</code></pre>
+<p>As you can see, the function interprets the test (together with the <em>p</em>-value) for you.</p>
+<p>Note that the <code>report()</code> function can be used for other analyses. See more <a href="/blog/tips-and-tricks-in-rstudio-and-r-markdown/">tips and tricks in R</a> if you find this one useful.</p>
 <p>If your data is formatted in the long format (which is even better), simply use the <code>~</code>. For instance, imagine the exact same data presented like this:</p>
 <pre class="r"><code>dat2bis &lt;- data.frame(
   value = c(1.78, 1.5, 0.9, 0.6, 0.8, 1.9, 0.8, -0.7, -0.1, 0.4, 0.1),
@@ -770,7 +781,7 @@ dat3</code></pre>
   aes(x = sample, y = value) +
   geom_boxplot() +
   theme_minimal()</code></pre>
-<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>There is a function in R for this version of the test as well, and it is simply the <code>t.test()</code> function with the <code>var.equal = FALSE</code> argument. <code>FALSE</code> is the default option for the <code>var.equal</code> argument so you actually do not need to specify it. This version of the test is actually the Welch test, used when the variances of the populations are unknown and unequal. To test if two variances are equal, you can use the Levene’s test (<code>leveneTest(dat3$value, dat3$sample)</code> from the <code>{car}</code> package). Note that the alternative hypothesis is <span class="math inline">\(H_1: \mu_1 - \mu_2 &lt; 0\)</span> so we need to add the argument <code>alternative = "less"</code> as well:</p>
 <pre class="r"><code>test &lt;- t.test(value ~ sample,
   data = dat3,
@@ -815,7 +826,7 @@ ggplot(dat4) +
   aes(y = difference) +
   geom_boxplot() +
   theme_minimal()</code></pre>
-<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-25-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Since there is no function in R to perform a t-test with paired samples where the variance of the differences is known, here is one with arguments accepting the differences between the two samples (<code>x</code>), the variance of the differences in the population (<code>V</code>), the mean of the differences under the null hypothesis (<code>m0</code>, default is <code>0</code>), the significance level (<code>alpha</code>, default is <code>0.05</code>) and the alternative (<code>alternative</code>, one of <code>"two.sided"</code> (default), <code>"less"</code> or <code>"greater"</code>):</p>
 <pre class="r"><code>t.test_pairedknownvar &lt;- function(x, V, m0 = 0, alpha = 0.05, alternative = &quot;two.sided&quot;) {
   M &lt;- mean(x)
@@ -894,7 +905,7 @@ ggplot(dat5) +
   aes(y = difference) +
   geom_boxplot() +
   theme_minimal()</code></pre>
-<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>There is a function in R for this version of the test, and it is simply the <code>t.test()</code> function with the <code>paired = TRUE</code> argument. This version of the test is actually the standard version of the Student’s t-test with paired samples. Note that the alternative hypothesis is <span class="math inline">\(H_1: \mu_D &gt; 0\)</span> so we need to add the argument <code>alternative = "greater"</code> as well:</p>
 <pre class="r"><code>test &lt;- t.test(dat5$after, dat5$before,
   alternative = &quot;greater&quot;,
