@@ -298,7 +298,7 @@ group_by(dat, species) %&gt;%
   )</code></pre>
 <pre><code>## # A tibble: 3 x 3
 ##   species    mean    sd
-##   &lt;fct&gt;     &lt;dbl&gt; &lt;dbl&gt;
+## * &lt;fct&gt;     &lt;dbl&gt; &lt;dbl&gt;
 ## 1 Adelie     190.  6.54
 ## 2 Chinstrap  196.  7.13
 ## 3 Gentoo     217.  6.48</code></pre>
@@ -357,6 +357,16 @@ summary(res_aov)</code></pre>
 <h2>Interpretations of ANOVA results</h2>
 <p>Given that the <em>p</em>-value is smaller than 0.05, we reject the null hypothesis, so we reject the hypothesis that all means are equal. Therefore, we can conclude that <strong>at least one species is different than the others in terms of flippers length</strong> (<em>p</em>-value &lt; 2.2e-16).</p>
 <p>(<em>For the sake of illustration</em>, if the <em>p</em>-value was larger than 0.05: we cannot reject the null hypothesis that all means are equal, so we cannot reject the hypothesis that the 3 considered species of penguins are equal in terms of flippers length.)</p>
+<p>A nice and easy way to report results of an ANOVA in R is with the <code>report()</code> function from the <code>{report}</code> package (we first need to install and load the <code>{easystats}</code> package):</p>
+<pre class="r"><code>devtools::install_github(&quot;easystats/easystats&quot;)
+easystats::install_easystats_latest()
+# install.packages(&quot;remotes&quot;)
+# remotes::install_github(&quot;easystats/report&quot;) # You only need to do that once
+library(&quot;report&quot;) # Load the package every time you start R
+
+report(res_aov)</code></pre>
+<p>As you can see, the function interprets the results for you.</p>
+<p>Note that the <code>report()</code> function can be used for other analyses. See more <a href="/blog/tips-and-tricks-in-rstudio-and-r-markdown/">tips and tricks in R</a> if you find this one useful.</p>
 </div>
 <div id="whats-next" class="section level2">
 <h2>What’s next?</h2>
@@ -420,7 +430,7 @@ summary(post_test)</code></pre>
 ## 
 ## Linear Hypotheses:
 ##                         Estimate Std. Error t value Pr(&gt;|t|)    
-## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 7.21e-09 ***
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 6.54e-09 ***
 ## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &lt; 1e-09 ***
 ## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286  &lt; 1e-09 ***
 ## ---
@@ -438,7 +448,7 @@ summary(post_test)</code></pre>
 <p>The results of the post-hoc test can be visualized with the <code>plot()</code> function:</p>
 <pre class="r"><code>par(mar = c(3, 8, 3, 3))
 plot(post_test)</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the confidence intervals do not cross the zero line, which indicate that all groups are significantly different.</p>
 <p>Note that the Tukey HSD test can also be done in R with the <code>TukeyHSD()</code> function:</p>
 <pre class="r"><code>TukeyHSD(res_aov)</code></pre>
@@ -455,7 +465,7 @@ plot(post_test)</code></pre>
 <p>With this code, it is the column <code>p adj</code> (also the last column) which is of interest. Notice that the conclusions are the same than above: all species are significantly different in terms of flippers length.</p>
 <p>The results can also be visualized with the <code>plot()</code> function:</p>
 <pre class="r"><code>plot(TukeyHSD(res_aov))</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="dunnetts-test" class="section level3">
 <h3>Dunnett’s test</h3>
@@ -501,7 +511,7 @@ summary(post_test)</code></pre>
 <p>Again, the results of the post-hoc test can be visualized with the <code>plot()</code> function:</p>
 <pre class="r"><code>par(mar = c(3, 8, 3, 3))
 plot(post_test)</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-23-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-24-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the confidence intervals do not cross the zero line, which indicate that both the species Gentoo and Chinstrap are significantly different from the reference species Adelie.</p>
 <p>Note that in R, by default, the reference category for a <a href="/blog/data-types-in-r/#factor">factor variable</a> is the first category in alphabetical order. This is the reason that, by default, the reference species is Adelie.</p>
 <p>The reference category can be changed with the <code>relevel()</code> function (or with the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#reordering-factors"><code>{questionr}</code> addin</a>). Considering that we want Gentoo as the reference category instead of Adelie:</p>
@@ -540,7 +550,7 @@ summary(post_test)</code></pre>
 ## (Adjusted p values reported -- single-step method)</code></pre>
 <pre class="r"><code>par(mar = c(3, 8, 3, 3))
 plot(post_test)</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>From the results above we conclude that Adelie and Chinstrap species are significantly different from Gentoo species in terms of flippers length (adjusted <em>p</em>-values &lt; 1e-10).</p>
 <p>Note that even if your study does not have a reference group which you can compare to the other groups, it is still often better to do multiple comparisons determined by some research questions than to do all-pairwise tests. By reducing the number of post-hoc comparisons to what is necessary only, and no more, you maximize the statistical power.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
 </div>
@@ -597,7 +607,7 @@ for (i in y) {
     )
   }
 }</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As you can see on the above plot, boxplots by species are presented together with <em>p</em>-values of the ANOVA and post-hoc tests.</p>
 <p>Besides the fact that it combines a visual representation and results on the same plot, this code also has the advantage that you can perform multiple ANOVA tests at once. See more information in this <a href="/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/">article</a>.</p>
 </div>
