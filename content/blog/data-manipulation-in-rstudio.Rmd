@@ -30,9 +30,9 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-Not all data frames are as clean and tidy as you would expect. Therefore, after [importing your dataset into RStudio](/blog/how-to-import-an-excel-file-in-rstudio/), most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor. Data manipulation include a broad range of tools and techniques.
+Not all data frames are as clean and tidy as you would expect. Therefore, after [importing your dataset into RStudio](/blog/how-to-import-an-excel-file-in-rstudio/), most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor.
 
-We present here in details the manipulations that you will most likely need for your projects. Do not hesitate to let me know (as a comment at the end of this article for example) if you find other data manipulations essential so that I can add them.
+Data manipulation include a broad range of tools and techniques. We present here in details the manipulations that you will most likely need for your projects in R. Do not hesitate to let me know (as a comment at the end of this article for example) if you find other data manipulations essential so that I can add them.
 
 In this article we show the main functions to manipulate data in R. We first illustrate these functions on vectors, [factors](/blog/data-types-in-r/#factor) and lists. We then illustrate the main functions to manipulate data frames and dates/times in R.
 
@@ -88,11 +88,15 @@ You can also create a vector which is the repetition of numbers and strings:
 rep(c("A",2,"C"), times = c(3,1,2))
 ```
 
-but in that case, the number 2 will be considered as a string too (and not as a numeric) since there is at least one string in the vector.
+but in that case, the number 2 will be considered as a string too (and not as a [numeric](/blog/data-types-in-r/#numeric)) since there is at least one string in the vector.
 
 ## Assignment
 
-There are three ways to assign an object in R: `<-`, `=` or `assign()`:
+There are three ways to assign an object in R:
+
+1. `<-`
+1. `=`
+1. `assign()`
 
 ```{r}
 # 1st method
@@ -108,7 +112,7 @@ assign("x3",c(2.1,5,-4,1,5))
 x3
 ```
 
-You can also assign a vector to another vector:
+You can also assign a vector to another vector, for example:
 
 ```{r}
 y<-c(x,10,1/4)
@@ -120,11 +124,14 @@ y
 We can select one or several elements of a vector by specifying its position between square brackets:
 
 ```{r}
+# select one element
 x[3]
+
+# select more than one element with c()
 x[c(1,3,4)]
 ```
 
-We can also use [booleans](/blog/data-types-in-r/#logical) (i.e., `TRUE` or `FALSE`) to select some elements of a vector:
+We can also use [booleans](/blog/data-types-in-r/#logical) (i.e., `TRUE` or `FALSE`) to select some elements of a vector. This method selects only the elements corresponding to `TRUE`:
 
 ```{r}
 x[c(TRUE,FALSE,TRUE,TRUE,FALSE)]
@@ -148,7 +155,11 @@ class(x)
 
 y <- c(x, "Hello")
 class(y)
+```
 
+As you can see above, the class of a vector will be numeric only if all of its elements are numeric. As soon as one element is a character, the class of the vector will be a character.
+
+```{r}
 z <- c(TRUE, FALSE, FALSE)
 class(z)
 ```
@@ -167,7 +178,7 @@ x[length(x)]
 
 ## Finding the vector type
 
-We can find the type of a vector with the `is.type` functions:
+We can find the type of a vector with the family of `is.type` functions:
 
 ```{r}
 is.numeric(x)
@@ -188,9 +199,11 @@ We can change the type of a vector with the `as.numeric()`, `as.logical()` and `
 ```{r}
 x_character <- as.character(x)
 x_character
+is.character(x_character)
 
 x_logical <- as.logical(x)
 x_logical
+is.logical(x_logical)
 ```
 
 It is also possible to change its length:
@@ -200,11 +213,11 @@ length(x) <- 4
 x
 ```
 
-As you can see, the 4 first elements of the vector are conserved while all others are removed.
+As you can see, the first elements of the vector are conserved while all others are removed. In this case, the first 4 since we specified a length of 4.
 
 ## Numerical operators
 
-Several numerical operators such as `+`, `-`, `*`, `/` and `^` can be applied to vectors:
+The basic numerical operators such as `+`, `-`, `*`, `/` and `^` can be applied to vectors:
 
 ```{r}
 x<-c(2.1,5,-4,1)
@@ -215,7 +228,7 @@ x * y
 x^y
 ```
 
-It is also possible to compute the minimum, maximum, sum, product, cumulative sum and cumulative product of a vector:
+It is also possible to compute the [minimum, maximum](/blog/descriptive-statistics-in-r/#minimum-and-maximum), sum, product, cumulative sum and cumulative product of a vector:
 
 ```{r}
 min(x)
@@ -226,7 +239,16 @@ cumsum(x)
 cumprod(x)
 ```
 
-The following operations can be applied too: `sqrt` (square root), `cos`, `sin`, `tan`, `log`, `log10`, `exp`, `abs` (absolute value):
+The following mathematical operations can be applied too:
+
+- `sqrt()` (square root)
+- `cos()` (cosine)
+- `sin()` (sine)
+- `tan()` (tangent)
+- `log()` (logarithm)
+- `log10()` (base 10 logarithm)
+- `exp()` (exponential)
+- `abs()` (absolute value)
 
 ```{r}
 cos(x)
@@ -293,7 +315,7 @@ To find the positions of the elements containing a given string, use the `grep()
 grep("BE", code)
 ```
 
-To extract a character string from the beginning and the end positions, we can use the `substr()` function:
+To extract a character string based on the beginning and the end positions, we can use the `substr()` function:
 
 ```{r}
 substr(code,
@@ -304,12 +326,13 @@ substr(code,
 Replace a character string by another one if it exists in the vector by using the `sub()` function:
 
 ```{r}
-sub(pattern = "BE",
-    replacement = "BEL",
-    code)
+sub(pattern = "BE", # find BE
+    replacement = "BEL", # replace it with BEL
+    code
+    )
 ```
 
-Split a character string with the `strsplit()` function:
+Split a character string based on a specific symbol with the `strsplit()` function:
 
 ```{r}
 strsplit(c("Rafael Nadal","Roger Federer", "Novak Djokovic"),
@@ -341,7 +364,15 @@ sort(x, decreasing = TRUE) # largest to smallest
 order(x)
 ```
 
-As you can see, the third element of the vector is the smallest and the second element is the largest.
+As you can see, the third element of the vector is the smallest and the second element is the largest. This is indicated by the 3 at the beginning of the output, and the 2 at the end of the output.
+
+Like `sort()` the `decreasing = TRUE` argument can also be added:
+
+```{r}
+order(x, decreasing = TRUE)
+```
+
+In this case, the 2 in the output indicates that the second element of the vector is the largest, while the 3 indicates that the third element is the smallest.
 
 `rank()` gives the ranks of the elements:
 
@@ -364,7 +395,7 @@ rev(x)
 
 ## Creating factors
 
-We create factors with the `factor()` function:
+We create factors with the `factor()` function (do not forget the `c()`):
 
 ```{r}
 f1 <- factor(c("T1", "T3", "T1", "T2"))
@@ -390,6 +421,8 @@ v2 <- factor(v,
              ordered = TRUE)
 v2
 ```
+
+Note that the order of the levels will follow the order that is specified in the `labels` argument.
 
 ## Properties
 

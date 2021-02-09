@@ -86,8 +86,8 @@ output:
 <p><img src="/blog/data-manipulation-in-rstudio_files/0_voEJp2o-Z2k4-uUd.jpeg" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Not all data frames are as clean and tidy as you would expect. Therefore, after <a href="/blog/how-to-import-an-excel-file-in-rstudio/">importing your dataset into RStudio</a>, most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor. Data manipulation include a broad range of tools and techniques.</p>
-<p>We present here in details the manipulations that you will most likely need for your projects. Do not hesitate to let me know (as a comment at the end of this article for example) if you find other data manipulations essential so that I can add them.</p>
+<p>Not all data frames are as clean and tidy as you would expect. Therefore, after <a href="/blog/how-to-import-an-excel-file-in-rstudio/">importing your dataset into RStudio</a>, most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor.</p>
+<p>Data manipulation include a broad range of tools and techniques. We present here in details the manipulations that you will most likely need for your projects in R. Do not hesitate to let me know (as a comment at the end of this article for example) if you find other data manipulations essential so that I can add them.</p>
 <p>In this article we show the main functions to manipulate data in R. We first illustrate these functions on vectors, <a href="/blog/data-types-in-r/#factor">factors</a> and lists. We then illustrate the main functions to manipulate data frames and dates/times in R.</p>
 </div>
 <div id="vectors" class="section level1">
@@ -126,11 +126,16 @@ c(1:10)</code></pre>
 <p>You can also create a vector which is the repetition of numbers and strings:</p>
 <pre class="r"><code>rep(c(&quot;A&quot;, 2, &quot;C&quot;), times = c(3, 1, 2))</code></pre>
 <pre><code>## [1] &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;2&quot; &quot;C&quot; &quot;C&quot;</code></pre>
-<p>but in that case, the number 2 will be considered as a string too (and not as a numeric) since there is at least one string in the vector.</p>
+<p>but in that case, the number 2 will be considered as a string too (and not as a <a href="/blog/data-types-in-r/#numeric">numeric</a>) since there is at least one string in the vector.</p>
 </div>
 <div id="assignment" class="section level2">
 <h2>Assignment</h2>
-<p>There are three ways to assign an object in R: <code>&lt;-</code>, <code>=</code> or <code>assign()</code>:</p>
+<p>There are three ways to assign an object in R:</p>
+<ol style="list-style-type: decimal">
+<li><code>&lt;-</code></li>
+<li><code>=</code></li>
+<li><code>assign()</code></li>
+</ol>
 <pre class="r"><code># 1st method
 x &lt;- c(2.1, 5, -4, 1, 5)
 x</code></pre>
@@ -143,7 +148,7 @@ x2</code></pre>
 assign(&quot;x3&quot;, c(2.1, 5, -4, 1, 5))
 x3</code></pre>
 <pre><code>## [1]  2.1  5.0 -4.0  1.0  5.0</code></pre>
-<p>You can also assign a vector to another vector:</p>
+<p>You can also assign a vector to another vector, for example:</p>
 <pre class="r"><code>y &lt;- c(x, 10, 1 / 4)
 y</code></pre>
 <pre><code>## [1]  2.10  5.00 -4.00  1.00  5.00 10.00  0.25</code></pre>
@@ -151,11 +156,13 @@ y</code></pre>
 <div id="elements-of-a-vector" class="section level2">
 <h2>Elements of a vector</h2>
 <p>We can select one or several elements of a vector by specifying its position between square brackets:</p>
-<pre class="r"><code>x[3]</code></pre>
+<pre class="r"><code># select one element
+x[3]</code></pre>
 <pre><code>## [1] -4</code></pre>
-<pre class="r"><code>x[c(1, 3, 4)]</code></pre>
+<pre class="r"><code># select more than one element with c()
+x[c(1, 3, 4)]</code></pre>
 <pre><code>## [1]  2.1 -4.0  1.0</code></pre>
-<p>We can also use <a href="/blog/data-types-in-r/#logical">booleans</a> (i.e., <code>TRUE</code> or <code>FALSE</code>) to select some elements of a vector:</p>
+<p>We can also use <a href="/blog/data-types-in-r/#logical">booleans</a> (i.e., <code>TRUE</code> or <code>FALSE</code>) to select some elements of a vector. This method selects only the elements corresponding to <code>TRUE</code>:</p>
 <pre class="r"><code>x[c(TRUE, FALSE, TRUE, TRUE, FALSE)]</code></pre>
 <pre><code>## [1]  2.1 -4.0  1.0</code></pre>
 <p>Or we can give the elements to withdraw:</p>
@@ -172,6 +179,7 @@ class(x)</code></pre>
 <pre class="r"><code>y &lt;- c(x, &quot;Hello&quot;)
 class(y)</code></pre>
 <pre><code>## [1] &quot;character&quot;</code></pre>
+<p>As you can see above, the class of a vector will be numeric only if all of its elements are numeric. As soon as one element is a character, the class of the vector will be a character.</p>
 <pre class="r"><code>z &lt;- c(TRUE, FALSE, FALSE)
 class(z)</code></pre>
 <pre><code>## [1] &quot;logical&quot;</code></pre>
@@ -184,7 +192,7 @@ class(z)</code></pre>
 </div>
 <div id="finding-the-vector-type" class="section level2">
 <h2>Finding the vector type</h2>
-<p>We can find the type of a vector with the <code>is.type</code> functions:</p>
+<p>We can find the type of a vector with the family of <code>is.type</code> functions:</p>
 <pre class="r"><code>is.numeric(x)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <pre class="r"><code>is.logical(x)</code></pre>
@@ -201,18 +209,22 @@ class(z)</code></pre>
 <pre class="r"><code>x_character &lt;- as.character(x)
 x_character</code></pre>
 <pre><code>## [1] &quot;2.1&quot; &quot;5&quot;   &quot;-4&quot;  &quot;1&quot;   &quot;5&quot;   &quot;0&quot;</code></pre>
+<pre class="r"><code>is.character(x_character)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
 <pre class="r"><code>x_logical &lt;- as.logical(x)
 x_logical</code></pre>
 <pre><code>## [1]  TRUE  TRUE  TRUE  TRUE  TRUE FALSE</code></pre>
+<pre class="r"><code>is.logical(x_logical)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
 <p>It is also possible to change its length:</p>
 <pre class="r"><code>length(x) &lt;- 4
 x</code></pre>
 <pre><code>## [1]  2.1  5.0 -4.0  1.0</code></pre>
-<p>As you can see, the 4 first elements of the vector are conserved while all others are removed.</p>
+<p>As you can see, the first elements of the vector are conserved while all others are removed. In this case, the first 4 since we specified a length of 4.</p>
 </div>
 <div id="numerical-operators" class="section level2">
 <h2>Numerical operators</h2>
-<p>Several numerical operators such as <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> and <code>^</code> can be applied to vectors:</p>
+<p>The basic numerical operators such as <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> and <code>^</code> can be applied to vectors:</p>
 <pre class="r"><code>x &lt;- c(2.1, 5, -4, 1)
 y &lt;- c(0, -7, 1, 1 / 4)
 
@@ -222,7 +234,7 @@ x + y</code></pre>
 <pre><code>## [1]   0.00 -35.00  -4.00   0.25</code></pre>
 <pre class="r"><code>x^y</code></pre>
 <pre><code>## [1]  1.00e+00  1.28e-05 -4.00e+00  1.00e+00</code></pre>
-<p>It is also possible to compute the minimum, maximum, sum, product, cumulative sum and cumulative product of a vector:</p>
+<p>It is also possible to compute the <a href="/blog/descriptive-statistics-in-r/#minimum-and-maximum">minimum, maximum</a>, sum, product, cumulative sum and cumulative product of a vector:</p>
 <pre class="r"><code>min(x)</code></pre>
 <pre><code>## [1] -4</code></pre>
 <pre class="r"><code>max(x)</code></pre>
@@ -235,7 +247,17 @@ x + y</code></pre>
 <pre><code>## [1] 2.1 7.1 3.1 4.1</code></pre>
 <pre class="r"><code>cumprod(x)</code></pre>
 <pre><code>## [1]   2.1  10.5 -42.0 -42.0</code></pre>
-<p>The following operations can be applied too: <code>sqrt</code> (square root), <code>cos</code>, <code>sin</code>, <code>tan</code>, <code>log</code>, <code>log10</code>, <code>exp</code>, <code>abs</code> (absolute value):</p>
+<p>The following mathematical operations can be applied too:</p>
+<ul>
+<li><code>sqrt()</code> (square root)</li>
+<li><code>cos()</code> (cosine)</li>
+<li><code>sin()</code> (sine)</li>
+<li><code>tan()</code> (tangent)</li>
+<li><code>log()</code> (logarithm)</li>
+<li><code>log10()</code> (base 10 logarithm)</li>
+<li><code>exp()</code> (exponential)</li>
+<li><code>abs()</code> (absolute value)</li>
+</ul>
 <pre class="r"><code>cos(x)</code></pre>
 <pre><code>## [1] -0.5048461  0.2836622 -0.6536436  0.5403023</code></pre>
 <pre class="r"><code>exp(x)</code></pre>
@@ -295,7 +317,7 @@ code</code></pre>
 <p>To find the positions of the elements containing a given string, use the <code>grep()</code> function:</p>
 <pre class="r"><code>grep(&quot;BE&quot;, code)</code></pre>
 <pre><code>## [1] 1 2 5</code></pre>
-<p>To extract a character string from the beginning and the end positions, we can use the <code>substr()</code> function:</p>
+<p>To extract a character string based on the beginning and the end positions, we can use the <code>substr()</code> function:</p>
 <pre class="r"><code>substr(code,
   start = 1,
   stop = 3
@@ -303,12 +325,12 @@ code</code></pre>
 <pre><code>## [1] &quot;BE/&quot; &quot;BE/&quot; &quot;FR/&quot; &quot;EN/&quot; &quot;BE/&quot;</code></pre>
 <p>Replace a character string by another one if it exists in the vector by using the <code>sub()</code> function:</p>
 <pre class="r"><code>sub(
-  pattern = &quot;BE&quot;,
-  replacement = &quot;BEL&quot;,
+  pattern = &quot;BE&quot;, # find BE
+  replacement = &quot;BEL&quot;, # replace it with BEL
   code
 )</code></pre>
 <pre><code>## [1] &quot;BEL/1&quot; &quot;BEL/2&quot; &quot;FR/3&quot;  &quot;EN/4&quot;  &quot;BEL/5&quot;</code></pre>
-<p>Split a character string with the <code>strsplit()</code> function:</p>
+<p>Split a character string based on a specific symbol with the <code>strsplit()</code> function:</p>
 <pre class="r"><code>strsplit(c(&quot;Rafael Nadal&quot;, &quot;Roger Federer&quot;, &quot;Novak Djokovic&quot;),
   split = &quot; &quot;
 )</code></pre>
@@ -354,7 +376,11 @@ sort(x) # smallest to largest</code></pre>
 <p><code>order()</code> gives the permutation to apply to the vector in order to sort its elements:</p>
 <pre class="r"><code>order(x)</code></pre>
 <pre><code>## [1] 3 4 5 1 2</code></pre>
-<p>As you can see, the third element of the vector is the smallest and the second element is the largest.</p>
+<p>As you can see, the third element of the vector is the smallest and the second element is the largest. This is indicated by the 3 at the beginning of the output, and the 2 at the end of the output.</p>
+<p>Like <code>sort()</code> the <code>decreasing = TRUE</code> argument can also be added:</p>
+<pre class="r"><code>order(x, decreasing = TRUE)</code></pre>
+<pre><code>## [1] 2 1 4 5 3</code></pre>
+<p>In this case, the 2 in the output indicates that the second element of the vector is the largest, while the 3 indicates that the third element is the smallest.</p>
 <p><code>rank()</code> gives the ranks of the elements:</p>
 <pre class="r"><code>rank(x)</code></pre>
 <pre><code>## [1] 4.0 5.0 1.0 2.5 2.5</code></pre>
@@ -371,7 +397,7 @@ sort(x) # smallest to largest</code></pre>
 <p><a href="/blog/data-types-in-r/#factor">Factors in R</a> are vectors with a list of levels, also referred as categories. Factors are useful for <a href="/blog/variable-types-and-examples/#qualitative">qualitative</a> data such as the gender, civil status, eye color, etc.</p>
 <div id="creating-factors" class="section level2">
 <h2>Creating factors</h2>
-<p>We create factors with the <code>factor()</code> function:</p>
+<p>We create factors with the <code>factor()</code> function (do not forget the <code>c()</code>):</p>
 <pre class="r"><code>f1 &lt;- factor(c(&quot;T1&quot;, &quot;T3&quot;, &quot;T1&quot;, &quot;T2&quot;))
 f1</code></pre>
 <pre><code>## [1] T1 T3 T1 T2
@@ -394,6 +420,7 @@ v2</code></pre>
 v2</code></pre>
 <pre><code>## [1] good good bad  good bad 
 ## Levels: bad &lt; good</code></pre>
+<p>Note that the order of the levels will follow the order that is specified in the <code>labels</code> argument.</p>
 </div>
 <div id="properties" class="section level2">
 <h2>Properties</h2>
@@ -650,10 +677,10 @@ colnames(dat)</code></pre>
 <pre class="r"><code>library(dplyr)
 sample_n(dat, 4, replace = FALSE)</code></pre>
 <pre><code>##   speed dist
-## 1    24  120
-## 2    16   40
-## 3    13   34
-## 4    15   54</code></pre>
+## 1    25   85
+## 2    17   32
+## 3    18   84
+## 4    14   80</code></pre>
 </div>
 <div id="based-on-row-or-column-numbers" class="section level3">
 <h3>Based on row or column numbers</h3>
