@@ -8,7 +8,7 @@ tags:
   - R
   - Basics
 meta_img: blog/data-manipulation-in-rstudio_files/0_voEJp2o-Z2k4-uUd.jpeg
-description: See how to subset a dataset, create a new variable, recode categorical variables or labels, rename a variable, create a dataframe and deal with missing values
+description: See the main functions to manipulate data in R such as how to subset a data frame, create a new variable, recode categorical variables and rename a variable
 output:
   blogdown::html_page:
     toc: true
@@ -20,8 +20,33 @@ output:
 <div id="TOC">
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#dataset">Dataset</a></li>
-<li><a href="#subset-a-dataset">Subset a dataset</a><ul>
+<li><a href="#vectors">Vectors</a><ul>
+<li><a href="#concatenation">Concatenation</a></li>
+<li><a href="#seq-and-rep"><code>seq()</code> and <code>rep()</code></a></li>
+<li><a href="#assignment">Assignment</a></li>
+<li><a href="#elements-of-a-vector">Elements of a vector</a></li>
+<li><a href="#type-and-length">Type and length</a></li>
+<li><a href="#finding-the-vector-type">Finding the vector type</a></li>
+<li><a href="#modifications-of-type-and-length">Modifications of type and length</a></li>
+<li><a href="#numerical-operators">Numerical operators</a></li>
+<li><a href="#logical-operators">Logical operators</a></li>
+<li><a href="#all-and-any"><code>all()</code> and <code>any()</code></a></li>
+<li><a href="#operations-on-character-strings-vector">Operations on character strings vector</a></li>
+<li><a href="#orders-and-vectors">Orders and vectors</a></li>
+</ul></li>
+<li><a href="#factors">Factors</a><ul>
+<li><a href="#creating-factors">Creating factors</a></li>
+<li><a href="#properties">Properties</a></li>
+<li><a href="#handling">Handling</a></li>
+</ul></li>
+<li><a href="#lists">Lists</a><ul>
+<li><a href="#creating-lists">Creating lists</a></li>
+<li><a href="#handling-1">Handling</a></li>
+<li><a href="#getting-details-on-an-object">Getting details on an object</a></li>
+</ul></li>
+<li><a href="#data-frames">Data frames</a><ul>
+<li><a href="#line-and-column-names">Line and column names</a></li>
+<li><a href="#subset-a-data-frame">Subset a data frame</a><ul>
 <li><a href="#first-or-last-observations">First or last observations</a></li>
 <li><a href="#random-sample-of-observations">Random sample of observations</a></li>
 <li><a href="#based-on-row-or-column-numbers">Based on row or column numbers</a></li>
@@ -38,26 +63,469 @@ output:
 <li><a href="#change-reference-level">Change reference level</a></li>
 </ul></li>
 <li><a href="#rename-variable-names">Rename variable names</a></li>
-<li><a href="#create-a-dataframe-manually">Create a dataframe manually</a></li>
+<li><a href="#create-a-data-frame-manually">Create a data frame manually</a></li>
+<li><a href="#merging-two-data-frames">Merging two data frames</a></li>
+<li><a href="#add-new-observations-from-another-data-frame">Add new observations from another data frame</a></li>
+<li><a href="#add-new-variables-from-another-data-frame">Add new variables from another data frame</a></li>
+</ul></li>
 <li><a href="#missing-values">Missing values</a><ul>
 <li><a href="#remove-nas">Remove NAs</a></li>
 <li><a href="#impute-nas">Impute NAs</a></li>
 </ul></li>
 <li><a href="#scale">Scale</a></li>
+<li><a href="#dates-and-times">Dates and times</a><ul>
+<li><a href="#dates">Dates</a></li>
+<li><a href="#times">Times</a></li>
+<li><a href="#extraction-from-dates">Extraction from dates</a></li>
+</ul></li>
+<li><a href="#exportingsaving">Exporting/saving</a></li>
+<li><a href="#looking-for-help">Looking for help</a></li>
 </ul>
 </div>
 
 <p><img src="/blog/data-manipulation-in-rstudio_files/0_voEJp2o-Z2k4-uUd.jpeg" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Not all datasets are as clean and tidy as you would expect. Therefore, after <a href="/blog/how-to-import-an-excel-file-in-rstudio/">importing your dataset into RStudio</a>, most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor. Data manipulation include a broad range of tools and techniques.</p>
+<p>Not all data frames are as clean and tidy as you would expect. Therefore, after <a href="/blog/how-to-import-an-excel-file-in-rstudio/">importing your dataset into RStudio</a>, most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor. Data manipulation include a broad range of tools and techniques.</p>
 <p>We present here in details the manipulations that you will most likely need for your projects. Do not hesitate to let me know (as a comment at the end of this article for example) if you find other data manipulations essential so that I can add them.</p>
+<p>In this article we show the main functions to manipulate data in R. We first illustrate these functions on vectors, <a href="/blog/data-types-in-r/#factor">factors</a> and lists. We then illustrate the main functions to manipulate data frames and dates/times in R.</p>
 </div>
-<div id="dataset" class="section level1">
-<h1>Dataset</h1>
-<p>In this article, we use the dataset <code>cars</code> to illustrate the different data manipulation techniques. Note that the dataset is installed by default in RStudio (so you do not need to import it) and I use the generic name <code>dat</code> as the name of the dataset throughout the article (see <a href="/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way">here</a> why I always use a generic name instead of more specific names). Here is a table of the whole dataset:</p>
-<pre class="r"><code>dat &lt;- cars # rename the cars dataset with a generic name
-dat # display the entire dataset</code></pre>
+<div id="vectors" class="section level1">
+<h1>Vectors</h1>
+<div id="concatenation" class="section level2">
+<h2>Concatenation</h2>
+<p>We can concatenate (i.e., combine) numbers or strings with <code>c()</code>:</p>
+<pre class="r"><code>c(2, 4, -1)</code></pre>
+<pre><code>## [1]  2  4 -1</code></pre>
+<pre class="r"><code>c(1, 5 / 6, 2^3, -0.05)</code></pre>
+<pre><code>## [1]  1.0000000  0.8333333  8.0000000 -0.0500000</code></pre>
+<p>Note that by default R displays 7 decimals. You can modify it with <code>options(digits = 2)</code> (two decimals).</p>
+<p>It is also possible to create a sequence of consecutive <a href="/blog/data-types-in-r/#integer">integers</a>:</p>
+<pre class="r"><code>1:10</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<pre class="r"><code># is the same than
+c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<pre class="r"><code># or
+c(1:10)</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+</div>
+<div id="seq-and-rep" class="section level2">
+<h2><code>seq()</code> and <code>rep()</code></h2>
+<p><code>seq()</code> allows to make a vector defined by a sequence. You can either choose the increment:</p>
+<pre class="r"><code>seq(from = 2, to = 5, by = 0.5)</code></pre>
+<pre><code>## [1] 2.0 2.5 3.0 3.5 4.0 4.5 5.0</code></pre>
+<p>or its length:</p>
+<pre class="r"><code>seq(from = 2, to = 5, length.out = 7)</code></pre>
+<pre><code>## [1] 2.0 2.5 3.0 3.5 4.0 4.5 5.0</code></pre>
+<p>On the other hand, <code>rep()</code> creates a vector which is the repetition of numbers or strings:</p>
+<pre class="r"><code>rep(1, times = 3)</code></pre>
+<pre><code>## [1] 1 1 1</code></pre>
+<pre class="r"><code>rep(c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;), times = c(3, 1, 2))</code></pre>
+<pre><code>## [1] &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;B&quot; &quot;C&quot; &quot;C&quot;</code></pre>
+<p>You can also create a vector which is the repetition of numbers and strings:</p>
+<pre class="r"><code>rep(c(&quot;A&quot;, 2, &quot;C&quot;), times = c(3, 1, 2))</code></pre>
+<pre><code>## [1] &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;2&quot; &quot;C&quot; &quot;C&quot;</code></pre>
+<p>but in that case, the number 2 will be considered as a string too (and not as a numeric) since there is at least one string in the vector.</p>
+</div>
+<div id="assignment" class="section level2">
+<h2>Assignment</h2>
+<p>There are three ways to assign an object in R: <code>&lt;-</code>, <code>=</code> or <code>assign()</code>:</p>
+<pre class="r"><code># 1st method
+x &lt;- c(2.1, 5, -4, 1, 5)
+x</code></pre>
+<pre><code>## [1]  2.1  5.0 -4.0  1.0  5.0</code></pre>
+<pre class="r"><code># 2nd method
+x2 &lt;- c(2.1, 5, -4, 1, 5)
+x2</code></pre>
+<pre><code>## [1]  2.1  5.0 -4.0  1.0  5.0</code></pre>
+<pre class="r"><code># 3rd method (less common)
+assign(&quot;x3&quot;, c(2.1, 5, -4, 1, 5))
+x3</code></pre>
+<pre><code>## [1]  2.1  5.0 -4.0  1.0  5.0</code></pre>
+<p>You can also assign a vector to another vector:</p>
+<pre class="r"><code>y &lt;- c(x, 10, 1 / 4)
+y</code></pre>
+<pre><code>## [1]  2.10  5.00 -4.00  1.00  5.00 10.00  0.25</code></pre>
+</div>
+<div id="elements-of-a-vector" class="section level2">
+<h2>Elements of a vector</h2>
+<p>We can select one or several elements of a vector by specifying its position between square brackets:</p>
+<pre class="r"><code>x[3]</code></pre>
+<pre><code>## [1] -4</code></pre>
+<pre class="r"><code>x[c(1, 3, 4)]</code></pre>
+<pre><code>## [1]  2.1 -4.0  1.0</code></pre>
+<p>We can also use <a href="/blog/data-types-in-r/#logical">booleans</a> (i.e., <code>TRUE</code> or <code>FALSE</code>) to select some elements of a vector:</p>
+<pre class="r"><code>x[c(TRUE, FALSE, TRUE, TRUE, FALSE)]</code></pre>
+<pre><code>## [1]  2.1 -4.0  1.0</code></pre>
+<p>Or we can give the elements to withdraw:</p>
+<pre class="r"><code>x[-c(2, 4)]</code></pre>
+<pre><code>## [1]  2.1 -4.0  5.0</code></pre>
+</div>
+<div id="type-and-length" class="section level2">
+<h2>Type and length</h2>
+<p>The main types of a vector are <a href="/blog/data-types-in-r/#numeric">numeric</a>, <a href="/blog/data-types-in-r/#logical">logical</a> and <a href="/blog/data-types-in-r/#character">character</a>. For more details on each type, see the different <a href="/blog/data-types-in-r/">data types in R</a>.</p>
+<p><code>class()</code> gives the vector type:</p>
+<pre class="r"><code>x &lt;- c(2.1, 5, -4, 1, 5, 0)
+class(x)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>y &lt;- c(x, &quot;Hello&quot;)
+class(y)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>z &lt;- c(TRUE, FALSE, FALSE)
+class(z)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<p><code>length()</code> gives the length of a vector:</p>
+<pre class="r"><code>length(x)</code></pre>
+<pre><code>## [1] 6</code></pre>
+<p>So to select the last element of a vector (in a dynamic way), we can use a combination of <code>length()</code> and <code>[]</code>:</p>
+<pre class="r"><code>x[length(x)]</code></pre>
+<pre><code>## [1] 0</code></pre>
+</div>
+<div id="finding-the-vector-type" class="section level2">
+<h2>Finding the vector type</h2>
+<p>We can find the type of a vector with the <code>is.type</code> functions:</p>
+<pre class="r"><code>is.numeric(x)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>is.logical(x)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>is.character(x)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>Or in a more generic way with the <code>is()</code> function:</p>
+<pre class="r"><code>is(x)</code></pre>
+<pre><code>## [1] &quot;numeric&quot; &quot;vector&quot;</code></pre>
+</div>
+<div id="modifications-of-type-and-length" class="section level2">
+<h2>Modifications of type and length</h2>
+<p>We can change the type of a vector with the <code>as.numeric()</code>, <code>as.logical()</code> and <code>as.character()</code> functions:</p>
+<pre class="r"><code>x_character &lt;- as.character(x)
+x_character</code></pre>
+<pre><code>## [1] &quot;2.1&quot; &quot;5&quot;   &quot;-4&quot;  &quot;1&quot;   &quot;5&quot;   &quot;0&quot;</code></pre>
+<pre class="r"><code>x_logical &lt;- as.logical(x)
+x_logical</code></pre>
+<pre><code>## [1]  TRUE  TRUE  TRUE  TRUE  TRUE FALSE</code></pre>
+<p>It is also possible to change its length:</p>
+<pre class="r"><code>length(x) &lt;- 4
+x</code></pre>
+<pre><code>## [1]  2.1  5.0 -4.0  1.0</code></pre>
+<p>As you can see, the 4 first elements of the vector are conserved while all others are removed.</p>
+</div>
+<div id="numerical-operators" class="section level2">
+<h2>Numerical operators</h2>
+<p>Several numerical operators such as <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> and <code>^</code> can be applied to vectors:</p>
+<pre class="r"><code>x &lt;- c(2.1, 5, -4, 1)
+y &lt;- c(0, -7, 1, 1 / 4)
+
+x + y</code></pre>
+<pre><code>## [1]  2.10 -2.00 -3.00  1.25</code></pre>
+<pre class="r"><code>x * y</code></pre>
+<pre><code>## [1]   0.00 -35.00  -4.00   0.25</code></pre>
+<pre class="r"><code>x^y</code></pre>
+<pre><code>## [1]  1.00e+00  1.28e-05 -4.00e+00  1.00e+00</code></pre>
+<p>It is also possible to compute the minimum, maximum, sum, product, cumulative sum and cumulative product of a vector:</p>
+<pre class="r"><code>min(x)</code></pre>
+<pre><code>## [1] -4</code></pre>
+<pre class="r"><code>max(x)</code></pre>
+<pre><code>## [1] 5</code></pre>
+<pre class="r"><code>sum(x)</code></pre>
+<pre><code>## [1] 4.1</code></pre>
+<pre class="r"><code>prod(x)</code></pre>
+<pre><code>## [1] -42</code></pre>
+<pre class="r"><code>cumsum(x)</code></pre>
+<pre><code>## [1] 2.1 7.1 3.1 4.1</code></pre>
+<pre class="r"><code>cumprod(x)</code></pre>
+<pre><code>## [1]   2.1  10.5 -42.0 -42.0</code></pre>
+<p>The following operations can be applied too: <code>sqrt</code> (square root), <code>cos</code>, <code>sin</code>, <code>tan</code>, <code>log</code>, <code>log10</code>, <code>exp</code>, <code>abs</code> (absolute value):</p>
+<pre class="r"><code>cos(x)</code></pre>
+<pre><code>## [1] -0.5048461  0.2836622 -0.6536436  0.5403023</code></pre>
+<pre class="r"><code>exp(x)</code></pre>
+<pre><code>## [1]   8.16616991 148.41315910   0.01831564   2.71828183</code></pre>
+<p>If you need to round a number, you can use the <code>round()</code>, <code>floor()</code> and <code>ceiling()</code> functions:</p>
+<pre class="r"><code>round(cos(x), digits = 3) # 3 decimals</code></pre>
+<pre><code>## [1] -0.505  0.284 -0.654  0.540</code></pre>
+<pre class="r"><code>floor(cos(x)) # largest integer not greater than x</code></pre>
+<pre><code>## [1] -1  0 -1  0</code></pre>
+<pre class="r"><code>ceiling(cos(x)) # smallest integer not less than x</code></pre>
+<pre><code>## [1] 0 1 0 1</code></pre>
+</div>
+<div id="logical-operators" class="section level2">
+<h2>Logical operators</h2>
+<p>The most common logical operators in R are:</p>
+<ul>
+<li>Negation: <code>!</code></li>
+<li>Comparisons: <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>&gt;</code>, <code>==</code> (equality), <code>!=</code> (difference)</li>
+<li>And: <code>&amp;</code></li>
+<li>Or: <code>|</code></li>
+</ul>
+<pre class="r"><code>x</code></pre>
+<pre><code>## [1]  2.1  5.0 -4.0  1.0</code></pre>
+<pre class="r"><code>x &lt;= c(1, 6, 3, 4)</code></pre>
+<pre><code>## [1] FALSE  TRUE  TRUE  TRUE</code></pre>
+<pre class="r"><code>x &lt;= 1</code></pre>
+<pre><code>## [1] FALSE FALSE  TRUE  TRUE</code></pre>
+<pre class="r"><code>(x == 1 | x &gt; 4)</code></pre>
+<pre><code>## [1] FALSE  TRUE FALSE  TRUE</code></pre>
+<pre class="r"><code>!(x == 1 | x &gt; 4)</code></pre>
+<pre><code>## [1]  TRUE FALSE  TRUE FALSE</code></pre>
+</div>
+<div id="all-and-any" class="section level2">
+<h2><code>all()</code> and <code>any()</code></h2>
+<p>As the names suggest, <code>all()</code> return <code>TRUE</code> if conditions are met for all elements, whereas <code>any()</code> returns <code>TRUE</code> if conditions are met for any of the element of a vector:</p>
+<pre class="r"><code>x</code></pre>
+<pre><code>## [1]  2.1  5.0 -4.0  1.0</code></pre>
+<pre class="r"><code>x &lt;= 1</code></pre>
+<pre><code>## [1] FALSE FALSE  TRUE  TRUE</code></pre>
+<pre class="r"><code>all(x &lt;= 1)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>any(x &lt;= 1)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="operations-on-character-strings-vector" class="section level2">
+<h2>Operations on character strings vector</h2>
+<p>You can paste at least two vectors together:</p>
+<pre class="r"><code>code &lt;- paste(c(&quot;BE&quot;, &quot;BE&quot;, &quot;FR&quot;, &quot;EN&quot;, &quot;BE&quot;), 1:5, sep = &quot;/&quot;)
+code</code></pre>
+<pre><code>## [1] &quot;BE/1&quot; &quot;BE/2&quot; &quot;FR/3&quot; &quot;EN/4&quot; &quot;BE/5&quot;</code></pre>
+<p>The argument <code>sep</code> stands for <code>separator</code> and allows to specify the character(s) or symbol(s) used to separate each character strings.</p>
+<p>If you do not want to specify a separator, you can use <code>sep = ""</code> or the <code>paste0()</code> function:</p>
+<pre class="r"><code>paste(c(&quot;BE&quot;, &quot;BE&quot;, &quot;FR&quot;, &quot;EN&quot;, &quot;BE&quot;), 1:5, sep = &quot;&quot;)</code></pre>
+<pre><code>## [1] &quot;BE1&quot; &quot;BE2&quot; &quot;FR3&quot; &quot;EN4&quot; &quot;BE5&quot;</code></pre>
+<pre class="r"><code>paste0(c(&quot;BE&quot;, &quot;BE&quot;, &quot;FR&quot;, &quot;EN&quot;, &quot;BE&quot;), 1:5)</code></pre>
+<pre><code>## [1] &quot;BE1&quot; &quot;BE2&quot; &quot;FR3&quot; &quot;EN4&quot; &quot;BE5&quot;</code></pre>
+<p>To find the positions of the elements containing a given string, use the <code>grep()</code> function:</p>
+<pre class="r"><code>grep(&quot;BE&quot;, code)</code></pre>
+<pre><code>## [1] 1 2 5</code></pre>
+<p>To extract a character string from the beginning and the end positions, we can use the <code>substr()</code> function:</p>
+<pre class="r"><code>substr(code,
+  start = 1,
+  stop = 3
+) # extract characters 1 to 3</code></pre>
+<pre><code>## [1] &quot;BE/&quot; &quot;BE/&quot; &quot;FR/&quot; &quot;EN/&quot; &quot;BE/&quot;</code></pre>
+<p>Replace a character string by another one if it exists in the vector by using the <code>sub()</code> function:</p>
+<pre class="r"><code>sub(
+  pattern = &quot;BE&quot;,
+  replacement = &quot;BEL&quot;,
+  code
+)</code></pre>
+<pre><code>## [1] &quot;BEL/1&quot; &quot;BEL/2&quot; &quot;FR/3&quot;  &quot;EN/4&quot;  &quot;BEL/5&quot;</code></pre>
+<p>Split a character string with the <code>strsplit()</code> function:</p>
+<pre class="r"><code>strsplit(c(&quot;Rafael Nadal&quot;, &quot;Roger Federer&quot;, &quot;Novak Djokovic&quot;),
+  split = &quot; &quot;
+)</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;Rafael&quot; &quot;Nadal&quot; 
+## 
+## [[2]]
+## [1] &quot;Roger&quot;   &quot;Federer&quot;
+## 
+## [[3]]
+## [1] &quot;Novak&quot;    &quot;Djokovic&quot;</code></pre>
+<pre class="r"><code>strsplit(code,
+  split = &quot;/&quot;
+)</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;BE&quot; &quot;1&quot; 
+## 
+## [[2]]
+## [1] &quot;BE&quot; &quot;2&quot; 
+## 
+## [[3]]
+## [1] &quot;FR&quot; &quot;3&quot; 
+## 
+## [[4]]
+## [1] &quot;EN&quot; &quot;4&quot; 
+## 
+## [[5]]
+## [1] &quot;BE&quot; &quot;5&quot;</code></pre>
+<p>To transform a character vector to uppercase and lowercase:</p>
+<pre class="r"><code>toupper(c(&quot;Rafael Nadal&quot;, &quot;Roger Federer&quot;, &quot;Novak Djokovic&quot;))</code></pre>
+<pre><code>## [1] &quot;RAFAEL NADAL&quot;   &quot;ROGER FEDERER&quot;  &quot;NOVAK DJOKOVIC&quot;</code></pre>
+<pre class="r"><code>tolower(c(&quot;Rafael Nadal&quot;, &quot;Roger Federer&quot;, &quot;Novak Djokovic&quot;))</code></pre>
+<pre><code>## [1] &quot;rafael nadal&quot;   &quot;roger federer&quot;  &quot;novak djokovic&quot;</code></pre>
+</div>
+<div id="orders-and-vectors" class="section level2">
+<h2>Orders and vectors</h2>
+<p>We can sort the elements of a vector from smallest to largest, or from largest to smallest:</p>
+<pre class="r"><code>x &lt;- c(2.1, 5, -4, 1, 1)
+sort(x) # smallest to largest</code></pre>
+<pre><code>## [1] -4.0  1.0  1.0  2.1  5.0</code></pre>
+<pre class="r"><code>sort(x, decreasing = TRUE) # largest to smallest</code></pre>
+<pre><code>## [1]  5.0  2.1  1.0  1.0 -4.0</code></pre>
+<p><code>order()</code> gives the permutation to apply to the vector in order to sort its elements:</p>
+<pre class="r"><code>order(x)</code></pre>
+<pre><code>## [1] 3 4 5 1 2</code></pre>
+<p>As you can see, the third element of the vector is the smallest and the second element is the largest.</p>
+<p><code>rank()</code> gives the ranks of the elements:</p>
+<pre class="r"><code>rank(x)</code></pre>
+<pre><code>## [1] 4.0 5.0 1.0 2.5 2.5</code></pre>
+<p>The two last elements of the vector have a rank of 2.5 because they are equal and they come after the first but before the fourth rank.</p>
+<p>We can also reverse the elements (from the last one to the first one):</p>
+<pre class="r"><code>x</code></pre>
+<pre><code>## [1]  2.1  5.0 -4.0  1.0  1.0</code></pre>
+<pre class="r"><code>rev(x)</code></pre>
+<pre><code>## [1]  1.0  1.0 -4.0  5.0  2.1</code></pre>
+</div>
+</div>
+<div id="factors" class="section level1">
+<h1>Factors</h1>
+<p><a href="/blog/data-types-in-r/#factor">Factors in R</a> are vectors with a list of levels, also referred as categories. Factors are useful for <a href="/blog/variable-types-and-examples/#qualitative">qualitative</a> data such as the gender, civil status, eye color, etc.</p>
+<div id="creating-factors" class="section level2">
+<h2>Creating factors</h2>
+<p>We create factors with the <code>factor()</code> function:</p>
+<pre class="r"><code>f1 &lt;- factor(c(&quot;T1&quot;, &quot;T3&quot;, &quot;T1&quot;, &quot;T2&quot;))
+f1</code></pre>
+<pre><code>## [1] T1 T3 T1 T2
+## Levels: T1 T2 T3</code></pre>
+<p>We can of course create a factor from an existing vector:</p>
+<pre class="r"><code>v &lt;- c(1, 1, 0, 1, 0)
+v2 &lt;- factor(v,
+  levels = c(0, 1),
+  labels = c(&quot;bad&quot;, &quot;good&quot;)
+)
+v2</code></pre>
+<pre><code>## [1] good good bad  good bad 
+## Levels: bad good</code></pre>
+<p>We can also specify that the levels are ordered by adding the <code>ordered = TRUE</code> argument:</p>
+<pre class="r"><code>v2 &lt;- factor(v,
+  levels = c(0, 1),
+  labels = c(&quot;bad&quot;, &quot;good&quot;),
+  ordered = TRUE
+)
+v2</code></pre>
+<pre><code>## [1] good good bad  good bad 
+## Levels: bad &lt; good</code></pre>
+</div>
+<div id="properties" class="section level2">
+<h2>Properties</h2>
+<p>To know the names of the levels:</p>
+<pre class="r"><code>levels(f1)</code></pre>
+<pre><code>## [1] &quot;T1&quot; &quot;T2&quot; &quot;T3&quot;</code></pre>
+<p>For the number of levels:</p>
+<pre class="r"><code>nlevels(f1)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<p>In R, the first level is always the reference level. This reference level can be modified with <code>relevel()</code>:</p>
+<pre class="r"><code>relevel(f1, ref = &quot;T3&quot;)</code></pre>
+<pre><code>## [1] T1 T3 T1 T2
+## Levels: T3 T1 T2</code></pre>
+<p>You see that “T3” is now the first and thus the reference level. Changing the reference level has an impact on the order they are displayed or treated in statistical analyses. Compare, for instance, <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplots</a> with different reference levels.</p>
+</div>
+<div id="handling" class="section level2">
+<h2>Handling</h2>
+<p>To know the frequencies for each level:</p>
+<pre class="r"><code>table(f1)</code></pre>
+<pre><code>## f1
+## T1 T2 T3 
+##  2  1  1</code></pre>
+<pre class="r"><code># or
+summary(f1)</code></pre>
+<pre><code>## T1 T2 T3 
+##  2  1  1</code></pre>
+<p>Note that the relative frequencies (i.e., the proportions) can be found with the combination of <code>prop.table()</code> and <code>table()</code> or <code>summary()</code>:</p>
+<pre class="r"><code>prop.table(table(f1))</code></pre>
+<pre><code>## f1
+##   T1   T2   T3 
+## 0.50 0.25 0.25</code></pre>
+<pre class="r"><code># or
+prop.table(summary(f1))</code></pre>
+<pre><code>##   T1   T2   T3 
+## 0.50 0.25 0.25</code></pre>
+<p>Remember that a factor is coded in R as a numeric vector even though it looks like a character one. We can transform a factor into its numerical equivalent with the <code>as.numeric()</code> function:</p>
+<pre class="r"><code>f1</code></pre>
+<pre><code>## [1] T1 T3 T1 T2
+## Levels: T1 T2 T3</code></pre>
+<pre class="r"><code>as.numeric(f1)</code></pre>
+<pre><code>## [1] 1 3 1 2</code></pre>
+<p>And a numeric vector can be transformed into a factor with the <code>as.factor()</code> or <code>factor()</code> function:</p>
+<pre class="r"><code>num &lt;- 1:4
+fac &lt;- as.factor(num)
+fac</code></pre>
+<pre><code>## [1] 1 2 3 4
+## Levels: 1 2 3 4</code></pre>
+<pre class="r"><code>fac2 &lt;- factor(num)
+fac2</code></pre>
+<pre><code>## [1] 1 2 3 4
+## Levels: 1 2 3 4</code></pre>
+<p>The advantage of <code>factor()</code> is that it is possible to specify a name for each level:</p>
+<pre class="r"><code>fac2 &lt;- factor(num,
+  labels = c(&quot;bad&quot;, &quot;neutral&quot;, &quot;good&quot;, &quot;very good&quot;)
+)
+fac2</code></pre>
+<pre><code>## [1] bad       neutral   good      very good
+## Levels: bad neutral good very good</code></pre>
+</div>
+</div>
+<div id="lists" class="section level1">
+<h1>Lists</h1>
+<p>A list is a vector whose elements can be of different natures: a vector, a list, a factor, numeric or character, etc.</p>
+<div id="creating-lists" class="section level2">
+<h2>Creating lists</h2>
+<p>The function <code>list()</code> allows to create lists:</p>
+<pre class="r"><code>tahiti &lt;- list(
+  plane = c(&quot;Airbus&quot;, &quot;Boeing&quot;),
+  departure = c(&quot;Brussels&quot;, &quot;Milan&quot;, &quot;Paris&quot;),
+  duration = c(15, 11, 14)
+)
+tahiti</code></pre>
+<pre><code>## $plane
+## [1] &quot;Airbus&quot; &quot;Boeing&quot;
+## 
+## $departure
+## [1] &quot;Brussels&quot; &quot;Milan&quot;    &quot;Paris&quot;   
+## 
+## $duration
+## [1] 15 11 14</code></pre>
+</div>
+<div id="handling-1" class="section level2">
+<h2>Handling</h2>
+<p>To extract elements from a list:</p>
+<pre class="r"><code>tahiti$departure</code></pre>
+<pre><code>## [1] &quot;Brussels&quot; &quot;Milan&quot;    &quot;Paris&quot;</code></pre>
+<pre class="r"><code># or
+tahiti$de</code></pre>
+<pre><code>## [1] &quot;Brussels&quot; &quot;Milan&quot;    &quot;Paris&quot;</code></pre>
+<pre class="r"><code># or
+tahiti[[2]]</code></pre>
+<pre><code>## [1] &quot;Brussels&quot; &quot;Milan&quot;    &quot;Paris&quot;</code></pre>
+<pre class="r"><code># or
+tahiti[[&quot;departure&quot;]]</code></pre>
+<pre><code>## [1] &quot;Brussels&quot; &quot;Milan&quot;    &quot;Paris&quot;</code></pre>
+<pre class="r"><code>tahiti[[2]][c(1, 2)]</code></pre>
+<pre><code>## [1] &quot;Brussels&quot; &quot;Milan&quot;</code></pre>
+<p>To transform a list into a vector:</p>
+<pre class="r"><code>v &lt;- unlist(tahiti)
+v</code></pre>
+<pre><code>##     plane1     plane2 departure1 departure2 departure3  duration1  duration2 
+##   &quot;Airbus&quot;   &quot;Boeing&quot; &quot;Brussels&quot;    &quot;Milan&quot;    &quot;Paris&quot;       &quot;15&quot;       &quot;11&quot; 
+##  duration3 
+##       &quot;14&quot;</code></pre>
+<pre class="r"><code>is.vector(v)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="getting-details-on-an-object" class="section level2">
+<h2>Getting details on an object</h2>
+<p><code>attributes()</code> gives the names of the elements (it can be used on every R object):</p>
+<pre class="r"><code>attributes(tahiti)</code></pre>
+<pre><code>## $names
+## [1] &quot;plane&quot;     &quot;departure&quot; &quot;duration&quot;</code></pre>
+<p><code>str()</code> gives a short description about the elements (it can also be used on every R object):</p>
+<pre class="r"><code>str(tahiti)</code></pre>
+<pre><code>## List of 3
+##  $ plane    : chr [1:2] &quot;Airbus&quot; &quot;Boeing&quot;
+##  $ departure: chr [1:3] &quot;Brussels&quot; &quot;Milan&quot; &quot;Paris&quot;
+##  $ duration : num [1:3] 15 11 14</code></pre>
+</div>
+</div>
+<div id="data-frames" class="section level1">
+<h1>Data frames</h1>
+<p>Every imported file in R is a data frame (at least if you do not use a package to <a href="/blog/how-to-import-an-excel-file-in-rstudio/">import your data in R</a>). A data frame is a mix of a list and a matrix: it has the shape of a matrix but the columns can have different classes.</p>
+<p>Remember that the gold standard for a data frame is that columns represent variables, lines correspond to observations and each value must have its own cell:</p>
+<div class="figure">
+<img src="/blog/how-to-import-an-excel-file-in-rstudio_files/structure-of-dataset.png" alt="" />
+<p class="caption">Structure of a dataset. Source: R for Data Science by Hadley Wickham &amp; Garrett Grolemund</p>
+</div>
+<p>In this article, we use the data frame <code>cars</code> to illustrate the different data manipulation techniques. Note that the data frame is installed by default in RStudio (so you do not need to import it) and I use the generic name <code>dat</code> as the name of the data frame throughout the article (see <a href="/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way">here</a> why I always use a generic name instead of more specific names). Here is a table of the whole data frame:</p>
+<pre class="r"><code>dat &lt;- cars # rename the cars data frame with a generic name
+dat # display the entire data frame</code></pre>
 <pre><code>##    speed dist
 ## 1      4    2
 ## 2      4   10
@@ -109,7 +577,7 @@ dat # display the entire dataset</code></pre>
 ## 48    24   93
 ## 49    24  120
 ## 50    25   85</code></pre>
-<p>This dataset has 50 observations with 2 variables (speed and distance). You can check the number of observations and variables with <code>nrow(dat)</code> and <code>ncol(dat)</code>, or <code>dim(dat)</code>:</p>
+<p>This data frame has 50 observations with 2 variables (<code>speed</code> and <code>distance</code>). You can check the number of observations and variables with <code>nrow(dat)</code> and <code>ncol(dat)</code>, or <code>dim(dat)</code>:</p>
 <pre class="r"><code>nrow(dat) # number of rows/observations</code></pre>
 <pre><code>## [1] 50</code></pre>
 <pre class="r"><code>ncol(dat) # number of columns/variables</code></pre>
@@ -119,11 +587,35 @@ dat # display the entire dataset</code></pre>
 <!-- library(pander) -->
 <!-- pander(dat) -->
 <!-- Note that the `pander()` command is only used for aesthetic reasons. You do not necessarily have to use them when you work in R Studio. -->
+<div id="line-and-column-names" class="section level2">
+<h2>Line and column names</h2>
+<p>Before manipulating a data frame, it is interesting to know the line and column names:</p>
+<pre class="r"><code>dimnames(dat)</code></pre>
+<pre><code>## [[1]]
+##  [1] &quot;1&quot;  &quot;2&quot;  &quot;3&quot;  &quot;4&quot;  &quot;5&quot;  &quot;6&quot;  &quot;7&quot;  &quot;8&quot;  &quot;9&quot;  &quot;10&quot; &quot;11&quot; &quot;12&quot; &quot;13&quot; &quot;14&quot; &quot;15&quot;
+## [16] &quot;16&quot; &quot;17&quot; &quot;18&quot; &quot;19&quot; &quot;20&quot; &quot;21&quot; &quot;22&quot; &quot;23&quot; &quot;24&quot; &quot;25&quot; &quot;26&quot; &quot;27&quot; &quot;28&quot; &quot;29&quot; &quot;30&quot;
+## [31] &quot;31&quot; &quot;32&quot; &quot;33&quot; &quot;34&quot; &quot;35&quot; &quot;36&quot; &quot;37&quot; &quot;38&quot; &quot;39&quot; &quot;40&quot; &quot;41&quot; &quot;42&quot; &quot;43&quot; &quot;44&quot; &quot;45&quot;
+## [46] &quot;46&quot; &quot;47&quot; &quot;48&quot; &quot;49&quot; &quot;50&quot;
+## 
+## [[2]]
+## [1] &quot;speed&quot; &quot;dist&quot;</code></pre>
+<p>To know only the column names:</p>
+<pre class="r"><code>names(dat)</code></pre>
+<pre><code>## [1] &quot;speed&quot; &quot;dist&quot;</code></pre>
+<pre class="r"><code># or
+colnames(dat)</code></pre>
+<pre><code>## [1] &quot;speed&quot; &quot;dist&quot;</code></pre>
+<p>And to know only the row names:</p>
+<pre class="r"><code>rownames(dat)</code></pre>
+<pre><code>##  [1] &quot;1&quot;  &quot;2&quot;  &quot;3&quot;  &quot;4&quot;  &quot;5&quot;  &quot;6&quot;  &quot;7&quot;  &quot;8&quot;  &quot;9&quot;  &quot;10&quot; &quot;11&quot; &quot;12&quot; &quot;13&quot; &quot;14&quot; &quot;15&quot;
+## [16] &quot;16&quot; &quot;17&quot; &quot;18&quot; &quot;19&quot; &quot;20&quot; &quot;21&quot; &quot;22&quot; &quot;23&quot; &quot;24&quot; &quot;25&quot; &quot;26&quot; &quot;27&quot; &quot;28&quot; &quot;29&quot; &quot;30&quot;
+## [31] &quot;31&quot; &quot;32&quot; &quot;33&quot; &quot;34&quot; &quot;35&quot; &quot;36&quot; &quot;37&quot; &quot;38&quot; &quot;39&quot; &quot;40&quot; &quot;41&quot; &quot;42&quot; &quot;43&quot; &quot;44&quot; &quot;45&quot;
+## [46] &quot;46&quot; &quot;47&quot; &quot;48&quot; &quot;49&quot; &quot;50&quot;</code></pre>
 </div>
-<div id="subset-a-dataset" class="section level1">
-<h1>Subset a dataset</h1>
-<div id="first-or-last-observations" class="section level2">
-<h2>First or last observations</h2>
+<div id="subset-a-data-frame" class="section level2">
+<h2>Subset a data frame</h2>
+<div id="first-or-last-observations" class="section level3">
+<h3>First or last observations</h3>
 <ul>
 <li>To keep only the first 10 observations:</li>
 </ul>
@@ -150,22 +642,22 @@ dat # display the entire dataset</code></pre>
 ## 49    24  120
 ## 50    25   85</code></pre>
 </div>
-<div id="random-sample-of-observations" class="section level2">
-<h2>Random sample of observations</h2>
+<div id="random-sample-of-observations" class="section level3">
+<h3>Random sample of observations</h3>
 <ul>
 <li>To draw a sample of 4 observations without replacement:</li>
 </ul>
 <pre class="r"><code>library(dplyr)
 sample_n(dat, 4, replace = FALSE)</code></pre>
 <pre><code>##   speed dist
-## 1    17   50
-## 2    18   84
-## 3     9   10
-## 4    20   52</code></pre>
+## 1    24  120
+## 2    16   40
+## 3    13   34
+## 4    15   54</code></pre>
 </div>
-<div id="based-on-row-or-column-numbers" class="section level2">
-<h2>Based on row or column numbers</h2>
-<p>If you know what observation(s) or column(s) you want to keep, you can use the row or column number(s) to subset your dataset. We illustrate this with several examples:</p>
+<div id="based-on-row-or-column-numbers" class="section level3">
+<h3>Based on row or column numbers</h3>
+<p>If you know what observation(s) or column(s) you want to keep, you can use the row or column number(s) to subset your data frame. We illustrate this with several examples:</p>
 <ul>
 <li>keep all the variables for the <span class="math inline">\(3^{rd}\)</span> observation:</li>
 </ul>
@@ -211,8 +703,8 @@ sample_n(dat, 4, replace = FALSE)</code></pre>
 <pre class="r"><code>dat[nrow(dat), ] # nrow() gives the number of rows</code></pre>
 <pre><code>##    speed dist
 ## 50    25   85</code></pre>
-<p>This way, no matter the number of observations, you will always select the last one. This technique of using a piece of code instead of a specific value is to avoid “hard coding”. Hard coding is generally not recommended (unless you want to specify a parameter that you are sure will never change) because if your dataset changes, you will need to manually edit your code.</p>
-<p>As you probably figured out by now, you can select observations and/or variables of a dataset by running <code>dataset_name[row_number, column_number]</code>. When the row or column number is left empty, the entire row/column is selected. Note that all examples presented above also works for matrices:</p>
+<p>This way, no matter the number of observations, you will always select the last one. This technique of using a piece of code instead of a specific value is to avoid “hard coding”. Hard coding is generally not recommended (unless you want to specify a parameter that you are sure will never change) because if your data frame changes, you will need to manually edit your code.</p>
+<p>As you probably figured out by now, you can select observations and/or variables of a dataset by running <code>dataset_name[row_number, column_number]</code>. When the row or column number is left empty, the entire row/column is selected. Note that all examples presented above also work for matrices:</p>
 <pre class="r"><code>mat &lt;- matrix(c(-1, 2, 0, 3), ncol = 2, nrow = 2)
 mat</code></pre>
 <pre><code>##      [,1] [,2]
@@ -221,13 +713,13 @@ mat</code></pre>
 <pre class="r"><code>mat[1, 2]</code></pre>
 <pre><code>## [1] 0</code></pre>
 </div>
-<div id="based-on-variable-names" class="section level2">
-<h2>Based on variable names</h2>
+<div id="based-on-variable-names" class="section level3">
+<h3>Based on variable names</h3>
 <p>To select one variable of the dataset based on its name rather than on its column number, use <code>dataset_name$variable_name</code>:</p>
 <pre class="r"><code>dat$speed</code></pre>
 <pre><code>##  [1]  4  4  7  7  8  9 10 10 10 11 11 12 12 12 12 13 13 13 13 14 14 14 14 15 15
 ## [26] 15 16 16 17 17 17 18 18 18 18 19 19 19 20 20 20 20 20 22 23 24 24 24 24 25</code></pre>
-<p>Accessing variables inside a dataset with this second method is strongly recommended compared to the first if you intend to modify the structure of your database. Indeed, if a column is added or removed in the dataset, the numbering will change. Therefore, variables are generally referred to by its name rather than by its position (column number). In addition, it is easier to understand and interpret code with the name of the variable written (another reason to call variables with a concise but clear name). There is only one reason why I would still use the column number; if the variables names are expected to change while the structure of the dataset do not change.</p>
+<p>Accessing variables inside a data frame with this second method is strongly recommended compared to the first if you intend to modify the structure of your database. Indeed, if a column is added or removed in the data frame, the numbering will change. Therefore, variables are generally referred to by its name rather than by its position (column number). In addition, it is easier to understand and interpret code with the name of the variable written (another reason to call variables with a concise but clear name). There is only one reason why I would still use the column number; if the variables names are expected to change while the structure of the data frame do not change.</p>
 <p>To select variables, it is also possible to use the <code>select()</code> command from the powerful <code>dplyr</code> package (for compactness only the first 6 observations are displayed thanks to the <code>head()</code> command):</p>
 <pre class="r"><code>head(select(dat, speed))</code></pre>
 <pre><code>##   speed
@@ -247,11 +739,11 @@ mat</code></pre>
 ## 5     8
 ## 6     9</code></pre>
 </div>
-<div id="based-on-one-or-multiple-criterion" class="section level2">
-<h2>Based on one or multiple criterion</h2>
-<p>Instead of subsetting a dataset based on row/column numbers or variable names, you can also subset it based on one or multiple criterion:</p>
+<div id="based-on-one-or-multiple-criterion" class="section level3">
+<h3>Based on one or multiple criterion</h3>
+<p>Instead of subsetting a data frame based on row/column numbers or variable names, you can also subset it based on one or multiple criterion:</p>
 <ul>
-<li>keep only observations with speed larger than 20. The first argument refers to the name of the dataset, while the second argument refers to the subset criteria:</li>
+<li>keep only observations with speed larger than 20. The first argument refers to the name of the data frame, while the second argument refers to the subset criteria:</li>
 </ul>
 <pre class="r"><code>subset(dat, dat$speed &gt; 20)</code></pre>
 <pre><code>##    speed dist
@@ -296,19 +788,23 @@ mat</code></pre>
 ## 44    22   66
 ## 45    23   54
 ## 50    25   85</code></pre>
+<p>Note that it is also possible to subset a data frame with <code>split()</code>:</p>
+<pre class="r"><code>split(dat, dat$factor_variable)</code></pre>
+<p>The above code will split your data frame into several data frames, one for each level of the factor variable.</p>
 </div>
 </div>
-<div id="create-a-new-variable" class="section level1">
-<h1>Create a new variable</h1>
-<p>Often a dataset can be enhanced by creating new variables based on other variables from the initial dataset. In this example, we create two new variables; one being the speed times the distance (which we call <code>speed_dist</code>) and the other being a categorization of the speed (which we call <code>speed_cat</code>). We then display the first 6 observations of this new dataset with the 4 variables:</p>
+<div id="create-a-new-variable" class="section level2">
+<h2>Create a new variable</h2>
+<p>Often, a data frame can be enhanced by creating new variables based on other variables from the initial data frame, or simply by adding a new variable manually.</p>
+<p>In this example, we create two new variables; one being the speed times the distance (which we call <code>speed_dist</code>) and the other being a categorization of the speed (which we call <code>speed_cat</code>). We then display the first 6 observations of this new data frame with the 4 variables:</p>
 <pre class="r"><code># create new variable speed_dist
 dat$speed_dist &lt;- dat$speed * dat$dist
 
 # create new variable speed_cat
-# the function ifelse() below means that if dat$speed &gt; 7, then speed_cat is &quot;high speed&quot;, otherwise it is &quot;low_speed&quot;
-dat$speed_cat &lt;- ifelse(dat$speed &gt; 7,
+# with ifelse(): if dat$speed &gt; 7, then speed_cat is &quot;high speed&quot;, otherwise it is &quot;low_speed&quot;
+dat$speed_cat &lt;- factor(ifelse(dat$speed &gt; 7,
   &quot;high speed&quot;, &quot;low speed&quot;
-)
+))
 
 # display first 6 observations
 head(dat) # 6 is the default in head()</code></pre>
@@ -319,9 +815,9 @@ head(dat) # 6 is the default in head()</code></pre>
 ## 4     7   22        154  low speed
 ## 5     8   16        128 high speed
 ## 6     9   10         90 high speed</code></pre>
-<p>Note than in programming, a character string is generally surrounded by quotes (<code>"character string"</code>).</p>
-<div id="transform-a-continuous-variable-into-a-categorical-variable" class="section level2">
-<h2>Transform a continuous variable into a categorical variable</h2>
+<p>Note than in programming, a character string is generally surrounded by quotes (<code>"character string"</code>) and R is not an exception.</p>
+<div id="transform-a-continuous-variable-into-a-categorical-variable" class="section level3">
+<h3>Transform a continuous variable into a categorical variable</h3>
 <p>To transform a continuous variable into a categorical variable (also known as qualitative variable):</p>
 <pre class="r"><code>dat$speed_quali &lt;- cut(dat$speed,
   breaks = c(0, 12, 15, 19, 26), # cut points
@@ -337,8 +833,8 @@ dat[c(1:2, 23:24, 49:50), ] # display some observations</code></pre>
 ## 50    25   85       2125 high speed     [19,26)</code></pre>
 <p>This transformation is often done on age, when the age (a continuous variable) is transformed into a qualitative variable representing different age groups.</p>
 </div>
-<div id="sum-and-mean-in-rows" class="section level2">
-<h2>Sum and mean in rows</h2>
+<div id="sum-and-mean-in-rows" class="section level3">
+<h3>Sum and mean in rows</h3>
 <p>In survey with Likert scale (used in psychology, among others), it is often the case that we need to compute a score for each respondents based on multiple questions. The score is usually the mean or the sum of all the questions of interest. This can be done with <code>rowMeans()</code> and <code>rowSums()</code>. For instance, let’s compute the mean and the sum of the variables <code>speed</code>, <code>dist</code> and <code>speed_dist</code> (variables must be numeric of course as sum and mean cannot be computed on qualitative variables!) for each row and store them under the variables <code>mean_score</code> and <code>total_score</code>:</p>
 <pre class="r"><code>dat$mean_score &lt;- rowMeans(dat[, 1:3]) # variables speed, dist and speed_dist correspond to variables 1 to 3
 dat$total_score &lt;- rowSums(dat[, 1:3])
@@ -351,8 +847,8 @@ head(dat)</code></pre>
 ## 5     8   16        128 high speed      [0,12)  50.666667         152
 ## 6     9   10         90 high speed      [0,12)  36.333333         109</code></pre>
 </div>
-<div id="sum-and-mean-in-column" class="section level2">
-<h2>Sum and mean in column</h2>
+<div id="sum-and-mean-in-column" class="section level3">
+<h3>Sum and mean in column</h3>
 <p>It is also possible to compute the mean and sum by column with <code>colMeans()</code> and <code>colSums()</code>:</p>
 <pre class="r"><code>colMeans(dat[, 1:3])</code></pre>
 <pre><code>##      speed       dist speed_dist 
@@ -362,8 +858,8 @@ head(dat)</code></pre>
 ##        770       2149      38482</code></pre>
 </div>
 </div>
-<div id="categorical-variables-and-labels-management" class="section level1">
-<h1>Categorical variables and labels management</h1>
+<div id="categorical-variables-and-labels-management" class="section level2">
+<h2>Categorical variables and labels management</h2>
 <p>For categorical variables, it is a good practice to use the factor format and to name the different levels of the variables.</p>
 <ul>
 <li>for this example, let’s create another new variable called <code>dist_cat</code> based on the distance and then change its format from numeric to factor (while also specifying the labels of the levels):</li>
@@ -438,15 +934,16 @@ head(dat)</code></pre>
 ##  $ mean_score : num  4.67 18 13 61 50.67 ...
 ##  $ total_score: num  14 54 39 183 152 109 208 296 384 215 ...
 ##  $ dist_cat   : Factor w/ 2 levels &quot;small distance&quot;,..: 1 1 1 2 2 1 2 2 2 2 ...</code></pre>
-<p>Alternatively, if you want to transform several numeric variables into categorical variables without changing the labels, it is best to use the <code>transform()</code> function. We illustrate this function with the <code>mpg</code> dataset from the <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code></a> package:</p>
+<p>Alternatively, if you want to transform several numeric variables into categorical variables without changing the labels, it is best to use the <code>transform()</code> function. We illustrate this function with the <code>mpg</code> data frame from the <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code></a> package:</p>
 <pre class="r"><code>library(ggplot2)
 mpg &lt;- transform(mpg,
-                 cyl = factor(cyl),
-                 drv = factor(drv),
-                 fl = factor(fl),
-                 class = factor(class))</code></pre>
-<div id="recode-categorical-variables" class="section level2">
-<h2>Recode categorical variables</h2>
+  cyl = factor(cyl),
+  drv = factor(drv),
+  fl = factor(fl),
+  class = factor(class)
+)</code></pre>
+<div id="recode-categorical-variables" class="section level3">
+<h3>Recode categorical variables</h3>
 <p>It is possible to recode labels of a categorical variable if you are not satisfied with the current labels. In this example, we change the labels as follows:</p>
 <ul>
 <li>“small distance” <span class="math inline">\(\rightarrow\)</span> “short distance”</li>
@@ -487,8 +984,8 @@ head(dat)</code></pre>
 <!-- }) -->
 <!-- ``` -->
 </div>
-<div id="change-reference-level" class="section level2">
-<h2>Change reference level</h2>
+<div id="change-reference-level" class="section level3">
+<h3>Change reference level</h3>
 <p>For some analyses, you might want to change the order of the levels. For example, if you are analyzing data about a control group and a treatment group, you may want to set the control group as the reference group. By default, levels are ordered by alphabetical order or by its numeric value if it was change from numeric to factor.</p>
 <ul>
 <li>to check the current order of the levels (the first level being the reference):</li>
@@ -505,8 +1002,8 @@ levels(dat$dist_cat)</code></pre>
 <p>Large distance is now the first and thus the reference level.</p>
 </div>
 </div>
-<div id="rename-variable-names" class="section level1">
-<h1>Rename variable names</h1>
+<div id="rename-variable-names" class="section level2">
+<h2>Rename variable names</h2>
 <p>To rename variable names, use the <code>rename()</code> command from the <code>dplyr</code> package as follows:</p>
 <ul>
 <li>dist <span class="math inline">\(\rightarrow\)</span> distance</li>
@@ -522,14 +1019,13 @@ names(dat) # display variable names</code></pre>
 <pre><code>## [1] &quot;speed&quot;          &quot;distance&quot;       &quot;speed_distance&quot; &quot;speed_cat&quot;     
 ## [5] &quot;speed_quali&quot;    &quot;mean_score&quot;     &quot;total_score&quot;    &quot;distance_cat&quot;</code></pre>
 </div>
-<div id="create-a-dataframe-manually" class="section level1">
-<h1>Create a dataframe manually</h1>
-<p>Although most analyses are performed on an imported dataset, it is also possible to create a dataframe directly in R:</p>
+<div id="create-a-data-frame-manually" class="section level2">
+<h2>Create a data frame manually</h2>
+<p>Although most analyses are performed on an imported data frame, it is also possible to create a data frame directly in R:</p>
 <pre class="r"><code># Create the data frame named dat
 dat &lt;- data.frame(
-  &quot;variable1&quot; = c(6, 12, NA, 3), # presence of 1 missing value
-  &quot;variable2&quot; = c(3, 7, 9, 1),
-  stringsAsFactors = FALSE
+  &quot;variable1&quot; = c(6, 12, NA, 3), # presence of 1 missing value (NA)
+  &quot;variable2&quot; = c(3, 7, 9, 1)
 )
 # Print the data frame
 dat</code></pre>
@@ -539,15 +1035,133 @@ dat</code></pre>
 ## 3        NA         9
 ## 4         3         1</code></pre>
 </div>
+<div id="merging-two-data-frames" class="section level2">
+<h2>Merging two data frames</h2>
+<p>By default, the merge is done on the common variables (variables that have the same name). However, if they do not have the same name, it is still possible to merge the two data frames by specifying their names:</p>
+<pre class="r"><code>dat1 &lt;- data.frame(
+  person = c(1:4),
+  treatment = c(&quot;T1&quot;, &quot;T2&quot;)
+)
+dat1</code></pre>
+<pre><code>##   person treatment
+## 1      1        T1
+## 2      2        T2
+## 3      3        T1
+## 4      4        T2</code></pre>
+<pre class="r"><code>dat2 &lt;- data.frame(
+  patient = c(1:4),
+  age = c(56, 23, 32, 19),
+  gender = c(&quot;M&quot;, &quot;F&quot;, &quot;F&quot;, &quot;M&quot;)
+)
+dat2</code></pre>
+<pre><code>##   patient age gender
+## 1       1  56      M
+## 2       2  23      F
+## 3       3  32      F
+## 4       4  19      M</code></pre>
+<pre class="r"><code>merge(
+  x = dat1, y = dat2,
+  by.x = &quot;person&quot;, by.y = &quot;patient&quot;,
+  all = TRUE
+)</code></pre>
+<pre><code>##   person treatment age gender
+## 1      1        T1  56      M
+## 2      2        T2  23      F
+## 3      3        T1  32      F
+## 4      4        T2  19      M</code></pre>
+</div>
+<div id="add-new-observations-from-another-data-frame" class="section level2">
+<h2>Add new observations from another data frame</h2>
+<p>In order to add new observations from another data frame, the two data frames need to have the same column names (but they can be in a different order):</p>
+<pre class="r"><code>dat1</code></pre>
+<pre><code>##   person treatment
+## 1      1        T1
+## 2      2        T2
+## 3      3        T1
+## 4      4        T2</code></pre>
+<pre class="r"><code>dat3 &lt;- data.frame(
+  person = 5:8,
+  treatment = c(&quot;T3&quot;)
+)
+dat3</code></pre>
+<pre><code>##   person treatment
+## 1      5        T3
+## 2      6        T3
+## 3      7        T3
+## 4      8        T3</code></pre>
+<pre class="r"><code>rbind(dat1, dat3) # r stands for row</code></pre>
+<pre><code>##   person treatment
+## 1      1        T1
+## 2      2        T2
+## 3      3        T1
+## 4      4        T2
+## 5      5        T3
+## 6      6        T3
+## 7      7        T3
+## 8      8        T3</code></pre>
+<p>As you can see, data for persons 5 to 8 have been added at the end of the data frame <code>dat1</code> (because <code>dat1</code> comes before <code>dat3</code> in the <code>rbind()</code> function.</p>
+</div>
+<div id="add-new-variables-from-another-data-frame" class="section level2">
+<h2>Add new variables from another data frame</h2>
+<p>It is also possible to add new variables to a data frame with the <code>cbind()</code> function. Unlike <code>rbind()</code>, column names do not have to be the same since they are added next to each other:</p>
+<pre class="r"><code>dat2</code></pre>
+<pre><code>##   patient age gender
+## 1       1  56      M
+## 2       2  23      F
+## 3       3  32      F
+## 4       4  19      M</code></pre>
+<pre class="r"><code>dat3</code></pre>
+<pre><code>##   person treatment
+## 1      5        T3
+## 2      6        T3
+## 3      7        T3
+## 4      8        T3</code></pre>
+<pre class="r"><code>cbind(dat2, dat3) # c stands for column</code></pre>
+<pre><code>##   patient age gender person treatment
+## 1       1  56      M      5        T3
+## 2       2  23      F      6        T3
+## 3       3  32      F      7        T3
+## 4       4  19      M      8        T3</code></pre>
+</div>
+</div>
 <div id="missing-values" class="section level1">
 <h1>Missing values</h1>
-<p>Missing values (represented by NA in RStudio, for “Not Applicable”) are often problematic for many analyses. For instance, the mean of a series or variable with at least one NA will give a NA (the dataframe created in the previous section is used for this example):</p>
+<p>Missing values (represented by NA in RStudio, for “Not Applicable”) are often problematic for many analyses because every computation including a missing value has a missing value for result.</p>
+<p>For instance, the mean of a series or variable with at least one NA will give a NA (the data frame <code>dat</code> created in the previous section is used for this example):</p>
+<pre class="r"><code>dat</code></pre>
+<pre><code>##   variable1 variable2
+## 1         6         3
+## 2        12         7
+## 3        NA         9
+## 4         3         1</code></pre>
 <pre class="r"><code>mean(dat$variable1)</code></pre>
 <pre><code>## [1] NA</code></pre>
-<p>It is however possible to compute most measures for variables including at least one NA thanks to the argument <code>na.rm = TRUE</code>:</p>
+<p>The <code>na.omit()</code> function avoids the NA result, doing as if there was no missing value:</p>
+<pre class="r"><code>mean(na.omit(dat$variable1))</code></pre>
+<pre><code>## [1] 7</code></pre>
+<p>Moreover, most basic functions include an argument to deal with missing values:</p>
 <pre class="r"><code>mean(dat$variable1, na.rm = TRUE)</code></pre>
 <pre><code>## [1] 7</code></pre>
-<p>Nonetheless, datasets with NAs are still problematic for some types of analysis. Several alternatives exist to remove or impute missing values.</p>
+<p><code>is.na()</code> indicates if an element is a missing value or not:</p>
+<pre class="r"><code>is.na(dat)</code></pre>
+<pre><code>##      variable1 variable2
+## [1,]     FALSE     FALSE
+## [2,]     FALSE     FALSE
+## [3,]      TRUE     FALSE
+## [4,]     FALSE     FALSE</code></pre>
+<p>Note that “NA” as a string is not considered as a missing value:</p>
+<pre class="r"><code>y &lt;- c(&quot;NA&quot;, &quot;2&quot;)
+is.na(y)</code></pre>
+<pre><code>## [1] FALSE FALSE</code></pre>
+<p>To check whether there is at least one missing value in a vector or data frame:</p>
+<pre class="r"><code>anyNA(dat$variable2) # check for NA in variable1</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>anyNA(dat) # check for NA in the whole data frame</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code># or
+any(is.na(dat)) # check for NA in the whole data frame</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>Nonetheless, data frames with NAs are still problematic for some types of analysis. Several alternatives exist to remove or impute missing values.</p>
 <div id="remove-nas" class="section level2">
 <h2>Remove NAs</h2>
 <p>A simple solution is to remove all observations (i.e., rows) containing at least one missing value. This is done by keeping observations with complete cases:</p>
@@ -575,7 +1189,7 @@ dat_imputed</code></pre>
 </div>
 <div id="scale" class="section level1">
 <h1>Scale</h1>
-<p>Scaling (i.e., standardizing) a variable is often used before a Principal Component Analysis (PCA)<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> when variables of a dataset have different units. Remember that scaling a variable means that it will compute the mean and the standard deviation of that variable. Then each value (so each row) of that variable is “scaled” by subtracting the mean and dividing by the standard deviation of that variable. Formally:</p>
+<p>Scaling (i.e., standardizing) a variable is often used before a Principal Component Analysis (PCA)<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> when variables of a data frame have different units. Remember that scaling a variable means that it will compute the mean and the standard deviation of that variable. Then each value (so each row) of that variable is “scaled” by subtracting the mean and dividing by the standard deviation of that variable. Formally:</p>
 <p><span class="math display">\[z = \frac{x - \bar{x}}{s}\]</span></p>
 <p>where <span class="math inline">\(\bar{x}\)</span> and <span class="math inline">\(s\)</span> are the mean and the standard deviation of the variable, respectively.</p>
 <p>To scale one or more variables in R use <code>scale()</code>:</p>
@@ -586,12 +1200,78 @@ head(dat_scaled)</code></pre>
 ## [2,]  1.3907590  0.5477226
 ## [3,] -0.1986799  1.0954451
 ## [4,] -0.9933993 -1.0954451</code></pre>
+</div>
+<div id="dates-and-times" class="section level1">
+<h1>Dates and times</h1>
+<div id="dates" class="section level2">
+<h2>Dates</h2>
+<p>In R the default date format follows the rules of the ISO 8601 international standard which expresses a day as “2001-02-13” (yyyy-mm-dd).<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>Date can be defined by a string of characters or a number. For example, October 1st, 2016:</p>
+<pre class="r"><code>as.Date(&quot;01/10/16&quot;, format = &quot;%d/%m/%y&quot;)</code></pre>
+<pre><code>## [1] &quot;2016-10-01&quot;</code></pre>
+<pre class="r"><code>as.Date(274, origin = &quot;2016-01-01&quot;) # there are 274 days between the origin and October 1st, 2016</code></pre>
+<pre><code>## [1] &quot;2016-10-01&quot;</code></pre>
+</div>
+<div id="times" class="section level2">
+<h2>Times</h2>
+<p>An example with date and time vectors:</p>
+<pre class="r"><code>dates &lt;- c(&quot;02/27/92&quot;, &quot;02/27/99&quot;, &quot;01/14/92&quot;)
+times &lt;- c(&quot;23:03:20&quot;, &quot;22:29:56&quot;, &quot;01:03:30&quot;)
+x &lt;- paste(dates, times)
+x</code></pre>
+<pre><code>## [1] &quot;02/27/92 23:03:20&quot; &quot;02/27/99 22:29:56&quot; &quot;01/14/92 01:03:30&quot;</code></pre>
+<pre class="r"><code>strptime(x,
+  format = &quot;%m/%d/%y %H:%M:%S&quot;
+)</code></pre>
+<pre><code>## [1] &quot;1992-02-27 23:03:20 CET&quot; &quot;1999-02-27 22:29:56 CET&quot;
+## [3] &quot;1992-01-14 01:03:30 CET&quot;</code></pre>
+<p>Find more information on how to express a date and time format with <code>help(strptime)</code>.</p>
+</div>
+<div id="extraction-from-dates" class="section level2">
+<h2>Extraction from dates</h2>
+<p>We can extract weekdays, months, quarters and years as follows:</p>
+<pre class="r"><code>(y &lt;- strptime(x,
+  format = &quot;%m/%d/%y %H:%M:%S&quot;
+))</code></pre>
+<pre><code>## [1] &quot;1992-02-27 23:03:20 CET&quot; &quot;1999-02-27 22:29:56 CET&quot;
+## [3] &quot;1992-01-14 01:03:30 CET&quot;</code></pre>
+<pre class="r"><code>weekdays(y, abbreviate = FALSE)</code></pre>
+<pre><code>## [1] &quot;Thursday&quot; &quot;Saturday&quot; &quot;Tuesday&quot;</code></pre>
+<pre class="r"><code>months(y, abbreviate = FALSE)</code></pre>
+<pre><code>## [1] &quot;February&quot; &quot;February&quot; &quot;January&quot;</code></pre>
+<pre class="r"><code>quarters(y, abbreviate = FALSE)</code></pre>
+<pre><code>## [1] &quot;Q1&quot; &quot;Q1&quot; &quot;Q1&quot;</code></pre>
+<pre class="r"><code>format(y, &quot;%Y&quot;) # 4-digit year</code></pre>
+<pre><code>## [1] &quot;1992&quot; &quot;1999&quot; &quot;1992&quot;</code></pre>
+<pre class="r"><code>format(y, &quot;%y&quot;) # 2-digit year</code></pre>
+<pre><code>## [1] &quot;92&quot; &quot;99&quot; &quot;92&quot;</code></pre>
+</div>
+</div>
+<div id="exportingsaving" class="section level1">
+<h1>Exporting/saving</h1>
+<p>If a copy-paste is not sufficient, you can save an object in R format with <code>save()</code>:</p>
+<pre class="r"><code>save(dat, file = &quot;dat.Rdata&quot;)</code></pre>
+<p>or using <code>write.table()</code> or <code>write.csv()</code>:</p>
+<pre class="r"><code>write.table(dat, &quot;filename&quot;, row = FALSE, sep = &quot;\t&quot;, quote = FALSE)</code></pre>
+<p>If you need to send every results into a file instead of the console:</p>
+<pre class="r"><code>sink(&quot;filename&quot;)</code></pre>
+<p>(Don’t forget to stop it with <code>sink()</code>.)</p>
+</div>
+<div id="looking-for-help" class="section level1">
+<h1>Looking for help</h1>
+<p>You can always find some help about:</p>
+<ul>
+<li>a function: <code>?function</code> or <code>help(function)</code></li>
+<li>a package: <code>help(package = packagename)</code></li>
+<li>a concept: <code>help.search("concept")</code> or <code>apropos("concept")</code></li>
+</ul>
 <p>Thanks for reading. I hope this article helped you to manipulate your data in RStudio.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Principal Component Analysis (PCA) is a useful technique for exploratory data analysis, allowing a better visualization of the variation present in a dataset with a large number of variables. When there are many variables, the data cannot easily be illustrated in their raw format. To counter this, the PCA takes a dataset with many variables and simplifies it by transforming the original variables into a smaller number of “principal components”. The first dimension contains the most variance in the dataset and so on, and the dimensions are uncorrelated. Note that PCA is done on quantitative variables.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>Principal Component Analysis (PCA) is a useful technique for exploratory data analysis, allowing a better visualization of the variation present in a data frame with a large number of variables. When there are many variables, the data cannot easily be illustrated in their raw format. To counter this, the PCA takes a data frame with many variables and simplifies it by transforming the original variables into a smaller number of “principal components”. The first dimension contains the most variance in the data frame and so on, and the dimensions are uncorrelated. Note that PCA is done on quantitative variables.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>For your information, note that this date format is not the same for every software! Excel, for instance, uses a different format.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

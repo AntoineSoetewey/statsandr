@@ -8,7 +8,7 @@ tags:
   - R
   - Basics
 meta_img: blog/data-manipulation-in-rstudio_files/0_voEJp2o-Z2k4-uUd.jpeg
-description: See how to subset a dataset, create a new variable, recode categorical variables or labels, rename a variable, create a dataframe and deal with missing values
+description: See the main functions to manipulate data in R such as how to subset a data frame, create a new variable, recode categorical variables and rename a variable
 output:
   blogdown::html_page:
     toc: true
@@ -19,7 +19,10 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   fig.align = "center",
-  out.width='100%'
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
@@ -27,20 +30,506 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-Not all datasets are as clean and tidy as you would expect. Therefore, after [importing your dataset into RStudio](/blog/how-to-import-an-excel-file-in-rstudio/), most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor. Data manipulation include a broad range of tools and techniques.
+Not all data frames are as clean and tidy as you would expect. Therefore, after [importing your dataset into RStudio](/blog/how-to-import-an-excel-file-in-rstudio/), most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor. Data manipulation include a broad range of tools and techniques.
 
 We present here in details the manipulations that you will most likely need for your projects. Do not hesitate to let me know (as a comment at the end of this article for example) if you find other data manipulations essential so that I can add them.
 
-# Dataset
+In this article we show the main functions to manipulate data in R. We first illustrate these functions on vectors, [factors](/blog/data-types-in-r/#factor) and lists. We then illustrate the main functions to manipulate data frames and dates/times in R.
 
-In this article, we use the dataset `cars` to illustrate the different data manipulation techniques. Note that the dataset is installed by default in RStudio (so you do not need to import it) and I use the generic name `dat` as the name of the dataset throughout the article (see [here](/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way) why I always use a generic name instead of more specific names). Here is a table of the whole dataset:
+# Vectors
+
+## Concatenation
+
+We can concatenate (i.e., combine) numbers or strings with `c()`:
 
 ```{r}
-dat <- cars # rename the cars dataset with a generic name
-dat # display the entire dataset
+c(2,4,-1)
+c(1,5/6,2^3,-0.05)
 ```
 
-This dataset has `r nrow(dat)` observations with `r ncol(dat)` variables (speed and distance). You can check the number of observations and variables with `nrow(dat)` and `ncol(dat)`, or `dim(dat)`:
+Note that by default R displays 7 decimals. You can modify it with `options(digits = 2)` (two decimals).
+
+It is also possible to create a sequence of consecutive [integers](/blog/data-types-in-r/#integer):
+
+```{r}
+1:10
+
+# is the same than
+c(1,2,3,4,5,6,7,8,9,10)
+
+# or
+c(1:10)
+```
+
+## `seq()` and `rep()`
+
+`seq()` allows to make a vector defined by a sequence. You can either choose the increment:
+
+```{r}
+seq(from=2, to=5, by=0.5)
+```
+
+or its length:
+
+```{r}
+seq(from=2, to=5, length.out = 7)
+```
+
+On the other hand, `rep()` creates a vector which is the repetition of numbers or strings:
+
+```{r}
+rep(1, times = 3)
+rep(c("A","B","C"), times = c(3,1,2))
+```
+
+You can also create a vector which is the repetition of numbers and strings:
+
+```{r}
+rep(c("A",2,"C"), times = c(3,1,2))
+```
+
+but in that case, the number 2 will be considered as a string too (and not as a numeric) since there is at least one string in the vector.
+
+## Assignment
+
+There are three ways to assign an object in R: `<-`, `=` or `assign()`:
+
+```{r}
+# 1st method
+x<-c(2.1,5,-4,1,5)
+x
+
+# 2nd method
+x2=c(2.1,5,-4,1,5)
+x2
+
+# 3rd method (less common)
+assign("x3",c(2.1,5,-4,1,5))
+x3
+```
+
+You can also assign a vector to another vector:
+
+```{r}
+y<-c(x,10,1/4)
+y
+```
+
+## Elements of a vector
+
+We can select one or several elements of a vector by specifying its position between square brackets:
+
+```{r}
+x[3]
+x[c(1,3,4)]
+```
+
+We can also use [booleans](/blog/data-types-in-r/#logical) (i.e., `TRUE` or `FALSE`) to select some elements of a vector:
+
+```{r}
+x[c(TRUE,FALSE,TRUE,TRUE,FALSE)]
+```
+
+Or we can give the elements to withdraw:
+
+```{r}
+x[-c(2,4)]
+```
+
+## Type and length
+
+The main types of a vector are [numeric](/blog/data-types-in-r/#numeric), [logical](/blog/data-types-in-r/#logical) and [character](/blog/data-types-in-r/#character). For more details on each type, see the different [data types in R](/blog/data-types-in-r/).
+
+`class()` gives the vector type:
+
+```{r}
+x <- c(2.1, 5, -4, 1, 5, 0)
+class(x)
+
+y <- c(x, "Hello")
+class(y)
+
+z <- c(TRUE, FALSE, FALSE)
+class(z)
+```
+
+`length()` gives the length of a vector:
+
+```{r}
+length(x)
+```
+
+So to select the last element of a vector (in a dynamic way), we can use a combination of `length()` and `[]`:
+
+```{r}
+x[length(x)]
+```
+
+## Finding the vector type
+
+We can find the type of a vector with the `is.type` functions:
+
+```{r}
+is.numeric(x)
+is.logical(x)
+is.character(x)
+```
+
+Or in a more generic way with the `is()` function:
+
+```{r}
+is(x)
+```
+
+## Modifications of type and length
+
+We can change the type of a vector with the `as.numeric()`, `as.logical()` and `as.character()` functions:
+
+```{r}
+x_character <- as.character(x)
+x_character
+
+x_logical <- as.logical(x)
+x_logical
+```
+
+It is also possible to change its length:
+
+```{r}
+length(x) <- 4
+x
+```
+
+As you can see, the 4 first elements of the vector are conserved while all others are removed.
+
+## Numerical operators
+
+Several numerical operators such as `+`, `-`, `*`, `/` and `^` can be applied to vectors:
+
+```{r}
+x<-c(2.1,5,-4,1)
+y<-c(0,-7,1,1/4)
+
+x + y
+x * y
+x^y
+```
+
+It is also possible to compute the minimum, maximum, sum, product, cumulative sum and cumulative product of a vector:
+
+```{r}
+min(x)
+max(x)
+sum(x)
+prod(x)
+cumsum(x)
+cumprod(x)
+```
+
+The following operations can be applied too: `sqrt` (square root), `cos`, `sin`, `tan`, `log`, `log10`, `exp`, `abs` (absolute value):
+
+```{r}
+cos(x)
+exp(x)
+```
+
+If you need to round a number, you can use the `round()`, `floor()` and `ceiling()` functions:
+
+```{r}
+round(cos(x),digits=3) # 3 decimals
+floor(cos(x)) # largest integer not greater than x
+ceiling(cos(x)) # smallest integer not less than x
+```
+
+## Logical operators
+
+The most common logical operators in R are:
+
+- Negation: `!`
+- Comparisons: `<`, `<=`, `>=`, `>`, `==` (equality), `!=` (difference)
+- And: `&`
+- Or: `|`
+
+```{r}
+x
+x <= c(1,6,3,4)
+x<=1
+(x==1 | x>4)
+!(x==1 | x>4)
+```
+
+## `all()` and `any()`
+
+As the names suggest, `all()` return `TRUE` if conditions are met for all elements, whereas `any()` returns `TRUE` if conditions are met for any of the element of a vector:
+
+```{r}
+x
+x <= 1
+all(x <= 1)
+any(x <= 1)
+```
+
+## Operations on character strings vector
+
+You can paste at least two vectors together:
+
+```{r}
+code <- paste(c("BE", "BE", "FR", "EN", "BE"), 1:5, sep = "/")
+code
+```
+
+The argument `sep` stands for `separator` and allows to specify the character(s) or symbol(s) used to separate each character strings.
+
+If you do not want to specify a separator, you can use `sep = ""` or the `paste0()` function:
+
+```{r}
+paste(c("BE", "BE", "FR", "EN", "BE"), 1:5, sep = "")
+paste0(c("BE", "BE", "FR", "EN", "BE"), 1:5)
+```
+
+To find the positions of the elements containing a given string, use the `grep()` function:
+
+```{r}
+grep("BE", code)
+```
+
+To extract a character string from the beginning and the end positions, we can use the `substr()` function:
+
+```{r}
+substr(code,
+       start = 1,
+       stop = 3) # extract characters 1 to 3
+```
+
+Replace a character string by another one if it exists in the vector by using the `sub()` function:
+
+```{r}
+sub(pattern = "BE",
+    replacement = "BEL",
+    code)
+```
+
+Split a character string with the `strsplit()` function:
+
+```{r}
+strsplit(c("Rafael Nadal","Roger Federer", "Novak Djokovic"),
+         split = " ")
+strsplit(code,
+         split = "/")
+```
+
+To transform a character vector to uppercase and lowercase:
+
+```{r}
+toupper(c("Rafael Nadal","Roger Federer", "Novak Djokovic"))
+tolower(c("Rafael Nadal","Roger Federer", "Novak Djokovic"))
+```
+
+## Orders and vectors
+
+We can sort the elements of a vector from smallest to largest, or from largest to smallest:
+
+```{r}
+x<-c(2.1,5,-4,1,1)
+sort(x) # smallest to largest
+sort(x, decreasing = TRUE) # largest to smallest
+```
+
+`order()` gives the permutation to apply to the vector in order to sort its elements:
+
+```{r}
+order(x)
+```
+
+As you can see, the third element of the vector is the smallest and the second element is the largest.
+
+`rank()` gives the ranks of the elements:
+
+```{r}
+rank(x)
+```
+
+The two last elements of the vector have a rank of 2.5 because they are equal and they come after the first but before the fourth rank. 
+
+We can also reverse the elements (from the last one to the first one):
+
+```{r}
+x
+rev(x)
+```
+
+# Factors
+
+[Factors in R](/blog/data-types-in-r/#factor) are vectors with a list of levels, also referred as categories. Factors are useful for [qualitative](/blog/variable-types-and-examples/#qualitative) data such as the gender, civil status, eye color, etc.
+
+## Creating factors
+
+We create factors with the `factor()` function:
+
+```{r}
+f1 <- factor(c("T1", "T3", "T1", "T2"))
+f1
+```
+
+We can of course create a factor from an existing vector:
+
+```{r}
+v <- c(1,1,0,1,0)
+v2 <- factor(v,
+             levels=c(0,1),
+             labels=c("bad","good"))
+v2
+```
+
+We can also specify that the levels are ordered by adding the `ordered = TRUE` argument:
+
+```{r}
+v2 <- factor(v,
+             levels=c(0,1),
+             labels=c("bad","good"),
+             ordered = TRUE)
+v2
+```
+
+## Properties
+
+To know the names of the levels:
+
+```{r}
+levels(f1)
+```
+
+For the number of levels:
+
+```{r}
+nlevels(f1)
+```
+
+In R, the first level is always the reference level. This reference level can be modified with `relevel()`:
+
+```{r}
+relevel(f1,ref="T3")
+```
+
+You see that "T3" is now the first and thus the reference level. Changing the reference level has an impact on the order they are displayed or treated in statistical analyses. Compare, for instance, [boxplots](/blog/descriptive-statistics-in-r/#boxplot) with different reference levels.
+
+## Handling
+
+To know the frequencies for each level:
+
+```{r}
+table(f1)
+
+# or
+summary(f1)
+```
+
+Note that the relative frequencies (i.e., the proportions) can be found with the combination of `prop.table()` and `table()` or `summary()`:
+
+```{r}
+prop.table(table(f1))
+
+# or
+prop.table(summary(f1))
+```
+
+Remember that a factor is coded in R as a numeric vector even though it looks like a character one. We can transform a factor into its numerical equivalent with the `as.numeric()` function:
+
+```{r}
+f1
+as.numeric(f1)
+```
+
+And a numeric vector can be transformed into a factor with the `as.factor()` or `factor()` function:
+
+```{r}
+num <- 1:4
+fac <- as.factor(num)
+fac
+
+fac2 <- factor(num)
+fac2
+```
+
+The advantage of `factor()` is that it is possible to specify a name for each level:
+
+```{r}
+fac2 <- factor(num,
+               labels = c("bad", "neutral", "good", "very good"))
+fac2
+```
+
+# Lists
+
+A list is a vector whose elements can be of different natures: a vector, a list, a factor, numeric or character, etc.
+
+## Creating lists
+
+The function `list()` allows to create lists:
+
+```{r}
+tahiti<-list(plane=c("Airbus","Boeing"),
+             departure=c("Brussels","Milan","Paris"),
+             duration=c(15,11,14))
+tahiti
+```
+
+## Handling
+
+To extract elements from a list:
+
+```{r}
+tahiti$departure
+# or
+tahiti$de
+# or
+tahiti[[2]]
+
+# or
+tahiti[["departure"]]
+
+tahiti[[2]][c(1,2)]
+```
+
+To transform a list into a vector:
+
+```{r}
+v <- unlist(tahiti)
+v
+
+is.vector(v)
+```
+
+## Getting details on an object
+
+`attributes()` gives the names of the elements (it can be used on every R object):
+
+```{r}
+attributes(tahiti)
+```
+
+`str()` gives a short description about the elements (it can also be used on every R object):
+
+```{r}
+str(tahiti)
+```
+
+# Data frames
+
+Every imported file in R is a data frame (at least if you do not use a package to [import your data in R](/blog/how-to-import-an-excel-file-in-rstudio/)). A data frame is a mix of a list and a matrix: it has the shape of a matrix but the columns can have different classes.
+
+Remember that the gold standard for a data frame is that columns represent variables, lines correspond to observations and each value must have its own cell:
+
+![Structure of a dataset. Source: R for Data Science by Hadley Wickham & Garrett Grolemund](/blog/how-to-import-an-excel-file-in-rstudio_files/structure-of-dataset.png)
+
+In this article, we use the data frame `cars` to illustrate the different data manipulation techniques. Note that the data frame is installed by default in RStudio (so you do not need to import it) and I use the generic name `dat` as the name of the data frame throughout the article (see [here](/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way) why I always use a generic name instead of more specific names). Here is a table of the whole data frame:
+
+```{r}
+dat <- cars # rename the cars data frame with a generic name
+dat # display the entire data frame
+```
+
+This data frame has `r nrow(dat)` observations with `r ncol(dat)` variables (`speed` and `distance`). You can check the number of observations and variables with `nrow(dat)` and `ncol(dat)`, or `dim(dat)`:
 
 ```{r}
 nrow(dat) # number of rows/observations
@@ -52,60 +541,95 @@ dim(dat) # dimension: number of rows/observations and columns/variables
 <!-- pander(dat) -->
 <!-- Note that the `pander()` command is only used for aesthetic reasons. You do not necessarily have to use them when you work in R Studio. -->
 
-# Subset a dataset
+## Line and column names
 
-## First or last observations
+Before manipulating a data frame, it is interesting to know the line and column names:
+
+```{r}
+dimnames(dat)
+```
+
+To know only the column names:
+
+```{r}
+names(dat)
+# or
+colnames(dat)
+```
+
+And to know only the row names:
+
+```{r}
+rownames(dat)
+```
+
+## Subset a data frame
+
+### First or last observations
 
 * To keep only the first 10 observations:
+
 ```{r}
 head(dat, n = 10)
 ```
 
 * To keep only the last 5 observations:
+
 ```{r}
 tail(dat, n = 5)
 ```
 
-## Random sample of observations
+### Random sample of observations
 
 * To draw a sample of 4 observations without replacement:
+
 ```{r, message = FALSE}
 library(dplyr)
 sample_n(dat, 4, replace = FALSE)
 ```
 
-## Based on row or column numbers
+### Based on row or column numbers
 
-If you know what observation(s) or column(s) you want to keep, you can use the row or column number(s) to subset your dataset. We illustrate this with several examples:
+If you know what observation(s) or column(s) you want to keep, you can use the row or column number(s) to subset your data frame. We illustrate this with several examples:
 
 * keep all the variables for the $3^{rd}$ observation:
+
 ```{r, eval = FALSE}
 dat[3, ]
 ```
+
 * keep the $2^{nd}$ variable for all observations:
+
 ```{r, eval = FALSE}
 dat[, 2]
 ```
+
 * You can mix the two above methods to keep only the $2^{nd}$ variable of the $3^{rd}$ observation:
+
 ```{r}
 dat[3, 2]
 ```
+
 * keep several observations; for example observations $1$ to $5$, the $10^{th}$ and the $15^{th}$ observation for all variables:
+
 ```{r}
 dat[c(1:5, 10, 15), ] # do not forget c()
 ```
+
 * remove observations 5 to 45:
 ```{r}
 dat[-c(5:45), ]
 ```
+
 * tip: to keep only the last observation, use `nrow()` instead of the row number:
+
 ```{r}
 dat[nrow(dat), ] # nrow() gives the number of rows
 ```
 
-This way, no matter the number of observations, you will always select the last one. This technique of using a piece of code instead of a specific value is to avoid "hard coding". Hard coding is generally not recommended (unless you want to specify a parameter that you are sure will never change) because if your dataset changes, you will need to manually edit your code. 
+This way, no matter the number of observations, you will always select the last one. This technique of using a piece of code instead of a specific value is to avoid "hard coding". Hard coding is generally not recommended (unless you want to specify a parameter that you are sure will never change) because if your data frame changes, you will need to manually edit your code. 
 
-As you probably figured out by now, you can select observations and/or variables of a dataset by running `dataset_name[row_number, column_number]`. When the row or column number is left empty, the entire row/column is selected. Note that all examples presented above also works for matrices:
+As you probably figured out by now, you can select observations and/or variables of a dataset by running `dataset_name[row_number, column_number]`. When the row or column number is left empty, the entire row/column is selected. Note that all examples presented above also work for matrices:
 
 ```{r}
 mat <- matrix(c(-1, 2, 0, 3), ncol = 2, nrow = 2)
@@ -113,7 +637,7 @@ mat
 mat[1, 2]
 ```
 
-## Based on variable names
+### Based on variable names
 
 To select one variable of the dataset based on its name rather than on its column number, use `dataset_name$variable_name`:
 
@@ -121,7 +645,7 @@ To select one variable of the dataset based on its name rather than on its colum
 dat$speed
 ```
 
-Accessing variables inside a dataset with this second method is strongly recommended compared to the first if you intend to modify the structure of your database. Indeed, if a column is added or removed in the dataset, the numbering will change. Therefore, variables are generally referred to by its name rather than by its position (column number). In addition, it is easier to understand and interpret code with the name of the variable written (another reason to call variables with a concise but clear name). There is only one reason why I would still use the column number; if the variables names are expected to change while the structure of the dataset do not change.
+Accessing variables inside a data frame with this second method is strongly recommended compared to the first if you intend to modify the structure of your database. Indeed, if a column is added or removed in the data frame, the numbering will change. Therefore, variables are generally referred to by its name rather than by its position (column number). In addition, it is easier to understand and interpret code with the name of the variable written (another reason to call variables with a concise but clear name). There is only one reason why I would still use the column number; if the variables names are expected to change while the structure of the data frame do not change.
 
 To select variables, it is also possible to use the `select()` command from the powerful `dplyr` package (for compactness only the first 6 observations are displayed thanks to the `head()` command):
 
@@ -135,48 +659,65 @@ This is equivalent than removing the distance variable:
 head(select(dat, -dist))
 ```
 
-## Based on one or multiple criterion
+### Based on one or multiple criterion
 
-Instead of subsetting a dataset based on row/column numbers or variable names, you can also subset it based on one or multiple criterion:
+Instead of subsetting a data frame based on row/column numbers or variable names, you can also subset it based on one or multiple criterion:
 
-* keep only observations with speed larger than 20. The first argument refers to the name of the dataset, while the second argument refers to the subset criteria:
+* keep only observations with speed larger than 20. The first argument refers to the name of the data frame, while the second argument refers to the subset criteria:
+
 ```{r}
 subset(dat, dat$speed > 20)
 ```
+
 * keep only observations with distance smaller than or equal to 50 __and__ speed equal to 10. Note the `==` (and not `=`) for the equal criteria:
+
 ```{r}
 subset(dat, dat$dist <= 50 & dat$speed == 10)
 ```
+
 * use `|` to keep only observations with distance smaller than 20 __or__ speed equal to 10:
+
 ```{r}
 subset(dat, dat$dist < 20 | dat$speed == 10)
 ```
+
 * to filter out some observations, use `!=`. For instance, to keep observations with speed not equal to 24 and distance not equal to 120 (for compactness only the last 6 observations are displayed thanks to the `tail()` command):
+
 ```{r}
 tail(subset(dat, dat$speed != 24 & dat$dist != 120))
 ```
 
-# Create a new variable
+Note that it is also possible to subset a data frame with `split()`:
 
-Often a dataset can be enhanced by creating new variables based on other variables from the initial dataset. In this example, we create two new variables; one being the speed times the distance (which we call `speed_dist`) and the other being a categorization of the speed (which we call `speed_cat`). We then display the first 6 observations of this new dataset with the 4 variables:
+```{r, eval = FALSE}
+split(dat, dat$factor_variable)
+```
+
+The above code will split your data frame into several data frames, one for each level of the factor variable.
+
+## Create a new variable
+
+Often, a data frame can be enhanced by creating new variables based on other variables from the initial data frame, or simply by adding a new variable manually.
+
+In this example, we create two new variables; one being the speed times the distance (which we call `speed_dist`) and the other being a categorization of the speed (which we call `speed_cat`). We then display the first 6 observations of this new data frame with the 4 variables:
 
 ```{r}
 # create new variable speed_dist
 dat$speed_dist <- dat$speed * dat$dist
 
 # create new variable speed_cat
-# the function ifelse() below means that if dat$speed > 7, then speed_cat is "high speed", otherwise it is "low_speed"
-dat$speed_cat <- ifelse(dat$speed > 7,
+# with ifelse(): if dat$speed > 7, then speed_cat is "high speed", otherwise it is "low_speed"
+dat$speed_cat <- factor(ifelse(dat$speed > 7,
   "high speed", "low speed"
-)
+))
 
 # display first 6 observations
 head(dat) # 6 is the default in head()
 ```
 
-Note than in programming, a character string is generally surrounded by quotes (`"character string"`).
+Note than in programming, a character string is generally surrounded by quotes (`"character string"`) and R is not an exception.
 
-## Transform a continuous variable into a categorical variable
+### Transform a continuous variable into a categorical variable
 
 To transform a continuous variable into a categorical variable (also known as qualitative variable):
 
@@ -190,7 +731,7 @@ dat[c(1:2, 23:24, 49:50), ] # display some observations
 
 This transformation is often done on age, when the age (a continuous variable) is transformed into a qualitative variable representing different age groups.
 
-## Sum and mean in rows
+### Sum and mean in rows
 
 In survey with Likert scale (used in psychology, among others), it is often the case that we need to compute a score for each respondents based on multiple questions. The score is usually the mean or the sum of all the questions of interest. This can be done with `rowMeans()` and `rowSums()`. For instance, let's compute the mean and the sum of the variables `speed`, `dist` and `speed_dist` (variables must be numeric of course as sum and mean cannot be computed on qualitative variables!) for each row and store them under the variables `mean_score` and `total_score`:
 
@@ -200,7 +741,7 @@ dat$total_score <- rowSums(dat[, 1:3])
 head(dat)
 ```
 
-## Sum and mean in column
+### Sum and mean in column
 
 It is also possible to compute the mean and sum by column with `colMeans()` and `colSums()`:
 
@@ -209,7 +750,7 @@ colMeans(dat[, 1:3])
 colSums(dat[, 1:3])
 ```
 
-# Categorical variables and labels management
+## Categorical variables and labels management
 
 For categorical variables, it is a good practice to use the factor format and to name the different levels of the variables.
 
@@ -255,7 +796,7 @@ head(dat)
 str(dat)
 ```
 
-Alternatively, if you want to transform several numeric variables into categorical variables without changing the labels, it is best to use the `transform()` function. We illustrate this function with the `mpg` dataset from the [`{ggplot2}`](/blog/graphics-in-r-with-ggplot2/) package:
+Alternatively, if you want to transform several numeric variables into categorical variables without changing the labels, it is best to use the `transform()` function. We illustrate this function with the `mpg` data frame from the [`{ggplot2}`](/blog/graphics-in-r-with-ggplot2/) package:
 
 ```{r}
 library(ggplot2)
@@ -266,7 +807,7 @@ mpg <- transform(mpg,
                  class = factor(class))
 ```
 
-## Recode categorical variables
+### Recode categorical variables
 
 It is possible to recode labels of a categorical variable if you are not satisfied with the current labels. In this example, we change the labels as follows:
 
@@ -298,7 +839,7 @@ head(dat)
 <!-- }) -->
 <!-- ``` -->
 
-## Change reference level
+### Change reference level
 
 For some analyses, you might want to change the order of the levels. For example, if you are analyzing data about a control group and a treatment group, you may want to set the control group as the reference group. By default, levels are ordered by alphabetical order or by its numeric value if it was change from numeric to factor.
 
@@ -319,7 +860,7 @@ levels(dat$dist_cat)
 
 Large distance is now the first and thus the reference level.
 
-# Rename variable names
+## Rename variable names
 
 To rename variable names, use the `rename()` command from the `dplyr` package as follows:
 
@@ -336,36 +877,114 @@ dat <- rename(dat,
 names(dat) # display variable names
 ```
 
-# Create a dataframe manually
+## Create a data frame manually
 
-Although most analyses are performed on an imported dataset, it is also possible to create a dataframe directly in R:
+Although most analyses are performed on an imported data frame, it is also possible to create a data frame directly in R:
 
 ```{r}
 # Create the data frame named dat
 dat <- data.frame(
-  "variable1" = c(6, 12, NA, 3), # presence of 1 missing value
-  "variable2" = c(3, 7, 9, 1),
-  stringsAsFactors = FALSE
+  "variable1" = c(6, 12, NA, 3), # presence of 1 missing value (NA)
+  "variable2" = c(3, 7, 9, 1)
 )
 # Print the data frame
 dat
 ```
 
-# Missing values
+## Merging two data frames
 
-Missing values (represented by NA in RStudio, for "Not Applicable") are often problematic for many analyses. For instance, the mean of a series or variable with at least one NA will give a NA (the dataframe created in the previous section is used for this example):
+By default, the merge is done on the common variables (variables that have the same name). However, if they do not have the same name, it is still possible to merge the two data frames by specifying their names:
 
 ```{r}
+dat1 <- data.frame(person=c(1:4),
+                       treatment = c("T1", "T2")
+                       )
+dat1
+
+dat2 <- data.frame(patient=c(1:4),
+                       age = c(56, 23,32,19),
+                       gender = c("M", "F", "F", "M")
+                       )
+dat2
+
+merge(x= dat1, y=dat2,
+                     by.x="person",by.y="patient",
+                     all=TRUE)
+```
+
+## Add new observations from another data frame
+
+In order to add new observations from another data frame, the two data frames need to have the same column names (but they can be in a different order):
+
+```{r}
+dat1
+dat3 <- data.frame(person = 5:8,
+                   treatment = c("T3")
+                       )
+dat3
+
+rbind(dat1, dat3) # r stands for row
+```
+
+As you can see, data for persons 5 to 8 have been added at the end of the data frame `dat1` (because `dat1` comes before `dat3` in the `rbind()` function.
+
+## Add new variables from another data frame
+
+It is also possible to add new variables to a data frame with the `cbind()` function. Unlike `rbind()`, column names do not have to be the same since they are added next to each other:
+
+```{r}
+dat2
+dat3
+cbind(dat2, dat3) # c stands for column
+```
+
+# Missing values
+
+Missing values (represented by NA in RStudio, for "Not Applicable") are often problematic for many analyses because every computation including a missing value has a missing value for result.
+
+For instance, the mean of a series or variable with at least one NA will give a NA (the data frame `dat` created in the previous section is used for this example):
+
+```{r}
+dat
 mean(dat$variable1)
 ```
 
-It is however possible to compute most measures for variables including at least one NA thanks to the argument `na.rm = TRUE`:
+The `na.omit()` function avoids the NA result, doing as if there was no missing value:
+
+```{r}
+mean(na.omit(dat$variable1))
+```
+
+Moreover, most basic functions include an argument to deal with missing values:
 
 ```{r}
 mean(dat$variable1, na.rm = TRUE)
 ```
 
-Nonetheless, datasets with NAs are still problematic for some types of analysis. Several alternatives exist to remove or impute missing values.
+`is.na()` indicates if an element is a missing value or not:
+
+```{r}
+is.na(dat)
+```
+
+Note that "NA" as a string is not considered as a missing value:
+
+```{r}
+y<-c("NA","2")
+is.na(y)
+```
+
+To check whether there is at least one missing value in a vector or data frame:
+
+```{r}
+anyNA(dat$variable2) # check for NA in variable1
+anyNA(dat) # check for NA in the whole data frame
+
+#or
+any(is.na(dat)) # check for NA in the whole data frame
+```
+
+Nonetheless, data frames with NAs are still problematic for some types of analysis. Several alternatives exist to remove or impute missing values.
 
 ## Remove NAs
 
@@ -392,7 +1011,7 @@ When the median/mode method is used (the default), character vectors and factors
 
 # Scale
 
-Scaling (i.e., standardizing) a variable is often used before a Principal Component Analysis (PCA)^[Principal Component Analysis (PCA) is a useful technique for exploratory data analysis, allowing a better visualization of the variation present in a dataset with a large number of variables. When there are many variables, the data cannot easily be illustrated in their raw format. To counter this, the PCA takes a dataset with many variables and simplifies it by transforming the original variables into a smaller number of "principal components". The first dimension contains the most variance in the dataset and so on, and the dimensions are uncorrelated. Note that PCA is done on quantitative variables.] when variables of a dataset have different units. Remember that scaling a variable means that it will compute the mean and the standard deviation of that variable. Then each value (so each row) of that variable is "scaled" by subtracting the mean and dividing by the standard deviation of that variable. Formally:
+Scaling (i.e., standardizing) a variable is often used before a Principal Component Analysis (PCA)^[Principal Component Analysis (PCA) is a useful technique for exploratory data analysis, allowing a better visualization of the variation present in a data frame with a large number of variables. When there are many variables, the data cannot easily be illustrated in their raw format. To counter this, the PCA takes a data frame with many variables and simplifies it by transforming the original variables into a smaller number of "principal components". The first dimension contains the most variance in the data frame and so on, and the dimensions are uncorrelated. Note that PCA is done on quantitative variables.] when variables of a data frame have different units. Remember that scaling a variable means that it will compute the mean and the standard deviation of that variable. Then each value (so each row) of that variable is "scaled" by subtracting the mean and dividing by the standard deviation of that variable. Formally:
 
 $$z = \frac{x - \bar{x}}{s}$$
 
@@ -404,6 +1023,80 @@ To scale one or more variables in R use `scale()`:
 dat_scaled <- scale(dat_imputed)
 head(dat_scaled)
 ```
+
+# Dates and times
+
+## Dates
+
+In R the default date format follows the rules of the ISO 8601 international standard which expresses a day as "2001-02-13" (yyyy-mm-dd).^[For your information, note that this date format is not the same for every software! Excel, for instance, uses a different format.]
+
+Date can be defined by a string of characters or a number. For example, October 1st, 2016:
+
+```{r}
+as.Date("01/10/16",format="%d/%m/%y")
+as.Date(274,origin="2016-01-01") # there are 274 days between the origin and October 1st, 2016
+```
+
+## Times
+
+An example with date and time vectors:
+
+```{r}
+dates <- c("02/27/92", "02/27/99", "01/14/92")
+times <- c("23:03:20", "22:29:56", "01:03:30")
+x <- paste(dates, times)
+x
+strptime(x,
+         format = "%m/%d/%y %H:%M:%S")
+```
+
+Find more information on how to express a date and time format with `help(strptime)`.
+
+## Extraction from dates
+
+We can extract weekdays, months, quarters and years as follows:
+
+```{r}
+(y <- strptime(x,
+               format = "%m/%d/%y %H:%M:%S"))
+
+weekdays(y, abbreviate = FALSE)
+months(y, abbreviate = FALSE)
+quarters(y, abbreviate = FALSE)
+
+format(y,"%Y") # 4-digit year
+format(y,"%y") # 2-digit year
+```
+
+# Exporting/saving
+
+If a copy-paste is not sufficient, you can save an object in R format with `save()`:
+
+```{r, eval = FALSE}
+save(dat,file="dat.Rdata")
+```
+
+or using `write.table()` or `write.csv()`:
+
+```{r, eval = FALSE}
+write.table(dat,"filename",row=FALSE, sep="\t",quote=FALSE)
+```
+
+If you need to send every results into a file instead of the console:
+
+```{r, eval = FALSE}
+sink("filename")
+```
+
+(Don't forget to stop it with `sink()`.)
+
+# Looking for help
+
+You can always find some help about:
+
+- a function: `?function` or `help(function)`
+- a package: `help(package = packagename)`
+- a concept: `help.search("concept")` or `apropos("concept")`
 
 Thanks for reading. I hope this article helped you to manipulate your data in RStudio.
 
