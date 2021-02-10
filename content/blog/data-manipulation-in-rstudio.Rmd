@@ -509,7 +509,7 @@ tahiti
 
 ## Handling
 
-To extract elements from a list:
+There are several methods to extract elements from a list:
 
 ```{r}
 tahiti$departure
@@ -551,28 +551,32 @@ str(tahiti)
 
 Every imported file in R is a data frame (at least if you do not use a package to [import your data in R](/blog/how-to-import-an-excel-file-in-rstudio/)). A data frame is a mix of a list and a matrix: it has the shape of a matrix but the columns can have different classes.
 
-Remember that the gold standard for a data frame is that columns represent variables, lines correspond to observations and each value must have its own cell:
+Remember that the gold standard for a **data frame** is that:
 
-![Structure of a dataset. Source: R for Data Science by Hadley Wickham & Garrett Grolemund](/blog/how-to-import-an-excel-file-in-rstudio_files/structure-of-dataset.png)
+- **columns** represent **variables**
+- **lines** correspond to **observations** and
+- each **value** must have its own **cell**
 
-In this article, we use the data frame `cars` to illustrate the different data manipulation techniques. Note that the data frame is installed by default in RStudio (so you do not need to import it) and I use the generic name `dat` as the name of the data frame throughout the article (see [here](/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way) why I always use a generic name instead of more specific names). Here is a table of the whole data frame:
+![Structure of a data frame. Source: R for Data Science by Hadley Wickham & Garrett Grolemund](/blog/how-to-import-an-excel-file-in-rstudio_files/structure-of-dataset.png)
+
+In this article, we use the data frame `cars` to illustrate the main data manipulation techniques. Note that the data frame is installed by default in RStudio (so you do not need to import it) and I use the generic name `dat` as the name of the data frame throughout the article (see [here](/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way) why I always use a generic name instead of more specific names).
+
+Here is a table of the whole data frame:
 
 ```{r}
 dat <- cars # rename the cars data frame with a generic name
 dat # display the entire data frame
 ```
 
-This data frame has `r nrow(dat)` observations with `r ncol(dat)` variables (`speed` and `distance`). You can check the number of observations and variables with `nrow(dat)` and `ncol(dat)`, or `dim(dat)`:
+This data frame has `r nrow(dat)` observations with `r ncol(dat)` variables (`speed` and `distance`).
+
+You can check the number of observations and variables with `nrow()` and `ncol()` respectively, or both at the same time with `dim()`:
 
 ```{r}
 nrow(dat) # number of rows/observations
 ncol(dat) # number of columns/variables
-dim(dat) # dimension: number of rows/observations and columns/variables
+dim(dat) # dimension: number of rows and number of columns
 ```
-
-<!-- library(pander) -->
-<!-- pander(dat) -->
-<!-- Note that the `pander()` command is only used for aesthetic reasons. You do not necessarily have to use them when you work in R Studio. -->
 
 ## Line and column names
 
@@ -662,7 +666,9 @@ dat[nrow(dat), ] # nrow() gives the number of rows
 
 This way, no matter the number of observations, you will always select the last one. This technique of using a piece of code instead of a specific value is to avoid "hard coding". Hard coding is generally not recommended (unless you want to specify a parameter that you are sure will never change) because if your data frame changes, you will need to manually edit your code. 
 
-As you probably figured out by now, you can select observations and/or variables of a dataset by running `dataset_name[row_number, column_number]`. When the row or column number is left empty, the entire row/column is selected. Note that all examples presented above also work for matrices:
+As you probably figured out by now, you can select observations and/or variables of a dataset by running `dataset_name[row_number, column_number]`. When the row (column) number is left empty, the entire row (column) is selected.
+
+Note that all examples presented above also work for matrices:
 
 ```{r}
 mat <- matrix(c(-1, 2, 0, 3), ncol = 2, nrow = 2)
@@ -678,7 +684,7 @@ To select one variable of the dataset based on its name rather than on its colum
 dat$speed
 ```
 
-Accessing variables inside a data frame with this second method is strongly recommended compared to the first if you intend to modify the structure of your database. Indeed, if a column is added or removed in the data frame, the numbering will change. Therefore, variables are generally referred to by its name rather than by its position (column number). In addition, it is easier to understand and interpret code with the name of the variable written (another reason to call variables with a concise but clear name). There is only one reason why I would still use the column number; if the variables names are expected to change while the structure of the data frame do not change.
+Accessing variables inside a data frame with this second method is strongly recommended compared to the first if you intend to modify the structure of your database. Indeed, if a column is added or removed in the data frame, the numbering will change. Therefore, variables are generally referred to by its name rather than by its position (column number). In addition, it is easier to understand and interpret code with the name of the variable written (another reason to call variables with a concise but clear name). There is only one reason why I would still use the column number; if the variables names are expected to change while the structure of the data frame will not change.
 
 To select variables, it is also possible to use the `select()` command from the powerful `dplyr` package (for compactness only the first 6 observations are displayed thanks to the `head()` command):
 
@@ -748,29 +754,33 @@ dat$speed_cat <- factor(ifelse(dat$speed > 7,
 head(dat) # 6 is the default in head()
 ```
 
-Note than in programming, a character string is generally surrounded by quotes (`"character string"`) and R is not an exception.
+Note than in programming, a character string is generally surrounded by quotes (e.g., `"character string"`) and R is not an exception.
 
 ### Transform a continuous variable into a categorical variable
 
-To transform a continuous variable into a categorical variable (also known as qualitative variable):
+To transform a [continuous variable](/blog/variable-types-and-examples/#continuous) into a categorical variable (also known as [qualitative variable](/blog/variable-types-and-examples/#qualitative)):
 
 ```{r}
 dat$speed_quali <- cut(dat$speed,
   breaks = c(0, 12, 15, 19, 26), # cut points
   right = FALSE # closed on the left, open on the right
 )
+
 dat[c(1:2, 23:24, 49:50), ] # display some observations
 ```
 
-This transformation is often done on age, when the age (a continuous variable) is transformed into a qualitative variable representing different age groups.
+This transformation is for example often done on age, when the age (a continuous variable) is transformed into a qualitative variable representing different age groups.
 
 ### Sum and mean in rows
 
-In survey with Likert scale (used in psychology, among others), it is often the case that we need to compute a score for each respondents based on multiple questions. The score is usually the mean or the sum of all the questions of interest. This can be done with `rowMeans()` and `rowSums()`. For instance, let's compute the mean and the sum of the variables `speed`, `dist` and `speed_dist` (variables must be numeric of course as sum and mean cannot be computed on qualitative variables!) for each row and store them under the variables `mean_score` and `total_score`:
+In survey with Likert scale (used in psychology, among others), it is often the case that we need to compute a score for each respondents based on multiple questions. The score is usually the [mean](/blog/descriptive-statistics-in-r/#mean) or the sum of all the questions of interest.
+
+This can be done with `rowMeans()` and `rowSums()`. For instance, let's compute the mean and the sum of the variables `speed`, `dist` and `speed_dist` (variables must be numeric of course as a sum and a mean cannot be computed on qualitative variables!) for each row and store them under the variables `mean_score` and `total_score`:
 
 ```{r}
 dat$mean_score <- rowMeans(dat[, 1:3]) # variables speed, dist and speed_dist correspond to variables 1 to 3
 dat$total_score <- rowSums(dat[, 1:3])
+
 head(dat)
 ```
 
@@ -782,6 +792,15 @@ It is also possible to compute the mean and sum by column with `colMeans()` and 
 colMeans(dat[, 1:3])
 colSums(dat[, 1:3])
 ```
+
+This is equivalent than:
+
+```{r}
+mean(dat$speed)
+sum(dat$speed)
+```
+
+but it allows to do it for several variables at a time.
 
 ## Categorical variables and labels management
 
@@ -825,6 +844,7 @@ dat <- within(dat, {
     "big distance"
   ))
 })
+
 head(dat)
 str(dat)
 ```
@@ -844,33 +864,17 @@ mpg <- transform(mpg,
 
 It is possible to recode labels of a categorical variable if you are not satisfied with the current labels. In this example, we change the labels as follows:
 
-* "small distance" $\rightarrow$ "short distance"
-* "big distance" $\rightarrow$ "large distance"
+* "small distance" becomes "short distance"
+* "big distance" becomes "large distance"
 
 ```{r}
 dat$dist_cat <- recode(dat$dist_cat,
   "small distance" = "short distance",
   "big distance" = "large distance"
 )
+
 head(dat)
 ```
-
-<!-- This will be sufficient if you need to recode only one variable. However, if you need to recode more than one variables without having to recode them one by one, another piece of code is necessary: -->
-
-<!-- ```{r} -->
-<!-- dat2 <- select(dat, c(speed_cat, dist_cat)) -->
-<!-- dat2$speed_cat <- as.factor(dat$speed_cat) -->
-<!-- dat2 <- apply(dat2, 2, function(x) { -->
-<!--   x <- recode( -->
-<!--     x, -->
-<!--     "'small distance' = 'short distance'; -->
-<!--     'big distance' = 'large distance'; -->
-<!--     'low speed' = 'slow'; -->
-<!--     'high speed' = 'fast'" -->
-<!--   ) -->
-<!--   x -->
-<!-- }) -->
-<!-- ``` -->
 
 ### Change reference level
 
@@ -888,6 +892,7 @@ In this case, "short distance" being the first level it is the reference level. 
 
 ```{r}
 dat$dist_cat <- relevel(dat$dist_cat, ref = "large distance")
+
 levels(dat$dist_cat)
 ```
 
@@ -895,11 +900,13 @@ Large distance is now the first and thus the reference level.
 
 ## Rename variable names
 
-To rename variable names, use the `rename()` command from the `dplyr` package as follows:
+To rename variable names as follows:
 
 * dist $\rightarrow$ distance
 * speed_dist $\rightarrow$ speed_distance
 * dist_cat $\rightarrow$ distance_cat
+
+use the `rename()` command from the `dplyr` package:
 
 ```{r}
 dat <- rename(dat,
@@ -907,6 +914,7 @@ dat <- rename(dat,
   speed_distance = speed_dist,
   distance_cat = dist_cat
 )
+
 names(dat) # display variable names
 ```
 
@@ -915,11 +923,12 @@ names(dat) # display variable names
 Although most analyses are performed on an imported data frame, it is also possible to create a data frame directly in R:
 
 ```{r}
-# Create the data frame named dat
+# Create the data frame named dat with 2 variables
 dat <- data.frame(
   "variable1" = c(6, 12, NA, 3), # presence of 1 missing value (NA)
   "variable2" = c(3, 7, 9, 1)
 )
+
 # Print the data frame
 dat
 ```
@@ -932,14 +941,20 @@ By default, the merge is done on the common variables (variables that have the s
 dat1 <- data.frame(person=c(1:4),
                        treatment = c("T1", "T2")
                        )
+
 dat1
 
 dat2 <- data.frame(patient=c(1:4),
                        age = c(56, 23,32,19),
                        gender = c("M", "F", "F", "M")
                        )
-dat2
 
+dat2
+```
+
+We want to merge the two data frames by the subject number, but this number is referred as `person` in the first data frame and `patient` in the second data frame, so we need to indicate it:
+
+```{r}
 merge(x= dat1, y=dat2,
                      by.x="person",by.y="patient",
                      all=TRUE)
@@ -954,12 +969,13 @@ dat1
 dat3 <- data.frame(person = 5:8,
                    treatment = c("T3")
                        )
+
 dat3
 
-rbind(dat1, dat3) # r stands for row
+rbind(dat1, dat3) # r stands for row, so we bind data frames by row
 ```
 
-As you can see, data for persons 5 to 8 have been added at the end of the data frame `dat1` (because `dat1` comes before `dat3` in the `rbind()` function.
+As you can see, data for persons 5 to 8 have been added at the end of the data frame `dat1` (because `dat1` comes before `dat3` in the `rbind()` function).
 
 ## Add new variables from another data frame
 
@@ -968,17 +984,38 @@ It is also possible to add new variables to a data frame with the `cbind()` func
 ```{r}
 dat2
 dat3
-cbind(dat2, dat3) # c stands for column
+
+cbind(dat2, dat3) # c stands for column, so we bind data frames by column
+```
+
+If you want to add only a specific variable from another data frame:
+
+```{r}
+dat_cbind <- cbind(dat2, dat3$treatment)
+
+dat_cbind
+
+names(dat_cbind)[4] <- "treatment"
+
+dat_cbind
+```
+
+or more simply with the `data.frame()` function:
+
+```{r}
+data.frame(dat2,
+           treatment = dat3$treatment)
 ```
 
 # Missing values
 
-Missing values (represented by NA in RStudio, for "Not Applicable") are often problematic for many analyses because every computation including a missing value has a missing value for result.
+Missing values (represented by NA in RStudio, for "Not Applicable") are often problematic for many analyses because many computations including a missing value has a missing value for result.
 
-For instance, the mean of a series or variable with at least one NA will give a NA (the data frame `dat` created in the previous section is used for this example):
+For instance, the mean of a series or variable with at least one NA will give a NA as a result. The data frame `dat` created in the previous section is used for this example:
 
 ```{r}
 dat
+
 mean(dat$variable1)
 ```
 
@@ -1004,13 +1041,14 @@ Note that "NA" as a string is not considered as a missing value:
 
 ```{r}
 y<-c("NA","2")
+
 is.na(y)
 ```
 
 To check whether there is at least one missing value in a vector or data frame:
 
 ```{r}
-anyNA(dat$variable2) # check for NA in variable1
+anyNA(dat$variable2) # check for NA in variable2
 anyNA(dat) # check for NA in the whole data frame
 
 #or
@@ -1021,14 +1059,14 @@ Nonetheless, data frames with NAs are still problematic for some types of analys
 
 ## Remove NAs
 
-A simple solution is to remove all observations (i.e., rows) containing at least one missing value. This is done by keeping observations with complete cases:
+A simple solution is to remove all observations (i.e., rows) containing at least one missing value. This is done by keeping only observations with complete cases:
 
 ```{r}
 dat_complete <- dat[complete.cases(dat), ]
 dat_complete
 ```
 
-Be careful before removing observations with missing values, especially if missing values are not "missing at random". This is, however, beyond the scope of the present article.
+Be careful when removing observations with missing values, especially if missing values are not "missing at random". It is not because it possible (and easy) to remove them, that you should do it in all cases. This is, however, beyond the scope of the present article.
 
 ## Impute NAs
 
@@ -1036,6 +1074,7 @@ Instead of removing observations with at least one NA, it is possible to impute 
 
 ```{r, message = FALSE}
 library(imputeMissings)
+
 dat_imputed <- impute(dat) # default method is median/mode
 dat_imputed
 ```
@@ -1044,7 +1083,7 @@ When the median/mode method is used (the default), character vectors and factors
 
 # Scale
 
-Scaling (i.e., standardizing) a variable is often used before a Principal Component Analysis (PCA)^[Principal Component Analysis (PCA) is a useful technique for exploratory data analysis, allowing a better visualization of the variation present in a data frame with a large number of variables. When there are many variables, the data cannot easily be illustrated in their raw format. To counter this, the PCA takes a data frame with many variables and simplifies it by transforming the original variables into a smaller number of "principal components". The first dimension contains the most variance in the data frame and so on, and the dimensions are uncorrelated. Note that PCA is done on quantitative variables.] when variables of a data frame have different units. Remember that scaling a variable means that it will compute the mean and the standard deviation of that variable. Then each value (so each row) of that variable is "scaled" by subtracting the mean and dividing by the standard deviation of that variable. Formally:
+[Scaling](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#probabilities-and-standard-normal-distribution) (also referred as standardizing) a variable is often used before a Principal Component Analysis (PCA)^[Principal Component Analysis (PCA) is a useful technique for exploratory data analysis, allowing a better visualization of the variation present in a data frame with a large number of variables. When there are many variables, the data cannot easily be illustrated in their raw format. To counter this, the PCA takes a data frame with many variables and simplifies it by transforming the original variables into a smaller number of "principal components". The first dimension contains the most variance in the data frame and so on, and the dimensions are uncorrelated. Note that PCA is done on quantitative variables.] when variables of a data frame have different units. Remember that scaling a variable means that it will compute the mean and the standard deviation of that variable. Then each value (so each row) of that variable is "scaled" by subtracting the mean and dividing by the standard deviation of that variable. Formally:
 
 $$z = \frac{x - \bar{x}}{s}$$
 
@@ -1054,6 +1093,7 @@ To scale one or more variables in R use `scale()`:
 
 ```{r}
 dat_scaled <- scale(dat_imputed)
+
 head(dat_scaled)
 ```
 
@@ -1077,8 +1117,10 @@ An example with date and time vectors:
 ```{r}
 dates <- c("02/27/92", "02/27/99", "01/14/92")
 times <- c("23:03:20", "22:29:56", "01:03:30")
+
 x <- paste(dates, times)
 x
+
 strptime(x,
          format = "%m/%d/%y %H:%M:%S")
 ```
@@ -1087,11 +1129,18 @@ Find more information on how to express a date and time format with `help(strpti
 
 ## Extraction from dates
 
-We can extract weekdays, months, quarters and years as follows:
+We can extract:
+
+- weekdays
+- months
+- quarters
+- years
 
 ```{r}
-(y <- strptime(x,
-               format = "%m/%d/%y %H:%M:%S"))
+y <- strptime(x,
+               format = "%m/%d/%y %H:%M:%S")
+
+y
 
 weekdays(y, abbreviate = FALSE)
 months(y, abbreviate = FALSE)
@@ -1101,7 +1150,7 @@ format(y,"%Y") # 4-digit year
 format(y,"%y") # 2-digit year
 ```
 
-# Exporting/saving
+# Exporting and saving
 
 If a copy-paste is not sufficient, you can save an object in R format with `save()`:
 
@@ -1131,6 +1180,8 @@ You can always find some help about:
 - a package: `help(package = packagename)`
 - a concept: `help.search("concept")` or `apropos("concept")`
 
-Thanks for reading. I hope this article helped you to manipulate your data in RStudio.
+Otherwise, Google is your best friend!
+
+Thanks for reading. I hope this article helped you to manipulate your data in RStudio. Now that you know [how to import a data frame into R](/blog/how-to-import-an-excel-file-in-rstudio/) and how to manipulate it, the next step would probably be to learn how to perform [descriptive statistics in R](/blog/descriptive-statistics-in-r/). If you are looking for more advanced statistical analyses using R, see all [articles about R](/tags/r/).
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
