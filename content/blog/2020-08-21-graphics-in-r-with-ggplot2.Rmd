@@ -70,6 +70,8 @@ dat <- transform(dat,
 )
 ```
 
+For the interested reader, see more [data manipulation techniques in R](/blog/data-manipulation-in-r/).
+
 # Basic principles of `{ggplot2}`
 
 The `{ggplot2}` package is based on the principles of "The Grammar of Graphics" (hence "gg" in the name of `{ggplot2}`), that is, a coherent system for describing and building graphs. The main idea is to **design a graphic as a succession of layers**.
@@ -425,15 +427,25 @@ p + scale_x_continuous(limits = c(3, 6)) +
   scale_y_continuous(limits = c(20, 30))
 ```
 
-It is also possible to simply take a subset of the dataset with the `subset()` or `filter()` function. See how to [subset a dataset](/blog/data-manipulation-in-r/#subset-a-dataset) if you need a reminder.
+It is also possible to simply take a subset of the dataset with the `subset()` or `filter()` function. See how to [subset a dataset](/blog/data-manipulation-in-r/#subset-a-data-frame) if you need a reminder.
 
-### Scales on the y-axis
+### Scales for better axis formats
 
-Depending on your data, it is possible to format the y-axis in a certain way with the `{scales}` package. The format I use the most is `comma` which formats numbers in a more-readible way:
+Depending on your data, it is possible to format axes in a certain way with the `{scales}` package. The formats I use the most are `comma` and `label_number_si()` which formats large numbers in a more-readable way.
+
+For this example, we multiply both variables by 1000 to have larger numbers and then we apply a different format for each axis:
 
 ```{r}
-p + scale_y_continuous(label = scales::comma)
+ggplot(dat) +
+  aes(x = displ * 1000, y = hwy * 1000) +
+  geom_point() +
+  scale_y_continuous(labels = scales::label_number_si()) + # format y-axis
+  scale_x_continuous(labels = scales::comma) # format x-axis
 ```
+
+As you can see, numbers on the y-axis are automatically labeled with the best SI prefix ("K" for values $\ge$ 10e3, "M" for $\ge$ 10e6, "B" for $\ge$ 10e9, and "T" for $\ge$ 10e12) and numbers on the x-axis are displayed as 2,000, 3,000, etc. instead of 2000, 3000, etc.
+
+These two formats make large numbers easier to read. Other formats are possible such as using dollar signs, percentage signs, dates etc. See more information in the [package's documentation](https://scales.r-lib.org/){target="_blank"}.
 
 ### Legend
 
@@ -797,9 +809,23 @@ p + scale_x_date(date_breaks = "10 days", date_labels = "%d %b") +
   theme(axis.text.x = element_text(angle = 60, hjust = 1))
 ```
 
+# Tip
 
+I recently learned a tip very useful when drawing plots with `{ggplot2}`. If like me, you often comment and uncomment some lines of code in your plot, you know that you cannot transform the last line into a comment without removing the `+` sign in the line just above.
 
+Adding a line `NULL` at the end of your plots will avoid an error if you forget to remove the `+` sign in the last line of your code. See with this basic example:
 
+```{r}
+ggplot(dat) +
+  aes(x = date, y = hwy) +
+  geom_line() + # I do not have to remove the + sign
+  # theme_minimal() + # this line is a comment
+  NULL # adding this line doesn't change anything to the plot
+```
+
+This trick saves me a lot of time as I do not need to worry about making sure to remove the last `+` sign after commenting some lines of code in my plots.
+
+If you find this trick useful, you may like these other [tips and tricks in RStudio and R Markdown](/blog/tips-and-tricks-in-rstudio-and-r-markdown/).
 
 # To go further
 
