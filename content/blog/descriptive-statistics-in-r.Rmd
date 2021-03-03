@@ -21,7 +21,10 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   fig.align = "center",
-  out.width='100%'
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
@@ -550,7 +553,8 @@ If you do not need information about missing values, add the `report.nas = FALSE
 
 ```{r, plain.ascii = FALSE, style = "rmarkdown"}
 freq(dat$Species,
-     report.nas = FALSE) # remove NA information
+     report.nas = FALSE # remove NA information
+     )
 ```
 
 And for a minimalist output with only counts and proportions:
@@ -560,7 +564,8 @@ freq(dat$Species,
      report.nas = FALSE, # remove NA information
      totals = FALSE, # remove totals
      cumul = FALSE, # remove cumuls
-     headings = FALSE) # remove headings
+     headings = FALSE # remove headings
+     )
 ```
 
 ### Cross-tabulations with `ctable()`
@@ -577,7 +582,8 @@ Row proportions are shown by default. To display column or total proportions, ad
 ```{r, plain.ascii = FALSE, style = "rmarkdown"}
 ctable(x = dat$Species,
        y = dat$size,
-       prop = "t") # total proportions
+       prop = "t" # total proportions
+       )
 ```
 
 To remove proportions altogether, add the argument `prop = "n"`. Furthermore, to display only the bare minimum, add the `totals = FALSE` and `headings = FALSE` arguments:
@@ -587,7 +593,8 @@ ctable(x = dat$Species,
        y = dat$size,
        prop = "n", # remove proportions
        totals = FALSE, # remove totals
-       headings = FALSE) # remove headings
+       headings = FALSE # remove headings
+       )
 ```
 
 This is equivalent than `table(dat$Species, dat$size)` and `xtabs(~ dat$Species + dat$size)` performed in the section on [contingency tables](/blog/descriptive-statistics-in-r/#contingency-table).
@@ -598,7 +605,8 @@ To display results of the [Chi-square test of independence](/blog/chi-square-tes
 ctable(x = dat$Species,
        y = dat$size,
        chisq = TRUE, # display results of Chi-square test of independence
-       headings = FALSE) # remove headings
+       headings = FALSE # remove headings
+       )
 ```
 
 The *p*-value is close to 0 so we reject the null hypothesis of independence between the two variables. In our context, this indicates that species and size are dependent and that there is a significant relationship between the two variables.
@@ -609,7 +617,8 @@ It is also possible to create a contingency table for each level of a third cate
 stby(list(x = tobacco$smoker, # smoker and diseased
           y = tobacco$diseased), 
      INDICES = tobacco$gender, # for each gender
-     FUN = ctable) # ctable for cross-tabulation
+     FUN = ctable # ctable for cross-tabulation
+     )
 ```
 
 ### Descriptive statistics with `descr()`
@@ -627,7 +636,8 @@ The `descr()` function allows to display:
 ```{r, plain.ascii = FALSE, style = "rmarkdown", message = FALSE}
 descr(dat,
       headings = FALSE, # remove headings
-      stats = "common") # most common descriptive statistics
+      stats = "common" # most common descriptive statistics
+      )
 ```
 
 *Tip*: if you have a large number of variables, add the `transpose = TRUE` argument for a better display.
@@ -638,7 +648,8 @@ In order to compute these descriptive statistics by group (e.g., `Species` in ou
 stby(data = dat,
      INDICES = dat$Species, # by Species
      FUN = descr, # descriptive statistics
-     stats = "common") # most common descr. stats
+     stats = "common" # most common descr. stats
+     )
 ```
 
 ### Data frame summaries with `dfSummary()`
@@ -656,7 +667,8 @@ The `describeBy()` function from the `{psych}` package allows to report several 
 ```{r, message = FALSE, warning = FALSE}
 library(psych)
 describeBy(dat,
-           dat$Species) # grouping variable
+           dat$Species # grouping variable
+           )
 ```
 
 ## `aggregate()` function

@@ -390,8 +390,9 @@ round(prop.table(table(dat$Species, dat$size), 2), 2) # round to 2 digits with r
 <pre class="r"><code>library(vcd)
 
 mosaic(~ Species + size,
-       data = dat,
-       direction = c(&quot;v&quot;, &quot;h&quot;))</code></pre>
+  data = dat,
+  direction = c(&quot;v&quot;, &quot;h&quot;)
+)</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-32-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 </div>
@@ -475,7 +476,8 @@ dotplot(dat$Sepal.Length ~ dat$Species)</code></pre>
 <h1>Line plot</h1>
 <p>Line plots, particularly useful in time series or finance, can be created by adding the <code>type = "l"</code> argument in the <code>plot()</code> function:</p>
 <pre class="r"><code>plot(dat$Sepal.Length,
-     type = &quot;l&quot;) # &quot;l&quot; for line</code></pre>
+  type = &quot;l&quot;
+) # &quot;l&quot; for line</code></pre>
 <p><img src="/blog/descriptive-statistics-in-r_files/figure-html/unnamed-chunk-45-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="qq-plot" class="section level1">
@@ -560,7 +562,8 @@ freq(dat$Species)</code></pre>
 ##            Total    150    100.00         100.00    100.00         100.00</code></pre>
 <p>If you do not need information about missing values, add the <code>report.nas = FALSE</code> argument:</p>
 <pre class="r"><code>freq(dat$Species,
-     report.nas = FALSE) # remove NA information</code></pre>
+  report.nas = FALSE # remove NA information
+)</code></pre>
 <pre><code>## Frequencies  
 ## dat$Species  
 ## Type: Factor  
@@ -573,10 +576,11 @@ freq(dat$Species)</code></pre>
 ##            Total    150   100.00   100.00</code></pre>
 <p>And for a minimalist output with only counts and proportions:</p>
 <pre class="r"><code>freq(dat$Species,
-     report.nas = FALSE, # remove NA information
-     totals = FALSE, # remove totals
-     cumul = FALSE, # remove cumuls
-     headings = FALSE) # remove headings</code></pre>
+  report.nas = FALSE, # remove NA information
+  totals = FALSE, # remove totals
+  cumul = FALSE, # remove cumuls
+  headings = FALSE # remove headings
+)</code></pre>
 <pre><code>## 
 ##                    Freq       %
 ## ---------------- ------ -------
@@ -587,8 +591,10 @@ freq(dat$Species)</code></pre>
 <div id="cross-tabulations-with-ctable" class="section level3">
 <h3>Cross-tabulations with <code>ctable()</code></h3>
 <p>The <code>ctable()</code> function produces cross-tabulations (also known as contingency tables) for pairs of categorical variables. Using the two categorical variables in our dataset:</p>
-<pre class="r"><code>ctable(x = dat$Species,
-       y = dat$size)</code></pre>
+<pre class="r"><code>ctable(
+  x = dat$Species,
+  y = dat$size
+)</code></pre>
 <pre><code>## Cross-Tabulation, Row Proportions  
 ## Species * size  
 ## Data Frame: dat  
@@ -602,9 +608,11 @@ freq(dat$Species)</code></pre>
 ##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
 ## ------------ ------ ------------ ------------ --------------</code></pre>
 <p>Row proportions are shown by default. To display column or total proportions, add the <code>prop = "c"</code> or <code>prop = "t"</code> arguments, respectively:</p>
-<pre class="r"><code>ctable(x = dat$Species,
-       y = dat$size,
-       prop = &quot;t&quot;) # total proportions</code></pre>
+<pre class="r"><code>ctable(
+  x = dat$Species,
+  y = dat$size,
+  prop = &quot;t&quot; # total proportions
+)</code></pre>
 <pre><code>## Cross-Tabulation, Total Proportions  
 ## Species * size  
 ## Data Frame: dat  
@@ -618,11 +626,13 @@ freq(dat$Species)</code></pre>
 ##        Total          77 (51.3%)   73 (48.7%)   150 (100.0%)
 ## ------------ ------ ------------ ------------ --------------</code></pre>
 <p>To remove proportions altogether, add the argument <code>prop = "n"</code>. Furthermore, to display only the bare minimum, add the <code>totals = FALSE</code> and <code>headings = FALSE</code> arguments:</p>
-<pre class="r"><code>ctable(x = dat$Species,
-       y = dat$size,
-       prop = &quot;n&quot;, # remove proportions
-       totals = FALSE, # remove totals
-       headings = FALSE) # remove headings</code></pre>
+<pre class="r"><code>ctable(
+  x = dat$Species,
+  y = dat$size,
+  prop = &quot;n&quot;, # remove proportions
+  totals = FALSE, # remove totals
+  headings = FALSE # remove headings
+)</code></pre>
 <pre><code>## 
 ## ------------ ------ ----- -------
 ##                size   big   small
@@ -633,10 +643,12 @@ freq(dat$Species)</code></pre>
 ## ------------ ------ ----- -------</code></pre>
 <p>This is equivalent than <code>table(dat$Species, dat$size)</code> and <code>xtabs(~ dat$Species + dat$size)</code> performed in the section on <a href="/blog/descriptive-statistics-in-r/#contingency-table">contingency tables</a>.</p>
 <p>To display results of the <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a>, add the <code>chisq = TRUE</code> argument:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
-<pre class="r"><code>ctable(x = dat$Species,
-       y = dat$size,
-       chisq = TRUE, # display results of Chi-square test of independence
-       headings = FALSE) # remove headings</code></pre>
+<pre class="r"><code>ctable(
+  x = dat$Species,
+  y = dat$size,
+  chisq = TRUE, # display results of Chi-square test of independence
+  headings = FALSE # remove headings
+)</code></pre>
 <pre><code>## 
 ## ------------ ------ ------------ ------------ --------------
 ##                size          big        small          Total
@@ -654,10 +666,13 @@ freq(dat$Species)</code></pre>
 ## ----------------------------</code></pre>
 <p>The <em>p</em>-value is close to 0 so we reject the null hypothesis of independence between the two variables. In our context, this indicates that species and size are dependent and that there is a significant relationship between the two variables.</p>
 <p>It is also possible to create a contingency table for each level of a third categorical variable thanks to the combination of the <code>stby()</code> and <code>ctable()</code> functions. There are only 2 categorical variables in our dataset, so let’s use the <code>tabacco</code> dataset which has 4 categorical variables (i.e., gender, age group, smoker, diseased). For this example, we would like to create a contingency table of the variables <code>smoker</code> and <code>diseased</code>, and this for each <code>gender</code>:</p>
-<pre class="r"><code>stby(list(x = tobacco$smoker, # smoker and diseased
-          y = tobacco$diseased), 
-     INDICES = tobacco$gender, # for each gender
-     FUN = ctable) # ctable for cross-tabulation</code></pre>
+<pre class="r"><code>stby(list(
+  x = tobacco$smoker, # smoker and diseased
+  y = tobacco$diseased
+),
+INDICES = tobacco$gender, # for each gender
+FUN = ctable # ctable for cross-tabulation
+)</code></pre>
 <pre><code>## Cross-Tabulation, Row Proportions  
 ## smoker * diseased  
 ## Data Frame: tobacco  
@@ -692,21 +707,9 @@ freq(dat$Species)</code></pre>
 <li>the most common descriptive statistics (mean, standard deviation, minimum, median, maximum, number and percentage of valid observations), with <code>stats = "common"</code>:</li>
 </ul>
 <pre class="r"><code>descr(dat,
-      headings = FALSE, # remove headings
-      stats = &quot;common&quot;) # most common descriptive statistics</code></pre>
-<pre><code>## Warning: `funs()` is deprecated as of dplyr 0.8.0.
-## Please use a list of either functions or lambdas: 
-## 
-##   # Simple named list: 
-##   list(mean = mean, median = median)
-## 
-##   # Auto named with `tibble::lst()`: 
-##   tibble::lst(mean, median)
-## 
-##   # Using lambdas
-##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
+  headings = FALSE, # remove headings
+  stats = &quot;common&quot; # most common descriptive statistics
+)</code></pre>
 <pre><code>## 
 ##                   Petal.Length   Petal.Width   Sepal.Length   Sepal.Width
 ## --------------- -------------- ------------- -------------- -------------
@@ -719,10 +722,12 @@ freq(dat$Species)</code></pre>
 ##       Pct.Valid         100.00        100.00         100.00        100.00</code></pre>
 <p><em>Tip</em>: if you have a large number of variables, add the <code>transpose = TRUE</code> argument for a better display.</p>
 <p>In order to compute these descriptive statistics by group (e.g., <code>Species</code> in our dataset), use the <code>descr()</code> function in combination with the <code>stby()</code> function:</p>
-<pre class="r"><code>stby(data = dat,
-     INDICES = dat$Species, # by Species
-     FUN = descr, # descriptive statistics
-     stats = &quot;common&quot;) # most common descr. stats</code></pre>
+<pre class="r"><code>stby(
+  data = dat,
+  INDICES = dat$Species, # by Species
+  FUN = descr, # descriptive statistics
+  stats = &quot;common&quot; # most common descr. stats
+)</code></pre>
 <pre><code>## Descriptive Statistics  
 ## dat  
 ## Group: Species = setosa  
@@ -813,8 +818,10 @@ freq(dat$Species)</code></pre>
 <h2><code>describeBy()</code> from the <code>{psych}</code> package</h2>
 <p>The <code>describeBy()</code> function from the <code>{psych}</code> package allows to report several summary statistics (i.e., number of valid cases, mean, standard deviation, median, trimmed mean, mad: median absolute deviation (from the median), minimum, maximum, range, skewness and kurtosis) by a grouping variable.</p>
 <pre class="r"><code>library(psych)
-describeBy(dat,
-           dat$Species) # grouping variable</code></pre>
+describeBy(
+  dat,
+  dat$Species # grouping variable
+)</code></pre>
 <pre><code>## 
 ##  Descriptive statistics by group 
 ## group: setosa
@@ -869,8 +876,9 @@ describeBy(dat,
 <h2><code>aggregate()</code> function</h2>
 <p>The <code>aggregate()</code> function allows to split the data into subsets and then to compute summary statistics for each. For instance, if we want to compute the mean for the variables <code>Sepal.Length</code> and <code>Sepal.Width</code> by <code>Species</code> and <code>Size</code>:</p>
 <pre class="r"><code>aggregate(cbind(Sepal.Length, Sepal.Width) ~ Species + size,
-          data = dat,
-          mean)</code></pre>
+  data = dat,
+  mean
+)</code></pre>
 <pre><code>##      Species  size Sepal.Length Sepal.Width
 ## 1     setosa   big     5.800000    4.000000
 ## 2 versicolor   big     6.282759    2.868966
