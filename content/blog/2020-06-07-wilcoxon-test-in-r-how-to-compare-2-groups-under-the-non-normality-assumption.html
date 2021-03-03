@@ -23,29 +23,36 @@ output:
 <div id="TOC">
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#different-scenarios">2 different scenarios</a><ul>
+<li><a href="#two-different-scenarios">Two different scenarios</a><ul>
 <li><a href="#independent-samples">Independent samples</a></li>
 <li><a href="#paired-samples">Paired samples</a></li>
 </ul></li>
+<li><a href="#equal-variances">Equal variances</a></li>
 </ul>
 </div>
 
 <p><img src="/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption.jpeg" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>In a previous article, we showed how to <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">compare two groups under different scenarios using the Student’s t-test</a>. The Student’s t-test requires that the distributions follow a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normal distribution</a>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> In this article, we show how to compare two groups when the normality assumption is violated, using the Wilcoxon test.</p>
-<p>The Wilcoxon test (also referred as the Mann-Withney-Wilcoxon test) is a non-parametric test, meaning that it does not rely on data belonging to any particular parametric family of probability distributions. Non-parametric tests have the same objective as their parametric counterparts. However, they have an advantage over parametric tests: they <strong>do not</strong> require the assumption of normality of distributions. A Student’s t-test for instance is only applicable if the data are Gaussian or if the sample size is large enough (usually <span class="math inline">\(n \ge 30\)</span>). A non-parametric should be used in other cases.</p>
-<p>One may wonder why we would not always use a non-parametric test so we do not have to bother about testing for normality. The reason is that non-parametric tests are usually less powerful than corresponding parametric tests when the normality assumption holds. Therefore, all else being equal, with a non-parametric test you are less likely to reject the null hypothesis when it is false if the data follows a normal distribution. It is thus preferred to use the parametric version of a statistical test when the assumptions are met.</p>
+<p>In a previous article, we showed how to <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">compare two groups under different scenarios using the Student’s t-test</a>. The Student’s t-test requires that the distributions follow a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normal distribution</a>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> In this article, we show how to <strong>compare two groups when the normality assumption is violated</strong>, using the <strong>Wilcoxon test</strong>.</p>
+<p>The Wilcoxon test is a <strong>non-parametric test</strong>, meaning that it does not rely on data belonging to any particular parametric family of probability distributions. Non-parametric tests have the same objective as their parametric counterparts. However, they have an advantage over parametric tests: they <strong>do not require the assumption of normality</strong> of distributions. A Student’s t-test for instance is only applicable if the data are Gaussian or if the sample size is large enough (usually <span class="math inline">\(n \ge 30\)</span>). A non-parametric should be used in other cases.</p>
+<p>One may wonder why we would not always use a non-parametric test so we do not have to bother about testing for normality. The reason is that non-parametric tests are usually less powerful than corresponding parametric tests when the normality assumption holds. Therefore, all else being equal, with a non-parametric test you are less likely to reject the <a href="/blog/hypothesis-test-by-hand/#step-1-stating-the-null-and-alternative-hypothesis">null hypothesis</a> when it is false if the data follows a normal distribution. It is thus preferred to use the parametric version of a statistical test when the assumptions are met.</p>
 <p>In the remaining of the article, we present the two scenarios of the Wilcoxon test and how to perform them in R through two examples.</p>
 </div>
-<div id="different-scenarios" class="section level1">
-<h1>2 different scenarios</h1>
+<div id="two-different-scenarios" class="section level1">
+<h1>Two different scenarios</h1>
 <p>As for the Student’s t-test, the Wilcoxon test is used to compare two groups and see whether they are significantly different from each other.</p>
-<p>The 2 groups to be compared are either:</p>
+<p>The two groups to be compared are either:</p>
 <ol style="list-style-type: decimal">
 <li>independent, or</li>
 <li>paired (i.e., dependent)</li>
 </ol>
+<p>There are actually two versions of the Wilcoxon test:</p>
+<ol style="list-style-type: decimal">
+<li>The <strong>Mann-Withney-Wilcoxon</strong> test (also referred as Wilcoxon rank sum test) is performed when the samples are independent (so this test is the non-parametric equivalent to the Student’s t-test for independent samples).</li>
+<li>The <strong>Wilcoxon signed-rank</strong> test (also sometimes referred as Wilcoxon test for paired samples) is performed when the samples are paired/dependent (so this test is the non-parametric equivalent to the Student’s t-test for paired samples).</li>
+</ol>
+<p>Luckily, those two tests can be done in R with the same function: <code>wilcox.test()</code>. They are presented in the following sections.</p>
 <div id="independent-samples" class="section level2">
 <h2>Independent samples</h2>
 <p>For the Wilcoxon test with independent samples, suppose that we want to test whether grades at the statistics exam differ between female and male students.</p>
@@ -84,7 +91,7 @@ dat</code></pre>
 ## 22  Boy     6
 ## 23  Boy     7
 ## 24  Boy    14</code></pre>
-<p>Here are the distributions of the grades by sex:</p>
+<p>Here are the distributions of the grades by sex (using <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code></a>):</p>
 <pre class="r"><code>library(ggplot2)
 
 ggplot(dat) +
@@ -223,9 +230,15 @@ test</code></pre>
 ## alternative hypothesis: true location shift is not equal to 0</code></pre>
 <p>We obtain the test statistic, the <em>p</em>-value and a reminder of the hypothesis tested.</p>
 <p>The <em>p</em>-value is 0.169. Therefore, at the 5% significance level, we do not reject the null hypothesis that the grades are similar before and after the semester.</p>
+</div>
+</div>
+<div id="equal-variances" class="section level1">
+<h1>Equal variances</h1>
+<p>As written at the beginning of the article, the Wilcoxon test does not require the assumption of normality.</p>
+<p>Regarding the assumption of equal variances, this assumption may or may not be needed depending on your goal. If you only want to compare the two groups you do not have to test the equality of variances. However, if your goal is to <strong>compare medians of the two groups</strong> then you will need to make sure that the two distributions have the same shape.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
+<p>So testing equality of variances will change your interpretation. In this article I do not compare medians, I only compare the groups. This is the reason I do not test for equality of variances.</p>
 <p>Thanks for reading. I hope this article helped you to compare two groups that do not follow a normal distribution in R using the Wilcoxon test. See the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test</a> if you need to perform the parametric version of the Wilcoxon test, and the <a href="/blog/anova-in-r/">ANOVA</a> if you need to compare 3 groups or more.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
-</div>
 </div>
 <div class="footnotes">
 <hr />
@@ -234,5 +247,6 @@ test</code></pre>
 <li id="fn2"><p>Note that in order to use the Student’s t-test (the parametric version of the Wilcoxon test), it is required that <strong>both samples follow a normal distribution</strong>. Therefore, even if one sample follows a normal distribution (and the other does not follow a normal distribution), it is recommended to use the non-parametric test.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 <li id="fn3"><p>Note that the presence of equal elements (ties) prevents an exact <em>p</em>-value calculation. This can be tackled by computing the exact or asymptotic Wilcoxon-Mann-Whitney test with adjustment for ties, using the <code>wilcox_test()</code> function from the <code>{coin}</code> package: <code>wilcox_test(dat$Grade ~ dat$Sex, distribution = exact())</code> or <code>wilcox_test(dat$Grade ~ dat$Sex)</code>. In our case, conclusions remain unchanged.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
 <li id="fn4"><p>We add <code>alternative = "less"</code> (and not <code>alternative = "greater"</code>) because we want to test that grades for boys are <strong>less</strong> than grade for girls. Using <code>"less"</code> or <code>"greater"</code> can be deducted from the reference level in the dataset.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>See these three articles for a more detailed discussion on the condition of equal variances in Wilcoxon test: <a href="https://statistics.laerd.com/statistical-guides/mann-whitney-u-test-assumptions.php">1</a>, <a href="https://influentialpoints.com/Training/Wilcoxon-Mann-Whitney_U_test_use_and_misuse.htm">2</a> &amp; <a href="https://influentialpoints.com/Training/Wilcoxon_matched_pairs_signed_rank_test_use_and_misuse.htm">3</a><a href="#fnref5" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
