@@ -16,7 +16,7 @@ output:
     toc: true
     toc_depth: 6
 # draft: true
-# bibliography: bibliography.bib
+bibliography: bibliography.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -33,9 +33,9 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-Correlations between variables play an important role in a [descriptive analysis](/tags/descriptive-statistics/). A correlation measures the relationship between two variables, that is, how they are linked to each other. In this sense, a correlation allows to know which variables evolve in the same direction, which ones evolve in the opposite direction, and which ones are independent.
+Correlations between variables play an important role in a [descriptive analysis](/tags/descriptive-statistics/). A correlation measures the **relationship between two variables**, that is, how they are linked to each other. In this sense, a correlation allows to know which variables evolve in the same direction, which ones evolve in the opposite direction, and which ones are independent.
 
-In this article, I show how to compute correlation coefficients, how to perform correlation tests and how to visualize relationships between variables in R.
+In this article, I show how to compute **correlation coefficients**, how to perform **correlation tests** and how to **visualize relationships** between variables in R.
 
 Correlation is usually computed on two [quantitative](/blog/variable-types-and-examples/#quantitative) variables. See the [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/) if you need to study the relationship between two [qualitative](/blog/variable-types-and-examples/#qualitative) variables.
 
@@ -71,7 +71,7 @@ The correlation between 2 variables is found with the `cor()` function. Suppose 
 cor(dat$hp, dat$mpg)
 ```
 
-Note that the correlation between variables *x* and *y* is equal to the correlation between variables *y* and *x* so the order of the variables in the `cor()` function does not matter.
+Note that the correlation between variables *X* and *Y* is equal to the correlation between variables *Y* and *X* so the order of the variables in the `cor()` function does not matter.
 
 The Pearson correlation is computed by default with the `cor()` function. If you want to compute the Spearman correlation, add the argument `method = "spearman"` to the `cor()` function:
 
@@ -83,9 +83,9 @@ cor(dat$hp, dat$mpg,
 
 There are several correlation methods (Run `?cor` for more information about the different methods available in the `cor()` function):
 
-* Pearson correlation is often used for [quantitative continuous](/blog/variable-types-and-examples/#continuous) variables that have a linear relationship
-* Spearman correlation (which is actually similar to Pearson but based on the ranked values for each variable rather than on the raw data) is often used to evaluate relationships involving [qualitative ordinal](/blog/variable-types-and-examples/#ordinal) variables or quantitative variables if the link is partially linear
-* Kendall which is computed from the number of concordant and discordant pairs is often used for qualitative ordinal variables
+* **Pearson** correlation is often used for [quantitative continuous](/blog/variable-types-and-examples/#continuous) variables that have a linear relationship
+* **Spearman** correlation (which is actually similar to Pearson but based on the ranked values for each variable rather than on the raw data) is often used to evaluate relationships involving [qualitative ordinal](/blog/variable-types-and-examples/#ordinal) variables or quantitative variables if the link is partially linear
+* **Kendall** which is computed from the number of concordant and discordant pairs is often used for qualitative ordinal variables
 
 ## Correlation matrix: correlations for all variables
 
@@ -102,9 +102,14 @@ This correlation matrix gives an overview of the correlations for all combinatio
 
 ## Interpretation of a correlation coefficient
 
-First of all, correlation ranges from **-1 to 1**.
+First of all, correlation ranges from **-1 to 1**. It gives us an indication on two things:
 
-On the one hand, a negative correlation implies that the two variables under consideration vary in opposite directions, that is, if a variable increases the other decreases and vice versa. On the other hand, a positive correlation implies that the two variables under consideration vary in the same direction, i.e., if a variable increases the other one increases and if one decreases the other one decreases as well. Last but not least, a correlation close to 0 indicates that the two variables are independent.
+1. The direction of the relationship between the 2 variables
+1. The strength of the relationship between the 2 variables
+
+Regarding the direction of the relationship: On the one hand, a **negative correlation** implies that the two variables under consideration vary in **opposite directions**, that is, if a variable increases the other decreases and vice versa. On the other hand, a **positive correlation** implies that the two variables under consideration vary in the **same direction**, i.e., if a variable increases the other one increases and if one decreases the other one decreases as well.
+
+Regarding the strength of the relationship: The **more extreme** the correlation coefficient (the closer to -1 or 1), the **stronger the relationship**. This also means that a **correlation close to 0** indicates that the two variables are **independent**, that is, as one variable increases, there is no tendency in the other variable to either decrease or increase.
 
 As an illustration, the Pearson correlation between horsepower (`hp`) and miles per gallon (`mpg`) found above is `r round(cor(dat$hp, dat$mpg), 2)`, meaning that the 2 variables vary in opposite direction. This makes sense, cars with more horsepower tend to consume more fuel (and thus have a lower millage par gallon). On the contrary, from the correlation matrix we see that the correlation between miles per gallon (`mpg`) and the time to drive 1/4 of a mile (`qsec`) is `r round(cor(dat$mpg, dat$qsec), 2)`, meaning that fast cars (low `qsec`) tend to have a worse millage per gallon (low `mpg`). This again make sense as fast cars tend to consume more fuel.
 
@@ -163,12 +168,19 @@ corrplot(cor(dat),
 
 ## For 2 variables
 
-Unlike a correlation matrix which indicates correlation coefficients between pairs of variables, the correlation test is used to test whether the correlation (denoted $\rho$) between 2 variables is significantly different from 0 or not.
+Unlike a correlation matrix which indicates the correlation coefficients between some pairs of variables in the [sample](/blog/what-is-the-difference-between-population-and-sample/), a correlation test is used to test whether the correlation (denoted $\rho$) between 2 variables is significantly different from 0 or not in the [population](/blog/what-is-the-difference-between-population-and-sample/).
 
-Actually, a correlation coefficient different from 0 does not mean that the correlation is **significantly** different from 0. This needs to be tested with a correlation test. The null and alternative hypothesis for the correlation test are as follows:
+Actually, a correlation coefficient different from 0 in the sample does not mean that the correlation is **significantly** different from 0 in the population. This needs to be tested with a [hypothesis test](/blog/hypothesis-test-by-hand/)---and known as the correlation test.
 
-* $H_0$: $\rho = 0$
-* $H_1$: $\rho \ne 0$
+The null and alternative hypothesis for the correlation test are as follows:
+
+* $H_0$: $\rho = 0$ (meaning that there is no linear relationship between the two variables)
+* $H_1$: $\rho \ne 0$ (meaning that there is a linear relationship between the two variables)
+
+Via this correlation test, what we are actually testing is whether:
+
+- the sample contains sufficient evidence to reject the null hypothesis and conclude that the correlation coefficient does not equal 0, so the relationship exists in the population.
+- or on the contrary, the sample does not contain enough evidence that the correlation coefficient does not equal 0, so in this case we do not reject the null hypothesis of no relationship between the variables in the population.
 
 Suppose that we want to test whether the rear axle ratio (`drat`) is correlated with the time to drive a quarter of a mile (`qsec`):
 
@@ -178,11 +190,11 @@ test <- cor.test(dat$drat, dat$qsec)
 test
 ```
 
-The *p*-value of the correlation test between these 2 variables is `r round(test$p.value, 3)`. At the 5% significance level, we do not reject the null hypothesis of no correlation. We therefore conclude that we do not reject the hypothesis that there is no linear relationship between the 2 variables.
+The *p*-value of the correlation test between these 2 variables is `r round(test$p.value, 3)`. At the 5% significance level, we do not reject the null hypothesis of no correlation. We therefore conclude that we do not reject the hypothesis that there is no linear relationship between the 2 variables.^[It is important to remember that we tested for a *linear* relationship between the two variables since we used the Pearson's correlation. It may be the case that there is a relationship between the two variables in the population, but this relation may not be linear.]
 
-This test proves that even if the correlation coefficient is different from 0 (the correlation is `r round(test$estimate, 2)`), it is actually not significantly different from 0.
+This test proves that even if the correlation coefficient is different from 0 (the correlation is `r round(test$estimate, 2)` in the sample), it is actually not significantly different from 0 in the population.
 
-Note that the *p*-value of a correlation test is based on the correlation coefficient **and** the sample size. The larger the sample size and the more extreme the correlation (closer to -1 or 1), the more likely the null hypothesis of no correlation will be rejected. With a small sample size, it is thus possible to obtain a *relatively* large correlation (based on the correlation coefficient), but still find a correlation not significantly different from 0 (based on the correlation test). For this reason, it is recommended to always perform a correlation test before interpreting a correlation coefficient to avoid flawed conclusions.
+Note that the *p*-value of a correlation test is based on the correlation coefficient **and** the sample size. The larger the sample size and the more extreme the correlation (closer to -1 or 1), the more likely the null hypothesis of no correlation will be rejected. With a small sample size, it is thus possible to obtain a *relatively* large correlation in the sample (based on the correlation coefficient), but still find a correlation not significantly different from 0 in the population (based on the correlation test). For this reason, it is recommended to always perform a correlation test before interpreting a correlation coefficient to avoid flawed conclusions.
 
 A nice and easy way to report results of a correlation test in R is with the `report()` function from the `{report}` package:
 
@@ -225,7 +237,9 @@ correlation::correlation(dat,
                          include_factors = TRUE, method = "auto")
 ```
 
-As you can see, it gives, among other useful information, the correlation coefficients (column `r`) and the result of the correlation test (column `95% CI` for the confidence interval or `p` for the $p$-value) for all pairs of variables. This table is very useful and informative, but let see if it is possible to combine the concepts of correlation coefficients and correlations test in one single visualization. A visualization that would be easy to read and interpret.
+As you can see, it gives, among other useful information, the correlation coefficients (column `r`) and the result of the correlation test (column `95% CI` for the confidence interval or `p` for the $p$-value) for all pairs of variables.
+
+This table is very useful and informative, but let see if it is possible to combine the concepts of correlation coefficients and correlations test in one single visualization. A visualization that would be easy to read and interpret.
 
 Ideally, we would like to have a concise overview of correlations between all possible pairs of variables present in a dataset, with a clear distinction for correlations that are significantly different from 0.
 
@@ -290,6 +304,29 @@ The correlogram shows correlation coefficients for all pairs of variables (with 
 
 To learn more about this plot and the code used, I invite you to read the article entitled "[Correlogram in R: how to highlight the most correlated variables in a dataset](/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/)".
 
+# Correlation does not imply causation
+
+I am pretty sure you have already heard the statement "Correlation does not imply causation" in statistics. An article about correlation would not be complete without discussing about causation.
+
+A non-zero correlation between two variables does not necessarily mean that there is a cause and effect relationship between these two variables!
+
+Indeed, a significant correlation between two variables means that changes in one variable are associated (positively or negatively) with changes in the other variable. Nonetheless, a significant correlation *does not* indicates that variations in one variable *cause* the variations in the other variable.
+
+A non-zero correlation between X and Y can appear in several cases:
+
+- X causes Y
+- Y causes X
+- a third variable cause X and Y
+- a combination of these three reasons
+
+Sometimes it is quite clear that there is a causal relationship between two variables. Take for example the correlation between the price of a consumer product such as milk and its consumption. It is quite obvious that there is a causal link between the two: if the price of milk increases, it is expected that its consumption will decrease.
+
+However, this causal link is not always present even if the correlation is significant. @maurage2013does showed that, although there is a positive and significant correlation between chocolate consumption and the number of Nobel laureates, this correlation comes from the fact that a third variable, Gross Domestic Product (GDP), causes chocolate consumption and the number of Nobel laureates. They found that countries with higher GDP tend to have a higher level of chocolate consumption and scientific research (leading to more Nobel laureates).
+
+This example shows that one must be very cautious when interpreting correlations and avoid over-interpreting a correlation as a causal relationship.
+
 Thanks for reading. I hope this article helped you to compute correlations and perform correlation tests in R.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
+
+# References
