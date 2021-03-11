@@ -374,9 +374,9 @@ report(res_aov)</code></pre>
 <div id="whats-next" class="section level2">
 <h2>What’s next?</h2>
 <p>If the <strong>null hypothesis is not rejected</strong> (<em>p</em>-value <span class="math inline">\(\ge\)</span> 0.05), it means that we do not reject the hypothesis that all groups are equal. The ANOVA more or less stops here. Other types of analyses can be performed of course, but—given the data at hand—we could not prove that at least one group was different so we usually do not go further with the ANOVA.</p>
-<p>On the contrary, if <em>and only if</em> the <strong>null hypothesis is rejected</strong> (as it is our case since the <em>p</em>-value &lt; 0.05), we proved that at least one group is different. We can decide to stop here if we are only interested to test whether all species are equal in terms of flippers length.</p>
+<p>On the contrary, if the <strong>null hypothesis is rejected</strong> (as it is our case since the <em>p</em>-value &lt; 0.05), we proved that at least one group is different. We can decide to stop here if we are only interested to test whether all species are equal in terms of flippers length.</p>
 <p>But most of the time, when we showed thanks to an ANOVA that at least one group is different, we are also interested in knowing <strong>which</strong> one(s) is(are) different. Results of an ANOVA, however, do <strong><em>NOT</em></strong> tell us which group(s) is(are) different from the others.</p>
-<p>To test this, we need to use other types of test, referred as post-hoc tests (in Latin, “after this”, so after obtaining statistically significant ANOVA results) or multiple pairwise-comparison tests. This family of statistical tests is the topic of the following sections.</p>
+<p>To test this, we need to use other types of test, referred as post-hoc tests (in Latin, “after this”, so after obtaining statistically significant ANOVA results) or multiple pairwise-comparison tests.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> This family of statistical tests is the topic of the following sections.</p>
 </div>
 </div>
 <div id="post-hoc-test" class="section level1">
@@ -401,7 +401,7 @@ P(\text{at least 1 signif. result}) &amp; = 1 - P(\text{no signif. results}) \\
 \end{equation}\]</span></p>
 <p>So, with as few as 3 tests being considered, we already have a 14.26% chance of observing at least one significant result, even if all of the tests are actually not significant.</p>
 <p>And as the number of groups increases, the number of comparisons increases as well, so the probability of having a significant result simply due to chance keeps increasing. For example, with 10 groups we need to make 45 comparisons and the probability of having at least one significant result by chance becomes <span class="math inline">\(1 - (1 - 0.05)^{45} = 90\%\)</span>. So it is very likely to observe a significant result just by chance when comparing 10 groups, and when we have 14 groups or more we are almost certain (99%) to have a false positive!</p>
-<p>Post-hoc tests take into account that multiple tests are done and deal with the problem by adjusting <span class="math inline">\(\alpha\)</span> in some way, so that the probability of observing at least one significant result due to chance remains below our desired significance level.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<p>Post-hoc tests take into account that multiple tests are done and deal with the problem by adjusting <span class="math inline">\(\alpha\)</span> in some way, so that the probability of observing at least one significant result due to chance remains below our desired significance level.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
 </div>
 <div id="post-hoc-tests-in-r-and-their-interpretation" class="section level2">
 <h2>Post-hoc tests in R and their interpretation</h2>
@@ -433,13 +433,13 @@ summary(post_test)</code></pre>
 ## 
 ## Linear Hypotheses:
 ##                         Estimate Std. Error t value Pr(&gt;|t|)    
-## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 7.32e-09 ***
-## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &lt; 1e-09 ***
-## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286  &lt; 1e-09 ***
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 1.24e-08 ***
+## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &lt; 1e-08 ***
+## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286  &lt; 1e-08 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</code></pre>
-<p>In the output of the Tukey HSD test, we are interested in the table displayed after <code>Linear Hypotheses:</code>, and more precisely, in the first and last column of the table. The first column shows the comparisons which have been made; the last column (<code>Pr(&gt;|t|)</code>) shows the adjusted<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> <em>p</em>-values for each comparison (with the null hypothesis being the two groups are equal and the alternative hypothesis being the two groups are different).</p>
+<p>In the output of the Tukey HSD test, we are interested in the table displayed after <code>Linear Hypotheses:</code>, and more precisely, in the first and last column of the table. The first column shows the comparisons which have been made; the last column (<code>Pr(&gt;|t|)</code>) shows the adjusted<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> <em>p</em>-values for each comparison (with the null hypothesis being the two groups are equal and the alternative hypothesis being the two groups are different).</p>
 <p>It is these adjusted <em>p</em>-values that are used to test whether two groups are significantly different or not, and we can be confident that the entire set of comparisons collectively has an error rate of 0.05.</p>
 <p>In our example, we tested:</p>
 <ol style="list-style-type: decimal">
@@ -555,7 +555,7 @@ summary(post_test)</code></pre>
 plot(post_test)</code></pre>
 <p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>From the results above we conclude that Adelie and Chinstrap species are significantly different from Gentoo species in terms of flippers length (adjusted <em>p</em>-values &lt; 1e-10).</p>
-<p>Note that even if your study does not have a reference group which you can compare to the other groups, it is still often better to do multiple comparisons determined by some research questions than to do all-pairwise tests. By reducing the number of post-hoc comparisons to what is necessary only, and no more, you maximize the statistical power.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
+<p>Note that even if your study does not have a reference group which you can compare to the other groups, it is still often better to do multiple comparisons determined by some research questions than to do all-pairwise tests. By reducing the number of post-hoc comparisons to what is necessary only, and no more, you maximize the statistical power.<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
 </div>
 </div>
 <div id="other-p-values-adjustment-methods" class="section level2">
@@ -628,8 +628,9 @@ for (i in y) {
 <li id="fn1"><p>Note that it is called <em>one-way</em> or <em>one-factor</em> ANOVA because the means relate to the different modalities of a single independent variable, or factor.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>Residuals (denoted <span class="math inline">\(\epsilon\)</span>) are the differences between the observed values of the dependent variable (<span class="math inline">\(y\)</span>) and the predicted values (<span class="math inline">\(\hat{y}\)</span>). In the context of ANOVA, residuals correspond to the differences between the observed values and the mean of all values for that group.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 <li id="fn3"><p>As long as you use the Kruskal-Wallis test to, <em>in fine</em>, compare groups, homoscedasticity is not required. If you wish to compare medians, the Kruskal-Wallis test requires homoscedasticity. See more information about the difference in this <a href="https://influentialpoints.com/Training/Kruskal-Wallis_ANOVA_use_and_misuse.htm" target="_blank">article</a>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>Note that you could in principle apply the Bonferroni correction to all tests. For example, in the example above, with 3 tests and a global desired significance level of <span class="math inline">\(\alpha\)</span> = 0.05, we would only reject a null hypothesis if the <em>p</em>-value is less than <span class="math inline">\(\frac{0.05}{3}\)</span> = 0.0167. This method is, however, known to be quite conservative, leading to a potentially high rate of false negatives.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>The <em>p</em>-values are adjusted to keep the global significance level to the desired level.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
-<li id="fn6"><p>Thanks Michael Friendly for this suggestion.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Note that, as discussed in the comments at the end of the article, post-hoc tests can under some circumstances be done directly (without an ANOVA). See the comments or <span class="citation">@hsu1996multiple</span> for more details.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Note that you could in principle apply the Bonferroni correction to all tests. For example, in the example above, with 3 tests and a global desired significance level of <span class="math inline">\(\alpha\)</span> = 0.05, we would only reject a null hypothesis if the <em>p</em>-value is less than <span class="math inline">\(\frac{0.05}{3}\)</span> = 0.0167. This method is, however, known to be quite conservative, leading to a potentially high rate of false negatives.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>The <em>p</em>-values are adjusted to keep the global significance level to the desired level.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>Thanks Michael Friendly for this suggestion.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
