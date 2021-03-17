@@ -8,7 +8,7 @@ description: "Frequently asked questions. Feel free to contact me if you have an
 1. [Why did you launch this blog?](#2-why-did-you-launch-this-blog)
 1. [What technology and theme do you use to write this blog and the articles?](#3-what-technology-and-theme-do-you-use-to-write-this-blog-and-the-articles)
 1. [I am new to this blog, to R or to statistics, from where can I start?](#4-i-am-new-to-this-blog-to-r-or-to-statistics-from-where-can-i-start)
-1. [Can I use your code or material in my own project?](#5-can-i-use-your-code-or-material-in-my-own-project)
+1. [Can I reuse or translate the content of your blog?](#5-can-i-reuse-or-translate-the-content-of-your-blog)
 1. [I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?](#6-i-would-like-to-replicate-an-analysis-you-have-done-in-one-of-your-article-can-i-have-access-to-the-entire-code)
 1. [I believe there is mistake/bug, what is the best way to report it?](#7-i-believe-there-is-mistakebug-what-is-the-best-way-to-report-it)
 1. [I have a question, how can I contact you?](#8-i-have-a-question-how-can-i-contact-you)
@@ -48,7 +48,7 @@ If you are new to this blog, you can start with the following articles:
 
 Alternatively, you can check all articles with the tag "[Basics](/tags/basics/)".
 
-## 5. Can I use your code or material in my own project?
+## 5. Can I reuse or translate the content of your blog?
 
 Yes, but bear in mind that I take no responsibility for the code or the results you obtain from it.
 
@@ -65,6 +65,8 @@ For example:
 Antoine Soetewey, *Outliers detection in R*, Stats and R. Retrieved from https://statsandr.com/blog/outliers-detection-in-r/, accessed on November 3rd, 2020.
 
 If your work is public, feel free to [send it to me](/contact/) so I can check it out.
+
+I am also very happy to see translations of my blog posts. Let me know about your translation so that I can link to it in the original blog post.
 
 ## 6. I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?
 
