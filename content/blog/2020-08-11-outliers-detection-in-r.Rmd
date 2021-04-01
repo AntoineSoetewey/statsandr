@@ -214,13 +214,13 @@ where $MAD$ is the median absolute deviation and is defined as the median of the
 
 $$MAD = median(|X_i - \tilde{X}|)$$
 
-For this method we first set the interval limits thanks to the `median()` and `mad()` functions:
+For this method we first set the interval limits thanks to the `median()` and `mad()` functions:^[The constant in the `mad()` function is 1.4826 by default, so it has to be set to 1 to find the median absolute deviation. See `help(mad)` for more details. Thanks to Elisei for pointing this out to me.]
 
 ```{r}
-lower_bound <- median(dat$hwy) - 3 * mad(dat$hwy)
+lower_bound <- median(dat$hwy) - 3 * mad(dat$hwy, constant = 1)
 lower_bound
  
-upper_bound <- median(dat$hwy) + 3 * mad(dat$hwy)
+upper_bound <- median(dat$hwy) + 3 * mad(dat$hwy, constant = 1)
 upper_bound
 ```
 
@@ -231,7 +231,7 @@ outlier_ind <- which(dat$hwy < lower_bound | dat$hwy > upper_bound)
 outlier_ind
 ```
 
-According to the Hampel filter, there is no potential outlier for the `hwy` variable.
+According to the Hampel filter, there are 3 outliers for the `hwy` variable.
 
 # Statistical tests
 
