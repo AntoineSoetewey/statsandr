@@ -7,7 +7,7 @@ menu: "main"
 
 Hello, my name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a PhD student in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences ([ISBA](https://uclouvain.be/en/research-institutes/lidam/isba)). My [research](https://www.antoinesoetewey.com/research/) interests focus on survival analysis and bio-statistical procedures applied to cancer patients.
 
-In parallel with my doctoral thesis, I am [teaching assistant](https://www.antoinesoetewey.com/teaching/) for several courses in statistics and probability at bachelor and master’s level. I also provide trainings/workshops and consulting in statistics and R programming as part of UCLouvain's technology platform for Statistical Methodology and Computing Service ([SMCS](https://sites.uclouvain.be/smcs-gateway/)). See my [CV](https://www.antoinesoetewey.com/cv/) for a more detailed overview of my academic and professional background.
+In parallel with my doctoral thesis, I am [teaching assistant](https://www.antoinesoetewey.com/teaching/) for several courses in statistics and probability at bachelor and master’s level. I also provide trainings/workshops and consulting in statistics and R programming as part of UCLouvain's technology platform for Statistical Methodology and Computing Service ([SMCS](https://sites.uclouvain.be/smcs-gateway/)). See my [CV](https://www.antoinesoetewey.com/cv.pdf) for a more detailed overview of my academic and professional background.
 
 Given my experience, I also support:
 
