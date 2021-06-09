@@ -32,6 +32,7 @@ bibliography: bibliography.bib
 <li><a href="#normality">Normality</a></li>
 <li><a href="#equality-of-variances---homogeneity">Equality of variances - homogeneity</a></li>
 <li><a href="#another-method-to-test-normality-and-homogeneity">Another method to test normality and homogeneity</a></li>
+<li><a href="#outliers">Outliers</a></li>
 </ul></li>
 <li><a href="#anova">ANOVA</a><ul>
 <li><a href="#preliminary-analyses">Preliminary analyses</a></li>
@@ -129,6 +130,12 @@ ggplot(dat) +
 <li><strong>Independence</strong>: the data, collected from a representative and randomly selected portion of the total <a href="/blog/what-is-the-difference-between-population-and-sample/">population</a>, should be independent between groups and within each group. The assumption of independence is most often verified based on the design of the experiment and on the good control of experimental conditions rather than via a formal test. If you are still unsure about independence based on the experiment design, ask yourself if one observation is related to another (if one observation has an impact on another) within each group or between the groups themselves. If not, it is most likely that you have independent <a href="/blog/what-is-the-difference-between-population-and-sample/">samples</a>. If observations between samples (forming the different groups to be compared) are dependent (for example, if three measurements have been collected on the <strong>same individuals</strong> as it is often the case in medical studies when measuring a metric (i) before, (ii) during and (iii) after a treatment), the repeated measures ANOVA should be preferred in order to take into account the dependency between the samples.</li>
 <li><strong>Normality</strong>: Residuals<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> should follow approximately a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/"><strong>normal distribution</strong></a>. The normality assumption can be tested visually thanks to a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> and a <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a>, and/or formally via a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">normality test</a> such as the Shapiro-Wilk or Kolmogorov-Smirnov test. If, even after a transformation of your data (e.g., logarithmic transformation, square root, Box-Cox, etc.), the residuals still do not follow approximately a normal distribution, the Kruskal-Wallis test can be applied (<code>kruskal.test(variable ~ group, data = dat</code> in R). This non-parametric test, robust to non normal distributions, has the same goal than the ANOVA—compare 3 or more groups—but it uses sample medians instead of sample means to compare groups.</li>
 <li><strong>Equality of variances</strong>: the variances of the different groups should be equal in the populations (an assumption called homogeneity of the variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity if variances are different across groups). This assumption can be tested graphically (by comparing the dispersion in a <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> or <a href="/blog/descriptive-statistics-in-r/#dotplot">dotplot</a> for instance), or more formally via the Levene’s test (<code>leveneTest(variable ~ group)</code> from the <code>{car}</code> package) or Bartlett’s test, among others. If the hypothesis of equal variances is rejected, another version of the ANOVA can be used: the Welch ANOVA (<code>oneway.test(variable ~ group, var.equal = FALSE)</code>). Note that the Welch ANOVA does not require homogeneity of the variances, but the distributions should still follow approximately a normal distribution. Note that the Kruskal-Wallis test does not require the assumptions of normality nor homoscedasticity of the variances.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></li>
+<li><strong>Outliers</strong>: An <a href="/blog/outliers-detection-in-r/">outlier</a> is a value or an observation that is distant from the other observations. There should be <strong>no significant outliers in the different groups</strong>, or the conclusions of your ANOVA may be flawed. There are several methods to <a href="/blog/outliers-detection-in-r/">detect outliers</a> in your data but in order to deal with them, it is your choice to either:
+<ul>
+<li>use the non-parametric version (i.e., the Kruskal-Wallis test)</li>
+<li>transform your data (logarithmic or Box-Cox transformation, among others)</li>
+<li>or remove them (be careful)</li>
+</ul></li>
 </ul>
 <p>Choosing the appropriate test depending on whether assumptions are met may be confusing so here is a brief summary:</p>
 <ol style="list-style-type: decimal">
@@ -257,7 +264,16 @@ plot(res_aov, which = 3)
 plot(res_aov, which = 2)</code></pre>
 <p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Plot on the left hand side shows that there is no evident relationships between residuals and fitted values (the mean of each group), so homogeneity of variances is assumed. If homogeneity of variances was violated, the red line would not be flat (horizontal).</p>
-<p>Plot on the right hand side shows that residuals follow approximately a normal distribution, so normality is assumed. If normality was violated, points would consistently deviate from the dotted line.</p>
+<p>Plot on the right hand side shows that residuals follow approximately a normal distribution, so normality is assumed. If normality was violated, points would consistently deviate from the dashed line.</p>
+</div>
+<div id="outliers" class="section level2">
+<h2>Outliers</h2>
+<p>There are several techniques to <a href="/blog/outliers-detection-in-r/">detect outliers</a>. In this article, we focus on the most simple one (yet very efficient)—the visual approach via a boxplot:</p>
+<pre class="r"><code>boxplot(flipper_length_mm ~ species,
+  data = dat
+)</code></pre>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>There is one outlier in the group <code>Adelie</code>, as defined by the <a href="/blog/descriptive-statistics-in-r/#interquartile-range">interquartile range</a> criterion. This point is, however, not seen as a significant outlier so we can assume that the assumption of no significant outliers is met.</p>
 </div>
 </div>
 <div id="anova" class="section level1">
@@ -270,14 +286,14 @@ plot(res_aov, which = 2)</code></pre>
 <pre class="r"><code>boxplot(flipper_length_mm ~ species,
   data = dat
 )</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Or with the <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code> package</a>:</p>
 <pre class="r"><code>library(ggplot2)
 
 ggplot(dat) +
   aes(x = species, y = flipper_length_mm) +
   geom_boxplot()</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The boxplots above show that, at least for our sample, penguins of the species <code>Gentoo</code> seem to have the biggest flipper, and <code>Adelie</code> species the smallest flipper.</p>
 <p>Besides a boxplot for each species, it is also a good practice to compute some <a href="/blog/descriptive-statistics-in-r/"><strong>descriptive statistics</strong></a> such as the <a href="/blog/descriptive-statistics-in-r/#mean">mean</a> and <a href="/blog/descriptive-statistics-in-r/#standard-deviation-and-variance">standard deviation</a> by species. This can be done, for instance, with the <code>aggregate()</code> function:</p>
 <pre class="r"><code>aggregate(flipper_length_mm ~ species,
@@ -451,7 +467,7 @@ summary(post_test)</code></pre>
 <p>The results of the post-hoc test can be visualized with the <code>plot()</code> function:</p>
 <pre class="r"><code>par(mar = c(3, 8, 3, 3))
 plot(post_test)</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the confidence intervals do not cross the zero line, which indicate that all groups are significantly different.</p>
 <p>Note that the Tukey HSD test can also be done in R with the <code>TukeyHSD()</code> function:</p>
 <pre class="r"><code>TukeyHSD(res_aov)</code></pre>
@@ -468,7 +484,7 @@ plot(post_test)</code></pre>
 <p>With this code, it is the column <code>p adj</code> (also the last column) which is of interest. Notice that the conclusions are the same than above: all species are significantly different in terms of flippers length.</p>
 <p>The results can also be visualized with the <code>plot()</code> function:</p>
 <pre class="r"><code>plot(TukeyHSD(res_aov))</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-23-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="dunnetts-test" class="section level3">
 <h3>Dunnett’s test</h3>
@@ -514,7 +530,7 @@ summary(post_test)</code></pre>
 <p>Again, the results of the post-hoc test can be visualized with the <code>plot()</code> function:</p>
 <pre class="r"><code>par(mar = c(3, 8, 3, 3))
 plot(post_test)</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-24-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-25-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the confidence intervals do not cross the zero line, which indicate that both the species Gentoo and Chinstrap are significantly different from the reference species Adelie.</p>
 <p>Note that in R, by default, the reference category for a <a href="/blog/data-types-in-r/#factor">factor variable</a> is the first category in alphabetical order. This is the reason that, by default, the reference species is Adelie.</p>
 <p>The reference category can be changed with the <code>relevel()</code> function (or with the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#reordering-factors"><code>{questionr}</code> addin</a>). Considering that we want Gentoo as the reference category instead of Adelie:</p>
@@ -553,7 +569,7 @@ summary(post_test)</code></pre>
 ## (Adjusted p values reported -- single-step method)</code></pre>
 <pre class="r"><code>par(mar = c(3, 8, 3, 3))
 plot(post_test)</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>From the results above we conclude that Adelie and Chinstrap species are significantly different from Gentoo species in terms of flippers length (adjusted <em>p</em>-values &lt; 1e-10).</p>
 <p>Note that even if your study does not have a reference group which you can compare to the other groups, it is still often better to do multiple comparisons determined by some research questions than to do all-pairwise tests. By reducing the number of post-hoc comparisons to what is necessary only, and no more, you maximize the statistical power.<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
 </div>
@@ -610,7 +626,7 @@ for (i in y) {
     )
   }
 }</code></pre>
-<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As you can see on the above plot, boxplots by species are presented together with <em>p</em>-values of the ANOVA and post-hoc tests.</p>
 <p>Besides the fact that it combines a visual representation and results on the same plot, this code also has the advantage that you can perform multiple ANOVA tests at once. See more information in this <a href="/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/">article</a>.</p>
 </div>

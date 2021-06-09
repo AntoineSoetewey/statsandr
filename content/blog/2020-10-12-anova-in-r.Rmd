@@ -120,6 +120,10 @@ Below are the assumptions of the ANOVA, how to test them and which other tests e
 * **Independence**: the data, collected from a representative and randomly selected portion of the total [population](/blog/what-is-the-difference-between-population-and-sample/), should be independent between groups and within each group. The assumption of independence is most often verified based on the design of the experiment and on the good control of experimental conditions rather than via a formal test. If you are still unsure about independence based on the experiment design, ask yourself if one observation is related to another (if one observation has an impact on another) within each group or between the groups themselves. If not, it is most likely that you have independent [samples](/blog/what-is-the-difference-between-population-and-sample/). If observations between samples (forming the different groups to be compared) are dependent (for example, if three measurements have been collected on the **same individuals** as it is often the case in medical studies when measuring a metric (i) before, (ii) during and (iii) after a treatment), the repeated measures ANOVA should be preferred in order to take into account the dependency between the samples.
 * **Normality**: Residuals^[Residuals (denoted $\epsilon$) are the differences between the observed values of the dependent variable ($y$) and the predicted values ($\hat{y}$). In the context of ANOVA, residuals correspond to the differences between the observed values and the mean of all values for that group.] should follow approximately a [**normal distribution**](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/). The normality assumption can be tested visually thanks to a [histogram](/blog/descriptive-statistics-in-r/#histogram) and a [QQ-plot](/blog/descriptive-statistics-in-r/#qq-plot), and/or formally via a [normality test](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test) such as the Shapiro-Wilk or Kolmogorov-Smirnov test. If, even after a transformation of your data (e.g., logarithmic transformation, square root, Box-Cox, etc.), the residuals still do not follow approximately a normal distribution, the Kruskal-Wallis test can be applied (`kruskal.test(variable ~ group, data = dat` in R). This non-parametric test, robust to non normal distributions, has the same goal than the ANOVA---compare 3 or more groups---but it uses sample medians instead of sample means to compare groups.
 * **Equality of variances**: the variances of the different groups should be equal in the populations (an assumption called homogeneity of the variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity if variances are different across groups). This assumption can be tested graphically (by comparing the dispersion in a [boxplot](/blog/descriptive-statistics-in-r/#boxplot) or [dotplot](/blog/descriptive-statistics-in-r/#dotplot) for instance), or more formally via the Levene's test (`leveneTest(variable ~ group)` from the `{car}` package) or Bartlett's test, among others. If the hypothesis of equal variances is rejected, another version of the ANOVA can be used: the Welch ANOVA (`oneway.test(variable ~ group, var.equal = FALSE)`). Note that the Welch ANOVA does not require homogeneity of the variances, but the distributions should still follow approximately a normal distribution. Note that the Kruskal-Wallis test does not require the assumptions of normality nor homoscedasticity of the variances.^[As long as you use the Kruskal-Wallis test to, *in fine*, compare groups, homoscedasticity is not required. If you wish to compare medians, the Kruskal-Wallis test requires homoscedasticity. See more information about the difference in this [article](https://influentialpoints.com/Training/Kruskal-Wallis_ANOVA_use_and_misuse.htm){target="_blank"}.]
+* **Outliers**: An [outlier](/blog/outliers-detection-in-r/) is a value or an observation that is distant from the other observations. There should be **no significant outliers in the different groups**, or the conclusions of your ANOVA may be flawed. There are several methods to [detect outliers](/blog/outliers-detection-in-r/) in your data but in order to deal with them, it is your choice to either:
+  + use the non-parametric version (i.e., the Kruskal-Wallis test)
+  + transform your data (logarithmic or Box-Cox transformation, among others)
+  + or remove them (be careful)
 
 Choosing the appropriate test depending on whether assumptions are met may be confusing so here is a brief summary:
 
@@ -275,7 +279,19 @@ plot(res_aov, which = 2)
 
 Plot on the left hand side shows that there is no evident relationships between residuals and fitted values (the mean of each group), so homogeneity of variances is assumed. If homogeneity of variances was violated, the red line would not be flat (horizontal).
 
-Plot on the right hand side shows that residuals follow approximately a normal distribution, so normality is assumed. If normality was violated, points would consistently deviate from the dotted line.
+Plot on the right hand side shows that residuals follow approximately a normal distribution, so normality is assumed. If normality was violated, points would consistently deviate from the dashed line.
+
+## Outliers
+
+There are several techniques to [detect outliers](/blog/outliers-detection-in-r/). In this article, we focus on the most simple one (yet very efficient)---the visual approach via a boxplot:
+
+```{r}
+boxplot(flipper_length_mm ~ species,
+  data = dat
+)
+```
+
+There is one outlier in the group `Adelie`, as defined by the [interquartile range](/blog/descriptive-statistics-in-r/#interquartile-range) criterion. This point is, however, not seen as a significant outlier so we can assume that the assumption of no significant outliers is met.
 
 # ANOVA
 
