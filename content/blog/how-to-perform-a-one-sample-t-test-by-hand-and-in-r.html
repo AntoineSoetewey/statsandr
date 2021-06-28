@@ -193,8 +193,7 @@ output:
 <div id="how-to-compute-the-one-sample-t-test-in-r" class="section level1">
 <h1>How to compute the one sample t-test in R?</h1>
 <p>A good practice before doing t-tests in R is to visualize the data thanks to a <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> (or a <a href="/blog/descriptive-statistics-in-r/#density-plot">density plot</a>, or eventually both). A boxplot gives a first indication on the location of the sample, and thus, a first indication on whether the null hypothesis is likely to be rejected or not. However, even if a boxplot or a density plot is great in showing the distribution of a sample, only a sound statistical test will confirm our first impression.</p>
-<p>After a visualization of the data, we replicate in R the results found by hand. We will see that for the version of the t-test with a known population variance, there is no default function built in R (at least to my knowledge, do not hesitate to let me know if I’m mistaken). In this case, a function is written to replicate the results by hand.</p>
-<p>Note that we use the same data, the same assumptions and the same question for both scenarios to facilitate the comparison between the tests performed by hand and in R.</p>
+<p>After a visualization of the data, we replicate in R the results found by hand. Note that we use the same data, the same assumptions and the same question for both scenarios to facilitate the comparison between the tests performed by hand and in R.</p>
 <div id="scenario-1-variance-of-the-population-is-known-1" class="section level2">
 <h2>Scenario 1: variance of the population is known</h2>
 <p>For the first scenario, suppose the data below. Moreover, suppose that the population variance <span class="math inline">\(\sigma^2 = 1\)</span> and that we would like to test whether the population mean is different from 0.</p>
@@ -220,7 +219,7 @@ ggplot(dat1) +
 <pre class="r"><code>boxplot(dat1$value)</code></pre>
 <p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The boxplot shows that the distribution of the sample is not distant from 0 (the hypothesized value), so we tend to believe that we will not be able to reject the null hypothesis that the population mean is equal to 0. However, only a formal statistical test will confirm this belief.</p>
-<p>Since there is no function in R to perform a t-test with a known population variance, here is one with arguments accepting the sample (<code>x</code>), the variance of the population (<code>V</code>), the mean under the null hypothesis (<code>m0</code>, default is <code>0</code>), the significance level (<code>alpha</code>, default is <code>0.05</code>) and the alternative (<code>alternative</code>, one of <code>"two.sided"</code> (default), <code>"less"</code> or <code>"greater"</code>):</p>
+<p>Below a function to perform a t-test with a known population variance, with arguments accepting the sample (<code>x</code>), the variance of the population (<code>V</code>), the mean under the null hypothesis (<code>m0</code>, default is <code>0</code>), the significance level (<code>alpha</code>, default is <code>0.05</code>) and the alternative (<code>alternative</code>, one of <code>"two.sided"</code> (default), <code>"less"</code> or <code>"greater"</code>):</p>
 <pre class="r"><code>t.test2 &lt;- function(x, V, m0 = 0, alpha = 0.05, alternative = &quot;two.sided&quot;) {
   M &lt;- mean(x)
   n &lt;- length(x)
@@ -277,6 +276,25 @@ test</code></pre>
 <pre class="r"><code>test$p.value</code></pre>
 <pre><code>## [1] 0.2104977</code></pre>
 <p>The <em>p</em>-value is 0.21 so at the 5% significance level we do not reject the null hypothesis. There is no sufficient evidence in the data to reject the hypothesis that the population mean is equal to 0. This result confirms what we found by hand.</p>
+<p>Note that a similar function exists in the <code>{BSDA}</code> package:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<pre class="r"><code>library(BSDA)
+
+z.test(dat1$value,
+       alternative = &quot;two.sided&quot;,
+       mu = 0,
+       sigma.x = 1,
+       conf.level = 0.95)</code></pre>
+<pre><code>## 
+##  One-sample z-Test
+## 
+## data:  dat1$value
+## z = 1.2522, p-value = 0.2105
+## alternative hypothesis: true mean is not equal to 0
+## 95 percent confidence interval:
+##  -0.3165225  1.4365225
+## sample estimates:
+## mean of x 
+##      0.56</code></pre>
 <p>If you are unfamiliar with the concept of <em>p</em>-value, I invite you to read my <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha">note on <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span></a>.</p>
 <p><strong>To sum up</strong> what have been said in that article about <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span>:</p>
 <ul>
@@ -303,7 +321,7 @@ dat2</code></pre>
   aes(y = value) +
   geom_boxplot() +
   theme_minimal()</code></pre>
-<p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Unlike the previous scenario, the box is quite distant from the hypothesized value of 5. From this boxplot, we can expect the test to reject the null hypothesis of the population mean being equal to 5. Nonetheless, only a formal statistical test will confirm this expectation.</p>
 <p>There is a function in R, and it is simply the <code>t.test()</code> function. This version of the test is actually the “standard” t-test for one sample. Note that in our case the alternative hypothesis is <span class="math inline">\(H_1: \mu &gt; 5\)</span> so we need to add the arguments <code>mu = 5</code> and <code>alternative = "greater"</code> to the function because the default arguments are <code>mu = 0</code> and the two-sided test:</p>
 <pre class="r"><code>test &lt;- t.test(dat2$value,
@@ -359,5 +377,6 @@ test</code></pre>
 <hr />
 <ol>
 <li id="fn1"><p>It is a least the case regarding parametric hypothesis tests. A parametric test means that it is based on a theoretical statistical distribution, which depends on some defined parameters. In the case of the one sample t-test, it is based on the Student’s t distribution with a single parameter, the degrees of freedom (<span class="math inline">\(df = n - 1\)</span> where <span class="math inline">\(n\)</span> is the sample size), or the normal distribution.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Thanks gmacar for pointing it out to me.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

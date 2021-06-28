@@ -154,9 +154,7 @@ Note that when the sample size is large (usually when *n > 30*), the Student's t
 
 A good practice before doing t-tests in R is to visualize the data thanks to a [boxplot](/blog/descriptive-statistics-in-r/#boxplot) (or a [density plot](/blog/descriptive-statistics-in-r/#density-plot), or eventually both). A boxplot gives a first indication on the location of the sample, and thus, a first indication on whether the null hypothesis is likely to be rejected or not. However, even if a boxplot or a density plot is great in showing the distribution of a sample, only a sound statistical test will confirm our first impression.
 
-After a visualization of the data, we replicate in R the results found by hand. We will see that for the version of the t-test with a known population variance, there is no default function built in R (at least to my knowledge, do not hesitate to let me know if I'm mistaken). In this case, a function is written to replicate the results by hand.
-
-Note that we use the same data, the same assumptions and the same question for both scenarios to facilitate the comparison between the tests performed by hand and in R.
+After a visualization of the data, we replicate in R the results found by hand. Note that we use the same data, the same assumptions and the same question for both scenarios to facilitate the comparison between the tests performed by hand and in R.
 
 ## Scenario 1: variance of the population is known
 
@@ -185,7 +183,7 @@ boxplot(dat1$value)
 
 The boxplot shows that the distribution of the sample is not distant from 0 (the hypothesized value), so we tend to believe that we will not be able to reject the null hypothesis that the population mean is equal to 0. However, only a formal statistical test will confirm this belief.
 
-Since there is no function in R to perform a t-test with a known population variance, here is one with arguments accepting the sample (`x`), the variance of the population (`V`), the mean under the null hypothesis (`m0`, default is `0`), the significance level (`alpha`, default is `0.05`) and the alternative (`alternative`, one of `"two.sided"` (default), `"less"` or `"greater"`):
+Below a function to perform a t-test with a known population variance, with arguments accepting the sample (`x`), the variance of the population (`V`), the mean under the null hypothesis (`m0`, default is `0`), the significance level (`alpha`, default is `0.05`) and the alternative (`alternative`, one of `"two.sided"` (default), `"less"` or `"greater"`):
 
 ```{r}
 t.test2 <- function(x, V, m0 = 0, alpha = 0.05, alternative = "two.sided") {
@@ -227,6 +225,18 @@ test$p.value
 ```
 
 The *p*-value is `r round(test$p.value, 3)` so at the 5% significance level we `r ifelse(test$p.value < 0.05, "reject the null hypothesis", "do not reject the null hypothesis")`. There is no sufficient evidence in the data to reject the hypothesis that the population mean is equal to 0. This result confirms what we found by hand.
+
+Note that a similar function exists in the `{BSDA}` package:^[Thanks gmacar for pointing it out to me.]
+
+```{r, message = FALSE}
+library(BSDA)
+
+z.test(dat1$value,
+       alternative = "two.sided",
+       mu = 0,
+       sigma.x = 1,
+       conf.level = 0.95)
+```
 
 If you are unfamiliar with the concept of *p*-value, I invite you to read my [note on *p*-value and significance level $\alpha$](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha).
 
