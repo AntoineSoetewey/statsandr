@@ -572,7 +572,7 @@ ggplot(dat_ggplot) +
 )</code></pre>
 <p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The two boxes seem to overlap which illustrate that the two samples are quite similar, so we tend to believe that we will not be able to reject the null hypothesis that the two populations are similar. However, only a formal statistical test will confirm this belief.</p>
-<p>Since there is no function in R to perform a t-test with known variances, here is one with arguments accepting the two samples (<code>x</code> and <code>y</code>), the two variances of the populations (<code>V1</code> and <code>V2</code>), the difference in means under the null hypothesis (<code>m0</code>, default is <code>0</code>), the significance level (<code>alpha</code>, default is <code>0.05</code>) and the alternative (<code>alternative</code>, one of <code>"two.sided"</code> (default), <code>"less"</code> or <code>"greater"</code>):</p>
+<p>Below a function to perform a t-test with known variances, with arguments accepting the two samples (<code>x</code> and <code>y</code>), the two variances of the populations (<code>V1</code> and <code>V2</code>), the difference in means under the null hypothesis (<code>m0</code>, default is <code>0</code>), the significance level (<code>alpha</code>, default is <code>0.05</code>) and the alternative (<code>alternative</code>, one of <code>"two.sided"</code> (default), <code>"less"</code> or <code>"greater"</code>):</p>
 <pre class="r"><code>t.test_knownvar &lt;- function(x, y, V1, V2, m0 = 0, alpha = 0.05, alternative = &quot;two.sided&quot;) {
   M1 &lt;- mean(x)
   M2 &lt;- mean(y)
@@ -641,6 +641,27 @@ test</code></pre>
 <pre class="r"><code>test$p.value</code></pre>
 <pre><code>## [1] 0.949571</code></pre>
 <p>The <em>p</em>-value is 0.95 so at the 5% significance level we do not reject the null hypothesis of equal means. There is no sufficient evidence in the data to reject the hypothesis that the two means in the populations are similar. This result confirms what we found by hand.</p>
+<p>Note that a similar function exists in the <code>{BSDA}</code> package:<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<pre class="r"><code>library(BSDA)
+
+z.test(dat1$sample1,
+       dat1$sample2,
+       alternative = &quot;two.sided&quot;,
+       mu = 0,
+       sigma.x = 1,
+       sigma.y = 1,
+       conf.level = 0.95)</code></pre>
+<pre><code>## 
+##  Two-sample z-Test
+## 
+## data:  dat1$sample1 and dat1$sample2
+## z = -0.063246, p-value = 0.9496
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.27959  1.19959
+## sample estimates:
+## mean of x mean of y 
+##      0.02      0.06</code></pre>
 <div id="a-note-on-p-value-and-significance-level-alpha" class="section level3">
 <h3>A note on <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span></h3>
 <p>For those unfamiliar with the concept of <em>p</em>-value, the <em>p</em>-value is a <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/">probability</a> and as any probability it goes from 0 to 1. The <strong><em>p</em>-value is the probability of having observations at least as extreme as the one we measured (via the samples) if the null hypothesis were true</strong>. In other words, it is the probability of having a test statistic at least as extreme as the one we computed, given that the null hypothesis is true. In some sense, it gives you an indication on <strong>how likely your null hypothesis is</strong>. It is also defined as the smallest level of significance for which the data indicate rejection of the null hypothesis.</p>
@@ -682,7 +703,7 @@ ggplot(dat_ggplot) +
   aes(x = sample, y = value) +
   geom_boxplot() +
   theme_minimal()</code></pre>
-<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Unlike the previous scenario, the two boxes do not overlap which illustrates that the two samples are different from each other. From this boxplot, we can expect the test to reject the null hypothesis of equal means in the populations. Nonetheless, only a formal statistical test will confirm this expectation.</p>
 <p>There is a function in R, and it is simply the <code>t.test()</code> function. This version of the test is actually the “standard” Student’s t-test for two samples. Note that it is assumed that the variances of the two populations are equal so we need to specify it in the function with the argument <code>var.equal = TRUE</code> (the default is <code>FALSE</code>) and the alternative hypothesis is <span class="math inline">\(H_1: \mu_1 - \mu_2 &gt; 0\)</span> so we need to add the argument <code>alternative = "greater"</code> as well:</p>
 <pre class="r"><code>test &lt;- t.test(dat2$sample1, dat2$sample2,
@@ -781,7 +802,7 @@ dat3</code></pre>
   aes(x = sample, y = value) +
   geom_boxplot() +
   theme_minimal()</code></pre>
-<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-23-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>There is a function in R for this version of the test as well, and it is simply the <code>t.test()</code> function with the <code>var.equal = FALSE</code> argument. <code>FALSE</code> is the default option for the <code>var.equal</code> argument so you actually do not need to specify it. This version of the test is actually the Welch test, used when the variances of the populations are unknown and unequal. To test if two variances are equal, you can use the Levene’s test (<code>leveneTest(dat3$value, dat3$sample)</code> from the <code>{car}</code> package). Note that the alternative hypothesis is <span class="math inline">\(H_1: \mu_1 - \mu_2 &lt; 0\)</span> so we need to add the argument <code>alternative = "less"</code> as well:</p>
 <pre class="r"><code>test &lt;- t.test(value ~ sample,
   data = dat3,
@@ -826,7 +847,7 @@ ggplot(dat4) +
   aes(y = difference) +
   geom_boxplot() +
   theme_minimal()</code></pre>
-<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Since there is no function in R to perform a t-test with paired samples where the variance of the differences is known, here is one with arguments accepting the differences between the two samples (<code>x</code>), the variance of the differences in the population (<code>V</code>), the mean of the differences under the null hypothesis (<code>m0</code>, default is <code>0</code>), the significance level (<code>alpha</code>, default is <code>0.05</code>) and the alternative (<code>alternative</code>, one of <code>"two.sided"</code> (default), <code>"less"</code> or <code>"greater"</code>):</p>
 <pre class="r"><code>t.test_pairedknownvar &lt;- function(x, V, m0 = 0, alpha = 0.05, alternative = &quot;two.sided&quot;) {
   M &lt;- mean(x)
@@ -905,7 +926,7 @@ ggplot(dat5) +
   aes(y = difference) +
   geom_boxplot() +
   theme_minimal()</code></pre>
-<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-31-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>There is a function in R for this version of the test, and it is simply the <code>t.test()</code> function with the <code>paired = TRUE</code> argument. This version of the test is actually the standard version of the Student’s t-test with paired samples. Note that the alternative hypothesis is <span class="math inline">\(H_1: \mu_D &gt; 0\)</span> so we need to add the argument <code>alternative = "greater"</code> as well:</p>
 <pre class="r"><code>test &lt;- t.test(dat5$after, dat5$before,
   alternative = &quot;greater&quot;,
@@ -1008,5 +1029,6 @@ test</code></pre>
 <li id="fn1"><p>Remind that inferential statistics, as opposed to <a href="/blog/descriptive-statistics-by-hand/">descriptive statistics</a>, is a branch of statistics defined as the science of drawing conclusions about a population from observations made on a representative sample of that population. See the <a href="/blog/what-is-the-difference-between-population-and-sample/">difference between population and sample</a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>For the rest of the present article, when we write Student’s t-test, we refer to the case of 2 samples. See <a href="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/">one sample t-test</a> if you want to compare only one sample.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 <li id="fn3"><p>It is a least the case for parametric hypothesis tests. A parametric test means that it is based on a theoretical statistical distribution, which depends on some defined parameters. In the case of the Student’s t-test for two samples, it is based on the Student’s t distribution with a single parameter, the degrees of freedom (<span class="math inline">\(df = n_1 + n_2 - 2\)</span> where <span class="math inline">\(n_1\)</span> and <span class="math inline">\(n_2\)</span> are the two sample sizes), or the normal distribution.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Thanks gmacar for pointing it out to me.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
