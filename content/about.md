@@ -5,16 +5,16 @@ description: "Learn more about the author of the blog Stats and R---Antoine Soet
 menu: "main"
 ---
 
-My name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a PhD student in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences ([ISBA](https://uclouvain.be/en/research-institutes/lidam/isba)). My [research](https://www.antoinesoetewey.com/research/) interests focus on survival analysis and bio-statistical procedures applied to cancer patients.
+My name is [Antoine Soetewey](https://www.antoinesoetewey.com/). I am a PhD student in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences. My [research](https://www.antoinesoetewey.com/research/) interests focus on survival analysis and bio-statistical procedures applied to cancer patients.
 
-In parallel with my doctoral thesis, I am [teaching assistant](https://www.antoinesoetewey.com/teaching/) for several courses in statistics and probability at bachelor and master’s level. I also provide trainings/workshops and consulting in statistics and R programming as part of UCLouvain's technology platform for Statistical Methodology and Computing Service ([SMCS](https://sites.uclouvain.be/smcs-gateway/)). See my [CV](https://www.antoinesoetewey.com/cv.pdf) for a more detailed overview of my academic and professional background.
+In parallel with my doctoral thesis, I am [teaching assistant](https://www.antoinesoetewey.com/teaching/) for several courses in statistics and probability at bachelor and master’s level. I also provide trainings/workshops and consulting in statistics and R programming as part of UCLouvain's technology platform for Statistical Methodology and Computing Service. See my [CV](https://www.antoinesoetewey.com/cv.pdf) for a more detailed overview of my academic and professional background.
 
 Given my experience, I also support:
 
 * **Professionals** in their research, data analysis and informed decision-making by bringing a statistical dimension to their projects, regardless of the sector or core business.
 * **University students** and academics in their studies through the success of their exam or the statistical part of their thesis, thanks to tailor-made courses and personalized support in statistics and probability.
 
-Feel free to [contact me](/contact/) if you need help in statistics for your academic or work related projects.
+If you need help in statistics for your academic or work related projects, see more information on [easystat.be](https://easystat.be/) and feel free to contact me!
 
 ## Blog - What?
 
