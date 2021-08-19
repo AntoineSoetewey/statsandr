@@ -122,7 +122,7 @@ Yes, I am open to one-on-one teaching or consulting to help:
 * professionals in their research or project, and
 * university students in their classes or thesis
 
-Do not hesitate to [contact me](/contact/) if you have any questions (e.g., availabilities, rates, etc.).
+See more information on [easystat.be](https://easystat.be/) and feel free to contact me for further questions or to organize the first class. This website is in French, so do not hesitate to [contact me](/contact/) if you do not understand.
 
 ## 14. I have a question that is not mentioned here
 
