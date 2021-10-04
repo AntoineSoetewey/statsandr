@@ -1,0 +1,813 @@
+---
+title: Multiple linear regression made simple
+author: Antoine Soetewey
+date: '2021-10-04'
+slug: multiple-linear-regression-made-simple
+categories: []
+tags:
+  - R
+  - Statistics
+  - Linear regression
+meta_img: blog/multiple-linear-regression-made-simple/images/multiple-linear-regression.jpeg
+description: Learn how to run multiple and simple linear regression in R, how to interpret the results and how to verify the conditions of application
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+# draft: true
+bibliography: bibliography.bib
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#simple-linear-regression-reminder">Simple linear regression: reminder</a>
+<ul>
+<li><a href="#principle">Principle</a></li>
+<li><a href="#equation">Equation</a></li>
+<li><a href="#interpretations-of-coefficients-widehatbeta">Interpretations of coefficients <span class="math inline">\(\widehat\beta\)</span></a></li>
+<li><a href="#significance-of-the-relationship">Significance of the relationship</a>
+<ul>
+<li><a href="#correlation-does-not-imply-causation">Correlation does not imply causation</a></li>
+</ul></li>
+<li><a href="#conditions-of-application">Conditions of application</a></li>
+<li><a href="#visualizations">Visualizations</a></li>
+</ul></li>
+<li><a href="#multiple-linear-regression">Multiple linear regression</a>
+<ul>
+<li><a href="#principle-1">Principle</a></li>
+<li><a href="#equation-1">Equation</a></li>
+<li><a href="#interpretations-of-coefficients-widehatbeta-1">Interpretations of coefficients <span class="math inline">\(\widehat\beta\)</span></a></li>
+<li><a href="#conditions-of-application-1">Conditions of application</a></li>
+<li><a href="#how-to-choose-a-good-linear-model">How to choose a good linear model?</a>
+<ul>
+<li><a href="#p-value-associated-to-the-model"><span class="math inline">\(P\)</span>-value associated to the model</a></li>
+<li><a href="#coefficient-of-determination-r2">Coefficient of determination <span class="math inline">\(R^2\)</span></a></li>
+<li><a href="#parsimony">Parsimony</a></li>
+</ul></li>
+<li><a href="#visualizations-1">Visualizations</a></li>
+<li><a href="#to-go-further">To go further</a>
+<ul>
+<li><a href="#extract-models-equation">Extract model’s equation</a></li>
+<li><a href="#predictions">Predictions</a></li>
+<li><a href="#linear-hypothesis-tests">Linear hypothesis tests</a></li>
+<li><a href="#overall-effect-of-categorical-variables">Overall effect of categorical variables</a></li>
+<li><a href="#interaction">Interaction</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#summary">Summary</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+
+<p><img src="images/multiple-linear-regression.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Remember that <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> is a branch of statistics that allows to describe your data at hand. Inferential statistics (with the popular <a href="/blog/hypothesis-test-by-hand/">hypothesis tests</a> and confidence intervals) is another branch of statistics that allows to make inferences, that is, to draw conclusions about a population based on a <a href="/blog/what-is-the-difference-between-population-and-sample/">sample</a>. The last branch of statistics is about <strong>modeling the relationship between two or more variables</strong>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> The most common statistical tool to describe and evaluate the link between variables is linear regression.</p>
+<p>There are two types of linear regression:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Simple linear regression</strong> is a statistical approach that allows to assess the linear relationship between two <a href="/blog/variable-types-and-examples/#quantitative">quantitative variables</a>. More precisely, it enables the relationship to be quantified and its significance to be evaluated.</li>
+<li><strong>Multiple linear regression</strong> is a generalization of simple linear regression, in the sense that this approach makes it possible to evaluate the linear relationships between a response variable (quantitative) and several explanatory variables (quantitative or <a href="/blog/variable-types-and-examples/#qualitative">qualitative</a>).</li>
+</ol>
+<p>In the real world, multiple linear regression is used more frequently than simple linear regression. This is mostly the case because:</p>
+<ul>
+<li>Multiple linear regression allows to evaluate the relationship between two variables, while <strong>controlling for the effect</strong> (i.e., removing the effect) <strong>of other variables</strong>.</li>
+<li>With data collection becoming easier, more variables can be included and taken into account when analyzing data.</li>
+</ul>
+<p>Multiple linear regression being such a powerful statistical tool, I would like to present it so that everyone understands it, and perhaps even use it when deemed necessary. However, I cannot afford to write about multiple linear regression without first presenting simple linear regression.</p>
+<p>So after a reminder about the principle and the interpretations that can be drawn from a simple linear regression, I will illustrate how to perform multiple linear regression in R. I will also show, in the context of multiple linear regression, how to interpret the output and discuss about its conditions of application. I will then conclude the article by presenting more advanced topics directly linked to linear regression.</p>
+</div>
+<div id="simple-linear-regression-reminder" class="section level1">
+<h1>Simple linear regression: reminder</h1>
+<p>Simple linear regression is an asymmetric procedure in which:</p>
+<ul>
+<li>one of the variable is considered the response or the variable to be explained. It is also called <strong>dependent variable</strong>, and is represented on the y-axis</li>
+<li>the other variable is the explanatory or also called <strong>independent variable</strong>, and is represented on the x-axis</li>
+</ul>
+<p>Simple linear regression allows to <strong>evaluate the existence of a <em>linear</em> relationship between two variables</strong> and to quantify this link. Note that linearity is a strong assumption in linear regression in the sense that it tests and quantifies whether the two variables are <em>linearly</em> dependent.</p>
+<p>What makes linear regression a powerful statistical tool is that it allows to <strong>quantify by what quantity the response/dependent variable varies when the explanatory/independent variable increases by one unit</strong>. This concept is key in linear regression and helps to answer the following questions:</p>
+<ul>
+<li>Is there a link between the amount spent in advertising and the sales during a certain period?</li>
+<li>Is the number of years of schooling valued, in financial terms, in the first job?</li>
+<li>Will an increase in tobacco taxes reduce its consumption?</li>
+<li>What is the most likely price of an apartment, depending on the area?</li>
+<li>Does a person’s reaction time to a stimulus depend on gender?</li>
+</ul>
+<p>Simple linear regression can be seen as an extension to the <a href="/blog/anova-in-r/">analysis of variance (ANOVA)</a> and the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test</a>. ANOVA and t-test allow to compare groups in terms of a quantitative variable—2 groups for t-test and 3 or more groups for ANOVA.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> For these tests, the independent variable, that is, the grouping variable forming the different groups to compare must be a qualitative variable. Linear regression is an extension because in addition to be used to compare groups, it is also used with quantitative independent variables (which is not possible with t-test and ANOVA).</p>
+<p>In this article, we are interested in assessing whether there is a linear relationship between the distance traveled with a gallon of fuel and the weight of cars. For this example, we use the <code>mtcars</code> dataset (preloaded in R).</p>
+<p>The dataset includes fuel consumption and 10 aspects of automotive design and performance for 32 automobiles:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<ol style="list-style-type: decimal">
+<li><code>mpg</code> Miles/(US) gallon (with a gallon <span class="math inline">\(\approx\)</span> 3.79 liters)</li>
+<li><code>cyl</code> Number of cylinders</li>
+<li><code>disp</code> Displacement (cu.in.)</li>
+<li><code>hp</code> Gross horsepower</li>
+<li><code>drat</code> Rear axle ratio</li>
+<li><code>wt</code> Weight (1000 lbs, with 1000 lbs <span class="math inline">\(\approx\)</span> 453.59 kg)</li>
+<li><code>qsec</code> 1/4 mile time (with 1/4 mile <span class="math inline">\(\approx\)</span> 402.34 meters)</li>
+<li><code>vs</code> Engine (0 = V-shaped, 1 = straight)</li>
+<li><code>am</code> Transmission (0 = automatic, 1 = manual)</li>
+<li><code>gear</code> Number of forward gears</li>
+<li><code>carb</code> Number of carburetors</li>
+</ol>
+<pre class="r"><code>dat &lt;- mtcars
+
+library(ggplot2)
+ggplot(dat, aes(x = wt, y = mpg)) +
+  geom_point() +
+  labs(
+    y = &quot;Miles per gallon&quot;,
+    x = &quot;Car&#39;s weight (1000 lbs)&quot;
+  ) +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The <a href="/blog/graphics-in-r-with-ggplot2/#scatter-plot">scatterplot</a> above shows that there seems to be a <strong>negative relationship between the distance traveled with a gallon of fuel and the weight of a car</strong>. This makes sense, as the heavier the car, the more fuel it consumes and thus the fewer miles it can drive with a gallon.</p>
+<p>This is already a good overview of the relationship between the two variables, but a simple linear regression with the miles per gallon as dependent variable and the car’s weight as independent variable goes further. It will tell us by <strong>how many miles the distance varies, on average, when the weight varies by one unit</strong> (1000 lbs in this case). This is possible thanks to the regression line.</p>
+<div id="principle" class="section level2">
+<h2>Principle</h2>
+<p>The principle of simple linear regression is to <strong>find the line</strong> (i.e., determine its equation) <strong>which passes as close as possible to the observations</strong>, that is, the set of points formed by the pairs <span class="math inline">\((x_i, y_i)\)</span>.</p>
+<p>In the first step, there are many potential lines. Three of them are plotted:</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>To find the line which passes as close as possible to all the points, we take the square of the vertical distance between each point and each potential line. Note that we take the square of the distances to make sure that a negative gap (i.e., a point below the line) is not compensated by a positive gap (i.e., a point above the line). The line which passes closest to the set of points is the one which <strong><em>minimizes</em></strong> <strong>the sum of these squared distances</strong>.</p>
+<p>The resulting regression line is presented in blue in the following plot, and the dashed gray lines represent the vertical distance between the points and the fitted line. These vertical distances between each observed point and the fitted line determined by the least squares method are called the <strong>residuals</strong> of the linear regression model and denoted <span class="math inline">\(\epsilon\)</span>.</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>By definition, there is no other line with a smaller total distance between the points and the line. This method is called the least squares method, or <strong>OLS</strong> for <strong>ordinary least squares</strong>.</p>
+</div>
+<div id="equation" class="section level2">
+<h2>Equation</h2>
+<p>The regression model can be written in the form of the equation:</p>
+<p><span class="math display">\[Y = \beta_0 + \beta_1 X + \epsilon\]</span></p>
+<p>with:</p>
+<ul>
+<li><span class="math inline">\(Y\)</span> the dependent variable</li>
+<li><span class="math inline">\(X\)</span> the independent variable</li>
+<li><span class="math inline">\(\beta_0\)</span> the intercept (the mean value of <span class="math inline">\(Y\)</span> when <span class="math inline">\(x = 0\)</span>), also sometimes denoted <span class="math inline">\(\alpha\)</span></li>
+<li><span class="math inline">\(\beta_1\)</span> the slope (the expected increase in <span class="math inline">\(Y\)</span> when <span class="math inline">\(X\)</span> increases by one unit)</li>
+<li><span class="math inline">\(\epsilon\)</span> the residuals (the error term of mean 0 which describes the variations of <span class="math inline">\(Y\)</span> not captured by the model, also referred as the noise)</li>
+</ul>
+<p>When we determine the line which passes closest to all the points (we say that we fit a line to the observed data), we actually <strong>estimate the unknown parameters <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span></strong> based on the data at hand. Remember from your geometry classes, to draw a line you only need two parameters—the intercept and the slope.</p>
+<p>These estimates (and thus the blue line shown in the previous scatterplot) can be computed by hand with the following formulas:</p>
+<p><span class="math display">\[\widehat\beta_1 = \frac{\sum^n_{i = 1} (x_i - \bar{x})(y_i - \bar{y})}{\sum^n_{i = 1}(x_i - \bar{x})^2} = \frac{\left(\sum^n_{i = 1}x_iy_i\right) - n\bar{x}\bar{y}}{\sum^n_{i = 1}(x_i - \bar{x})^2}\]</span></p>
+<p>and</p>
+<p><span class="math display">\[\widehat\beta_0 = \bar{y} - \widehat\beta_1 \bar{x}\]</span></p>
+<p>with <span class="math inline">\(\bar{x}\)</span> and <span class="math inline">\(\bar{y}\)</span> denoting the sample mean of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, respectively.</p>
+<p>(If you struggle to compute <span class="math inline">\(\widehat\beta_0\)</span> and <span class="math inline">\(\widehat\beta_1\)</span> by hand, see this <a href="/blog/a-shiny-app-for-simple-linear-regression-by-hand-and-in-r/">Shiny app</a> which helps you to easily find these estimates based on your data.)</p>
+</div>
+<div id="interpretations-of-coefficients-widehatbeta" class="section level2">
+<h2>Interpretations of coefficients <span class="math inline">\(\widehat\beta\)</span></h2>
+<p>The <strong>intercept <span class="math inline">\(\widehat\beta_0\)</span></strong> is the <strong>mean value of the dependent variable <span class="math inline">\(Y\)</span> when the independent variable <span class="math inline">\(X\)</span> takes the value 0</strong>. Its estimation has no interest in evaluating whether there is a linear relationship between two variables. It has, however, an interest if you want to know what the mean value of <span class="math inline">\(Y\)</span> could be when <span class="math inline">\(x = 0\)</span>.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<p>The <strong>slope <span class="math inline">\(\widehat\beta_1\)</span></strong>, on the other hand, corresponds to the expected <strong>variation of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X\)</span> varies by one unit</strong>. It tells us two important information:</p>
+<ul>
+<li>The <strong>sign of the slope</strong> indicates the <strong>direction of the line</strong>—a positive slope (<span class="math inline">\(\widehat\beta_1 &gt; 0\)</span>) indicates that there is a positive relationship between the two variables of interest (they vary in the same direction), whereas a negative slope (<span class="math inline">\(\widehat\beta_1 &lt; 0\)</span>) means that there is a negative relationship between the two variables (they vary in opposite directions).</li>
+<li>The <strong>value of the slope</strong> provides information on the <strong>speed of evolution</strong> of the variable <span class="math inline">\(Y\)</span> as a function of the variable <span class="math inline">\(X\)</span>. The larger the slope in absolute value, the larger the expected variation of <span class="math inline">\(Y\)</span> for each unit of <span class="math inline">\(X\)</span>. Note, however, that a large value does not necessarily mean that the relationship is statistically significant (more on that in the section about <a href="/blog/multiple-linear-regression-made-simple/#significance-of-the-relationship">significance of the relationship</a>).</li>
+</ul>
+<p>This is similar to the <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation coefficient</a>, which gives information about the direction and the strength of the relationship between two variables.</p>
+<p>To perform a linear regression in R, we use the <code>lm()</code> function (which stands for linear model). The function requires to set the dependent variable first then the independent variable, separated by a tilde (<code>~</code>).</p>
+<p>Applied to our example of weight and car’s consumption, we have:</p>
+<pre class="r"><code>model &lt;- lm(mpg ~ wt, data = dat)</code></pre>
+<p>The <code>summary()</code> function gives the results of the model:</p>
+<pre class="r"><code>summary(model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.5432 -2.3647 -0.1252  1.4096  6.8727 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  37.2851     1.8776  19.858  &lt; 2e-16 ***
+## wt           -5.3445     0.5591  -9.559 1.29e-10 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.046 on 30 degrees of freedom
+## Multiple R-squared:  0.7528, Adjusted R-squared:  0.7446 
+## F-statistic: 91.38 on 1 and 30 DF,  p-value: 1.294e-10</code></pre>
+<p>The results can be summarized as follows (see the column <code>Estimate</code> in the table <code>Coefficients</code>):</p>
+<ul>
+<li>The intercept <span class="math inline">\(\widehat\beta_0 =\)</span> 37.29 indicates that, for a hypothetical car weighting 0 lbs, we can expect, on average, a consumption of 37.29 miles/gallon. (This interpretation is shown for illustrative purposes, but as a car weighting 0 lbs is impossible, the interpretation has no meaning. In practice, we would therefore refrain from interpreting the intercept in this case.)</li>
+<li>The slope <span class="math inline">\(\widehat\beta_1 =\)</span> -5.34 indicates that:
+<ul>
+<li>There is a <strong>negative relationship</strong> between the weight and the distance a car can drive with a gallon (this was expected given the negative trend of the points in the scatterplot shown previously).</li>
+<li>But more importantly, a slope of -5.34 means that, for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles per gallon decreases, on average, by 5.34 units. In other words, <strong>for an increase of 1000 lbs, the number of miles/gallon decreases, on average, by 5.34</strong>.</li>
+</ul></li>
+</ul>
+</div>
+<div id="significance-of-the-relationship" class="section level2">
+<h2>Significance of the relationship</h2>
+<p>As mentioned earlier, the <strong>value of the slope does not</strong>, by itself, make it possible to <strong>assess the significance of the linear relationship</strong>. In other words, a slope different from 0 does not necessarily mean it is <em>significantly</em> different from 0, so it does not mean that there is a <strong>significant</strong> relationship between the two variables in the population. There could be a slope of 10 that is not significant, and a slope of 2 that is significant.</p>
+<p>Significance of the relationship also depends on the variability of the slope, which is measured by its standard error and generally noted <span class="math inline">\(se(\widehat\beta_1)\)</span>.</p>
+<p>Without going too much into details, to assess the significance of the linear relationship, we divide the slope by its standard error. This ratio is the test statistic and follows a Student distribution with <span class="math inline">\(n - 2\)</span> degrees of freedom:<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
+<p><span class="math display">\[T_{n - 2} = \frac{\widehat\beta}{se(\widehat\beta_1)}\]</span></p>
+<p>For a bilateral test, the null and alternative hypotheses are:<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
+<ul>
+<li><span class="math inline">\(H_0 : \beta_1 = 0\)</span> (there is no (linear) relationship between the two variables)</li>
+<li><span class="math inline">\(H_1 : \beta_1 \ne 0\)</span> (there is a (linear) relationship between the two variables)</li>
+</ul>
+<p>Roughly speaking, if this ratio is greater than 2 in absolute value then the slope is significantly different from 0, and therefore the relationship between the two variables is significant (and in that case it is positive or negative depending on the sign of the estimate <span class="math inline">\(\widehat\beta_1\)</span>).</p>
+<p>The standard error and the test statistic are shown in the column <code>Std. Error</code> and <code>t value</code> in the table <code>Coefficients</code>.</p>
+<p>Fortunately, R gives a more precise and easier way to assess to the significance of the relationship. The information is provided in the column <code>Pr(&gt;|t|)</code> of the <code>Coefficients</code> table. This is the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha"><em>p</em>-value</a> of the test. As for any statistical test, if the <em>p</em>-value is greater than or equal to the significance level (usually <span class="math inline">\(\alpha = 0.05\)</span>), we do not reject the null hypothesis, and if the <em>p</em>-value is lower than the significance level, we reject the null hypothesis. If we do not reject the null hypothesis, we do not reject the hypothesis of no relationship between the two variables (because we do not reject the hypothesis of a slope of 0). On the contrary, if we reject the null hypothesis of no relationship, we can conclude that there is a significant linear relationship between the two variables.</p>
+<p>In our example, the <em>p</em>-value = 1.29e-10 &lt; 0.05 so we reject the null hypothesis at the significance level <span class="math inline">\(\alpha = 5\%\)</span>. We therefore conclude that there is a <strong>significant relationship between a car’s weight and its fuel consumption</strong>.</p>
+<p><em>Tip:</em> In order to make sure I interpret only parameters that are significant, I tend to first check the significance of the parameters thanks to the <em>p</em>-values, and then interpret the estimates accordingly. For completeness, note that the test is also performed on the intercept. The <em>p</em>-value being smaller than 0.05, we also conclude that the intercept is significantly different from 0.</p>
+<div id="correlation-does-not-imply-causation" class="section level3">
+<h3>Correlation does not imply causation</h3>
+<p>Be careful that a significant relationship between two variables does not necessarily mean that there is an influence of one variable on the other or that there is a causal effect between these two variables!</p>
+<p>A significant relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> can appear in several cases:</p>
+<ul>
+<li><span class="math inline">\(X\)</span> causes <span class="math inline">\(Y\)</span></li>
+<li><span class="math inline">\(Y\)</span> causes <span class="math inline">\(X\)</span></li>
+<li>a third variable cause <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span></li>
+<li>a combination of these three reasons</li>
+</ul>
+<p>A statistical model alone cannot establish a causal link between two variables. Demonstrating causality between two variables is more complex and requires, among others, a specific experimental design, the repeatability of the results over time, as well as various samples. This is the reason you will often read “<a href="/blog/correlation-coefficient-and-correlation-test-in-r/#correlation-does-not-imply-causation">Correlation does not imply causation</a>” and linear regression follows the same principle.</p>
+</div>
+</div>
+<div id="conditions-of-application" class="section level2">
+<h2>Conditions of application</h2>
+<p>Linear regression cannot be used in all situations. In addition to the requirement that the dependent variable must be a continuous quantitative variables, simple linear regression requires that the data satisfy the following conditions:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Linearity:</strong> The relationship between the two variables should be linear (at least roughly). For this reason it is always necessary to represent graphically the data with a scatterplot before performing a simple linear regression.</li>
+</ol>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Independence:</strong> Observations must be independent. It is the sampling plan and the experimental design that usually provide information on this condition. If the data come from different individuals or experimental units, they are usually independent. On the other hand, if the same individuals are measured at different periods, the data are probably not independent.</li>
+<li><strong>Normality of the residuals:</strong> For large sample sizes, confidence intervals and tests on the coefficients are (approximately) valid whether the error follows a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normal distribution</a> or not (a consequence of the central limit theorem, see more in <span class="citation"><a href="#ref-ernst2017regression" role="doc-biblioref">Ernst and Albers</a> (<a href="#ref-ernst2017regression" role="doc-biblioref">2017</a>)</span>)! For small sample sizes, residuals should follow a normal distribution. This condition can be tested visually (via a <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a> and/or a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a>), or more formally (via the <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">Shapiro-Wilk test</a> for instance).</li>
+<li><strong>Homoscedasticity of the residuals:</strong> The variance of the errors should be constant. There is a lack of homoscedasticity when the dispersion of the residuals increases with the predicted values (fitted values). This condition can be tested visually (by plotting the standardized residuals vs. the fitted values) or more formally (via the Breusch-Pagan test).</li>
+<li><strong>No influential points:</strong> If the data contain <a href="/blog/outliers-detection-in-r/">outliers</a>, it is essential to identify them so that they <strong>do not</strong>, on their own, <strong>influence</strong> the results of the regression. Note that an outlier is not an issue <em>per se</em> if the point is in the alignment of the regression line for example because it does not influence the regression line. It becomes a problem in the context of linear regression if it influences in a substantial manner the estimates (and in particular the slope of the regression line). This can be tackled by identifying outliers, and comparing the results with and without the potential outliers (do the results remain the same with the two approaches?)</li>
+</ol>
+<p><em>Tip:</em> I remember the first 4 conditions thanks to the acronym “LINE,” for Linearity, Independence, Normality and Equality of variance.</p>
+<p>If any of the condition is not met, the tests and the conclusions could be erroneous so it is best to avoid using and interpreting the model. If this is the case, often the conditions can be met by transforming (e.g., logarithmic transformation, square or square root, Box-Cox transformation, etc.) the data. If it does not help, it could be worth thinking about removing some variables or adding other variables, or even considering non-linear models.</p>
+<p>Keep in mind that in practice, <strong>conditions of application should be verified before drawing any conclusion</strong> based on the model. I refrain here from testing the conditions on our data because it will be covered in details in the context of multiple linear regression (see this <a href="/blog/multiple-linear-regression-made-simple/#conditions-of-application-1">section</a>).</p>
+</div>
+<div id="visualizations" class="section level2">
+<h2>Visualizations</h2>
+<p>If you are a frequent reader of the blog, you may know that I like to draw (simple but efficient) <a href="/tags/visualization/">visualizations</a> to illustrate my statistical analyses. Linear regression is not an exception.</p>
+<p>There are numerous ways to visualize the relationship between the two variables of interest, but the easiest one I found so far is via the <code>visreg()</code> function from the package of the same name:</p>
+<pre class="r"><code>library(visreg)
+visreg(model)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Other elements could be displayed on the regression plot (for example the coefficients, the <span class="math inline">\(R^2\)</span>, the global <span class="math inline">\(p\)</span>-value, etc.). However, I like this approach for its simplicity—only a single line of code.</p>
+</div>
+</div>
+<div id="multiple-linear-regression" class="section level1">
+<h1>Multiple linear regression</h1>
+<p>Now that you understand the principle behind simple linear regression and you know how to interpret the results, it is time to discuss about multiple linear regression.</p>
+<p>We also start with the underlying principle of multiple linear regression, then show how to interpret the results, how to test the conditions of application and finish with more advanced topics.</p>
+<div id="principle-1" class="section level2">
+<h2>Principle</h2>
+<p>Multiple linear regression is a generalization of simple linear regression, in the sense that this approach makes it possible to relate one variable with <strong>several variables</strong> through a linear function in its parameters.</p>
+<p>Multiple linear regression is used to assess the relationship between two variables <strong>while taking into account the effect of other variables</strong>. By taking into account the effect of other variables, we cancel out the effect of these other variables in order to <strong>isolate</strong> and measure the relationship between the two variables of interest. This point is the main difference with simple linear regression.</p>
+<p>To illustrate how to perform a multiple linear regression in R, we use the same dataset than the one used for simple linear regression (<code>mtcars</code>). Below a short preview:</p>
+<pre class="r"><code>head(dat)</code></pre>
+<pre><code>##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+## Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre>
+<p>We have seen that there is a significant and negative linear relationship between the distance a car can drive with a gallon and its weight (<span class="math inline">\(\widehat\beta_1 =\)</span> -5.34, <span class="math inline">\(p\)</span>-value &lt; 0.001).</p>
+<p>However, one may wonder whether there are not in reality other factors that could explain a car’s fuel consumption.</p>
+<p>To explore this, we can visualize the relationship between a car’s fuel consumption (<code>mpg</code>) together with its weight (<code>wt</code>), horsepower (<code>hp</code>) and displacement (<code>disp</code>) (engine displacement is the combined swept (or displaced) volume of air resulting from the up-and-down movement of pistons in the cylinders, usually the higher the more powerful the car):</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = wt, y = mpg, colour = hp, size = disp) +
+  geom_point() +
+  scale_color_gradient() +
+  labs(
+    y = &quot;Miles per gallon&quot;,
+    x = &quot;Weight (1000 lbs)&quot;,
+    color = &quot;Horsepower&quot;,
+    size = &quot;Displacement&quot;
+  ) +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>It seems that, in addition to the negative relationship between miles per gallon and weight, there is also:</p>
+<ul>
+<li>a negative relationship between miles/gallon and horsepower (lighter points, indicating more horsepower, tend to be more present in low levels of miles per gallon)</li>
+<li>a negative relationship between miles/gallon and displacement (bigger points, indicating larger values of displacement, tend to be more present in low levels of miles per gallon).</li>
+</ul>
+<p>Therefore, we would like to evaluate the relation between the fuel consumption and the weight, but this time by adding information on the horsepower and displacement. By adding this additional information, we are able to <strong>capture only the direct relationship between miles/gallon and weight</strong> (the indirect effect due to horsepower and displacement is canceled out).</p>
+<p>This is the whole point of multiple linear regression! In fact, in multiple linear regression, the estimated relationship between the dependent variable and an explanatory variable is an <strong>adjusted</strong> relationship, that is, free of the linear effects of the other explanatory variables.</p>
+<p>Let’s illustrate this notion of adjustment by adding both horsepower and displacement in our linear regression model:</p>
+<pre class="r"><code>model2 &lt;- lm(mpg ~ wt + hp + disp,
+  data = dat
+)
+
+summary(model2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt + hp + disp, data = dat)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.891 -1.640 -0.172  1.061  5.861 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 37.105505   2.110815  17.579  &lt; 2e-16 ***
+## wt          -3.800891   1.066191  -3.565  0.00133 ** 
+## hp          -0.031157   0.011436  -2.724  0.01097 *  
+## disp        -0.000937   0.010350  -0.091  0.92851    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.639 on 28 degrees of freedom
+## Multiple R-squared:  0.8268, Adjusted R-squared:  0.8083 
+## F-statistic: 44.57 on 3 and 28 DF,  p-value: 8.65e-11</code></pre>
+<p>We can see that now, the relationship between miles/gallon and weight is weaker in terms of slope (<span class="math inline">\(\widehat\beta_1 =\)</span> -3.8 now, against <span class="math inline">\(\widehat\beta_1 =\)</span> -5.34 when only the weight was considered).</p>
+<p>The effect of weight on fuel consumption was adjusted according to the effect of horsepower and displacement. This is the remaining effect between miles/gallon and weight after the effects of horsepower and displacement have been taken into account. More detailed interpretations in this <a href="/blog/multiple-linear-regression-made-simple/#interpretations-of-coefficients-widehatbeta-1">section</a>.</p>
+</div>
+<div id="equation-1" class="section level2">
+<h2>Equation</h2>
+<p>Multiple linear regression models are defined by the equation</p>
+<p><span class="math display">\[Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_p X_p + \epsilon\]</span></p>
+<p>It is similar than the equation of simple linear regression, except that there is more than one independent variables (<span class="math inline">\(X_1, X_2, \dots, X_p\)</span>).</p>
+<p>Estimation of the parameters <span class="math inline">\(\beta_0, \dots, \beta_p\)</span> by the method of least squares is based on the same principle as that of simple linear regression, but applied to <span class="math inline">\(p\)</span> dimensions. It is thus no longer a question of finding the best line (the one which passes closest to the pairs of points (<span class="math inline">\(y_i, x_i\)</span>)), but finding the <span class="math inline">\(p\)</span>-dimensional plane which passes closest to the coordinate points (<span class="math inline">\(y_i, x_{i1}, \dots, x_{ip}\)</span>). This is done by <strong><em>minimizing</em> the sum of the squares of the deviations of the points on the plane</strong>:</p>
+<div class="figure">
+<img src="images/multiple-linear-regression-plane.png" style="width:100.0%" alt="" />
+<p class="caption">Source: Thaddeussegura</p>
+</div>
+</div>
+<div id="interpretations-of-coefficients-widehatbeta-1" class="section level2">
+<h2>Interpretations of coefficients <span class="math inline">\(\widehat\beta\)</span></h2>
+<p>The least squares method results in an adjusted estimate of the coefficients. The term adjusted means <strong>after taking into account the linear effects</strong> of the other independent variables on the dependent variable, but also on the predictor variable.</p>
+<p>In other words, the coefficient <span class="math inline">\(\beta_1\)</span> corresponds to the slope of the relationship between <span class="math inline">\(Y\)</span> and <span class="math inline">\(X_1\)</span> when the linear effects of the other explanatory variables (<span class="math inline">\(X_2, \dots, X_p\)</span>) have been removed, both at the level of the dependent variable <span class="math inline">\(Y\)</span> but also at the level of <span class="math inline">\(X_1\)</span>.</p>
+<p>Applied to our model with weight, horsepower and displacement as independent variables, we have:</p>
+<pre class="r"><code>summary(model2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt + hp + disp, data = dat)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.891 -1.640 -0.172  1.061  5.861 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 37.105505   2.110815  17.579  &lt; 2e-16 ***
+## wt          -3.800891   1.066191  -3.565  0.00133 ** 
+## hp          -0.031157   0.011436  -2.724  0.01097 *  
+## disp        -0.000937   0.010350  -0.091  0.92851    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.639 on 28 degrees of freedom
+## Multiple R-squared:  0.8268, Adjusted R-squared:  0.8083 
+## F-statistic: 44.57 on 3 and 28 DF,  p-value: 8.65e-11</code></pre>
+<p>The table <code>Coefficients</code> gives the estimate for each parameter (column <code>Estimate</code>), together with the <span class="math inline">\(p\)</span>-value of the nullity of the parameter (column <code>Pr(&gt;|t|)</code>).</p>
+<p>The hypotheses are the same as for simple linear regression, that is:</p>
+<ul>
+<li><span class="math inline">\(H_0 : \beta_j = 0\)</span></li>
+<li><span class="math inline">\(H_1 : \beta_j \ne 0\)</span></li>
+</ul>
+<p>The test of <span class="math inline">\(\beta_j = 0\)</span> is equivalent to testing the hypothesis: is the dependent variable associated with the independent variable studied, all other things being equal, that is to say, at constant level of the other independent variables.</p>
+<p>In other words:</p>
+<ul>
+<li>the test of <span class="math inline">\(\beta_1 = 0\)</span> corresponds to testing the hypothesis: is fuel consumption associated with a car’s weight, at a constant level of horsepower and displacement</li>
+<li>the test of <span class="math inline">\(\beta_2 = 0\)</span> corresponds to testing the hypothesis: is fuel consumption associated with horsepower, at a constant level of weight and displacement</li>
+<li>the test of <span class="math inline">\(\beta_3 = 0\)</span> corresponds to testing the hypothesis: is fuel consumption associated with displacement, at a constant level of weight and displacement</li>
+<li>(for the sake of completeness: the test of <span class="math inline">\(\beta_0 = 0\)</span> corresponds to testing the hypothesis: is miles/gallon different from 0 when weight, horsepower and displacement are equal to 0)</li>
+</ul>
+<p>Based on the output of our model, we conclude that:</p>
+<ul>
+<li>There is a significant and negative relationship between miles/gallon and weight, <strong>all else being equal</strong>. So for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles/gallon decreases, on average, by 3.8, for a constant level of horsepower and displacement (<span class="math inline">\(p\)</span>-value = 0.001).</li>
+<li>There is a significant and negative relationship between miles/gallon and horsepower, all else being equal. So for an increase of one unit of horsepower, the distance traveled with a gallon decreases, on average, by 0.03 mile, for a constant level of weight and displacement (<span class="math inline">\(p\)</span>-value = 0.011).</li>
+<li>We do not reject the hypothesis of no relationship between miles/gallon and displacement when weight and horsepower stay constant (because <span class="math inline">\(p\)</span>-value = 0.929 &gt; 0.05).</li>
+<li>(For completeness but it should be interpreted only when it makes sense: for a weight, horsepower and displacement = 0, we can expect that a car has, on average, a fuel consumption of 37.11 miles/gallon (<span class="math inline">\(p\)</span>-value &lt; 0.001).)</li>
+</ul>
+<p>This is how to interpret quantitative independent variables. <strong>Interpreting qualitative independent variables</strong> is slightly different in the sense that it quantifies the effect of a level in comparison with the reference level, sill all else being equal. So it compares the different groups (formed by the different levels of the categorical variable) in terms of the dependent variable (this is why linear regression can be seen as an extension to the t-test and ANOVA).</p>
+<p>For the illustration, we model the fuel consumption (<code>mpg</code>) on the weight (<code>wt</code>) and the shape of the engine (<code>vs</code>). The variable <code>vs</code> has two levels: V-shaped (the <a href="/blog/data-manipulation-in-r/#change-reference-level">reference level</a>) and straight engine.<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
+<pre class="r"><code>## Recoding dat$vs
+library(forcats)
+dat$vs &lt;- as.character(dat$vs)
+dat$vs &lt;- fct_recode(dat$vs,
+  &quot;V-shaped&quot; = &quot;0&quot;,
+  &quot;Straight&quot; = &quot;1&quot;
+)
+
+model3 &lt;- lm(mpg ~ wt + vs,
+  data = dat
+)
+
+summary(model3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt + vs, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.7071 -2.4415 -0.3129  1.4319  6.0156 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  33.0042     2.3554  14.012 1.92e-14 ***
+## wt           -4.4428     0.6134  -7.243 5.63e-08 ***
+## vsStraight    3.1544     1.1907   2.649   0.0129 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.78 on 29 degrees of freedom
+## Multiple R-squared:  0.801,  Adjusted R-squared:  0.7873 
+## F-statistic: 58.36 on 2 and 29 DF,  p-value: 6.818e-11</code></pre>
+<p>Based on the output of our model, we conclude that:</p>
+<ul>
+<li>For a V-shaped engine and for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles/gallon decreases, on average, by 4.44 (<span class="math inline">\(p\)</span>-value &lt; 0.001).</li>
+<li>The distance traveled with a gallon of fuel increases by, on average, 3.15 miles <strong>when the engine is straight compared to a V-shaped engine</strong>, for a constant weight (<span class="math inline">\(p\)</span>-value = 0.013).</li>
+<li>(For completeness but it should be interpreted only when it makes sense: for a weight = 0 and a V-shaped engine, we can expect that the car has, on average, a fuel consumption of 33 miles/gallon (<span class="math inline">\(p\)</span>-value &lt; 0.001).)</li>
+</ul>
+</div>
+<div id="conditions-of-application-1" class="section level2">
+<h2>Conditions of application</h2>
+<p>As for simple linear regression, multiple linear regression requires some conditions of application for the model to be usable and the results to be interpretable. Conditions for simple linear regression also apply to multiple linear regression, that is:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Linearity</strong> of the relationships between the dependent and independent variables<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></li>
+<li><strong>Independence</strong> of the observations</li>
+<li><strong>Normality</strong> of the residuals</li>
+<li><strong>Homoscedasticity</strong> of the residuals</li>
+<li><strong>No influential points</strong> (<a href="/blog/outliers-detection-in-r/">outliers</a>)</li>
+</ol>
+<p>But there is one more condition for multiple linear regression:</p>
+<ol start="6" style="list-style-type: decimal">
+<li><strong>No multicollinearity:</strong> Multicollinearity arises when there is a strong linear <strong><a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation</a> between the independent variables</strong>, conditional on the other variables in the model. It is important to check it because it may lead to an imprecision or an instability of the estimated parameters when a variable changes. It can be assessed by studying the correlation between each pair of independent variables, or even better, by computing the variance inflation factor (VIF). The VIF measures how much the variance of an estimated regression coefficient increases, relative to a situation in which the explanatory variables are strictly independent. A high value of VIF is a sign of multicollinearity (the threshold is generally admitted at 5 or 10 depending on the domain). The easiest way to reduce the VIF is to remove some correlated independent variables, or eventually to <a href="/blog/data-manipulation-in-r/#scale">standardize</a> the data.</li>
+</ol>
+<p>You will often see that these conditions are verified by running <code>plot(model, which = 1:6)</code> and it is totally correct. However, I recently discovered the <code>check_model()</code> function from the <code>{performance}</code> package which tests these conditions all at the same time (and let’s be honest, in a more elegant way).<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a></p>
+<p>Applied on our <code>model2</code> with miles/gallon as dependent variable, and weight, horsepower and displacement as independent variables, we have:</p>
+<pre class="r"><code># install.packages(&quot;performance&quot;)
+# install.packages(&quot;see&quot;)
+library(performance)
+
+check_model(model2)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>In addition to testing all conditions at the same time, it also gives insight on how to interpret the different diagnostic plots and what you should expect (see in the subtitles of each plot):</p>
+<ul>
+<li>Linearity (top left plot) is not perfect—a variable could be removed/added or a transformation could be applied to improve linearity<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></li>
+<li>Homogeneity of variance (top right plot) is respected</li>
+<li>Multicollinearity (middle left plot) is not an issue (I tend to use the threshold of 10 for VIF, and all of them are below 10)<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a></li>
+<li>There is no influential points (middle right plot)</li>
+<li>Normality of the residuals (two bottom plots) is also not perfect due to 3 points deviating from the reference line but it still seems acceptable to me. In any case, the number of observations is large enough given the number of parameters<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a> and given the small deviation from normality so tests on the coefficients are (approximately) valid whether the error follows a normal distribution or not</li>
+</ul>
+<p>When the conditions of application are met, we usually say that the model is valid. But not all valid models are <em>good</em> models.</p>
+</div>
+<div id="how-to-choose-a-good-linear-model" class="section level2">
+<h2>How to choose a good linear model?</h2>
+<p>A model which satisfies the conditions of application is the minimum requirement, but you will likely find several models that meet this criteria. So one may wonder <strong>how to choose between different models</strong> that are all valid?</p>
+<p>The three most common tools to select a good linear model are according to:</p>
+<ol style="list-style-type: decimal">
+<li>the <span class="math inline">\(p\)</span>-value associated to the model,</li>
+<li>the coefficient of determination <span class="math inline">\(R^2\)</span> and</li>
+<li>the Akaike Information Criterion</li>
+</ol>
+<p>The approaches are detailed in the next sections. Note that the first two are applicable to simple and multiple linear regression, whereas the third is only applicable to multiple linear regression.</p>
+<div id="p-value-associated-to-the-model" class="section level3">
+<h3><span class="math inline">\(P\)</span>-value associated to the model</h3>
+<p>Before interpreting the estimates of a model, it is a good practice to first check the <span class="math inline">\(p\)</span>-value associated to the model. This <span class="math inline">\(p\)</span>-value indicates if the model is <strong>better than a model with only the intercept</strong>.</p>
+<p>The hypotheses of the test (called F-test) are:</p>
+<ul>
+<li><span class="math inline">\(H_0: \beta_1 = \beta_2 = \dots = \beta_p = 0\)</span></li>
+<li><span class="math inline">\(H_1:\)</span> at least one coefficient <span class="math inline">\(\beta \ne 0\)</span></li>
+</ul>
+<p>This <span class="math inline">\(p\)</span>-value can be found at the bottom of the <code>summary()</code> output:</p>
+<pre class="r"><code>summary(model2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt + hp + disp, data = dat)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.891 -1.640 -0.172  1.061  5.861 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 37.105505   2.110815  17.579  &lt; 2e-16 ***
+## wt          -3.800891   1.066191  -3.565  0.00133 ** 
+## hp          -0.031157   0.011436  -2.724  0.01097 *  
+## disp        -0.000937   0.010350  -0.091  0.92851    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.639 on 28 degrees of freedom
+## Multiple R-squared:  0.8268, Adjusted R-squared:  0.8083 
+## F-statistic: 44.57 on 3 and 28 DF,  p-value: 8.65e-11</code></pre>
+<p>The <span class="math inline">\(p\)</span>-value = 8.65e-11. The null hypothesis is rejected, so we conclude that our model is better than a model with only the intercept because at least one coefficient <span class="math inline">\(\beta\)</span> is significantly different from 0.</p>
+<p>If this <span class="math inline">\(p\)</span>-value &gt; 0.05 for one of your model, it means that none of the variables you selected help in explaining the dependent variable. In other words, you should completely forget about this model because it cannot do better than simply taking the mean of the dependent variable.</p>
+</div>
+<div id="coefficient-of-determination-r2" class="section level3">
+<h3>Coefficient of determination <span class="math inline">\(R^2\)</span></h3>
+<p>The coefficient of determination, <span class="math inline">\(R^2\)</span>, is a measure of the <strong>goodness of fit of the model</strong>. It measures the proportion of the total variability that is explained by the model, or how well the model fits the data.</p>
+<p><span class="math inline">\(R^2\)</span> varies between 0 and 1:</p>
+<ul>
+<li><span class="math inline">\(R^2 = 0\)</span>: the model explains nothing</li>
+<li><span class="math inline">\(R^2 = 1\)</span>: the model explains everything</li>
+<li><span class="math inline">\(0 &lt; R^2 &lt; 1\)</span>: the model explains part of the variability</li>
+<li>the higher the <span class="math inline">\(R^2\)</span>, the better the model explains the dependent variable. As a rule of thumb, a <span class="math inline">\(R^2 &gt; 0.7\)</span> indicates a good fit of the model<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a></li>
+</ul>
+<p>Note that in a simple linear regression model, the coefficient of determination is equal to the square of the <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation coefficient</a>: <span class="math inline">\(R^2 = corr(X, Y)^2\)</span>.</p>
+<p>Applied on our <code>model2</code> with miles/gallon as dependent variable, and weight, horsepower and displacement as independent variables, we have:</p>
+<pre class="r"><code>summary(model2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt + hp + disp, data = dat)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.891 -1.640 -0.172  1.061  5.861 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 37.105505   2.110815  17.579  &lt; 2e-16 ***
+## wt          -3.800891   1.066191  -3.565  0.00133 ** 
+## hp          -0.031157   0.011436  -2.724  0.01097 *  
+## disp        -0.000937   0.010350  -0.091  0.92851    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.639 on 28 degrees of freedom
+## Multiple R-squared:  0.8268, Adjusted R-squared:  0.8083 
+## F-statistic: 44.57 on 3 and 28 DF,  p-value: 8.65e-11</code></pre>
+<p><span class="math inline">\(R^2\)</span> is displayed at the bottom of the <code>summary()</code> output or can be extracted with <code>summary(model2)$r.squared</code>.</p>
+<p><span class="math inline">\(R^2\)</span> for this model is 0.8268, which means that 82.68% of the variability of the distance traveled with a gallon is explained by the weight, horsepower and displacement of the car. The relatively high <span class="math inline">\(R^2\)</span> means that the weight, horsepower and displacement of a car are good characteristics to explain the distance it can drive with a gallon of fuel.</p>
+<p>Note that if you want to compare models with different number of independent variables, it is best to refer to the adjusted <span class="math inline">\(R^2\)</span> (= 0.8083 here). Indeed, adding variables to the model cannot make the <span class="math inline">\(R^2\)</span> to decrease, even if the variables are not related to the dependent variables (so the <span class="math inline">\(R^2\)</span> will artificially increase when adding variables to the model, or at least stay constant). Therefore, the adjusted <span class="math inline">\(R^2\)</span> takes into account the complexity of the model (the number of variables) by penalizing for additional variables, so it is a compromise between goodness of fit and parsimony.</p>
+</div>
+<div id="parsimony" class="section level3">
+<h3>Parsimony</h3>
+<p>A <strong>parsimonious model (few variables) is usually preferred</strong> over a complex model (many variables). There are two ways to obtain a parsimonious model from a model with many independent variables:</p>
+<ol style="list-style-type: decimal">
+<li>We can <strong>iteratively remove the independent variable least significantly related to the dependent variable</strong> (i.e., the one with the highest <span class="math inline">\(p\)</span>-value in an <a href="/blog/multiple-linear-regression-made-simple/#overall-effect-of-categorical-variables">analysis of variance table</a>) until all of them are significantly associated to the response variable, or</li>
+<li>We can select the model based on the <strong>Akaike Information Criterion (AIC)</strong>. AIC expresses a desire to fit the model with the smallest number of coefficients possible and allows to compare models. According to this criterion, the best model is the one with the lowest AIC. This criterion is based on a compromise between the quality of the fit and its complexity. We usually start from a global model with many independent variables, and the procedure (referred as stepwise algorithm)<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a> automatically compares models then selects the best one according to the AIC.</li>
+</ol>
+<p>We show how to do the second option in R. For the illustration, we start with a model with all variables in the dataset as independent variables (do not forget to transform the factor variables first):</p>
+<pre class="r"><code>## vs has already been transformed into factor
+## so only am is transformed here
+
+## Recoding dat$vs
+library(forcats)
+dat$am &lt;- as.character(dat$am)
+dat$am &lt;- fct_recode(dat$am,
+  &quot;Automatic&quot; = &quot;0&quot;,
+  &quot;Manual&quot; = &quot;1&quot;
+)
+
+model4 &lt;- lm(mpg ~ .,
+  data = dat
+)
+
+model4 &lt;- step(model4, trace = FALSE)</code></pre>
+<p>(The formula <code>mpg ~ .</code> is a shortcut to consider all variables present in the dataset as independent variables, except the one that has been specified as the dependent variable (<code>mpg</code> here)).</p>
+<p>The model that has been selected according to this criterion is the following:</p>
+<pre class="r"><code>summary(model4)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt + qsec + am, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.4811 -1.5555 -0.7257  1.4110  4.6610 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   9.6178     6.9596   1.382 0.177915    
+## wt           -3.9165     0.7112  -5.507 6.95e-06 ***
+## qsec          1.2259     0.2887   4.247 0.000216 ***
+## amManual      2.9358     1.4109   2.081 0.046716 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.459 on 28 degrees of freedom
+## Multiple R-squared:  0.8497, Adjusted R-squared:  0.8336 
+## F-statistic: 52.75 on 3 and 28 DF,  p-value: 1.21e-11</code></pre>
+<p>Be careful when using an automatic procedure because, even though it is the best model that is selected, it is based:</p>
+<ul>
+<li>on a single criterion (AIC in this case), but more importantly;</li>
+<li>it is based on some set of mathematical rules, which means that industry knowledge or human expertise is not taken into consideration.</li>
+</ul>
+<p>I believe that this kind of automatic procedure for model’s selection is a good starting point, but I also believe that the final model should always be checked and tested against other models to make sure it makes sense in practice (apply common sense).</p>
+<p>Last but not least, do not forget to also verify the <a href="/blog/multiple-linear-regression-made-simple/#conditions-of-application-1">conditions of application</a> because the stepwise procedure does not guarantee that they are respected.</p>
+</div>
+</div>
+<div id="visualizations-1" class="section level2">
+<h2>Visualizations</h2>
+<p>There are many ways to visualize results of a linear regression. The 2 easiest ones I am aware of are:</p>
+<ol style="list-style-type: decimal">
+<li><code>visreg()</code> which illustrates the relationships between the dependent and independent variables in different plots (one for each independent variable unless you specify which relationship you want to illustrate):</li>
+</ol>
+<pre class="r"><code>library(visreg)
+visreg(model4)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-2.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-3.png" width="100%" style="display: block; margin: auto;" /></p>
+<ol start="2" style="list-style-type: decimal">
+<li><code>ggcoefstats()</code> which illustrates the results in one single plot:</li>
+</ol>
+<pre class="r"><code>library(ggstatsplot)
+ggcoefstats(model4)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>In this plot:</p>
+<ul>
+<li>when the solid line does not cross the vertical dashed line, the estimates is significantly different from 0 at the 5% significance level (i.e., <span class="math inline">\(p\)</span>-value &lt; 0.05)</li>
+<li>furthermore, a point to the right (left) of the vertical dashed line means that there is a positive (negative) relationship between the two variables</li>
+<li>the more extreme the point, the stronger the relationship</li>
+</ul>
+</div>
+<div id="to-go-further" class="section level2">
+<h2>To go further</h2>
+<p>Below some more advanced topics related to linear regression. Feel free to comment at the end of the article if you believe I missed an important one.</p>
+<div id="extract-models-equation" class="section level3">
+<h3>Extract model’s equation</h3>
+<p>You can easily extract the equation of your linear model in LaTeX or directly in your R Markdown document thanks to the <code>extract_eq()</code> function from the <code>{equatiomatic}</code> package:</p>
+<pre class="r"><code>library(equatiomatic)
+extract_eq(model4, use_coefs = TRUE)</code></pre>
+<p><span class="math display">\[
+\operatorname{\widehat{mpg}} = 9.62 - 3.92(\operatorname{wt}) + 1.23(\operatorname{qsec}) + 2.94(\operatorname{am}_{\operatorname{Manual}})
+\]</span></p>
+<p>The function works for linear regression, but also for many other models such as <a href="/blog/anova-in-r/">ANOVA</a>, GLM, logistic regression, etc.</p>
+</div>
+<div id="predictions" class="section level3">
+<h3>Predictions</h3>
+<p>Linear regression is also very often used for <strong>predictive purposes</strong>. Confidence and prediction intervals for <strong>new data</strong> can be computed with the <code>predict()</code> function.</p>
+<p>Suppose we want to predict the miles/gallon for a car with a manual transmission, weighting 3000 lbs and which drives a quarter of a mile (<code>qsec</code>) in 18 seconds:</p>
+<pre class="r"><code># confidence interval for new data
+predict(model4,
+  new = data.frame(wt = 3, qsec = 18, am = &quot;Manual&quot;),
+  interval = &quot;confidence&quot;,
+  level = .95
+)</code></pre>
+<pre><code>##        fit      lwr    upr
+## 1 22.87005 21.09811 24.642</code></pre>
+<pre class="r"><code># prediction interval for new data
+predict(model4,
+  new = data.frame(wt = 3, qsec = 18, am = &quot;Manual&quot;),
+  interval = &quot;prediction&quot;,
+  level = .95
+)</code></pre>
+<pre><code>##        fit      lwr      upr
+## 1 22.87005 17.53074 28.20937</code></pre>
+<p>Based on our model, it is expected that this car will drive 22.87 miles with a gallon.</p>
+<p>The difference between the confidence and prediction interval is that:</p>
+<ul>
+<li>a <strong>confidence</strong> interval gives the predicted value for the <strong>mean</strong> of <span class="math inline">\(Y\)</span> for a new observation, whereas</li>
+<li>a <strong>prediction</strong> interval gives the predicted value for an <strong>individual</strong> <span class="math inline">\(Y\)</span> for a new observation.</li>
+</ul>
+<p>The prediction interval is wider than the confidence interval to account for the <strong>additional uncertainty due to predicting an individual response</strong>, and not the mean, for a given value of <span class="math inline">\(X\)</span>.</p>
+</div>
+<div id="linear-hypothesis-tests" class="section level3">
+<h3>Linear hypothesis tests</h3>
+<p>Linear hypothesis tests make it possible to generalize the F-test mentioned in this <a href="/blog/multiple-linear-regression-made-simple/#p-value-associated-to-the-model">section</a>, while offering the possibility to perform either tests of comparison of coefficients, or tests of equality of linear combinations of coefficients.</p>
+<p>For example, to test the linear constraint:</p>
+<ul>
+<li><span class="math inline">\(H_0: \beta_1 = \beta_2 = 0\)</span></li>
+<li><span class="math inline">\(H_1:\)</span> not <span class="math inline">\(H_0\)</span></li>
+</ul>
+<p>we use the <code>linearHypothesis()</code> function of the <code>{car}</code> package as follows:</p>
+<pre class="r"><code>library(car)
+linearHypothesis(model4, c(&quot;wt = 0&quot;, &quot;qsec = 0&quot;))</code></pre>
+<pre><code>## Linear hypothesis test
+## 
+## Hypothesis:
+## wt = 0
+## qsec = 0
+## 
+## Model 1: restricted model
+## Model 2: mpg ~ wt + qsec + am
+## 
+##   Res.Df    RSS Df Sum of Sq      F   Pr(&gt;F)    
+## 1     30 720.90                                 
+## 2     28 169.29  2    551.61 45.618 1.55e-09 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>We reject the null hypothesis and we conclude that at least one of <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span> is different from 0 (<span class="math inline">\(p\)</span>-value = 1.55e-09).</p>
+</div>
+<div id="overall-effect-of-categorical-variables" class="section level3">
+<h3>Overall effect of categorical variables</h3>
+<p>When the independent variables are categorical with <span class="math inline">\(k\)</span> categories, the regression table provides <span class="math inline">\(k-1\)</span> <span class="math inline">\(p\)</span>-values:</p>
+<pre class="r"><code>model5 &lt;- lm(mpg ~ vs + am + as.factor(cyl),
+  data = dat
+)
+
+summary(model5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ vs + am + as.factor(cyl), data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.2821 -1.4402  0.0391  1.8845  6.2179 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)       22.809      2.928   7.789 2.24e-08 ***
+## vsStraight         1.708      2.235   0.764  0.45135    
+## amManual           3.165      1.528   2.071  0.04805 *  
+## as.factor(cyl)6   -5.399      1.837  -2.938  0.00668 ** 
+## as.factor(cyl)8   -8.161      2.892  -2.822  0.00884 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.097 on 27 degrees of freedom
+## Multiple R-squared:  0.7701, Adjusted R-squared:  0.736 
+## F-statistic: 22.61 on 4 and 27 DF,  p-value: 2.741e-08</code></pre>
+<p>The variables <code>vs</code> and <code>am</code> have 2 levels so one is displayed in the regression output. The variable <code>cyl</code> has 3 levels (4, 6 and 8) so 2 of them are displayed. The overall effect of <code>vs</code> and <code>am</code> are reported in the <code>Pr(&gt;|t|)</code> column, but not the <strong>overall</strong> effect of <code>cyl</code> because there are more than 2 levels for this variable.</p>
+<p>To get the <span class="math inline">\(p\)</span>-value of the overall effect of a categorical variable, we need to get an analysis of variance table via the <code>Anova()</code> function from the <code>{car}</code> package:<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a></p>
+<pre class="r"><code>library(car)
+Anova(model5)</code></pre>
+<pre><code>## Anova Table (Type II tests)
+## 
+## Response: mpg
+##                 Sum Sq Df F value  Pr(&gt;F)  
+## vs               5.601  1  0.5841 0.45135  
+## am              41.122  1  4.2886 0.04805 *
+## as.factor(cyl)  94.591  2  4.9324 0.01493 *
+## Residuals      258.895 27                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>From this analysis of variance table, we conclude that:</p>
+<ul>
+<li><code>vs</code> is not significantly associated with <code>mpg</code> (<span class="math inline">\(p\)</span>-value = 0.451)</li>
+<li><code>am</code> and <code>cyl</code> are significantly associated with <code>mpg</code> (<span class="math inline">\(p\)</span>-values &lt; 0.05)</li>
+</ul>
+</div>
+<div id="interaction" class="section level3">
+<h3>Interaction</h3>
+<p>So far we have covered multiple linear regression without any interaction. There is an <strong>interaction</strong> effect between factors A and B <strong>if the effect of factor A on the response depends on the level taken by factor B</strong>.</p>
+<p>In R, interaction can be added as follows:</p>
+<pre class="r"><code>model6 &lt;- lm(mpg ~ wt + am + wt:am,
+  data = dat
+)
+
+# Or in a shorter way:
+model6 &lt;- lm(mpg ~ wt * am,
+  data = dat
+)
+
+summary(model6)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt * am, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.6004 -1.5446 -0.5325  0.9012  6.0909 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  31.4161     3.0201  10.402 4.00e-11 ***
+## wt           -3.7859     0.7856  -4.819 4.55e-05 ***
+## amManual     14.8784     4.2640   3.489  0.00162 ** 
+## wt:amManual  -5.2984     1.4447  -3.667  0.00102 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.591 on 28 degrees of freedom
+## Multiple R-squared:  0.833,  Adjusted R-squared:  0.8151 
+## F-statistic: 46.57 on 3 and 28 DF,  p-value: 5.209e-11</code></pre>
+<p>From the output we conclude that there is an interaction between the weight and the transmission (<span class="math inline">\(p\)</span>-value = 0.00102). This means that the effect of the weight on the distance traveled with a gallon <strong>depends on the transmission type</strong>.</p>
+<p>The easiest way to handle interaction is to visualize the relationship for each level of the categorical variable:</p>
+<pre class="r"><code>visreg(model6, &quot;wt&quot;, by = &quot;am&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We see that the relationship between weight and miles/gallon is stronger (the slope is steeper) for cars with a manual transmission compared to cars with an automatic transmission.</p>
+<p>This is a good example to illustrate the point that when studying a relationship between two variables, say <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, if one also has data for other variables which are potentially associated with both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, it is important to include them in the regression and to analyze the relationship <strong>conditionally on these variables</strong>.</p>
+<p>Omitting some variables that should be included in the model may lead to erroneous and misleading conclusions, up to the point that the relationship is completely reversed (a phenomenon referred as <a href="https://en.wikipedia.org/wiki/Simpson%27s_paradox" target="_blank">Simpson’s paradox</a>).</p>
+</div>
+</div>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>In this article, we started with a reminder of <a href="/blog/multiple-linear-regression-made-simple/#simple-linear-regression-reminder">simple linear regression</a> and in particular its <a href="/blog/multiple-linear-regression-made-simple/#principle">principle</a> and how to <a href="/blog/multiple-linear-regression-made-simple/#interpretations-of-coefficients-widehatbeta">interpret the results</a>.</p>
+<p>This laid the foundations for a better understanding of <a href="/blog/multiple-linear-regression-made-simple/#multiple-linear-regression">multiple linear regression</a>. After explaining its <a href="/blog/multiple-linear-regression-made-simple/#principle-1">principle</a>, we showed how to <a href="/blog/multiple-linear-regression-made-simple/#interpretations-of-coefficients-widehatbeta-1">interpret the output</a> and how to choose a <a href="/blog/multiple-linear-regression-made-simple/#how-to-choose-a-good-linear-model">good linear model</a>. We then mentioned a couple of <a href="/blog/multiple-linear-regression-made-simple/#visualizations-1">visualizations</a> and finished the article with some more <a href="/blog/multiple-linear-regression-made-simple/#to-go-further">advanced topics</a>.</p>
+<p>Thanks for reading. I hope this article helped you to understand better linear regression and gave you the confidence to do your own regressions in R.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-austin2015number" class="csl-entry">
+Austin, Peter C, and Ewout W Steyerberg. 2015. <span>“The Number of Subjects Per Variable Required in Linear Regression Analyses.”</span> <em>Journal of Clinical Epidemiology</em> 68 (6): 627–36.
+</div>
+<div id="ref-ernst2017regression" class="csl-entry">
+Ernst, Anja F, and Casper J Albers. 2017. <span>“Regression Assumptions in Clinical Psychology Research Practice?a Systematic Review of Common Misconceptions.”</span> <em>PeerJ</em> 5: e3323.
+</div>
+<div id="ref-james2013introduction" class="csl-entry">
+James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2013. <em>An Introduction to Statistical Learning</em>. Vol. 112. Springer.
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Some people see regression analysis as a part of inferential statistics. It is true, as a sample is taken to evaluate the link between two or more variables in a population of interest. I tend to distinguish regression from inferential statistics for the simple reasons that (i) regressions are often used to a broader extent (for predictive analyses, among others), and because (ii) the main goal of linear regression (see this <a href="/blog/multiple-linear-regression-made-simple/#simple-linear-regression-reminder">section</a>) differs from the objectives of confidence intervals and hypothesis testing well known in the field of inferential statistics.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Formally, ANOVA can also be used to compare 2 groups, but in practice we tend to use it for 3 or more groups, leaving the t-test for 2 groups.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>More information about the dataset can be found by executing <code>?mtcars</code>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Note that it best to avoid interpreting the intercept when <span class="math inline">\(X\)</span> cannot be equal to 0 or when it makes no sense in practice.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p><span class="math inline">\(n\)</span> is the number of observations.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>Other values than 0 are accepted as well. In that case, the test statistic becomes <span class="math inline">\(T_{n - 2} = \frac{\widehat\beta - a}{se(\widehat\beta_1)}\)</span> where <span class="math inline">\(a\)</span> is the hypothesized slope.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>You can always change the reference level with the <code>relevel()</code> function. See more <a href="/blog/data-manipulation-in-r/">data manipulation techniques</a>.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>Note that linearity can also be tested on the residuals.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>After installing the <code>{performance}</code> package, you will also need to install the <code>{see}</code> package manually. See <a href="/blog/an-efficient-way-to-install-and-load-r-packages/">how to install a R package</a> if you need more help.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p>If you apply a logarithmic transformation, see two guides on how to interpret the results: in <a href="https://sites.google.com/site/curtiskephart/ta/econ113/interpreting-beta" target="_blank">English</a>, in <a href="https://www.parisschoolofeconomics.eu/docs/yin-remi/interpretation-des-coefficients.pdf" target="_blank">French</a>.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
+<li id="fn11"><p>I use the threshold of 10 because, as shown by <span class="citation"><a href="#ref-james2013introduction" role="doc-biblioref">James et al.</a> (<a href="#ref-james2013introduction" role="doc-biblioref">2013</a>)</span>, a value between 5 and 10 indicates a moderate correlation, while VIF values greater than 10 indicate a high and <em>non-tolerable</em> correlation.<a href="#fnref11" class="footnote-back">↩︎</a></p></li>
+<li id="fn12"><p><span class="citation"><a href="#ref-austin2015number" role="doc-biblioref">Austin and Steyerberg</a> (<a href="#ref-austin2015number" role="doc-biblioref">2015</a>)</span> showed that two subjects per variable tends to permit accurate estimation of regression coefficients in a linear regression model estimated using ordinary least squares. Our dataset contains 32 observations, way above the minimum of two subjects per variable.<a href="#fnref12" class="footnote-back">↩︎</a></p></li>
+<li id="fn13"><p>Note that a high <span class="math inline">\(R^2\)</span> does not guarantee that you selected the best variables or that your model is good. It simply tells that the model fits the data quite well. It is advised to apply common sense when comparing models and not only refer to <span class="math inline">\(R^2\)</span> (in particular when <span class="math inline">\(R^2\)</span> are close).<a href="#fnref13" class="footnote-back">↩︎</a></p></li>
+<li id="fn14"><p>There are two main methods; backward and forward. The backward method consists in starting from the model containing all the explanatory variables likely to be relevant, then recursively removing the variable which reduces the information criterion of the model, until no reduction is possible. The forward method is the reverse of the backward method in the sense that we start from a one-variable model with the lowest information criterion and at each step, an explanatory variable is added. By default, the <code>step()</code> function in R combines the backward and forward methods.<a href="#fnref14" class="footnote-back">↩︎</a></p></li>
+<li id="fn15"><p>To not be confused with the <code>anova()</code> function because it provides results that depend on the order in which the variables appear in the model.<a href="#fnref15" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
