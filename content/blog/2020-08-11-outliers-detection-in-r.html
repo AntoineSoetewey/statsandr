@@ -17,18 +17,21 @@ output:
 bibliography: bibliography.bib
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#descriptive-statistics">Descriptive statistics</a><ul>
+<li><a href="#descriptive-statistics">Descriptive statistics</a>
+<ul>
 <li><a href="#minimum-and-maximum">Minimum and maximum</a></li>
 <li><a href="#histogram">Histogram</a></li>
 <li><a href="#boxplot">Boxplot</a></li>
 <li><a href="#percentiles">Percentiles</a></li>
 </ul></li>
 <li><a href="#hampel-filter">Hampel filter</a></li>
-<li><a href="#statistical-tests">Statistical tests</a><ul>
+<li><a href="#statistical-tests">Statistical tests</a>
+<ul>
 <li><a href="#grubbss-test">Grubbs’s test</a></li>
 <li><a href="#dixons-test">Dixon’s test</a></li>
 <li><a href="#rosners-test">Rosner’s test</a></li>
@@ -41,7 +44,7 @@ bibliography: bibliography.bib
 <p><img src="/blog/2020-08-11-outliers-detection-in-r_files/outliers-detection-in-R.jpeg" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>An <strong>outlier</strong> is a value or an <strong>observation that is distant from other observations</strong>, that is to say, a data point that differs significantly from other data points. <span class="citation">Enderlein (<a href="#ref-enderlein1987hawkins" role="doc-biblioref">1987</a>)</span> goes even further as the author considers outliers as values that deviate so much from other observations one might suppose a different underlying sampling mechanism.</p>
+<p>An <strong>outlier</strong> is a value or an <strong>observation that is distant from other observations</strong>, that is to say, a data point that differs significantly from other data points. <span class="citation"><a href="#ref-enderlein1987hawkins" role="doc-biblioref">Enderlein</a> (<a href="#ref-enderlein1987hawkins" role="doc-biblioref">1987</a>)</span> goes even further as the author considers outliers as values that deviate so much from other observations one might suppose a different underlying sampling mechanism.</p>
 <p>An observation must always be compared to other observations made on the same phenomenon before actually calling it an outlier. Indeed, someone who is 200 cm tall (6’7" in US) will most likely be considered as an outlier compared to the general population, but that same person may not be considered as an outlier if we measured the height of basketball players.</p>
 <p>An outlier may be due to the variability inherent in the observed phenomenon. For example, it is often the case that there are outliers when collecting data on salaries, as some people make much more money than the rest. Outliers can also arise due to an experimental, measurement or encoding error. For instance, a human weighting 786 kg (1733 pounds) is clearly an error when encoding the weight of the subject. Her or his weight is most probably 78.6 kg (173 pounds) or 7.86 kg (17 pounds) depending on whether weights of adults or babies have been measured.</p>
 <p>For this reason, it sometimes makes sense to formally distinguish two classes of outliers: (i) extreme values and (ii) mistakes. Extreme values are statistically and philosophically more interesting, because they are possible but unlikely responses. (Thanks Felix Kluxen for the valuable suggestion.)</p>
@@ -50,7 +53,7 @@ bibliography: bibliography.bib
 <p>This article will not tell you whether you should remove outliers or not (nor if you should impute them with the median, mean, mode or any other value), but it will help you to detect them in order to, as a first step, verify them. After their verification, it is then your choice to exclude or include them for your analyses (and this usually requires a thoughtful reflection on the researcher’s side). Removing or keeping outliers mostly depend on three factors:</p>
 <ol style="list-style-type: decimal">
 <li>The domain/context of your analyses and the research question. In some domains, it is common to remove outliers as they often occur due to a malfunctioning process. In other fields, outliers are kept because they contain valuable information. It also happens that analyses are performed twice, once with and once without outliers to evaluate their impact on the conclusions. If results change drastically due to some influential values, this should caution the researcher to make overambitious claims.</li>
-<li>Whether the tests you are going to apply are robust to the presence of outliers or not. For instance, the slope of a simple linear regression may significantly varies with just one outlier, whereas non-parametric tests such as the <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/">Wilcoxon test</a> are usually robust to outliers.</li>
+<li>Whether the tests you are going to apply are robust to the presence of outliers or not. For instance, the slope of a simple <a href="/blog/multiple-linear-regression-made-simple/">linear regression</a> may significantly varies with just one outlier, whereas non-parametric tests such as the <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/">Wilcoxon test</a> are usually robust to outliers.</li>
 <li>How distant are the outliers from other observations? Some observations considered as outliers (according to the techniques presented below) are actually not really extreme compared to all other observations, while other potential outliers may be really distant from the rest of the observations.</li>
 </ol>
 <p>The dataset <code>mpg</code> from the <code>{ggplot2}</code> package will be used to illustrate the different approaches of outliers detection in R, and in particular we will focus on the variable <code>hwy</code> (highway miles per gallon).</p>
@@ -121,12 +124,12 @@ out_ind</code></pre>
 <pre><code>## [1] 213 222 223</code></pre>
 <p>With this information you can now easily go back to the specific rows in the dataset to verify them, or print all variables for these outliers:</p>
 <pre class="r"><code>dat[out_ind, ]</code></pre>
-<pre><code>## # A tibble: 3 x 11
-##   manufacturer model   displ  year   cyl trans   drv     cty   hwy fl    class  
-##   &lt;chr&gt;        &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;  
-## 1 volkswagen   jetta     1.9  1999     4 manual… f        33    44 d     compact
-## 2 volkswagen   new be…   1.9  1999     4 manual… f        35    44 d     subcom…
-## 3 volkswagen   new be…   1.9  1999     4 auto(l… f        29    41 d     subcom…</code></pre>
+<pre><code>## # A tibble: 3 × 11
+##   manufacturer model      displ  year   cyl trans  drv     cty   hwy fl    class
+##   &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;
+## 1 volkswagen   jetta        1.9  1999     4 manua… f        33    44 d     comp…
+## 2 volkswagen   new beetle   1.9  1999     4 manua… f        35    44 d     subc…
+## 3 volkswagen   new beetle   1.9  1999     4 auto(… f        29    41 d     subc…</code></pre>
 <p>It is also possible to print the values of the outliers directly on the boxplot with the <code>mtext()</code> function:</p>
 <pre class="r"><code>boxplot(dat$hwy,
   ylab = &quot;hwy&quot;,
@@ -153,7 +156,7 @@ outlier_ind</code></pre>
 <pre><code>##  [1]  55  60  66  70 106 107 127 197 213 222 223</code></pre>
 <p>Then their values of highway miles per gallon can be printed:</p>
 <pre class="r"><code>dat[outlier_ind, &quot;hwy&quot;]</code></pre>
-<pre><code>## # A tibble: 11 x 1
+<pre><code>## # A tibble: 11 × 1
 ##      hwy
 ##    &lt;int&gt;
 ##  1    12
@@ -169,7 +172,7 @@ outlier_ind</code></pre>
 ## 11    41</code></pre>
 <p>Alternatively, all variables for these outliers can be printed:</p>
 <pre class="r"><code>dat[outlier_ind, ]</code></pre>
-<pre><code>## # A tibble: 11 x 11
+<pre><code>## # A tibble: 11 × 11
 ##    manufacturer model    displ  year   cyl trans  drv     cty   hwy fl    class 
 ##    &lt;chr&gt;        &lt;chr&gt;    &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; 
 ##  1 dodge        dakota …   4.7  2008     8 auto(… 4         9    12 e     pickup
@@ -190,12 +193,12 @@ upper_bound &lt;- quantile(dat$hwy, 0.99)
 outlier_ind &lt;- which(dat$hwy &lt; lower_bound | dat$hwy &gt; upper_bound)
 
 dat[outlier_ind, ]</code></pre>
-<pre><code>## # A tibble: 3 x 11
-##   manufacturer model   displ  year   cyl trans   drv     cty   hwy fl    class  
-##   &lt;chr&gt;        &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;  
-## 1 volkswagen   jetta     1.9  1999     4 manual… f        33    44 d     compact
-## 2 volkswagen   new be…   1.9  1999     4 manual… f        35    44 d     subcom…
-## 3 volkswagen   new be…   1.9  1999     4 auto(l… f        29    41 d     subcom…</code></pre>
+<pre><code>## # A tibble: 3 × 11
+##   manufacturer model      displ  year   cyl trans  drv     cty   hwy fl    class
+##   &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;
+## 1 volkswagen   jetta        1.9  1999     4 manua… f        33    44 d     comp…
+## 2 volkswagen   new beetle   1.9  1999     4 manua… f        35    44 d     subc…
+## 3 volkswagen   new beetle   1.9  1999     4 auto(… f        29    41 d     subc…</code></pre>
 <p>Setting the percentiles to 1 and 99 gives the same potential outliers as with the IQR criterion.</p>
 </div>
 </div>
@@ -434,9 +437,9 @@ res &lt;- aq.plot(Y)</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
-<div id="refs" class="references">
-<div id="ref-enderlein1987hawkins">
-<p>Enderlein, G. 1987. “Hawkins, Dm: Identification of Outliers. Chapman and Hall, London–New York 1980, 188 S.,£ 14, 50.” <em>Biometrical Journal</em> 29 (2): 198–98.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-enderlein1987hawkins" class="csl-entry">
+Enderlein, G. 1987. <span>“Hawkins, DM: Identification of Outliers. Chapman and Hall, London–New York 1980, 188 s.,<span>£</span> 14, 50.”</span> <em>Biometrical Journal</em> 29 (2): 198–98.
 </div>
 </div>
 </div>
