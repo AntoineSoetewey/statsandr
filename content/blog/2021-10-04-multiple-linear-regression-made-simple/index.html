@@ -374,6 +374,7 @@ summary(model2)</code></pre>
 <li>the test of <span class="math inline">\(\beta_3 = 0\)</span> corresponds to testing the hypothesis: is fuel consumption associated with displacement, at a constant level of weight and displacement</li>
 <li>(for the sake of completeness: the test of <span class="math inline">\(\beta_0 = 0\)</span> corresponds to testing the hypothesis: is miles/gallon different from 0 when weight, horsepower and displacement are equal to 0)</li>
 </ul>
+<p>In practice, we usually check the conditions of application <em>before</em> interpreting the coefficients (because if they are not respected, results may be biased). In this article, however, I present the interpretations before testing the conditions because the point is to show how to interpret the results, and less about finding a valid model.</p>
 <p>Based on the output of our model, we conclude that:</p>
 <ul>
 <li>There is a significant and negative relationship between miles/gallon and weight, <strong>all else being equal</strong>. So for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles/gallon decreases, on average, by 3.8, for a constant level of horsepower and displacement (<span class="math inline">\(p\)</span>-value = 0.001).</li>
@@ -450,7 +451,7 @@ check_model(model2)</code></pre>
 <li>Multicollinearity (middle left plot) is not an issue (I tend to use the threshold of 10 for VIF, and all of them are below 10)<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a></li>
 <li>There is no influential points (middle right plot)</li>
 <li>Normality of the residuals (two bottom plots) is also not perfect due to 3 points deviating from the reference line but it still seems acceptable to me. In any case, the number of observations is large enough given the number of parameters<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a> and given the small deviation from normality so tests on the coefficients are (approximately) valid whether the error follows a normal distribution or not</li>
-<li>Linearity (top left plot) is not perfect so let’s check each independent variables separately:</li>
+<li>Linearity (top left plot) is not perfect so let’s check each independent variable separately:</li>
 </ul>
 <pre class="r"><code># weight
 ggplot(dat, aes(x = wt, y = mpg)) +
@@ -829,7 +830,7 @@ James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2013. <em>A
 <li id="fn6"><p>Other values than 0 are accepted as well. In that case, the test statistic becomes <span class="math inline">\(T_{n - 2} = \frac{\widehat\beta - a}{se(\widehat\beta_1)}\)</span> where <span class="math inline">\(a\)</span> is the hypothesized slope.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
 <li id="fn7"><p>Note that linearity can be checked with a scatterplot of the two variables, or via a scatterplot of the residuals and the fitted values. See more about this in this <a href="/blog/multiple-linear-regression-made-simple/#conditions-of-application-1">section</a>.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
 <li id="fn8"><p>You can always change the reference level with the <code>relevel()</code> function. See more <a href="/blog/data-manipulation-in-r/">data manipulation techniques</a>.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
-<li id="fn9"><p>Note that linearity can also be tested on the residuals.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>Note that linearity can also be tested with a scatterplot of the residuals and the fitted values.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
 <li id="fn10"><p>After installing the <code>{performance}</code> package, you will also need to install the <code>{see}</code> package manually. See <a href="/blog/an-efficient-way-to-install-and-load-r-packages/">how to install a R package</a> if you need more help.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
 <li id="fn11"><p>I use the threshold of 10 because, as shown by <span class="citation"><a href="#ref-james2013introduction" role="doc-biblioref">James et al.</a> (<a href="#ref-james2013introduction" role="doc-biblioref">2013</a>)</span>, a value between 5 and 10 indicates a moderate correlation, while VIF values greater than 10 indicate a high and <em>non-tolerable</em> correlation.<a href="#fnref11" class="footnote-back">↩︎</a></p></li>
 <li id="fn12"><p><span class="citation"><a href="#ref-austin2015number" role="doc-biblioref">Austin and Steyerberg</a> (<a href="#ref-austin2015number" role="doc-biblioref">2015</a>)</span> showed that two subjects per variable tends to permit accurate estimation of regression coefficients in a linear regression model estimated using ordinary least squares. Our dataset contains 32 observations, way above the minimum of two subjects per variable.<a href="#fnref12" class="footnote-back">↩︎</a></p></li>

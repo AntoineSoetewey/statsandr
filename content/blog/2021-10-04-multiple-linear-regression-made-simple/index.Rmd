@@ -405,6 +405,8 @@ In other words:
 - the test of $\beta_3 = 0$ corresponds to testing the hypothesis: is fuel consumption associated with displacement, at a constant level of weight and displacement
 - (for the sake of completeness: the test of $\beta_0 = 0$ corresponds to testing the hypothesis: is miles/gallon different from 0 when weight, horsepower and displacement are equal to 0)
 
+In practice, we usually check the conditions of application *before* interpreting the coefficients (because if they are not respected, results may be biased). In this article, however, I present the interpretations before testing the conditions because the point is to show how to interpret the results, and less about finding a valid model.
+
 Based on the output of our model, we conclude that:
 
 - There is a significant and negative relationship between miles/gallon and weight, **all else being equal**. So for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles/gallon decreases, on average, by `r -1 * round(coef(model2)[2], 2)`, for a constant level of horsepower and displacement ($p$-value = 0.001).
@@ -441,7 +443,7 @@ Based on the output of our model, we conclude that:
 
 As for simple linear regression, multiple linear regression requires some conditions of application for the model to be usable and the results to be interpretable. Conditions for simple linear regression also apply to multiple linear regression, that is:
 
-1. **Linearity** of the relationships between the dependent and independent variables^[Note that linearity can also be tested on the residuals.]
+1. **Linearity** of the relationships between the dependent and independent variables^[Note that linearity can also be tested with a scatterplot of the residuals and the fitted values.]
 1. **Independence** of the observations
 1. **Normality** of the residuals
 1. **Homoscedasticity** of the residuals
@@ -469,7 +471,7 @@ In addition to testing all conditions at the same time, it also gives insight on
 - Multicollinearity (middle left plot) is not an issue (I tend to use the threshold of 10 for VIF, and all of them are below 10)^[I use the threshold of 10 because, as shown by @james2013introduction, a value between 5 and 10 indicates a moderate correlation, while VIF values greater than 10 indicate a high and *non-tolerable* correlation.]
 - There is no influential points (middle right plot)
 - Normality of the residuals (two bottom plots) is also not perfect due to 3 points deviating from the reference line but it still seems acceptable to me. In any case, the number of observations is large enough given the number of parameters^[@austin2015number showed that two subjects per variable tends to permit accurate estimation of regression coefficients in a linear regression model estimated using ordinary least squares. Our dataset contains 32 observations, way above the minimum of two subjects per variable.] and given the small deviation from normality so tests on the coefficients are (approximately) valid whether the error follows a normal distribution or not
-- Linearity (top left plot) is not perfect so let's check each independent variables separately:
+- Linearity (top left plot) is not perfect so let's check each independent variable separately:
 
 ```{r}
 # weight
