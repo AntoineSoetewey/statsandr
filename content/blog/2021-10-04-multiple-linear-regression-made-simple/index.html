@@ -232,7 +232,7 @@ ggplot(dat, aes(x = wt, y = mpg)) +
 <h2>Conditions of application</h2>
 <p>Linear regression cannot be used in all situations. In addition to the requirement that the dependent variable must be a continuous quantitative variables, simple linear regression requires that the data satisfy the following conditions:</p>
 <ol style="list-style-type: decimal">
-<li><strong>Linearity:</strong> The relationship between the two variables should be linear (at least roughly). For this reason it is always necessary to represent graphically the data with a scatterplot before performing a simple linear regression.</li>
+<li><strong>Linearity:</strong> The relationship between the two variables should be linear (at least roughly). For this reason it is always necessary to represent graphically the data with a scatterplot before performing a simple linear regression.<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></li>
 </ol>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <ol start="2" style="list-style-type: decimal">
@@ -382,7 +382,7 @@ summary(model2)</code></pre>
 <li>(For completeness but it should be interpreted only when it makes sense: for a weight, horsepower and displacement = 0, we can expect that a car has, on average, a fuel consumption of 37.11 miles/gallon (<span class="math inline">\(p\)</span>-value &lt; 0.001).)</li>
 </ul>
 <p>This is how to interpret quantitative independent variables. <strong>Interpreting qualitative independent variables</strong> is slightly different in the sense that it quantifies the effect of a level in comparison with the reference level, sill all else being equal. So it compares the different groups (formed by the different levels of the categorical variable) in terms of the dependent variable (this is why linear regression can be seen as an extension to the t-test and ANOVA).</p>
-<p>For the illustration, we model the fuel consumption (<code>mpg</code>) on the weight (<code>wt</code>) and the shape of the engine (<code>vs</code>). The variable <code>vs</code> has two levels: V-shaped (the <a href="/blog/data-manipulation-in-r/#change-reference-level">reference level</a>) and straight engine.<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
+<p>For the illustration, we model the fuel consumption (<code>mpg</code>) on the weight (<code>wt</code>) and the shape of the engine (<code>vs</code>). The variable <code>vs</code> has two levels: V-shaped (the <a href="/blog/data-manipulation-in-r/#change-reference-level">reference level</a>) and straight engine.<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></p>
 <pre class="r"><code>## Recoding dat$vs
 library(forcats)
 dat$vs &lt;- as.character(dat$vs)
@@ -426,7 +426,7 @@ summary(model3)</code></pre>
 <h2>Conditions of application</h2>
 <p>As for simple linear regression, multiple linear regression requires some conditions of application for the model to be usable and the results to be interpretable. Conditions for simple linear regression also apply to multiple linear regression, that is:</p>
 <ol style="list-style-type: decimal">
-<li><strong>Linearity</strong> of the relationships between the dependent and independent variables<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></li>
+<li><strong>Linearity</strong> of the relationships between the dependent and independent variables<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a></li>
 <li><strong>Independence</strong> of the observations</li>
 <li><strong>Normality</strong> of the residuals</li>
 <li><strong>Homoscedasticity</strong> of the residuals</li>
@@ -436,7 +436,7 @@ summary(model3)</code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li><strong>No multicollinearity:</strong> Multicollinearity arises when there is a strong linear <strong><a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation</a> between the independent variables</strong>, conditional on the other variables in the model. It is important to check it because it may lead to an imprecision or an instability of the estimated parameters when a variable changes. It can be assessed by studying the correlation between each pair of independent variables, or even better, by computing the variance inflation factor (VIF). The VIF measures how much the variance of an estimated regression coefficient increases, relative to a situation in which the explanatory variables are strictly independent. A high value of VIF is a sign of multicollinearity (the threshold is generally admitted at 5 or 10 depending on the domain). The easiest way to reduce the VIF is to remove some correlated independent variables, or eventually to <a href="/blog/data-manipulation-in-r/#scale">standardize</a> the data.</li>
 </ol>
-<p>You will often see that these conditions are verified by running <code>plot(model, which = 1:6)</code> and it is totally correct. However, I recently discovered the <code>check_model()</code> function from the <code>{performance}</code> package which tests these conditions all at the same time (and let’s be honest, in a more elegant way).<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a></p>
+<p>You will often see that these conditions are verified by running <code>plot(model, which = 1:6)</code> and it is totally correct. However, I recently discovered the <code>check_model()</code> function from the <code>{performance}</code> package which tests these conditions all at the same time (and let’s be honest, in a more elegant way).<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></p>
 <p>Applied on our <code>model2</code> with miles/gallon as dependent variable, and weight, horsepower and displacement as independent variables, we have:</p>
 <pre class="r"><code># install.packages(&quot;performance&quot;)
 # install.packages(&quot;see&quot;)
@@ -446,13 +446,30 @@ check_model(model2)</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In addition to testing all conditions at the same time, it also gives insight on how to interpret the different diagnostic plots and what you should expect (see in the subtitles of each plot):</p>
 <ul>
-<li>Linearity (top left plot) is not perfect—a variable could be removed/added or a transformation could be applied to improve linearity<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></li>
 <li>Homogeneity of variance (top right plot) is respected</li>
 <li>Multicollinearity (middle left plot) is not an issue (I tend to use the threshold of 10 for VIF, and all of them are below 10)<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a></li>
 <li>There is no influential points (middle right plot)</li>
 <li>Normality of the residuals (two bottom plots) is also not perfect due to 3 points deviating from the reference line but it still seems acceptable to me. In any case, the number of observations is large enough given the number of parameters<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a> and given the small deviation from normality so tests on the coefficients are (approximately) valid whether the error follows a normal distribution or not</li>
+<li>Linearity (top left plot) is not perfect so let’s check each independent variables separately:</li>
 </ul>
-<p>When the conditions of application are met, we usually say that the model is valid. But not all valid models are <em>good</em> models.</p>
+<pre class="r"><code># weight
+ggplot(dat, aes(x = wt, y = mpg)) +
+  geom_point() +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># horsepower
+ggplot(dat, aes(x = hp, y = mpg)) +
+  geom_point() +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># displacement
+ggplot(dat, aes(x = disp, y = mpg)) +
+  geom_point() +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-3.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>It seems that the relationship between miles/gallon and horsepower is not linear, which could be the main component of the slight linearity defect of the model. To improve linearity, the variable could be removed or a transformation could be applied (logarithmic and/or squared for instance).<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a></p>
+<p>For the sake of easiness and for illustrative purposes, we assume linearity for the rest of the article.</p>
+<p>When the conditions of application are met, we usually say that the model is valid. But not all valid models are <em>good</em> models. The next section deals with model selection.</p>
 </div>
 <div id="how-to-choose-a-good-linear-model" class="section level2">
 <h2>How to choose a good linear model?</h2>
@@ -505,7 +522,7 @@ check_model(model2)</code></pre>
 <li><span class="math inline">\(R^2 = 0\)</span>: the model explains nothing</li>
 <li><span class="math inline">\(R^2 = 1\)</span>: the model explains everything</li>
 <li><span class="math inline">\(0 &lt; R^2 &lt; 1\)</span>: the model explains part of the variability</li>
-<li>the higher the <span class="math inline">\(R^2\)</span>, the better the model explains the dependent variable. As a rule of thumb, a <span class="math inline">\(R^2 &gt; 0.7\)</span> indicates a good fit of the model<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a></li>
+<li>the higher the <span class="math inline">\(R^2\)</span>, the better the model explains the dependent variable. As a rule of thumb, a <span class="math inline">\(R^2 &gt; 0.7\)</span> indicates a good fit of the model<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a></li>
 </ul>
 <p>Note that in a simple linear regression model, the coefficient of determination is equal to the square of the <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation coefficient</a>: <span class="math inline">\(R^2 = corr(X, Y)^2\)</span>.</p>
 <p>Applied on our <code>model2</code> with miles/gallon as dependent variable, and weight, horsepower and displacement as independent variables, we have:</p>
@@ -539,7 +556,7 @@ check_model(model2)</code></pre>
 <p>A <strong>parsimonious model (few variables) is usually preferred</strong> over a complex model (many variables). There are two ways to obtain a parsimonious model from a model with many independent variables:</p>
 <ol style="list-style-type: decimal">
 <li>We can <strong>iteratively remove the independent variable least significantly related to the dependent variable</strong> (i.e., the one with the highest <span class="math inline">\(p\)</span>-value in an <a href="/blog/multiple-linear-regression-made-simple/#overall-effect-of-categorical-variables">analysis of variance table</a>) until all of them are significantly associated to the response variable, or</li>
-<li>We can select the model based on the <strong>Akaike Information Criterion (AIC)</strong>. AIC expresses a desire to fit the model with the smallest number of coefficients possible and allows to compare models. According to this criterion, the best model is the one with the lowest AIC. This criterion is based on a compromise between the quality of the fit and its complexity. We usually start from a global model with many independent variables, and the procedure (referred as stepwise algorithm)<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a> automatically compares models then selects the best one according to the AIC.</li>
+<li>We can select the model based on the <strong>Akaike Information Criterion (AIC)</strong>. AIC expresses a desire to fit the model with the smallest number of coefficients possible and allows to compare models. According to this criterion, the best model is the one with the lowest AIC. This criterion is based on a compromise between the quality of the fit and its complexity. We usually start from a global model with many independent variables, and the procedure (referred as stepwise algorithm)<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a> automatically compares models then selects the best one according to the AIC.</li>
 </ol>
 <p>We show how to do the second option in R. For the illustration, we start with a model with all variables in the dataset as independent variables (do not forget to transform the factor variables first):</p>
 <pre class="r"><code>## vs has already been transformed into factor
@@ -598,13 +615,13 @@ model4 &lt;- step(model4, trace = FALSE)</code></pre>
 </ol>
 <pre class="r"><code>library(visreg)
 visreg(model4)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-2.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-3.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-2.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-3.png" width="100%" style="display: block; margin: auto;" /></p>
 <ol start="2" style="list-style-type: decimal">
 <li><code>ggcoefstats()</code> which illustrates the results in one single plot:</li>
 </ol>
 <pre class="r"><code>library(ggstatsplot)
 ggcoefstats(model4)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In this plot:</p>
 <ul>
 <li>when the solid line does not cross the vertical dashed line, the estimates is significantly different from 0 at the 5% significance level (i.e., <span class="math inline">\(p\)</span>-value &lt; 0.05)</li>
@@ -717,7 +734,7 @@ summary(model5)</code></pre>
 ## Multiple R-squared:  0.7701, Adjusted R-squared:  0.736 
 ## F-statistic: 22.61 on 4 and 27 DF,  p-value: 2.741e-08</code></pre>
 <p>The variables <code>vs</code> and <code>am</code> have 2 levels so one is displayed in the regression output. The variable <code>cyl</code> has 3 levels (4, 6 and 8) so 2 of them are displayed. The overall effect of <code>vs</code> and <code>am</code> are reported in the <code>Pr(&gt;|t|)</code> column, but not the <strong>overall</strong> effect of <code>cyl</code> because there are more than 2 levels for this variable.</p>
-<p>To get the <span class="math inline">\(p\)</span>-value of the overall effect of a categorical variable, we need to get an analysis of variance table via the <code>Anova()</code> function from the <code>{car}</code> package:<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a></p>
+<p>To get the <span class="math inline">\(p\)</span>-value of the overall effect of a categorical variable, we need to get an analysis of variance table via the <code>Anova()</code> function from the <code>{car}</code> package:<a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a></p>
 <pre class="r"><code>library(car)
 Anova(model5)</code></pre>
 <pre><code>## Anova Table (Type II tests)
@@ -773,7 +790,7 @@ summary(model6)</code></pre>
 <p>From the output we conclude that there is an interaction between the weight and the transmission (<span class="math inline">\(p\)</span>-value = 0.00102). This means that the effect of the weight on the distance traveled with a gallon <strong>depends on the transmission type</strong>.</p>
 <p>The easiest way to handle interaction is to visualize the relationship for each level of the categorical variable:</p>
 <pre class="r"><code>visreg(model6, &quot;wt&quot;, by = &quot;am&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the relationship between weight and miles/gallon is stronger (the slope is steeper) for cars with a manual transmission compared to cars with an automatic transmission.</p>
 <p>This is a good example to illustrate the point that when studying a relationship between two variables, say <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, if one also has data for other variables which are potentially associated with both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, it is important to include them in the regression and to analyze the relationship <strong>conditionally on these variables</strong>.</p>
 <p>Omitting some variables that should be included in the model may lead to erroneous and misleading conclusions, up to the point that the relationship is completely reversed (a phenomenon referred as <a href="https://en.wikipedia.org/wiki/Simpson%27s_paradox" target="_blank">Simpson’s paradox</a>).</p>
@@ -810,14 +827,15 @@ James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2013. <em>A
 <li id="fn4"><p>Note that it best to avoid interpreting the intercept when <span class="math inline">\(X\)</span> cannot be equal to 0 or when it makes no sense in practice.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
 <li id="fn5"><p><span class="math inline">\(n\)</span> is the number of observations.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
 <li id="fn6"><p>Other values than 0 are accepted as well. In that case, the test statistic becomes <span class="math inline">\(T_{n - 2} = \frac{\widehat\beta - a}{se(\widehat\beta_1)}\)</span> where <span class="math inline">\(a\)</span> is the hypothesized slope.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
-<li id="fn7"><p>You can always change the reference level with the <code>relevel()</code> function. See more <a href="/blog/data-manipulation-in-r/">data manipulation techniques</a>.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
-<li id="fn8"><p>Note that linearity can also be tested on the residuals.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
-<li id="fn9"><p>After installing the <code>{performance}</code> package, you will also need to install the <code>{see}</code> package manually. See <a href="/blog/an-efficient-way-to-install-and-load-r-packages/">how to install a R package</a> if you need more help.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
-<li id="fn10"><p>If you apply a logarithmic transformation, see two guides on how to interpret the results: in <a href="https://sites.google.com/site/curtiskephart/ta/econ113/interpreting-beta" target="_blank">English</a>, in <a href="https://www.parisschoolofeconomics.eu/docs/yin-remi/interpretation-des-coefficients.pdf" target="_blank">French</a>.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>Note that linearity can be checked with a scatterplot of the two variables, or via a scatterplot of the residuals and the fitted values. See more about this in this <a href="/blog/multiple-linear-regression-made-simple/#conditions-of-application-1">section</a>.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>You can always change the reference level with the <code>relevel()</code> function. See more <a href="/blog/data-manipulation-in-r/">data manipulation techniques</a>.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>Note that linearity can also be tested on the residuals.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p>After installing the <code>{performance}</code> package, you will also need to install the <code>{see}</code> package manually. See <a href="/blog/an-efficient-way-to-install-and-load-r-packages/">how to install a R package</a> if you need more help.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
 <li id="fn11"><p>I use the threshold of 10 because, as shown by <span class="citation"><a href="#ref-james2013introduction" role="doc-biblioref">James et al.</a> (<a href="#ref-james2013introduction" role="doc-biblioref">2013</a>)</span>, a value between 5 and 10 indicates a moderate correlation, while VIF values greater than 10 indicate a high and <em>non-tolerable</em> correlation.<a href="#fnref11" class="footnote-back">↩︎</a></p></li>
 <li id="fn12"><p><span class="citation"><a href="#ref-austin2015number" role="doc-biblioref">Austin and Steyerberg</a> (<a href="#ref-austin2015number" role="doc-biblioref">2015</a>)</span> showed that two subjects per variable tends to permit accurate estimation of regression coefficients in a linear regression model estimated using ordinary least squares. Our dataset contains 32 observations, way above the minimum of two subjects per variable.<a href="#fnref12" class="footnote-back">↩︎</a></p></li>
-<li id="fn13"><p>Note that a high <span class="math inline">\(R^2\)</span> does not guarantee that you selected the best variables or that your model is good. It simply tells that the model fits the data quite well. It is advised to apply common sense when comparing models and not only refer to <span class="math inline">\(R^2\)</span> (in particular when <span class="math inline">\(R^2\)</span> are close).<a href="#fnref13" class="footnote-back">↩︎</a></p></li>
-<li id="fn14"><p>There are two main methods; backward and forward. The backward method consists in starting from the model containing all the explanatory variables likely to be relevant, then recursively removing the variable which reduces the information criterion of the model, until no reduction is possible. The forward method is the reverse of the backward method in the sense that we start from a one-variable model with the lowest information criterion and at each step, an explanatory variable is added. By default, the <code>step()</code> function in R combines the backward and forward methods.<a href="#fnref14" class="footnote-back">↩︎</a></p></li>
-<li id="fn15"><p>To not be confused with the <code>anova()</code> function because it provides results that depend on the order in which the variables appear in the model.<a href="#fnref15" class="footnote-back">↩︎</a></p></li>
+<li id="fn13"><p>If you apply a logarithmic transformation, see two guides on how to interpret the results: in <a href="https://sites.google.com/site/curtiskephart/ta/econ113/interpreting-beta" target="_blank">English</a> and in <a href="https://www.parisschoolofeconomics.eu/docs/yin-remi/interpretation-des-coefficients.pdf" target="_blank">French</a>.<a href="#fnref13" class="footnote-back">↩︎</a></p></li>
+<li id="fn14"><p>Note that a high <span class="math inline">\(R^2\)</span> does not guarantee that you selected the best variables or that your model is good. It simply tells that the model fits the data quite well. It is advised to apply common sense when comparing models and not only refer to <span class="math inline">\(R^2\)</span> (in particular when <span class="math inline">\(R^2\)</span> are close).<a href="#fnref14" class="footnote-back">↩︎</a></p></li>
+<li id="fn15"><p>There are two main methods; backward and forward. The backward method consists in starting from the model containing all the explanatory variables likely to be relevant, then recursively removing the variable which reduces the information criterion of the model, until no reduction is possible. The forward method is the reverse of the backward method in the sense that we start from a one-variable model with the lowest information criterion and at each step, an explanatory variable is added. By default, the <code>step()</code> function in R combines the backward and forward methods.<a href="#fnref15" class="footnote-back">↩︎</a></p></li>
+<li id="fn16"><p>To not be confused with the <code>anova()</code> function because it provides results that depend on the order in which the variables appear in the model.<a href="#fnref16" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

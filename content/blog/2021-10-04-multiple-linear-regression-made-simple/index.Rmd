@@ -243,7 +243,7 @@ A statistical model alone cannot establish a causal link between two variables. 
 
 Linear regression cannot be used in all situations. In addition to the requirement that the dependent variable must be a continuous quantitative variables, simple linear regression requires that the data satisfy the following conditions:
 
-1. **Linearity:** The relationship between the two variables should be linear (at least roughly). For this reason it is always necessary to represent graphically the data with a scatterplot before performing a simple linear regression.
+1. **Linearity:** The relationship between the two variables should be linear (at least roughly). For this reason it is always necessary to represent graphically the data with a scatterplot before performing a simple linear regression.^[Note that linearity can be checked with a scatterplot of the two variables, or via a scatterplot of the residuals and the fitted values. See more about this in this [section](/blog/multiple-linear-regression-made-simple/#conditions-of-application-1).]
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 library(MASS)
@@ -465,13 +465,34 @@ check_model(model2)
 
 In addition to testing all conditions at the same time, it also gives insight on how to interpret the different diagnostic plots and what you should expect (see in the subtitles of each plot):
 
-- Linearity (top left plot) is not perfect---a variable could be removed/added or a transformation could be applied to improve linearity^[If you apply a logarithmic transformation, see two guides on how to interpret the results: in [English](https://sites.google.com/site/curtiskephart/ta/econ113/interpreting-beta){target="_blank"}, in [French](https://www.parisschoolofeconomics.eu/docs/yin-remi/interpretation-des-coefficients.pdf){target="_blank"}.]
 - Homogeneity of variance (top right plot) is respected
 - Multicollinearity (middle left plot) is not an issue (I tend to use the threshold of 10 for VIF, and all of them are below 10)^[I use the threshold of 10 because, as shown by @james2013introduction, a value between 5 and 10 indicates a moderate correlation, while VIF values greater than 10 indicate a high and *non-tolerable* correlation.]
 - There is no influential points (middle right plot)
 - Normality of the residuals (two bottom plots) is also not perfect due to 3 points deviating from the reference line but it still seems acceptable to me. In any case, the number of observations is large enough given the number of parameters^[@austin2015number showed that two subjects per variable tends to permit accurate estimation of regression coefficients in a linear regression model estimated using ordinary least squares. Our dataset contains 32 observations, way above the minimum of two subjects per variable.] and given the small deviation from normality so tests on the coefficients are (approximately) valid whether the error follows a normal distribution or not
+- Linearity (top left plot) is not perfect so let's check each independent variables separately:
 
-When the conditions of application are met, we usually say that the model is valid. But not all valid models are *good* models.
+```{r}
+# weight
+ggplot(dat, aes(x=wt, y=mpg))+
+    geom_point() +
+  theme_minimal()
+
+# horsepower
+ggplot(dat, aes(x=hp, y=mpg))+
+    geom_point() +
+  theme_minimal()
+
+# displacement
+ggplot(dat, aes(x=disp, y=mpg))+
+    geom_point() +
+  theme_minimal()
+```
+
+It seems that the relationship between miles/gallon and horsepower is not linear, which could be the main component of the slight linearity defect of the model. To improve linearity, the variable could be removed or a transformation could be applied (logarithmic and/or squared for instance).^[If you apply a logarithmic transformation, see two guides on how to interpret the results: in [English](https://sites.google.com/site/curtiskephart/ta/econ113/interpreting-beta){target="_blank"} and in [French](https://www.parisschoolofeconomics.eu/docs/yin-remi/interpretation-des-coefficients.pdf){target="_blank"}.]
+
+For the sake of easiness and for illustrative purposes, we assume linearity for the rest of the article.
+
+When the conditions of application are met, we usually say that the model is valid. But not all valid models are *good* models. The next section deals with model selection.
 
 ## How to choose a good linear model?
 
