@@ -307,7 +307,22 @@ library(visreg)
 visreg(model)
 ```
 
-Other elements could be displayed on the regression plot (for example the coefficients, the $R^2$, the global $p$-value, etc.). However, I like this approach for its simplicity---only a single line of code.
+I like this approach for its simplicity---only a single line of code.
+
+However, other elements could be displayed on the regression plot (for example the regression equation and the $R^2$). This can easily be done with the `stat_regline_equation()` and `stat_cor()` functions from the `{ggpubr}` package:
+
+```{r}
+# load necessary libraries
+library(ggpubr)
+
+# create plot with regression line, regression equation and R^2
+ggplot(dat, aes(x = wt, y = mpg)) +
+  geom_smooth(method="lm") +
+  geom_point() +
+  stat_regline_equation(label.x=3, label.y=32) + # for regression equation
+  stat_cor(aes(label=..rr.label..), label.x=3, label.y=30) + # for R^2
+  theme_minimal()
+```
 
 # Multiple linear regression
 

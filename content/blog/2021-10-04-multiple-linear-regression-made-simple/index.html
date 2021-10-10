@@ -253,7 +253,19 @@ ggplot(dat, aes(x = wt, y = mpg)) +
 <pre class="r"><code>library(visreg)
 visreg(model)</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<p>Other elements could be displayed on the regression plot (for example the coefficients, the <span class="math inline">\(R^2\)</span>, the global <span class="math inline">\(p\)</span>-value, etc.). However, I like this approach for its simplicity—only a single line of code.</p>
+<p>I like this approach for its simplicity—only a single line of code.</p>
+<p>However, other elements could be displayed on the regression plot (for example the regression equation and the <span class="math inline">\(R^2\)</span>). This can easily be done with the <code>stat_regline_equation()</code> and <code>stat_cor()</code> functions from the <code>{ggpubr}</code> package:</p>
+<pre class="r"><code># load necessary libraries
+library(ggpubr)
+
+# create plot with regression line, regression equation and R^2
+ggplot(dat, aes(x = wt, y = mpg)) +
+  geom_smooth(method = &quot;lm&quot;) +
+  geom_point() +
+  stat_regline_equation(label.x = 3, label.y = 32) + # for regression equation
+  stat_cor(aes(label = ..rr.label..), label.x = 3, label.y = 30) + # for R^2
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="multiple-linear-regression" class="section level1">
@@ -287,7 +299,7 @@ visreg(model)</code></pre>
     size = &quot;Displacement&quot;
   ) +
   theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>It seems that, in addition to the negative relationship between miles per gallon and weight, there is also:</p>
 <ul>
 <li>a negative relationship between miles/gallon and horsepower (lighter points, indicating more horsepower, tend to be more present in low levels of miles per gallon)</li>
@@ -445,7 +457,7 @@ summary(model3)</code></pre>
 library(performance)
 
 check_model(model2)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In addition to testing all conditions at the same time, it also gives insight on how to interpret the different diagnostic plots and what you should expect (see in the subtitles of each plot):</p>
 <ul>
 <li>Homogeneity of variance (top right plot) is respected</li>
@@ -458,17 +470,17 @@ check_model(model2)</code></pre>
 ggplot(dat, aes(x = wt, y = mpg)) +
   geom_point() +
   theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># horsepower
 ggplot(dat, aes(x = hp, y = mpg)) +
   geom_point() +
   theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-2.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># displacement
 ggplot(dat, aes(x = disp, y = mpg)) +
   geom_point() +
   theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-3.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-3.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>It seems that the relationship between miles/gallon and horsepower is not linear, which could be the main component of the slight linearity defect of the model. To improve linearity, the variable could be removed or a transformation could be applied (logarithmic and/or squared for instance).<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a> If this does not fix the issue of linearity, other types of models could be considered.</p>
 <p>For the sake of easiness and for illustrative purposes, we assume linearity for the rest of the article.</p>
 <p>When the conditions of application are met, we usually say that the model is valid. But not all valid models are <em>good</em> models. The next section deals with model selection.</p>
@@ -617,13 +629,13 @@ model4 &lt;- step(model4, trace = FALSE)</code></pre>
 </ol>
 <pre class="r"><code>library(visreg)
 visreg(model4)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-2.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-3.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-2.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-3.png" width="100%" style="display: block; margin: auto;" /></p>
 <ol start="2" style="list-style-type: decimal">
 <li><code>ggcoefstats()</code> which illustrates the results in one single plot:</li>
 </ol>
 <pre class="r"><code>library(ggstatsplot)
 ggcoefstats(model4)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In this plot:</p>
 <ul>
 <li>when the solid line does not cross the vertical dashed line, the estimates is significantly different from 0 at the 5% significance level (i.e., <span class="math inline">\(p\)</span>-value &lt; 0.05)</li>
@@ -792,7 +804,7 @@ summary(model6)</code></pre>
 <p>From the output we conclude that there is an interaction between the weight and the transmission (<span class="math inline">\(p\)</span>-value = 0.00102). This means that the effect of the weight on the distance traveled with a gallon <strong>depends on the transmission type</strong>.</p>
 <p>The easiest way to handle interaction is to visualize the relationship for each level of the categorical variable:</p>
 <pre class="r"><code>visreg(model6, &quot;wt&quot;, by = &quot;am&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the relationship between weight and miles/gallon is stronger (the slope is steeper) for cars with a manual transmission compared to cars with an automatic transmission.</p>
 <p>This is a good example to illustrate the point that when studying a relationship between two variables, say <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, if one also has data for other variables which are potentially associated with both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, it is important to include them in the regression and to analyze the relationship <strong>conditionally on these variables</strong>.</p>
 <p>Omitting some variables that should be included in the model may lead to erroneous and misleading conclusions, up to the point that the relationship is completely reversed (a phenomenon referred as <a href="https://en.wikipedia.org/wiki/Simpson%27s_paradox" target="_blank">Simpson’s paradox</a>).</p>
