@@ -51,6 +51,7 @@ bibliography: bibliography.bib
 <li><a href="#to-go-further">To go further</a>
 <ul>
 <li><a href="#extract-models-equation">Extract model’s equation</a></li>
+<li><a href="#automatic-reporting">Automatic reporting</a></li>
 <li><a href="#predictions">Predictions</a></li>
 <li><a href="#linear-hypothesis-tests">Linear hypothesis tests</a></li>
 <li><a href="#overall-effect-of-categorical-variables">Overall effect of categorical variables</a></li>
@@ -663,6 +664,21 @@ extract_eq(model4,
 \]</span></p>
 <p>The function works for linear regression, but also for many other models such as <a href="/blog/anova-in-r/">ANOVA</a>, GLM, logistic regression, etc.</p>
 </div>
+<div id="automatic-reporting" class="section level3">
+<h3>Automatic reporting</h3>
+<p>The <code>report()</code> function from the package of the same name allows to automatically produces reports of models according to best practices guidelines:</p>
+<pre class="r"><code>library(report)
+
+report(model4)</code></pre>
+<pre><code>## We fitted a linear model (estimated using OLS) to predict mpg with wt, qsec and am (formula: mpg ~ wt + qsec + am). The model explains a statistically significant and substantial proportion of variance (R2 = 0.85, F(3, 28) = 52.75, p &lt; .001, adj. R2 = 0.83). The model&#39;s intercept, corresponding to wt = 0, qsec = 0 and am = Automatic, is at 9.62 (95% CI [-4.64, 23.87], t(28) = 1.38, p = 0.178). Within this model:
+## 
+##   - The effect of wt is statistically significant and negative (beta = -3.92, 95% CI [-5.37, -2.46], t(28) = -5.51, p &lt; .001; Std. beta = -0.64, 95% CI [-0.87, -0.40])
+##   - The effect of qsec is statistically significant and positive (beta = 1.23, 95% CI [0.63, 1.82], t(28) = 4.25, p &lt; .001; Std. beta = 0.36, 95% CI [0.19, 0.54])
+##   - The effect of am [Manual] is statistically significant and positive (beta = 2.94, 95% CI [0.05, 5.83], t(28) = 2.08, p = 0.047; Std. beta = 0.49, 95% CI [7.59e-03, 0.97])
+## 
+## Standardized parameters were obtained by fitting the model on a standardized version of the dataset.</code></pre>
+<p>Note that the function also works for dataframes, statistical tests and other models.</p>
+</div>
 <div id="predictions" class="section level3">
 <h3>Predictions</h3>
 <p>Linear regression is also very often used for <strong>predictive purposes</strong>. Confidence and prediction intervals for <strong>new data</strong> can be computed with the <code>predict()</code> function.</p>
@@ -804,7 +820,7 @@ summary(model6)</code></pre>
 <p>From the output we conclude that there is an interaction between the weight and the transmission (<span class="math inline">\(p\)</span>-value = 0.00102). This means that the effect of the weight on the distance traveled with a gallon <strong>depends on the transmission type</strong>.</p>
 <p>The easiest way to handle interaction is to visualize the relationship for each level of the categorical variable:</p>
 <pre class="r"><code>visreg(model6, &quot;wt&quot;, by = &quot;am&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the relationship between weight and miles/gallon is stronger (the slope is steeper) for cars with a manual transmission compared to cars with an automatic transmission.</p>
 <p>This is a good example to illustrate the point that when studying a relationship between two variables, say <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, if one also has data for other variables which are potentially associated with both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, it is important to include them in the regression and to analyze the relationship <strong>conditionally on these variables</strong>.</p>
 <p>Omitting some variables that should be included in the model may lead to erroneous and misleading conclusions, up to the point that the relationship is completely reversed (a phenomenon referred as <a href="https://en.wikipedia.org/wiki/Simpson%27s_paradox" target="_blank">Simpson’s paradox</a>).</p>
