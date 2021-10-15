@@ -61,7 +61,7 @@ head(dat, n = 5)
 
 ## One-proportion test
 
-For this example, we have a sample of 150 flowers and we want to test whether the proportion of small flowers is the same than the proportion of big flowers (measured by the variable `size`). Here are the number of flowers by size, and the corresponding proportions:
+For this example, we have a sample of 150 flowers and we want to test whether the proportion of small flowers is different than the proportion of big flowers (measured by the variable `size`). Here are the number of flowers by size, and the corresponding proportions:
 
 ```{r}
 # barplot
@@ -78,11 +78,16 @@ table(dat$size)
 round(prop.table(table(dat$size)), 2)
 ```
 
-Among the 150 flowers forming our sample, 51% and 49% are big and small, respectively. To test whether the proportions are the same among both sizes, we use the `prop.test()` function which accepts the following arguments:
+Among the 150 flowers forming our sample, 51% and 49% are big and small, respectively. To test whether the proportions are different among both sizes, we use the `prop.test()` function which accepts the following arguments:
 
 * number of successes
 * number of observations/trials
 * expected probability (the one we want to test against)
+
+The hypotheses in our example are:
+
+* $H_0$: proportions of big and small flowers are equal
+* $H_1$: proportions of big and small flowers are different
 
 Considering (arbitrarily) that `big` is the success, we have:^[Choosing big or small as the success event gives the exact same conclusion.]
 
@@ -161,7 +166,14 @@ ggplot(dat) +
 table(dat$Species)
 ```
 
-The variable `Species` has 3 levels, with 50 observations in each level. Suppose for this example that we want to test whether the 3 species are equally common. If they were equally common, they would be equally distributed and the expected proportions would be $\frac{1}{3}$ for each of the species.
+The variable `Species` has 3 levels, with 50 observations in each level.
+
+Suppose for this example that we want to test whether the 3 species are equally common. If they were equally common, they would be equally distributed and the expected proportions would be $\frac{1}{3}$ for each of the species.
+
+The hypotheses are now:
+
+* $H_0$: proportions of each species are equal
+* $H_1$: there is at least one species with a different proportion^[Be careful that the alternative hypothesis is not that *all* proportions are different. One different from the others is sufficient to reject the null hypothesis. It is, in some sense, similar to the alternative hypothesis of the [ANOVA](/blog/anova-in-r/) which says that at least one mean is different than another.]
 
 This test can be done with the `chisq.test()` function, accepting the following arguments:
 
@@ -171,7 +183,7 @@ This test can be done with the `chisq.test()` function, accepting the following 
 Applied to our research question (i.e., are the 3 species equally common?), we have:
 
 ```{r}
-# goodness of fit test
+# chi-square goodness of fit test
 test <- chisq.test(table(dat$Species), # observed proportions
   p = c(1 / 3, 1 / 3, 1 / 3) # expected proportions
 )
@@ -300,7 +312,7 @@ ggplot() +
 We see that the observed and expected frequencies are quite similar, so we expect that the number of girls in families of 5 children follows a binomial distribution. However, only the goodness of fit test will confirm our belief:
 
 ```{r, warning = FALSE, message = FALSE}
-# goodness of fit test
+# chi-square goodness of fit test
 test <- chisq.test(dat$Freq, # observed frequencies
   p = df$Expected_relative_freq # expected proportions
 )
@@ -310,11 +322,11 @@ test
 
 The *p*-value is `r round(test$p.value, 3)` so, at the 5% significance level, we do not reject the null hypothesis that the observed and expected frequencies are equal. This is equivalent than concluding that we cannot reject the hypothesis that the number of girls in families of 5 children follows a binomial distribution (since the expected frequencies were based on a binomial distribution).
 
-Note that the goodness of fit test can of course be performed with other types of distribution than the binomial one. For instance, if you want to test whether an observed distribution follows a Poisson distribution, this test can be used to compare the observed frequencies with the expected proportions that would be obtained in case of a Poisson distribution.
+Note that the chi-square goodness of fit test can of course be performed with other types of distribution than the binomial one. For instance, if you want to test whether an observed distribution follows a Poisson distribution, this test can be used to compare the observed frequencies with the expected proportions that would be obtained in case of a Poisson distribution.
 
 # By hand
 
-Now that we showed how to perform the one-proportion and goodness of fit test in R, in this section we show how to do these tests by hand. We first illustrate the one-proportion test then the Chi-square goodness of fit test.
+Now that we showed how to perform the one-proportion and chi-square goodness of fit test in R, in this section we show how to do these tests by hand. We first illustrate the one-proportion test then the chi-square goodness of fit test.
 
 ## One-proportion test
 
@@ -401,7 +413,7 @@ The *p*-value is `r round(test$p.value, 3)` so, at the 5% significance level, we
 
 ## Goodness of fit test
 
-We now illustrate the goodness of fit test by hand with the following example.
+We now illustrate the chi-square goodness of fit test by hand with the following example.
 
 Suppose that we toss a dice 100 times, we note how many times it lands on each face (1 to 6) and we test whether the dice is fair. Here are the observed counts by dice face:
 
@@ -441,10 +453,15 @@ we need to test whether they are *significantly* different. For this, we perform
 
 **Step 1.**
 
-The null and alternative hypotheses of the goodness of fit test are:
+The null and alternative hypotheses of the chi-square goodness of fit test are:
 
 * $H_0$: there is no significant difference between the observed and the expected frequencies
 * $H_1$: there is a significant difference between the observed and the expected frequencies
+
+Applied to our example, we have:
+
+* $H_0$: all faces occur in the same proportion
+* $H_1$: at least one proportion is not equal to 1/6
 
 **Step 2.**
 
@@ -501,7 +518,7 @@ Again, you can use the [Shiny app](/blog/a-guide-on-how-to-read-statistical-tabl
 Just for the sake of illustration, here is the verification of the above example in R:
 
 ```{r}
-# goodness of fit test
+# chi-square goodness of fit test
 test <- chisq.test(dat$observed_freq, # observed frequencies for each dice face
   p = rep(1 / 6, 6) # expected probabilities for each dice face
 )
@@ -511,6 +528,6 @@ test
 
 The test statistic and degrees of freedom are exactly the same than the ones found by hand. The *p*-value is `r round(test$p.value, 3)` which, still at the 5% significance level, leads to the same conclusion than by hand (i.e., failing to reject the null hypothesis).
 
-Thanks for reading. I hope this article helped you to understand and perform the one-proportion and goodness of fit test in R and by hand.
+Thanks for reading. I hope this article helped you to understand and perform the one-proportion and chi-square goodness of fit test in R and by hand.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
