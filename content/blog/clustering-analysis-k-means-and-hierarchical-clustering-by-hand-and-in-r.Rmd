@@ -119,6 +119,7 @@ Eurojobs <- read.csv(
   file = "https://statsandr.com/blog/data/Eurojobs.csv",
   sep = ",", dec = ".", header = TRUE
 )
+
 head(Eurojobs) # head() is used to display only the first 6 observations
 ```
 
@@ -129,6 +130,7 @@ Eurojobs <- read.csv(
   file = "https://statsandr.com/blog/data/Eurojobs.csv",
   sep = ",", dec = ".", header = TRUE, row.names = 1
 )
+
 Eurojobs # displays dataset
 dim(Eurojobs) # displays the number of rows and columns
 ```
@@ -159,6 +161,7 @@ The cluster for each observation can be stored directly in the dataset as a colu
 Eurojobs_cluster <- data.frame(Eurojobs,
   cluster = as.factor(model$cluster)
 )
+
 head(Eurojobs_cluster)
 ```
 
@@ -183,7 +186,7 @@ Here is how you can check the quality of the partition in R:
 BSS / TSS * 100
 ```
 
-The quality of the partition is `r round(BSS / TSS * 100, 2)`%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters!) in order to determine the best partition among the ones considered.
+The quality of the partition is `r round(BSS / TSS * 100, 2)`%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters! see why at the end of this [section](/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/#kmeans-with-3-groups)) in order to determine the best partition among the ones considered.
 
 ### `nstart` for several initial centers and better stability
 
@@ -217,7 +220,11 @@ TSS3 <- model3$totss
 BSS3 / TSS3 * 100
 ```
 
-It can be seen that the classification into three groups allows for a higher explained percentage and a higher quality. This will always be the case: with more classes, the partition will be finer, and the *BSS* contribution will be higher. On the other hand, the "model" will be more complex, requiring more classes. In the extreme case where *k = n* (each observation is a singleton class), we have *BSS = TSS*, but the partition has lost all interest.
+It can be seen that the classification into three groups allows for a higher explained percentage and a higher quality.
+
+This will always be the case: with more classes, the partition will be finer, and the *BSS* contribution will be higher. On the other hand, the "model" will be more complex, requiring more classes. In the extreme case where *k = n* (each observation is a singleton class), we have *BSS = TSS*, but the partition has lost all interest.
+
+This is the reason we compare partitions via their quality only for partitions that have the same number of clusters.
 
 ### Optimal number of clusters
 
@@ -1419,7 +1426,9 @@ barplot(hclust$height,
 
 Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.
 
-Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the _silhouette plot_, _elbow plot_ or some numerical measures like Dunn's index, Hubert's gamma, etc., which show the variation of the error with the number of clusters (*k*), and you choose the value of *k* where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn's Index (the higher the index, the better). However, these methods are beyond the scope of this course and the method presented with the dendrogram is generally sufficient.
+Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the _silhouette plot_, _elbow plot_ or some numerical measures like Dunn's index, Hubert's gamma, etc., which show the variation of the error with the number of clusters (*k*), and you choose the value of *k* where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn's Index (the higher the index, the better).
+
+However, these methods are beyond the scope of this article and the method presented with the dendrogram is generally sufficient. See more detailed information in this [article](http://www.sthda.com/english/wiki/wiki.php?id_contents=7952){target="_blank"}.
 
 #### Complete linkage
 
@@ -1483,7 +1492,9 @@ rect.hclust(hclust,
 
 # *k*-means versus hierarchical clustering
 
-Clustering is rather a subjective statistical analysis and there can be more than one appropriate algorithm, depending on the dataset at hand or the type of problem to be solved. So choosing between *k*-means and hierarchical clustering is not always easy. If you have a good reason to think that there is a specific number of clusters in your dataset (for example if you would like to distinguish diseased and healthy patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the *k*-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.
+Clustering is rather a subjective statistical analysis and there can be more than one appropriate algorithm, depending on the dataset at hand or the type of problem to be solved. So choosing between *k*-means and hierarchical clustering is not always easy.
+
+If you have a good reason to think that there is a **specific number of clusters** in your dataset (for example if you would like to distinguish diseased and healthy patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the *k*-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.
 
 In addition to this, if you are still undecided note that, on the one hand, with a large number of variables, *k*-means may be computationally faster than hierarchical clustering if the number of clusters is small. On the other hand, the result of a hierarchical clustering is a structure that is more informative and interpretable than the unstructured set of flat clusters returned by *k*-means. Therefore, it is easier to determine the optimal number of clusters by looking at the dendrogram of a hierarchical clustering than trying to predict this optimal number in advance in case of *k*-means.
 

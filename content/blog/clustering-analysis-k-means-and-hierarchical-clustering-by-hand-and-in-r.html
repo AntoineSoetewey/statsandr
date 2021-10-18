@@ -17,44 +17,56 @@ output:
 bibliography: bibliography.bib
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
-<li><a href="#what-is-clustering-analysis">What is clustering analysis?</a><ul>
-<li><a href="#application-1-computing-distances">Application 1: Computing distances</a><ul>
+<li><a href="#what-is-clustering-analysis">What is clustering analysis?</a>
+<ul>
+<li><a href="#application-1-computing-distances">Application 1: Computing distances</a>
+<ul>
 <li><a href="#solution">Solution</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#k-means-clustering"><em>k</em>-means clustering</a><ul>
-<li><a href="#application-2-k-means-clustering">Application 2: <em>k</em>-means clustering</a><ul>
+<li><a href="#k-means-clustering"><em>k</em>-means clustering</a>
+<ul>
+<li><a href="#application-2-k-means-clustering">Application 2: <em>k</em>-means clustering</a>
+<ul>
 <li><a href="#data">Data</a></li>
 <li><a href="#kmeans-with-2-groups"><code>kmeans()</code> with 2 groups</a></li>
 <li><a href="#quality-of-a-k-means-partition">Quality of a <em>k</em>-means partition</a></li>
 <li><a href="#nstart-for-several-initial-centers-and-better-stability"><code>nstart</code> for several initial centers and better stability</a></li>
 <li><a href="#kmeans-with-3-groups"><code>kmeans()</code> with 3 groups</a></li>
-<li><a href="#optimal-number-of-clusters">Optimal number of clusters</a><ul>
+<li><a href="#optimal-number-of-clusters">Optimal number of clusters</a>
+<ul>
 <li><a href="#elbow-method">Elbow method</a></li>
 <li><a href="#silhouette-method">Silhouette method</a></li>
 <li><a href="#gap-statistic-method">Gap statistic method</a></li>
 <li><a href="#nbclust"><code>NbClust()</code></a></li>
 </ul></li>
 <li><a href="#visualizations">Visualizations</a></li>
-<li><a href="#manual-application-and-verification-in-r">Manual application and verification in R</a><ul>
+<li><a href="#manual-application-and-verification-in-r">Manual application and verification in R</a>
+<ul>
 <li><a href="#solution-by-hand">Solution by hand</a></li>
 <li><a href="#solution-in-r">Solution in R</a></li>
 </ul></li>
 </ul></li>
 </ul></li>
-<li><a href="#hierarchical-clustering">Hierarchical clustering</a><ul>
-<li><a href="#application-3-hierarchical-clustering">Application 3: hierarchical clustering</a><ul>
+<li><a href="#hierarchical-clustering">Hierarchical clustering</a>
+<ul>
+<li><a href="#application-3-hierarchical-clustering">Application 3: hierarchical clustering</a>
+<ul>
 <li><a href="#data-1">Data</a></li>
-<li><a href="#solution-by-hand-1">Solution by hand</a><ul>
+<li><a href="#solution-by-hand-1">Solution by hand</a>
+<ul>
 <li><a href="#single-linkage">Single linkage</a></li>
 <li><a href="#complete-linkage">Complete linkage</a></li>
 <li><a href="#average-linkage">Average linkage</a></li>
 </ul></li>
-<li><a href="#solution-in-r-1">Solution in R</a><ul>
-<li><a href="#single-linkage-1">Single linkage</a><ul>
+<li><a href="#solution-in-r-1">Solution in R</a>
+<ul>
+<li><a href="#single-linkage-1">Single linkage</a>
+<ul>
 <li><a href="#optimal-number-of-clusters-1">Optimal number of clusters</a></li>
 </ul></li>
 <li><a href="#complete-linkage-1">Complete linkage</a></li>
@@ -147,6 +159,7 @@ Eurojobs &lt;- read.csv(
   file = &quot;https://statsandr.com/blog/data/Eurojobs.csv&quot;,
   sep = &quot;,&quot;, dec = &quot;.&quot;, header = TRUE
 )
+
 head(Eurojobs) # head() is used to display only the first 6 observations</code></pre>
 <pre><code>##      Country  Agr Min  Man  PS  Con   SI Fin  SPS  TC
 ## 1    Belgium  3.3 0.9 27.6 0.9  8.2 19.1 6.2 26.6 7.2
@@ -160,6 +173,7 @@ head(Eurojobs) # head() is used to display only the first 6 observations</code><
   file = &quot;https://statsandr.com/blog/data/Eurojobs.csv&quot;,
   sep = &quot;,&quot;, dec = &quot;.&quot;, header = TRUE, row.names = 1
 )
+
 Eurojobs # displays dataset</code></pre>
 <pre><code>##                 Agr Min  Man  PS  Con   SI  Fin  SPS  TC
 ## Belgium         3.3 0.9 27.6 0.9  8.2 19.1  6.2 26.6 7.2
@@ -217,6 +231,7 @@ print(model$cluster)</code></pre>
 <pre class="r"><code>Eurojobs_cluster &lt;- data.frame(Eurojobs,
   cluster = as.factor(model$cluster)
 )
+
 head(Eurojobs_cluster)</code></pre>
 <pre><code>##             Agr Min  Man  PS  Con   SI Fin  SPS  TC cluster
 ## Belgium     3.3 0.9 27.6 0.9  8.2 19.1 6.2 26.6 7.2       1
@@ -242,7 +257,7 @@ head(Eurojobs_cluster)</code></pre>
 <pre class="r"><code># We calculate the quality of the partition
 BSS / TSS * 100</code></pre>
 <pre><code>## [1] 51.86826</code></pre>
-<p>The quality of the partition is 51.87%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters!) in order to determine the best partition among the ones considered.</p>
+<p>The quality of the partition is 51.87%. This value has no real interpretation in absolute terms except that a higher quality means a higher explained percentage. However, it is more insightful when it is compared to the quality of other partitions (with the same number of clusters! see why at the end of this <a href="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/#kmeans-with-3-groups">section</a>) in order to determine the best partition among the ones considered.</p>
 </div>
 <div id="nstart-for-several-initial-centers-and-better-stability" class="section level3">
 <h3><code>nstart</code> for several initial centers and better stability</h3>
@@ -261,7 +276,9 @@ BSS3 &lt;- model3$betweenss
 TSS3 &lt;- model3$totss
 BSS3 / TSS3 * 100</code></pre>
 <pre><code>## [1] 74.59455</code></pre>
-<p>It can be seen that the classification into three groups allows for a higher explained percentage and a higher quality. This will always be the case: with more classes, the partition will be finer, and the <em>BSS</em> contribution will be higher. On the other hand, the “model” will be more complex, requiring more classes. In the extreme case where <em>k = n</em> (each observation is a singleton class), we have <em>BSS = TSS</em>, but the partition has lost all interest.</p>
+<p>It can be seen that the classification into three groups allows for a higher explained percentage and a higher quality.</p>
+<p>This will always be the case: with more classes, the partition will be finer, and the <em>BSS</em> contribution will be higher. On the other hand, the “model” will be more complex, requiring more classes. In the extreme case where <em>k = n</em> (each observation is a singleton class), we have <em>BSS = TSS</em>, but the partition has lost all interest.</p>
+<p>This is the reason we compare partitions via their quality only for partitions that have the same number of clusters.</p>
 </div>
 <div id="optimal-number-of-clusters" class="section level3">
 <h3>Optimal number of clusters</h3>
@@ -1006,7 +1023,7 @@ res.k &lt;- kmeans(X,
   algorithm = &quot;Lloyd&quot;
 )</code></pre>
 <p>Unlike in the previous application with the dataset <code>Eurojobs.csv</code> where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set <code>centers = X[c(5,6), ]</code> to indicate that that there are 2 centers, and that they are going to be the points 5 and 6 (see a reminder on <a href="/blog/data-manipulation-in-r/">how to subset a dataframe</a> if needed).</p>
-<p>The reason for adding the argument <code>algorithm = "Lloyd"</code> can be found in the usage of the R function <code>kmeans()</code>. In fact, there are several variants of the <em>k</em>-means algorithm. The default choice is the <span class="citation">Hartigan and Wong (<a href="#ref-jaaw28m" role="doc-biblioref">1979</a>)</span> version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of <span class="citation">Lloyd (<a href="#ref-lloyd1982least" role="doc-biblioref">1982</a>)</span>, we find the same solution in R and by hand. For more information, you can consult the documentation of the <code>kmeans()</code> function (via <code>?kmeans</code> or <code>help(kmeans)</code>) and read the articles mentioned.</p>
+<p>The reason for adding the argument <code>algorithm = "Lloyd"</code> can be found in the usage of the R function <code>kmeans()</code>. In fact, there are several variants of the <em>k</em>-means algorithm. The default choice is the <span class="citation"><a href="#ref-jaaw28m" role="doc-biblioref">Hartigan and Wong</a> (<a href="#ref-jaaw28m" role="doc-biblioref">1979</a>)</span> version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of <span class="citation"><a href="#ref-lloyd1982least" role="doc-biblioref">Lloyd</a> (<a href="#ref-lloyd1982least" role="doc-biblioref">1982</a>)</span>, we find the same solution in R and by hand. For more information, you can consult the documentation of the <code>kmeans()</code> function (via <code>?kmeans</code> or <code>help(kmeans)</code>) and read the articles mentioned.</p>
 <p>The solution in R is then found by extracting</p>
 <ul>
 <li>the partition with <code>$cluster</code>:</li>
@@ -1845,7 +1862,8 @@ rect.hclust(hclust,
 )</code></pre>
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-37-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.</p>
-<p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the <em>silhouette plot</em>, <em>elbow plot</em> or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better). However, these methods are beyond the scope of this course and the method presented with the dendrogram is generally sufficient.</p>
+<p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the <em>silhouette plot</em>, <em>elbow plot</em> or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better).</p>
+<p>However, these methods are beyond the scope of this article and the method presented with the dendrogram is generally sufficient. See more detailed information in this <a href="http://www.sthda.com/english/wiki/wiki.php?id_contents=7952" target="_blank">article</a>.</p>
 </div>
 </div>
 <div id="complete-linkage-1" class="section level4">
@@ -1893,19 +1911,20 @@ rect.hclust(hclust,
 </div>
 <div id="k-means-versus-hierarchical-clustering" class="section level1">
 <h1><em>k</em>-means versus hierarchical clustering</h1>
-<p>Clustering is rather a subjective statistical analysis and there can be more than one appropriate algorithm, depending on the dataset at hand or the type of problem to be solved. So choosing between <em>k</em>-means and hierarchical clustering is not always easy. If you have a good reason to think that there is a specific number of clusters in your dataset (for example if you would like to distinguish diseased and healthy patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the <em>k</em>-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.</p>
+<p>Clustering is rather a subjective statistical analysis and there can be more than one appropriate algorithm, depending on the dataset at hand or the type of problem to be solved. So choosing between <em>k</em>-means and hierarchical clustering is not always easy.</p>
+<p>If you have a good reason to think that there is a <strong>specific number of clusters</strong> in your dataset (for example if you would like to distinguish diseased and healthy patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the <em>k</em>-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.</p>
 <p>In addition to this, if you are still undecided note that, on the one hand, with a large number of variables, <em>k</em>-means may be computationally faster than hierarchical clustering if the number of clusters is small. On the other hand, the result of a hierarchical clustering is a structure that is more informative and interpretable than the unstructured set of flat clusters returned by <em>k</em>-means. Therefore, it is easier to determine the optimal number of clusters by looking at the dendrogram of a hierarchical clustering than trying to predict this optimal number in advance in case of <em>k</em>-means.</p>
 <p>Thanks for reading. I hope this article helped you understand the different clustering methods and how to compute them by hand and in R.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
-<div id="refs" class="references">
-<div id="ref-jaaw28m">
-<p>Hartigan, J. A., and M. A. Wong. 1979. “A K-Means Clustering Algorithm.” <em>Applied Statistics</em> 28: 100–108.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-jaaw28m" class="csl-entry">
+Hartigan, J. A., and M. A. Wong. 1979. <span>“A k-Means Clustering Algorithm.”</span> <em>Applied Statistics</em> 28: 100–108.
 </div>
-<div id="ref-lloyd1982least">
-<p>Lloyd, Stuart. 1982. “Least Squares Quantization in Pcm.” <em>IEEE Transactions on Information Theory</em> 28 (2): 129–37.</p>
+<div id="ref-lloyd1982least" class="csl-entry">
+Lloyd, Stuart. 1982. <span>“Least Squares Quantization in PCM.”</span> <em>IEEE Transactions on Information Theory</em> 28 (2): 129–37.
 </div>
 </div>
 </div>
