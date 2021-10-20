@@ -265,7 +265,7 @@ library(pander)
 pander(test)
 ```
 
-All information that you need are displayed in an elegant table. The `pander()` function works on many statistical tests (not to say all of them, but I have not tried it on *all* available tests in R) and on regression models:
+All information that you need are displayed in an elegant table. The `pander()` function works on many statistical tests (not to say all of them, but I have not tried it on *all* available tests in R) and on [regression models](/blog/multiple-linear-regression-made-simple/):
 
 ```{r}
 # Linear model with lm()
@@ -279,8 +279,8 @@ pander(model)
 The pander function also makes datasets, tables, vectors, etc. more readable in R Markdown output. For example, see the differences below:
 
 ```{r}
-head(dat) # first 6 observations of a dataset
-pander(head(dat))
+head(dat)[1:7] # first 6 observations of the first 7 variables
+pander(head(dat)[1:7])
 
 summary(dat) # main descriptive statistics
 pander(summary(dat))
@@ -339,22 +339,15 @@ model <- lm(price ~ carat + x + y + z + depth,
 
 extract_eq(model,
            use_coefs = TRUE,
-           wrap = TRUE)
+           wrap = TRUE,
+           terms_per_line = 2)
 ```
 
 Note that:
 
 * If you use it in R Markdown, you need to add `results = 'asis'` for that specific code chunk, otherwise the equation will be rendered as a LaTeX equation
 * At the time of writing, it works only for PDF and HTML output and not for Word
-* The default number of terms per line is 4. You can change that with the `terms_per_line` argument:
-
-```{r, results = 'asis'}
-extract_eq(model,
-           use_coefs = TRUE,
-           wrap = TRUE,
-           terms_per_line = 2)
-```
-
+* The default number of terms per line is 4. You can change that with the `terms_per_line` argument
 * `{equatiomatic}` supports output from logistic regression as well. See all supported models in the [vignette](https://cran.r-project.org/web/packages/equatiomatic/vignettes/intro-equatiomatic.html){target="_blank"}
 * If you need the theoretical model without the actual parameter estimates, remove the `use_coefs` argument:
 
