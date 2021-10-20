@@ -650,9 +650,9 @@ model</code></pre>
 <pre class="r"><code>pander(names(dat))</code></pre>
 <p><em>carat</em>, <em>cut</em>, <em>color</em>, <em>clarity</em>, <em>depth</em>, <em>table</em>, <em>price</em>, <em>x</em>, <em>y</em> and <em>z</em></p>
 <pre class="r"><code>rnorm(4) # generates 4 observations from a standard normal distribution</code></pre>
-<pre><code>## [1] -0.6692268 -1.5052139 -1.0280231  0.8520421</code></pre>
+<pre><code>## [1] 2.78332528 1.96243399 0.05703655 0.76586709</code></pre>
 <pre class="r"><code>pander(rnorm(4))</code></pre>
-<p><em>1.126</em>, <em>-0.1741</em>, <em>0.3664</em> and <em>-0.3546</em></p>
+<p><em>0.1666</em>, <em>-0.01018</em>, <em>-0.6024</em> and <em>-0.4699</em></p>
 <p>This trick is particularly useful when writing in <a href="/blog/getting-started-in-r-markdown/">R Markdown</a>, as the generated document will look much nicer.</p>
 <p>Another trick for the aesthetics is the <code>report()</code> function from the <code>{report}</code> package.</p>
 <p>Similar to <code>pander()</code>, the <code>report()</code> function allows to report test results in a more readable way—but it also interprets results for you. See for example with a <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation test</a>:</p>
@@ -670,18 +670,18 @@ report(cor.test(dat$price, dat$carat))</code></pre>
 <div id="extract-equation-model-with-equatiomatic" class="section level1">
 <h1>Extract equation model with <code>{equatiomatic}</code></h1>
 <p>If you often need to write equations corresponding to statistical models in R Markdown reports, the <a href="https://CRAN.R-project.org/package=equatiomatic" target="_blank"><code>{equatiomatic}</code></a> will help you to save time.</p>
-<p>Here is a basic example with a multiple <a href="/blog/multiple-linear-regression-made-simple/">linear regression</a> using the same dataset as above (i.e., <code>diamonds</code> from <code>{ggplot2}</code>):</p>
+<p>Here is a basic example with a simple <a href="/blog/multiple-linear-regression-made-simple/">linear regression</a> using the same dataset as above (i.e., <code>diamonds</code> from <code>{ggplot2}</code>):</p>
 <pre class="r"><code># install.packages(&quot;equatiomatic&quot;)
 library(equatiomatic)
 
 # fit a basic multiple linear regression model
-model &lt;- lm(price ~ carat + depth,
+model &lt;- lm(price ~ carat,
             data = dat)
 
 extract_eq(model,
            use_coefs = TRUE)</code></pre>
 <p><span class="math display">\[
-\operatorname{\widehat{price}} = 4045.33 + 7765.14(\operatorname{carat}) - 102.17(\operatorname{depth})
+\operatorname{\widehat{price}} = -2256.36 + 7756.43(\operatorname{carat})
 \]</span></p>
 <p>If the equation is long, you can display it on multiple lines by adding the argument <code>wrap = TRUE</code>:</p>
 <pre class="r"><code>model &lt;- lm(price ~ carat + x + y + z + depth,
