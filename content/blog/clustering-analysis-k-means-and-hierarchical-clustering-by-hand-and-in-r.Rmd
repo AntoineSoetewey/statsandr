@@ -32,12 +32,14 @@ Clustering analysis is a form of exploratory data analysis in which observations
 
 The purpose of cluster analysis (also known as classification) is to construct groups (or classes or *clusters*) while ensuring the following property: **within a group** the observations must be as **similar** as possible, while observations belonging to **different groups** must be as **different** as possible.
 
-There are two main types of classification:
+The two most common types of classification are:
 
 1. *k*-means clustering
 2. Hierarchical clustering
 
-The first is generally used when the **number of classes is fixed** in advance, while the second is generally used for an **unknown number of classes** and helps to determine this optimal number. Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the *ascending* classification is presented in this article.
+The first is generally used when the **number of classes is fixed** in advance, while the second is generally used for an **unknown number of classes** and helps to determine this optimal number. For this reason, *k*-means is considered as a supervised technique, while hierarchical clustering is considered as an unsupervised technique because the estimation of the number of clusters is part of the algorithm. See more clustering methods in this [article](https://easystats.github.io/parameters/articles/clustering.html){target="_blank"}.
+
+Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the *ascending* classification is presented in this article.
 
 Clustering algorithms use the **distance** in order to separate observations into different groups. Therefore, before diving into the presentation of the two classification methods, a reminder exercise on how to compute distances between points is presented.
 
@@ -91,7 +93,7 @@ Now that the distance has been presented, let's see how to perform clustering an
 
 The first form of classification is the method called _*k*-means clustering_ or the mobile center algorithm. As a reminder, this method aims at partitioning $n$ observations into $k$ clusters in which each observation belongs to the cluster with the closest average, serving as a prototype of the cluster.
 
-It is presented below via an application in R and by hand.
+We do not go too much into details about the mathematics. Instead, we focus on how to apply it in R and by hand.
 
 ## Application 2: *k*-means clustering
 
@@ -118,7 +120,9 @@ We first import the dataset. See [how to import data into R](/blog/how-to-import
 # Import data
 Eurojobs <- read.csv(
   file = "https://statsandr.com/blog/data/Eurojobs.csv",
-  sep = ",", dec = ".", header = TRUE
+  sep = ",",
+  dec = ".",
+  header = TRUE
 )
 
 head(Eurojobs) # head() is used to display only the first 6 observations
@@ -129,7 +133,10 @@ Note that there is a numbering before the first variable `Country`. For more cla
 ```{r}
 Eurojobs <- read.csv(
   file = "https://statsandr.com/blog/data/Eurojobs.csv",
-  sep = ",", dec = ".", header = TRUE, row.names = 1
+  sep = ",",
+  dec = ".",
+  header = TRUE,
+  row.names = 1
 )
 
 Eurojobs # displays dataset
@@ -151,10 +158,12 @@ model <- kmeans(Eurojobs, centers = 2)
 
 # displays the class determined by
 # the model for all observations:
-print(model$cluster)
+model$cluster
 ```
 
-Note that the argument `centers = 2` is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis, or based on methods explained in this [section](/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/#optimal-number-of-clusters). Calling `print(model$cluster)` or `model$cluster` is the same. This output specifies the group (i.e., 1 or 2) to which each country belongs to.
+Note that the argument `centers = 2` is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily.
+
+This number of clusters should be determined according to the context and goal of your analysis (so according to your expectations or hypotheses), or based on methods explained in this [section](/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/#optimal-number-of-clusters). The output `model$cluster` specifies the group (i.e., 1 or 2) to which each country belongs to.
 
 The cluster for each observation can be stored directly in the dataset as a column:
 
@@ -191,7 +200,7 @@ The quality of the partition is `r round(BSS / TSS * 100, 2)`%. This value has n
 
 ### `nstart` for several initial centers and better stability
 
-The *k*-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command `kmeans(Eurojobs, centers = 2)` may give different results every time it is run, and thus slight differences in the quality of the partitions. The `nstart` argument in the `kmeans()` function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:
+Note that *k*-means is a non-deterministic algorithm so running it multiple times may result in different classification. This is the case because the *k*-means algorithm uses a **random** set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command `kmeans(Eurojobs, centers = 2)` may give different results every time it is run, and thus slight differences in the quality of the partitions. The `nstart` argument in the `kmeans()` function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:
 
 ```{r, echo = FALSE}
 set.seed(42)
@@ -216,6 +225,7 @@ set.seed(42)
 
 ```{r}
 model3 <- kmeans(Eurojobs, centers = 3)
+
 BSS3 <- model3$betweenss
 TSS3 <- model3$totss
 BSS3 / TSS3 * 100
@@ -227,16 +237,34 @@ This will always be the case: with more classes, the partition will be finer, an
 
 This is the reason we compare partitions via their quality only for partitions that have the same number of clusters.
 
+An alternative method to perform a *k*-means is to use the `cluster_analysis()` function from the `{parameters}` package:
+
+```{r, message = FALSE}
+library(parameters)
+
+res_kmeans <- cluster_analysis(Eurojobs,
+                 n = 3,
+                 method = "kmeans")
+
+predict(res_kmeans) # get clusters
+```
+
+An advantage of this method is that it is possible to visualize the centers (i.e., the average of each variable for each cluster):
+
+```{r, message = FALSE}
+plot(res_kmeans)
+```
+
 ### Optimal number of clusters
 
 In order to find the optimal number of clusters for a *k*-means, it is recommended to choose it based on:
 
-* the context of the problem at hand, for instance if you know that there is a specific number of groups in your data (this is option is however subjective), or
+* the context of the problem at hand, for instance if you know that there is a specific number of groups in your data (you have strong expectations or hypotheses, this is option is however subjective), or
 * the following four approaches:
   1. Elbow method (which uses the within cluster sums of squares)
   1. Average silhouette method
   1. Gap statistic method
-  1. `NbClust()` function
+  1. Consensus-based algorithm
 
 We show the R code for these 4 methods below, more theoretical information can be found [here](https://www.datanovia.com/en/lessons/determining-the-optimal-number-of-clusters-3-must-know-methods/){target="_blank"}.
 
@@ -286,37 +314,30 @@ fviz_nbclust(Eurojobs, kmeans,
 
 The optimal number of clusters is the one that maximizes the gap statistic. This method suggests only 1 cluster (which is therefore a useless clustering).
 
-As you can see these three methods do not necessarily lead to the same result. Here, all 3 approaches suggest a different number of clusters.
+As you can see these three methods do not necessarily lead to the same result. Here, the 3 approaches suggest a different number of clusters.
 
-#### `NbClust()`
+#### Consensus-based algorithm
 
-A fourth alternative is to use the `NbClust()` function from the `{NbClust}` package, which provides 30 indices for choosing the best number of clusters.
+Because no method is clearly better, a fourth alternative is to run many methods and take the number of clusters that is the most agreed upon (i.e., find the consensus).
 
-```{r, warning = FALSE}
-nbclust_out <- NbClust(
-  data = Eurojobs,
-  distance = "euclidean",
-  min.nc = 2, # minimum number of clusters
-  max.nc = 5, # maximum number of clusters
-  method = "kmeans" # one of: "ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid", "kmeans"
-)
+This can easily be done with the `n_clusters()` function from the `{parameters}` package:
 
-# create a dataframe of the optimal number of clusters
-nbclust_plot <- data.frame(clusters = nbclust_out$Best.nc[1, ])
-# select only indices which select between 2 and 5 clusters
-nbclust_plot <- subset(nbclust_plot, clusters >= 2 & clusters <= 5)
+```{r, warning = FALSE, message = FALSE}
+library(parameters)
 
-# create plot
-ggplot(nbclust_plot) +
-  aes(x = clusters) +
-  geom_histogram(bins = 30L, fill = "#0c4c8a") +
-  labs(x = "Number of clusters", y = "Frequency among all indices", title = "Optimal number of clusters") +
-  theme_minimal()
+n_clust <- n_clusters(Eurojobs,
+                      package = c("easystats", "NbClust", "mclust"),
+                      standardize = FALSE)
+n_clust
 ```
 
-Based on all 30 indices, the best number of clusters is 3 clusters.
+The optimal number of clusters to retain can also be visualized:
 
-(See the article "[Graphics in R with ggplot2](/blog/graphics-in-r-with-ggplot2/)" to learn how to create this kind of plot in `{ggplot2}`).
+```{r, warning = FALSE, message = FALSE}
+plot(n_clust)
+```
+
+Based on all indices, most methods suggest to retain 3 clusters, followed by a 2-clusters solution.
 
 ### Visualizations
 
@@ -833,7 +854,7 @@ The 3 results are equal to what we found by hand (except the quality which is sl
 
 Remind that the difference with the partition by *k*-means is that for hierarchical clustering, the number of classes is **not** specified in advance. Hierarchical clustering will help to determine the optimal number of clusters.
 
-Before applying hierarchical clustering by hand and in R, let's see how it works step by step:
+Before applying hierarchical clustering by hand and in R, let's see how the ascending hierarchical clustering works step by step:
 
 1. It starts by putting every point in its own cluster, so each cluster is a singleton
 2. It then merges the 2 points that are closest to each other based on the distances from the distance matrix. The consequence is that there is one less cluster
@@ -854,7 +875,7 @@ In the following sections, only the three first linkage methods are presented (f
 
 ### Data
 
-Using the data from the graph and the table below, perform **by hand** the 3 algorithms (single, complete and average linkage) and draw the dendrograms. Then **check** your answers **in R**.
+Using the data from the graph and the table below, we perform **by hand** the 3 algorithms (single, complete and average linkage) and we draw the dendrograms. Then we **check** our answers **in R**.
 
 ```{r, echo = FALSE}
 n <- 5
@@ -865,7 +886,7 @@ text(X, labels = 1:5, pos = 3, cex = 1.5)
 X
 ```
 
-*Assume that the variables have the same units so there is no need to scale the data.*
+*We assume that the variables have the same units so there is no need to scale the data.*
 
 ### Solution by hand
 
@@ -1440,6 +1461,26 @@ Note that determining the number of clusters using the dendrogram or barplot is 
 
 However, these methods are beyond the scope of this article and the method presented with the dendrogram is generally sufficient. See more detailed information in this [article](http://www.sthda.com/english/wiki/wiki.php?id_contents=7952){target="_blank"}.
 
+Note that hierarchical clustering is a bit different than *k*-means in the sense that is does not return a vector containing the information about which cluster the observations belong to. Instead, it creates a hierarchical structure (a dendrogram), a tree from which we can cut branches to get a given number of clusters. This information can be found via the `cutree()` function:
+
+```{r}
+clust <- cutree(hclust,
+       k = 2)
+clust
+```
+
+We see that:
+
+- points 1 and 5 belong to the cluster 1
+- points 2, 3 and 4 belong to the cluster 2
+
+This is exactly what was drawn in the dendrogram above, and if needed, this information can be added to the initial data:
+
+```{r}
+X_clust <- cbind(X, clust)
+X_clust
+```
+
 #### Complete linkage
 
 We can apply the hierarchical clustering with the complete linkage criterion thanks to the `hclust()` function with the argument `method = "complete"`:
@@ -1502,7 +1543,7 @@ rect.hclust(hclust,
 
 # *k*-means versus hierarchical clustering
 
-Clustering is rather a subjective statistical analysis and there can be more than one appropriate algorithm, depending on the dataset at hand or the type of problem to be solved. So choosing between *k*-means and hierarchical clustering is not always easy.
+Clustering is rather a subjective statistical analysis and there can be more than one appropriate algorithm, depending on the dataset at hand or the type of problem to be solved. So choosing between *k*-means and hierarchical clustering is not always easy. Moreover, no method is better than the other, each come with their sets of limitations and benefits.
 
 If you have a good reason to think that there is a **specific number of clusters** in your dataset (for example if you would like to distinguish diseased and healthy patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the *k*-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.
 

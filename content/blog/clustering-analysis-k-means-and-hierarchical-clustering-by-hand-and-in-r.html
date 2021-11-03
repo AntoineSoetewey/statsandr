@@ -42,7 +42,7 @@ bibliography: bibliography.bib
 <li><a href="#elbow-method">Elbow method</a></li>
 <li><a href="#silhouette-method">Silhouette method</a></li>
 <li><a href="#gap-statistic-method">Gap statistic method</a></li>
-<li><a href="#nbclust"><code>NbClust()</code></a></li>
+<li><a href="#consensus-based-algorithm">Consensus-based algorithm</a></li>
 </ul></li>
 <li><a href="#visualizations">Visualizations</a></li>
 <li><a href="#manual-application-and-verification-in-r">Manual application and verification in R</a>
@@ -85,12 +85,13 @@ bibliography: bibliography.bib
 <h1>What is clustering analysis?</h1>
 <p>Clustering analysis is a form of exploratory data analysis in which observations are divided into different groups that share common characteristics.</p>
 <p>The purpose of cluster analysis (also known as classification) is to construct groups (or classes or <em>clusters</em>) while ensuring the following property: <strong>within a group</strong> the observations must be as <strong>similar</strong> as possible, while observations belonging to <strong>different groups</strong> must be as <strong>different</strong> as possible.</p>
-<p>There are two main types of classification:</p>
+<p>The two most common types of classification are:</p>
 <ol style="list-style-type: decimal">
 <li><em>k</em>-means clustering</li>
 <li>Hierarchical clustering</li>
 </ol>
-<p>The first is generally used when the <strong>number of classes is fixed</strong> in advance, while the second is generally used for an <strong>unknown number of classes</strong> and helps to determine this optimal number. Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the <em>ascending</em> classification is presented in this article.</p>
+<p>The first is generally used when the <strong>number of classes is fixed</strong> in advance, while the second is generally used for an <strong>unknown number of classes</strong> and helps to determine this optimal number. For this reason, <em>k</em>-means is considered as a supervised technique, while hierarchical clustering is considered as an unsupervised technique because the estimation of the number of clusters is part of the algorithm. See more clustering methods in this <a href="https://easystats.github.io/parameters/articles/clustering.html" target="_blank">article</a>.</p>
+<p>Both methods are illustrated below through applications by hand and in R. Note that for hierarchical clustering, only the <em>ascending</em> classification is presented in this article.</p>
 <p>Clustering algorithms use the <strong>distance</strong> in order to separate observations into different groups. Therefore, before diving into the presentation of the two classification methods, a reminder exercise on how to compute distances between points is presented.</p>
 <div id="application-1-computing-distances" class="section level2">
 <h2>Application 1: Computing distances</h2>
@@ -136,7 +137,7 @@ distance # display the distance matrix</code></pre>
 <div id="k-means-clustering" class="section level1">
 <h1><em>k</em>-means clustering</h1>
 <p>The first form of classification is the method called <em><em>k</em>-means clustering</em> or the mobile center algorithm. As a reminder, this method aims at partitioning <span class="math inline">\(n\)</span> observations into <span class="math inline">\(k\)</span> clusters in which each observation belongs to the cluster with the closest average, serving as a prototype of the cluster.</p>
-<p>It is presented below via an application in R and by hand.</p>
+<p>We do not go too much into details about the mathematics. Instead, we focus on how to apply it in R and by hand.</p>
 <div id="application-2-k-means-clustering" class="section level2">
 <h2>Application 2: <em>k</em>-means clustering</h2>
 <div id="data" class="section level3">
@@ -159,7 +160,9 @@ distance # display the distance matrix</code></pre>
 <pre class="r"><code># Import data
 Eurojobs &lt;- read.csv(
   file = &quot;https://statsandr.com/blog/data/Eurojobs.csv&quot;,
-  sep = &quot;,&quot;, dec = &quot;.&quot;, header = TRUE
+  sep = &quot;,&quot;,
+  dec = &quot;.&quot;,
+  header = TRUE
 )
 
 head(Eurojobs) # head() is used to display only the first 6 observations</code></pre>
@@ -173,7 +176,10 @@ head(Eurojobs) # head() is used to display only the first 6 observations</code><
 <p>Note that there is a numbering before the first variable <code>Country</code>. For more clarity, we will replace this numbering by the country. To do this, we add the argument <code>row.names = 1</code> in the import function <code>read.csv()</code> to specify that the first column corresponds to the row names:</p>
 <pre class="r"><code>Eurojobs &lt;- read.csv(
   file = &quot;https://statsandr.com/blog/data/Eurojobs.csv&quot;,
-  sep = &quot;,&quot;, dec = &quot;.&quot;, header = TRUE, row.names = 1
+  sep = &quot;,&quot;,
+  dec = &quot;.&quot;,
+  header = TRUE,
+  row.names = 1
 )
 
 Eurojobs # displays dataset</code></pre>
@@ -215,7 +221,7 @@ Eurojobs # displays dataset</code></pre>
 
 # displays the class determined by
 # the model for all observations:
-print(model$cluster)</code></pre>
+model$cluster</code></pre>
 <pre><code>##        Belgium        Denmark         France     W. Germany        Ireland 
 ##              1              1              1              1              2 
 ##          Italy     Luxembourg    Netherlands United Kingdom        Austria 
@@ -228,7 +234,8 @@ print(model$cluster)</code></pre>
 ##              1              2              2              2              2 
 ##     Yugoslavia 
 ##              2</code></pre>
-<p>Note that the argument <code>centers = 2</code> is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily. This number of clusters should be determined according to the context and goal of your analysis, or based on methods explained in this <a href="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/#optimal-number-of-clusters">section</a>. Calling <code>print(model$cluster)</code> or <code>model$cluster</code> is the same. This output specifies the group (i.e., 1 or 2) to which each country belongs to.</p>
+<p>Note that the argument <code>centers = 2</code> is used to set the number of clusters, determined in advance. In this exercise the number of clusters has been determined arbitrarily.</p>
+<p>This number of clusters should be determined according to the context and goal of your analysis (so according to your expectations or hypotheses), or based on methods explained in this <a href="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r/#optimal-number-of-clusters">section</a>. The output <code>model$cluster</code> specifies the group (i.e., 1 or 2) to which each country belongs to.</p>
 <p>The cluster for each observation can be stored directly in the dataset as a column:</p>
 <pre class="r"><code>Eurojobs_cluster &lt;- data.frame(Eurojobs,
   cluster = as.factor(model$cluster)
@@ -263,7 +270,7 @@ BSS / TSS * 100</code></pre>
 </div>
 <div id="nstart-for-several-initial-centers-and-better-stability" class="section level3">
 <h3><code>nstart</code> for several initial centers and better stability</h3>
-<p>The <em>k</em>-means algorithm uses a random set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command <code>kmeans(Eurojobs, centers = 2)</code> may give different results every time it is run, and thus slight differences in the quality of the partitions. The <code>nstart</code> argument in the <code>kmeans()</code> function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:</p>
+<p>Note that <em>k</em>-means is a non-deterministic algorithm so running it multiple times may result in different classification. This is the case because the <em>k</em>-means algorithm uses a <strong>random</strong> set of initial points to arrive at the final classification. Due to the fact that the initial centers are randomly chosen, the same command <code>kmeans(Eurojobs, centers = 2)</code> may give different results every time it is run, and thus slight differences in the quality of the partitions. The <code>nstart</code> argument in the <code>kmeans()</code> function allows to run the algorithm several times with different initial centers, in order to obtain a potentially better partition:</p>
 <pre class="r"><code>model2 &lt;- kmeans(Eurojobs, centers = 2, nstart = 10)
 100 * model2$betweenss / model2$totss</code></pre>
 <pre><code>## [1] 54.2503</code></pre>
@@ -274,6 +281,7 @@ BSS / TSS * 100</code></pre>
 <h3><code>kmeans()</code> with 3 groups</h3>
 <p>We now perform the <em>k</em>-means classification with 3 clusters and compute its quality:</p>
 <pre class="r"><code>model3 &lt;- kmeans(Eurojobs, centers = 3)
+
 BSS3 &lt;- model3$betweenss
 TSS3 &lt;- model3$totss
 BSS3 / TSS3 * 100</code></pre>
@@ -281,18 +289,30 @@ BSS3 / TSS3 * 100</code></pre>
 <p>It can be seen that the classification into three groups allows for a higher explained percentage and a higher quality.</p>
 <p>This will always be the case: with more classes, the partition will be finer, and the <em>BSS</em> contribution will be higher. On the other hand, the “model” will be more complex, requiring more classes. In the extreme case where <em>k = n</em> (each observation is a singleton class), we have <em>BSS = TSS</em>, but the partition has lost all interest.</p>
 <p>This is the reason we compare partitions via their quality only for partitions that have the same number of clusters.</p>
+<p>An alternative method to perform a <em>k</em>-means is to use the <code>cluster_analysis()</code> function from the <code>{parameters}</code> package:</p>
+<pre class="r"><code>library(parameters)
+
+res_kmeans &lt;- cluster_analysis(Eurojobs,
+                 n = 3,
+                 method = &quot;kmeans&quot;)
+
+predict(res_kmeans) # get clusters</code></pre>
+<pre><code>##  [1] 3 3 3 3 2 3 3 3 3 3 3 1 3 2 2 3 3 1 2 2 3 2 2 2 2 1</code></pre>
+<p>An advantage of this method is that it is possible to visualize the centers (i.e., the average of each variable for each cluster):</p>
+<pre class="r"><code>plot(res_kmeans)</code></pre>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="optimal-number-of-clusters" class="section level3">
 <h3>Optimal number of clusters</h3>
 <p>In order to find the optimal number of clusters for a <em>k</em>-means, it is recommended to choose it based on:</p>
 <ul>
-<li>the context of the problem at hand, for instance if you know that there is a specific number of groups in your data (this is option is however subjective), or</li>
+<li>the context of the problem at hand, for instance if you know that there is a specific number of groups in your data (you have strong expectations or hypotheses, this is option is however subjective), or</li>
 <li>the following four approaches:
 <ol style="list-style-type: decimal">
 <li>Elbow method (which uses the within cluster sums of squares)</li>
 <li>Average silhouette method</li>
 <li>Gap statistic method</li>
-<li><code>NbClust()</code> function</li>
+<li>Consensus-based algorithm</li>
 </ol></li>
 </ul>
 <p>We show the R code for these 4 methods below, more theoretical information can be found <a href="https://www.datanovia.com/en/lessons/determining-the-optimal-number-of-clusters-3-must-know-methods/" target="_blank">here</a>.</p>
@@ -307,7 +327,7 @@ library(NbClust)
 fviz_nbclust(Eurojobs, kmeans, method = &quot;wss&quot;) +
   geom_vline(xintercept = 4, linetype = 2) + # add line for better visualisation
   labs(subtitle = &quot;Elbow method&quot;) # add subtitle</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The location of a knee in the plot is usually considered as an indicator of the appropriate number of clusters because it means that adding another cluster does not improve much better the partition. This method seems to suggest 4 clusters.</p>
 <p>The Elbow method is sometimes ambiguous and an alternative is the average silhouette method.</p>
 </div>
@@ -317,7 +337,7 @@ fviz_nbclust(Eurojobs, kmeans, method = &quot;wss&quot;) +
 <pre class="r"><code># Silhouette method
 fviz_nbclust(Eurojobs, kmeans, method = &quot;silhouette&quot;) +
   labs(subtitle = &quot;Silhouette method&quot;)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The Silhouette method suggests 2 clusters.</p>
 </div>
 <div id="gap-statistic-method" class="section level4">
@@ -330,58 +350,27 @@ fviz_nbclust(Eurojobs, kmeans,
   nboot = 500 # reduce it for lower computation time (but less precise results)
 ) +
   labs(subtitle = &quot;Gap statistic method&quot;)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The optimal number of clusters is the one that maximizes the gap statistic. This method suggests only 1 cluster (which is therefore a useless clustering).</p>
-<p>As you can see these three methods do not necessarily lead to the same result. Here, all 3 approaches suggest a different number of clusters.</p>
+<p>As you can see these three methods do not necessarily lead to the same result. Here, the 3 approaches suggest a different number of clusters.</p>
 </div>
-<div id="nbclust" class="section level4">
-<h4><code>NbClust()</code></h4>
-<p>A fourth alternative is to use the <code>NbClust()</code> function from the <code>{NbClust}</code> package, which provides 30 indices for choosing the best number of clusters.</p>
-<pre class="r"><code>nbclust_out &lt;- NbClust(
-  data = Eurojobs,
-  distance = &quot;euclidean&quot;,
-  min.nc = 2, # minimum number of clusters
-  max.nc = 5, # maximum number of clusters
-  method = &quot;kmeans&quot; # one of: &quot;ward.D&quot;, &quot;ward.D2&quot;, &quot;single&quot;, &quot;complete&quot;, &quot;average&quot;, &quot;mcquitty&quot;, &quot;median&quot;, &quot;centroid&quot;, &quot;kmeans&quot;
-)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<pre><code>## *** : The Hubert index is a graphical method of determining the number of clusters.
-##                 In the plot of Hubert index, we seek a significant knee that corresponds to a 
-##                 significant increase of the value of the measure i.e the significant peak in Hubert
-##                 index second differences plot. 
-## </code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-16-2.png" width="100%" style="display: block; margin: auto;" /></p>
-<pre><code>## *** : The D index is a graphical method of determining the number of clusters. 
-##                 In the plot of D index, we seek a significant knee (the significant peak in Dindex
-##                 second differences plot) that corresponds to a significant increase of the value of
-##                 the measure. 
-##  
-## ******************************************************************* 
-## * Among all indices:                                                
-## * 5 proposed 2 as the best number of clusters 
-## * 16 proposed 3 as the best number of clusters 
-## * 2 proposed 5 as the best number of clusters 
-## 
-##                    ***** Conclusion *****                            
-##  
-## * According to the majority rule, the best number of clusters is  3 
-##  
-##  
-## *******************************************************************</code></pre>
-<pre class="r"><code># create a dataframe of the optimal number of clusters
-nbclust_plot &lt;- data.frame(clusters = nbclust_out$Best.nc[1, ])
-# select only indices which select between 2 and 5 clusters
-nbclust_plot &lt;- subset(nbclust_plot, clusters &gt;= 2 &amp; clusters &lt;= 5)
+<div id="consensus-based-algorithm" class="section level4">
+<h4>Consensus-based algorithm</h4>
+<p>Because no method is clearly better, a fourth alternative is to run many methods and take the number of clusters that is the most agreed upon (i.e., find the consensus).</p>
+<p>This can easily be done with the <code>n_clusters()</code> function from the <code>{parameters}</code> package:</p>
+<pre class="r"><code>library(parameters)
 
-# create plot
-ggplot(nbclust_plot) +
-  aes(x = clusters) +
-  geom_histogram(bins = 30L, fill = &quot;#0c4c8a&quot;) +
-  labs(x = &quot;Number of clusters&quot;, y = &quot;Frequency among all indices&quot;, title = &quot;Optimal number of clusters&quot;) +
-  theme_minimal()</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-16-3.png" width="100%" style="display: block; margin: auto;" /></p>
-<p>Based on all 30 indices, the best number of clusters is 3 clusters.</p>
-<p>(See the article “<a href="/blog/graphics-in-r-with-ggplot2/">Graphics in R with ggplot2</a>” to learn how to create this kind of plot in <code>{ggplot2}</code>).</p>
+n_clust &lt;- n_clusters(Eurojobs,
+                      package = c(&quot;easystats&quot;, &quot;NbClust&quot;, &quot;mclust&quot;),
+                      standardize = FALSE)
+n_clust</code></pre>
+<pre><code>## # Method Agreement Procedure:
+## 
+## The choice of 3 clusters is supported by 15 (53.57%) methods out of 28 (kl, Ch, Hartigan, CCC, Scott, Marriot, trcovw, Tracew, Rubin, Beale, Ratkowsky, Ball, PtBiserial, Dunn, SDindex).</code></pre>
+<p>The optimal number of clusters to retain can also be visualized:</p>
+<pre class="r"><code>plot(n_clust)</code></pre>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Based on all indices, most methods suggest to retain 3 clusters, followed by a 2-clusters solution.</p>
 </div>
 </div>
 <div id="visualizations" class="section level3">
@@ -398,7 +387,7 @@ fviz_silhouette(sil)</code></pre>
 <pre><code>##   cluster size ave.sil.width
 ## 1       1    5          0.33
 ## 2       2   21          0.54</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As a reminder, the interpretation of the silhouette coefficient is as follows:</p>
 <ul>
 <li><span class="math inline">\(&gt; 0\)</span> means that the observation is well grouped. The closer the coefficient is to 1, the better the observation is grouped.</li>
@@ -410,14 +399,14 @@ fviz_silhouette(sil)</code></pre>
 <pre class="r"><code>library(factoextra)
 
 fviz_cluster(km_res, Eurojobs, ellipse.type = &quot;norm&quot;)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Now that the <em>k</em>-means clustering has been detailed in R, see how to do the algorithm by hand in the following sections.</p>
 </div>
 <div id="manual-application-and-verification-in-r" class="section level3">
 <h3>Manual application and verification in R</h3>
 <p>Perform <strong>by hand</strong> the <em>k</em>-means algorithm for the points shown in the graph below, with <em>k</em> = 2 and with the points <em>i</em> = 5 and <em>i</em> = 6 as initial centers. Compute the quality of the partition you just found and then <strong>check</strong> your answers <strong>in R</strong>.</p>
 <p><em>Assume that the variables have the same units so there is no need to scale the data.</em></p>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <div id="solution-by-hand" class="section level4">
 <h4>Solution by hand</h4>
 <p>Step 1. Here are the coordinates of the 6 points:</p>
@@ -1063,7 +1052,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <div id="hierarchical-clustering" class="section level1">
 <h1>Hierarchical clustering</h1>
 <p>Remind that the difference with the partition by <em>k</em>-means is that for hierarchical clustering, the number of classes is <strong>not</strong> specified in advance. Hierarchical clustering will help to determine the optimal number of clusters.</p>
-<p>Before applying hierarchical clustering by hand and in R, let’s see how it works step by step:</p>
+<p>Before applying hierarchical clustering by hand and in R, let’s see how the ascending hierarchical clustering works step by step:</p>
 <ol style="list-style-type: decimal">
 <li>It starts by putting every point in its own cluster, so each cluster is a singleton</li>
 <li>It then merges the 2 points that are closest to each other based on the distances from the distance matrix. The consequence is that there is one less cluster</li>
@@ -1083,15 +1072,15 @@ round(res.k$centers, digits = 2)</code></pre>
 <h2>Application 3: hierarchical clustering</h2>
 <div id="data-1" class="section level3">
 <h3>Data</h3>
-<p>Using the data from the graph and the table below, perform <strong>by hand</strong> the 3 algorithms (single, complete and average linkage) and draw the dendrograms. Then <strong>check</strong> your answers <strong>in R</strong>.</p>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Using the data from the graph and the table below, we perform <strong>by hand</strong> the 3 algorithms (single, complete and average linkage) and we draw the dendrograms. Then we <strong>check</strong> our answers <strong>in R</strong>.</p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>##      V1    V2
 ## 1  2.03  0.06
 ## 2 -0.64 -0.10
 ## 3 -0.42 -0.53
 ## 4 -0.36  0.07
 ## 5  1.14  0.37</code></pre>
-<p><em>Assume that the variables have the same units so there is no need to scale the data.</em></p>
+<p><em>We assume that the variables have the same units so there is no need to scale the data.</em></p>
 </div>
 <div id="solution-by-hand-1" class="section level3">
 <h3>Solution by hand</h3>
@@ -1336,7 +1325,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>the final combination was between points 1 &amp; 5 and 2 &amp; 3 &amp; 4 with a height of 1.530</li>
 <li>this is exactly what is illustrated in the following dendrogram:</li>
 </ul>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-31-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In hierarchical clustering, dendrograms are used to show the sequence of combinations of the clusters. The distances of merge between clusters, called heights, are illustrated on the y-axis.</p>
 </div>
 <div id="complete-linkage" class="section level4">
@@ -1580,7 +1569,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>the final combination was between points 1 &amp; 5 and 2 &amp; 3 &amp; 4 with a height of 2.675</li>
 <li>this is exactly what is illustrated in the following dendrogram:</li>
 </ul>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-33-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="average-linkage" class="section level4">
 <h4>Average linkage</h4>
@@ -1824,7 +1813,7 @@ round(res.k$centers, digits = 2)</code></pre>
 <li>the final combination was between points 1 &amp; 5 and 2 &amp; 3 &amp; 4 with a height of 2.126167</li>
 <li>this is exactly what is illustrated in the following dendrogram:</li>
 </ul>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-32-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="solution-in-r-1" class="section level3">
@@ -1843,7 +1832,7 @@ hclust &lt;- hclust(dist(X), method = &quot;single&quot;)</code></pre>
 <pre class="r"><code>round(hclust$height, 3)</code></pre>
 <pre><code>## [1] 0.328 0.483 0.942 1.530</code></pre>
 <pre class="r"><code>plot(hclust)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-38-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
 <div id="optimal-number-of-clusters-1" class="section level5">
 <h5>Optimal number of clusters</h5>
@@ -1859,7 +1848,7 @@ rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
   border = &quot;blue&quot;
 )</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-36-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-39-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Note that determining the optimal number of clusters via the dendrogram is not specific to the single linkage, it can be applied to other linkage methods too!</p>
 <p>Below another figure explaining how to determine the optimal number of clusters:</p>
 <div class="figure">
@@ -1871,10 +1860,29 @@ rect.hclust(hclust,
 <pre class="r"><code>barplot(hclust$height,
   names.arg = (nrow(X) - 1):1 # show the number of cluster below each bars
 )</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-37-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-40-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Again, look for the largest jump of heights. In our case, the largest jump is from 1 to 2 classes. Therefore, the optimal number of classes is 2.</p>
 <p>Note that determining the number of clusters using the dendrogram or barplot is not a strict rule. You can also consider other methods such as the <em>silhouette plot</em>, <em>elbow plot</em> or some numerical measures like Dunn’s index, Hubert’s gamma, etc., which show the variation of the error with the number of clusters (<em>k</em>), and you choose the value of <em>k</em> where the error is smallest. Furthermore, measuring the goodness of clusters can be done thanks to the Dunn’s Index (the higher the index, the better).</p>
 <p>However, these methods are beyond the scope of this article and the method presented with the dendrogram is generally sufficient. See more detailed information in this <a href="http://www.sthda.com/english/wiki/wiki.php?id_contents=7952" target="_blank">article</a>.</p>
+<p>Note that hierarchical clustering is a bit different than <em>k</em>-means in the sense that is does not return a vector containing the information about which cluster the observations belong to. Instead, it creates a hierarchical structure (a dendrogram), a tree from which we can cut branches to get a given number of clusters. This information can be found via the <code>cutree()</code> function:</p>
+<pre class="r"><code>clust &lt;- cutree(hclust,
+       k = 2)
+clust</code></pre>
+<pre><code>## [1] 1 2 2 2 1</code></pre>
+<p>We see that:</p>
+<ul>
+<li>points 1 and 5 belong to the cluster 1</li>
+<li>points 2, 3 and 4 belong to the cluster 2</li>
+</ul>
+<p>This is exactly what was drawn in the dendrogram above, and if needed, this information can be added to the initial data:</p>
+<pre class="r"><code>X_clust &lt;- cbind(X, clust)
+X_clust</code></pre>
+<pre><code>##                  clust
+## [1,]  2.03  0.06     1
+## [2,] -0.64 -0.10     2
+## [3,] -0.42 -0.53     2
+## [4,] -0.36  0.07     2
+## [5,]  1.14  0.37     1</code></pre>
 </div>
 </div>
 <div id="complete-linkage-1" class="section level4">
@@ -1887,7 +1895,7 @@ hclust &lt;- hclust(dist(X), method = &quot;complete&quot;)</code></pre>
 <pre class="r"><code>round(hclust$height, 3)</code></pre>
 <pre><code>## [1] 0.328 0.603 0.942 2.675</code></pre>
 <pre class="r"><code>plot(hclust)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-39-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-44-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
 <p>Similar to the single linkage, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
 <pre class="r"><code>plot(hclust)
@@ -1895,7 +1903,7 @@ rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
   border = &quot;blue&quot;
 )</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-40-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-45-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="average-linkage-1" class="section level4">
 <h4>Average linkage</h4>
@@ -1907,7 +1915,7 @@ hclust &lt;- hclust(dist(X), method = &quot;average&quot;)</code></pre>
 <pre class="r"><code>round(hclust$height, 3)</code></pre>
 <pre><code>## [1] 0.328 0.543 0.942 2.126</code></pre>
 <pre class="r"><code>plot(hclust)</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-42-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-47-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As we can see from the dendrogram, the combination of points and the heights are the same than the ones obtained by hand.</p>
 <p>Like the single and complete linkages, the largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. In this case, the optimal number of clusters is thus 2. In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
 <pre class="r"><code>plot(hclust)
@@ -1915,14 +1923,14 @@ rect.hclust(hclust,
   k = 2, # k is used to specify the number of clusters
   border = &quot;blue&quot;
 )</code></pre>
-<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-43-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-48-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 </div>
 </div>
 <div id="k-means-versus-hierarchical-clustering" class="section level1">
 <h1><em>k</em>-means versus hierarchical clustering</h1>
-<p>Clustering is rather a subjective statistical analysis and there can be more than one appropriate algorithm, depending on the dataset at hand or the type of problem to be solved. So choosing between <em>k</em>-means and hierarchical clustering is not always easy.</p>
+<p>Clustering is rather a subjective statistical analysis and there can be more than one appropriate algorithm, depending on the dataset at hand or the type of problem to be solved. So choosing between <em>k</em>-means and hierarchical clustering is not always easy. Moreover, no method is better than the other, each come with their sets of limitations and benefits.</p>
 <p>If you have a good reason to think that there is a <strong>specific number of clusters</strong> in your dataset (for example if you would like to distinguish diseased and healthy patients depending on some characteristics but you do not know in which group patients belong to), you should probably opt for the <em>k</em>-means clustering as this technique is used when the number of groups is specified in advance. If you do not have any reason to believe there is a certain number of groups in your dataset (for instance in marketing when trying to distinguish clients without any prior belief on the number of different types of customers), then you should probably opt for the hierarchical clustering to determine in how many clusters your data should be divided.</p>
 <p>In addition to this, if you are still undecided note that, on the one hand, with a large number of variables, <em>k</em>-means may be computationally faster than hierarchical clustering if the number of clusters is small. On the other hand, the result of a hierarchical clustering is a structure that is more informative and interpretable than the unstructured set of flat clusters returned by <em>k</em>-means. Therefore, it is easier to determine the optimal number of clusters by looking at the dendrogram of a hierarchical clustering than trying to predict this optimal number in advance in case of <em>k</em>-means.</p>
 </div>
