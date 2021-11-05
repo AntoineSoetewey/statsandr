@@ -27,7 +27,10 @@ bibliography: bibliography.bib
 <ul>
 <li><a href="#principle">Principle</a></li>
 <li><a href="#equation">Equation</a></li>
-<li><a href="#interpretations-of-coefficients-widehatbeta">Interpretations of coefficients <span class="math inline">\(\widehat\beta\)</span></a></li>
+<li><a href="#interpretations-of-coefficients-widehatbeta">Interpretations of coefficients <span class="math inline">\(\widehat\beta\)</span></a>
+<ul>
+<li><a href="#another-interpretation-of-the-intercept">Another interpretation of the intercept</a></li>
+</ul></li>
 <li><a href="#significance-of-the-relationship">Significance of the relationship</a>
 <ul>
 <li><a href="#correlation-does-not-imply-causation">Correlation does not imply causation</a></li>
@@ -161,11 +164,11 @@ ggplot(dat, aes(x = wt, y = mpg)) +
 <div id="interpretations-of-coefficients-widehatbeta" class="section level2">
 <h2>Interpretations of coefficients <span class="math inline">\(\widehat\beta\)</span></h2>
 <p>The <strong>intercept <span class="math inline">\(\widehat\beta_0\)</span></strong> is the <strong>mean value of the dependent variable <span class="math inline">\(Y\)</span> when the independent variable <span class="math inline">\(X\)</span> takes the value 0</strong>. Its estimation has no interest in evaluating whether there is a linear relationship between two variables. It has, however, an interest if you want to know what the mean value of <span class="math inline">\(Y\)</span> could be when <span class="math inline">\(x = 0\)</span>.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
-<p>The <strong>slope <span class="math inline">\(\widehat\beta_1\)</span></strong>, on the other hand, corresponds to the expected <strong>variation of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X\)</span> varies by one unit</strong>. It tells us two important information:</p>
-<ul>
+<p>The <strong>slope <span class="math inline">\(\widehat\beta_1\)</span></strong>, on the other hand, corresponds to the expected <strong>variation of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X\)</span> varies by one unit</strong>. It tells us two important informations:</p>
+<ol style="list-style-type: decimal">
 <li>The <strong>sign of the slope</strong> indicates the <strong>direction of the line</strong>—a positive slope (<span class="math inline">\(\widehat\beta_1 &gt; 0\)</span>) indicates that there is a positive relationship between the two variables of interest (they vary in the same direction), whereas a negative slope (<span class="math inline">\(\widehat\beta_1 &lt; 0\)</span>) means that there is a negative relationship between the two variables (they vary in opposite directions).</li>
 <li>The <strong>value of the slope</strong> provides information on the <strong>speed of evolution</strong> of the variable <span class="math inline">\(Y\)</span> as a function of the variable <span class="math inline">\(X\)</span>. The larger the slope in absolute value, the larger the expected variation of <span class="math inline">\(Y\)</span> for each unit of <span class="math inline">\(X\)</span>. Note, however, that a large value does not necessarily mean that the relationship is statistically significant (more on that in the section about <a href="/blog/multiple-linear-regression-made-simple/#significance-of-the-relationship">significance of the relationship</a>).</li>
-</ul>
+</ol>
 <p>This is similar to the <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation coefficient</a>, which gives information about the direction and the strength of the relationship between two variables.</p>
 <p>To perform a linear regression in R, we use the <code>lm()</code> function (which stands for linear model). The function requires to set the dependent variable first then the independent variable, separated by a tilde (<code>~</code>).</p>
 <p>Applied to our example of weight and car’s consumption, we have:</p>
@@ -193,13 +196,56 @@ ggplot(dat, aes(x = wt, y = mpg)) +
 <p>In practice, we usually check the conditions of application <em>before</em> interpreting the coefficients (because if they are not respected, results may be biased). In this article, however, I present the interpretations before testing the conditions because the point is to show how to interpret the results, and less about finding a valid model.</p>
 <p>The results can be summarized as follows (see the column <code>Estimate</code> in the table <code>Coefficients</code>):</p>
 <ul>
-<li>The intercept <span class="math inline">\(\widehat\beta_0 =\)</span> 37.29 indicates that, for a hypothetical car weighting 0 lbs, we can expect, on average, a consumption of 37.29 miles/gallon. (This interpretation is shown for illustrative purposes, but as a car weighting 0 lbs is impossible, the interpretation has no meaning. In practice, we would therefore refrain from interpreting the intercept in this case.)</li>
+<li>The intercept <span class="math inline">\(\widehat\beta_0 =\)</span> 37.29 indicates that, for a hypothetical car weighting 0 lbs, we can expect, on average, a consumption of 37.29 miles/gallon. This interpretation is shown for illustrative purposes, but as a car weighting 0 lbs is impossible, the interpretation has no meaning. In practice, we would therefore refrain from interpreting the intercept in this case. See another interpretation of the intercept when the independent variable is centered around its mean in this <a href="/blog/multiple-linear-regression-made-simple/#another-interpretation-of-the-intercept">section</a>.</li>
 <li>The slope <span class="math inline">\(\widehat\beta_1 =\)</span> -5.34 indicates that:
 <ul>
 <li>There is a <strong>negative relationship</strong> between the weight and the distance a car can drive with a gallon (this was expected given the negative trend of the points in the scatterplot shown previously).</li>
 <li>But more importantly, a slope of -5.34 means that, for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles per gallon decreases, on average, by 5.34 units. In other words, <strong>for an increase of 1000 lbs, the number of miles/gallon decreases, on average, by 5.34</strong>.</li>
 </ul></li>
 </ul>
+<div id="another-interpretation-of-the-intercept" class="section level3">
+<h3>Another interpretation of the intercept</h3>
+<p>Another useful interpretation of the intercept is when the independent variable is centered around its mean. In this case, the intercept is interpreted as the mean value of <span class="math inline">\(Y\)</span> for individuals who have a value of <span class="math inline">\(X\)</span> equal to the mean of <span class="math inline">\(X\)</span>.</p>
+<p>Let’s see it in practice. We first center the <code>wt</code> variable around the mean then rerun a simple linear model with this new variable:</p>
+<pre class="r"><code>dat_centered &lt;- dat
+
+dat_centered$wt_centered &lt;- dat$wt - mean(dat$wt)
+
+mod_centered &lt;- lm(mpg ~ wt_centered,
+  data = dat_centered
+)
+
+summary(mod_centered)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt_centered, data = dat_centered)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.5432 -2.3647 -0.1252  1.4096  6.8727 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  20.0906     0.5384  37.313  &lt; 2e-16 ***
+## wt_centered  -5.3445     0.5591  -9.559 1.29e-10 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.046 on 30 degrees of freedom
+## Multiple R-squared:  0.7528, Adjusted R-squared:  0.7446 
+## F-statistic: 91.38 on 1 and 30 DF,  p-value: 1.294e-10</code></pre>
+<p>Based on the results, we see that:</p>
+<ul>
+<li>The slope has not changed, the interpretation is the same than without the centering (which makes sense since the regression line has simply been shifted to the right or left).</li>
+<li>More importantly, the intercept is now <span class="math inline">\(\widehat\beta_0 =\)</span> 20.09, so we can expect, on average, a consumption of 20.09 miles/gallon for a car with an average weight (the mean of weight is 3.22 so 3220 lbs).</li>
+</ul>
+<p>This centering is particularly interesting:</p>
+<ul>
+<li>when the continuous independent variable has <strong>no</strong> meaningful value of 0 (which is the case here as a car with a weight of 0 lbs is not meaningful), or</li>
+<li>when interpreting the intercept is important.</li>
+</ul>
+<p>Note that centering does not have to be done around the mean only. The independent variable can also be centered at some value that is actually in the range of the data. The exact value you center on does not matter as long it’s meaningful and within the range of data (it is not recommended to center it on a value that is not in the range of the data because we are not sure about the type of relationship between the two variables outside that range). For our example, we may find that choosing the lowest value or the highest value of weight is the best option. So it’s up to us to decide the weight at which it’s most meaningful to interpret the intercept.</p>
+</div>
 </div>
 <div id="significance-of-the-relationship" class="section level2">
 <h2>Significance of the relationship</h2>
@@ -236,7 +282,7 @@ ggplot(dat, aes(x = wt, y = mpg)) +
 <ol style="list-style-type: decimal">
 <li><strong>Linearity:</strong> The relationship between the two variables should be linear (at least roughly). For this reason it is always necessary to represent graphically the data with a scatterplot before performing a simple linear regression.<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></li>
 </ol>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <ol start="2" style="list-style-type: decimal">
 <li><strong>Independence:</strong> Observations must be independent. It is the sampling plan and the experimental design that usually provide information on this condition. If the data come from different individuals or experimental units, they are usually independent. On the other hand, if the same individuals are measured at different periods, the data are probably not independent.</li>
 <li><strong>Normality of the residuals:</strong> For large sample sizes, confidence intervals and tests on the coefficients are (approximately) valid whether the error follows a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normal distribution</a> or not (a consequence of the central limit theorem, see more in <span class="citation"><a href="#ref-ernst2017regression" role="doc-biblioref">Ernst and Albers</a> (<a href="#ref-ernst2017regression" role="doc-biblioref">2017</a>)</span>)! For small sample sizes, residuals should follow a normal distribution. This condition can be tested visually (via a <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a> and/or a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a>), or more formally (via the <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">Shapiro-Wilk test</a> for instance).</li>
@@ -253,7 +299,7 @@ ggplot(dat, aes(x = wt, y = mpg)) +
 <p>There are numerous ways to visualize the relationship between the two variables of interest, but the easiest one I found so far is via the <code>visreg()</code> function from the package of the same name:</p>
 <pre class="r"><code>library(visreg)
 visreg(model)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>I like this approach for its simplicity—only a single line of code.</p>
 <p>However, other elements could be displayed on the regression plot (for example the regression equation and the <span class="math inline">\(R^2\)</span>). This can easily be done with the <code>stat_regline_equation()</code> and <code>stat_cor()</code> functions from the <code>{ggpubr}</code> package:</p>
 <pre class="r"><code># load necessary libraries
@@ -266,7 +312,7 @@ ggplot(dat, aes(x = wt, y = mpg)) +
   stat_regline_equation(label.x = 3, label.y = 32) + # for regression equation
   stat_cor(aes(label = ..rr.label..), label.x = 3, label.y = 30) + # for R^2
   theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="multiple-linear-regression" class="section level1">
@@ -300,7 +346,7 @@ ggplot(dat, aes(x = wt, y = mpg)) +
     size = &quot;Displacement&quot;
   ) +
   theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>It seems that, in addition to the negative relationship between miles per gallon and weight, there is also:</p>
 <ul>
 <li>a negative relationship between miles/gallon and horsepower (lighter points, indicating more horsepower, tend to be more present in low levels of miles per gallon)</li>
@@ -394,7 +440,7 @@ summary(model2)</code></pre>
 <li>There is a significant and negative relationship between miles/gallon and weight, <strong>all else being equal</strong>. So for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles/gallon decreases, on average, by 3.8, for a constant level of horsepower and displacement (<span class="math inline">\(p\)</span>-value = 0.001).</li>
 <li>There is a significant and negative relationship between miles/gallon and horsepower, all else being equal. So for an increase of one unit of horsepower, the distance traveled with a gallon decreases, on average, by 0.03 mile, for a constant level of weight and displacement (<span class="math inline">\(p\)</span>-value = 0.011).</li>
 <li>We do not reject the hypothesis of no relationship between miles/gallon and displacement when weight and horsepower stay constant (because <span class="math inline">\(p\)</span>-value = 0.929 &gt; 0.05).</li>
-<li>(For completeness but it should be interpreted only when it makes sense: for a weight, horsepower and displacement = 0, we can expect that a car has, on average, a fuel consumption of 37.11 miles/gallon (<span class="math inline">\(p\)</span>-value &lt; 0.001).)</li>
+<li>(For completeness but it should be interpreted only when it makes sense: for a weight, horsepower and displacement = 0, we can expect that a car has, on average, a fuel consumption of 37.11 miles/gallon (<span class="math inline">\(p\)</span>-value &lt; 0.001). See a more useful interpretation of the intercept when the independent variables are centered in this <a href="/blog/multiple-linear-regression-made-simple/#another-interpretation-of-the-intercept">section</a>.)</li>
 </ul>
 <p>This is how to interpret quantitative independent variables. <strong>Interpreting qualitative independent variables</strong> is slightly different in the sense that it quantifies the effect of a level in comparison with the reference level, sill all else being equal. So it compares the different groups (formed by the different levels of the categorical variable) in terms of the dependent variable (this is why linear regression can be seen as an extension to the t-test and ANOVA).</p>
 <p>For the illustration, we model the fuel consumption (<code>mpg</code>) on the weight (<code>wt</code>) and the shape of the engine (<code>vs</code>). The variable <code>vs</code> has two levels: V-shaped (the <a href="/blog/data-manipulation-in-r/#change-reference-level">reference level</a>) and straight engine.<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></p>
@@ -434,7 +480,7 @@ summary(model3)</code></pre>
 <ul>
 <li>For a V-shaped engine and for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles/gallon decreases, on average, by 4.44 (<span class="math inline">\(p\)</span>-value &lt; 0.001).</li>
 <li>The distance traveled with a gallon of fuel increases by, on average, 3.15 miles <strong>when the engine is straight compared to a V-shaped engine</strong>, for a constant weight (<span class="math inline">\(p\)</span>-value = 0.013).</li>
-<li>(For completeness but it should be interpreted only when it makes sense: for a weight = 0 and a V-shaped engine, we can expect that the car has, on average, a fuel consumption of 33 miles/gallon (<span class="math inline">\(p\)</span>-value &lt; 0.001).)</li>
+<li>(For completeness but it should be interpreted only when it makes sense: for a weight = 0 and a V-shaped engine, we can expect that the car has, on average, a fuel consumption of 33 miles/gallon (<span class="math inline">\(p\)</span>-value &lt; 0.001). See a more useful interpretation of the intercept when the independent variables are centered in this <a href="/blog/multiple-linear-regression-made-simple/#another-interpretation-of-the-intercept">section</a>.)</li>
 </ul>
 </div>
 <div id="conditions-of-application-1" class="section level2">
@@ -458,7 +504,7 @@ summary(model3)</code></pre>
 library(performance)
 
 check_model(model2)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In addition to testing all conditions at the same time, it also gives insight on how to interpret the different diagnostic plots and what you should expect (see in the subtitles of each plot).</p>
 <p>Based on these diagnostic plots, we see that:</p>
 <ul>
@@ -472,17 +518,17 @@ check_model(model2)</code></pre>
 ggplot(dat, aes(x = wt, y = mpg)) +
   geom_point() +
   theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># horsepower
 ggplot(dat, aes(x = hp, y = mpg)) +
   geom_point() +
   theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-2.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># displacement
 ggplot(dat, aes(x = disp, y = mpg)) +
   geom_point() +
   theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-3.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-3.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>It seems that the relationship between miles/gallon and horsepower is not linear, which could be the main component of the slight linearity defect of the model. To improve linearity, the variable could be removed or a transformation could be applied (logarithmic and/or squared for instance).<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a> If this does not fix the issue of linearity, other types of models could be considered.</p>
 <p>For the sake of easiness and for illustrative purposes, we assume linearity for the rest of the article.</p>
 <p>When the conditions of application are met, we usually say that the model is valid. But not all valid models are <em>good</em> models. The next section deals with model selection.</p>
@@ -631,13 +677,13 @@ model4 &lt;- step(model4, trace = FALSE)</code></pre>
 </ol>
 <pre class="r"><code>library(visreg)
 visreg(model4)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-2.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-3.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-2.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-3.png" width="100%" style="display: block; margin: auto;" /></p>
 <ol start="2" style="list-style-type: decimal">
 <li><code>ggcoefstats()</code> which illustrates the results in one single plot:</li>
 </ol>
 <pre class="r"><code>library(ggstatsplot)
 ggcoefstats(model4)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In this plot:</p>
 <ul>
 <li>when the solid line does not cross the vertical dashed line, the estimates is significantly different from 0 at the 5% significance level (i.e., <span class="math inline">\(p\)</span>-value &lt; 0.05)</li>
@@ -677,7 +723,7 @@ report(model4)</code></pre>
 ##   - The effect of qsec is statistically significant and positive (beta = 1.23, 95% CI [0.63, 1.82], t(28) = 4.25, p &lt; .001; Std. beta = 0.36, 95% CI [0.19, 0.54])
 ##   - The effect of am [Manual] is statistically significant and positive (beta = 2.94, 95% CI [0.05, 5.83], t(28) = 2.08, p = 0.047; Std. beta = 0.49, 95% CI [7.59e-03, 0.97])
 ## 
-## Standardized parameters were obtained by fitting the model on a standardized version of the dataset.</code></pre>
+## Standardized parameters were obtained by fitting the model on a standardized version of the dataset. 95% Confidence Intervals (CIs) and p-values were computed using the Wald approximation.</code></pre>
 <p>Note that the function also works for dataframes, statistical tests and other models.</p>
 </div>
 <div id="predictions" class="section level3">
@@ -821,7 +867,7 @@ summary(model6)</code></pre>
 <p>From the output we conclude that there is an interaction between the weight and the transmission (<span class="math inline">\(p\)</span>-value = 0.00102). This means that the effect of the weight on the distance traveled with a gallon <strong>depends on the transmission type</strong>.</p>
 <p>The easiest way to handle interaction is to visualize the relationship for each level of the categorical variable:</p>
 <pre class="r"><code>visreg(model6, &quot;wt&quot;, by = &quot;am&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the relationship between weight and miles/gallon is stronger (the slope is steeper) for cars with a manual transmission compared to cars with an automatic transmission.</p>
 <p>This is a good example to illustrate the point that when studying a relationship between two variables, say <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, if one also has data for other variables which are potentially associated with both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, it is important to include them in the regression and to analyze the relationship <strong>conditionally on these variables</strong>.</p>
 <p>Omitting some variables that should be included in the model may lead to erroneous and misleading conclusions, up to the point that the relationship is completely reversed (a phenomenon referred as <a href="https://en.wikipedia.org/wiki/Simpson%27s_paradox" target="_blank">Simpson’s paradox</a>).</p>

@@ -173,10 +173,10 @@ with $\bar{x}$ and $\bar{y}$ denoting the sample mean of $x$ and $y$, respective
 
 The **intercept $\widehat\beta_0$** is the **mean value of the dependent variable $Y$ when the independent variable $X$ takes the value 0**. Its estimation has no interest in evaluating whether there is a linear relationship between two variables. It has, however, an interest if you want to know what the mean value of $Y$ could be when $x = 0$.^[Note that it best to avoid interpreting the intercept when $X$ cannot be equal to 0 or when it makes no sense in practice.]
 
-The **slope $\widehat\beta_1$**, on the other hand, corresponds to the expected **variation of $Y$ when $X$ varies by one unit**. It tells us two important information:
+The **slope $\widehat\beta_1$**, on the other hand, corresponds to the expected **variation of $Y$ when $X$ varies by one unit**. It tells us two important informations:
 
-- The **sign of the slope** indicates the **direction of the line**---a positive slope ($\widehat\beta_1 > 0$) indicates that there is a positive relationship between the two variables of interest (they vary in the same direction), whereas a negative slope ($\widehat\beta_1 < 0$) means that there is a negative relationship between the two variables (they vary in opposite directions).
-- The **value of the slope** provides information on the **speed of evolution** of the variable $Y$ as a function of the variable $X$. The larger the slope in absolute value, the larger the expected variation of $Y$ for each unit of $X$. Note, however, that a large value does not necessarily mean that the relationship is statistically significant (more on that in the section about [significance of the relationship](/blog/multiple-linear-regression-made-simple/#significance-of-the-relationship)).
+1. The **sign of the slope** indicates the **direction of the line**---a positive slope ($\widehat\beta_1 > 0$) indicates that there is a positive relationship between the two variables of interest (they vary in the same direction), whereas a negative slope ($\widehat\beta_1 < 0$) means that there is a negative relationship between the two variables (they vary in opposite directions).
+1. The **value of the slope** provides information on the **speed of evolution** of the variable $Y$ as a function of the variable $X$. The larger the slope in absolute value, the larger the expected variation of $Y$ for each unit of $X$. Note, however, that a large value does not necessarily mean that the relationship is statistically significant (more on that in the section about [significance of the relationship](/blog/multiple-linear-regression-made-simple/#significance-of-the-relationship)).
 
 This is similar to the [correlation coefficient](/blog/correlation-coefficient-and-correlation-test-in-r/), which gives information about the direction and the strength of the relationship between two variables.
 
@@ -198,10 +198,40 @@ In practice, we usually check the conditions of application *before* interpretin
 
 The results can be summarized as follows (see the column `Estimate` in the table `Coefficients`):
 
-- The intercept $\widehat\beta_0 =$ `r round(coef(model)[1], 2)` indicates that, for a hypothetical car weighting 0 lbs, we can expect, on average, a consumption of `r round(coef(model)[1], 2)` miles/gallon. (This interpretation is shown for illustrative purposes, but as a car weighting 0 lbs is impossible, the interpretation has no meaning. In practice, we would therefore refrain from interpreting the intercept in this case.)
+- The intercept $\widehat\beta_0 =$ `r round(coef(model)[1], 2)` indicates that, for a hypothetical car weighting 0 lbs, we can expect, on average, a consumption of `r round(coef(model)[1], 2)` miles/gallon. This interpretation is shown for illustrative purposes, but as a car weighting 0 lbs is impossible, the interpretation has no meaning. In practice, we would therefore refrain from interpreting the intercept in this case. See another interpretation of the intercept when the independent variable is centered around its mean in this [section](/blog/multiple-linear-regression-made-simple/#another-interpretation-of-the-intercept).
 - The slope $\widehat\beta_1 =$ `r round(coef(model)[2], 2)` indicates that:
   + There is a **negative relationship** between the weight and the distance a car can drive with a gallon (this was expected given the negative trend of the points in the scatterplot shown previously).
   + But more importantly, a slope of `r round(coef(model)[2], 2)` means that, for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles per gallon decreases, on average, by `r -1 * round(coef(model)[2], 2)` units. In other words, **for an increase of 1000 lbs, the number of miles/gallon decreases, on average, by `r -1 * round(coef(model)[2], 2)`**.
+  
+### Another interpretation of the intercept
+  
+Another useful interpretation of the intercept is when the independent variable is centered around its mean. In this case, the intercept is interpreted as the mean value of $Y$ for individuals who have a value of $X$ equal to the mean of $X$.
+
+Let's see it in practice. We first center the `wt` variable around the mean then rerun a simple linear model with this new variable:
+
+```{r}
+dat_centered <- dat
+
+dat_centered$wt_centered <- dat$wt - mean(dat$wt)
+
+mod_centered <- lm(mpg ~ wt_centered,
+                   data = dat_centered)
+
+summary(mod_centered)
+```
+
+Based on the results, we see that:
+
+- The slope has not changed, the interpretation is the same than without the centering (which makes sense since the regression line has simply been shifted to the right or left).
+- More importantly, the intercept is now $\widehat\beta_0 =$ `r round(coef(mod_centered)[1], 2)`, so we can expect, on average, a consumption of `r round(coef(mod_centered)[1], 2)` miles/gallon for a car with an average weight (the mean of weight is `r round(mean(dat_centered$wt), 2)` so `r round(mean(dat_centered$wt), 2) * 1000` lbs).
+
+
+This centering is particularly interesting:
+
+- when the continuous independent variable has **no** meaningful value of 0 (which is the case here as a car with a weight of 0 lbs is not meaningful), or
+- when interpreting the intercept is important.
+
+Note that centering does not have to be done around the mean only. The independent variable can also be centered at some value that is actually in the range of the data. The exact value you center on does not matter as long it's meaningful and within the range of data (it is not recommended to center it on a value that is not in the range of the data because we are not sure about the type of relationship between the two variables outside that range). For our example, we may find that choosing the lowest value or the highest value of weight is the best option. So it's up to us to decide the weight at which it's most meaningful to interpret the intercept.
   
 ## Significance of the relationship
 
@@ -429,7 +459,7 @@ Based on the output of our model, we conclude that:
 - There is a significant and negative relationship between miles/gallon and weight, **all else being equal**. So for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles/gallon decreases, on average, by `r -1 * round(coef(model2)[2], 2)`, for a constant level of horsepower and displacement ($p$-value = 0.001).
 - There is a significant and negative relationship between miles/gallon and horsepower, all else being equal. So for an increase of one unit of horsepower, the distance traveled with a gallon decreases, on average, by `r -1 * round(coef(model2)[3], 2)` mile, for a constant level of weight and displacement ($p$-value = 0.011).
 - We do not reject the hypothesis of no relationship between miles/gallon and displacement when weight and horsepower stay constant (because $p$-value = 0.929 > 0.05).
-- (For completeness but it should be interpreted only when it makes sense: for a weight, horsepower and displacement = 0, we can expect that a car has, on average, a fuel consumption of `r round(coef(model2)[1], 2)` miles/gallon ($p$-value < 0.001).)
+- (For completeness but it should be interpreted only when it makes sense: for a weight, horsepower and displacement = 0, we can expect that a car has, on average, a fuel consumption of `r round(coef(model2)[1], 2)` miles/gallon ($p$-value < 0.001). See a more useful interpretation of the intercept when the independent variables are centered in this [section](/blog/multiple-linear-regression-made-simple/#another-interpretation-of-the-intercept).)
 
 This is how to interpret quantitative independent variables. **Interpreting qualitative independent variables** is slightly different in the sense that it quantifies the effect of a level in comparison with the reference level, sill all else being equal. So it compares the different groups (formed by the different levels of the categorical variable) in terms of the dependent variable (this is why linear regression can be seen as an extension to the t-test and ANOVA).
 
@@ -454,7 +484,7 @@ Based on the output of our model, we conclude that:
 
 - For a V-shaped engine and for an increase of one unit in the weight (that is, an increase of 1000 lbs), the number of miles/gallon decreases, on average, by `r -1 * round(coef(model3)[2], 2)` ($p$-value < 0.001).
 - The distance traveled with a gallon of fuel increases by, on average, `r round(coef(model3)[3], 2)` miles **when the engine is straight compared to a V-shaped engine**, for a constant weight ($p$-value = 0.013).
-- (For completeness but it should be interpreted only when it makes sense: for a weight = 0 and a V-shaped engine, we can expect that the car has, on average, a fuel consumption of `r round(coef(model3)[1], 2)` miles/gallon ($p$-value < 0.001).)
+- (For completeness but it should be interpreted only when it makes sense: for a weight = 0 and a V-shaped engine, we can expect that the car has, on average, a fuel consumption of `r round(coef(model3)[1], 2)` miles/gallon ($p$-value < 0.001). See a more useful interpretation of the intercept when the independent variables are centered in this [section](/blog/multiple-linear-regression-made-simple/#another-interpretation-of-the-intercept).)
 
 ## Conditions of application
 
