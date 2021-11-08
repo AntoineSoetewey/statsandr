@@ -22,18 +22,22 @@ output:
 bibliography: bibliography.bib
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#perform-multiple-tests-at-once">Perform multiple tests at once</a></li>
-<li><a href="#concise-and-easily-interpretable-results">Concise and easily interpretable results</a><ul>
-<li><a href="#t-test">T-test</a><ul>
+<li><a href="#concise-and-easily-interpretable-results">Concise and easily interpretable results</a>
+<ul>
+<li><a href="#t-test">T-test</a>
+<ul>
 <li><a href="#additional-p-value-adjustment-methods">Additional <em>p</em>-value adjustment methods</a></li>
 </ul></li>
 <li><a href="#anova">ANOVA</a></li>
 </ul></li>
 <li><a href="#to-go-even-further">To go even further</a></li>
+<li><a href="#update-with-the-ggstatsplot-package">Update with the <code>{ggstatsplot}</code> package</a></li>
 <li><a href="#references">References</a></li>
 </ul>
 </div>
@@ -55,8 +59,9 @@ bibliography: bibliography.bib
 <li>Repeat steps 1 and 2 for each variable</li>
 </ol>
 <p>This was feasible as long as there were only a couple of variables to test. Nonetheless, most students came to me asking to perform these kind of tests not on one or two variables, but on <strong>multiples</strong> variables. So when there were more than one variable to test, I quickly realized that I was wasting my time and that there must be a more efficient way to do the job.</p>
-<p><em><strong>Note</strong>: you must be very careful with the issue of multiple testing (also referred as multiplicity) which can arise when you perform multiple t-tests. In short, when a large number of statistical tests are performed, some will have p-values less than 0.05 purely by chance, even if all null hypotheses are in fact really true. This is known as multiplicity or multiple testing. You can tackle this problem by using the Bonferroni correction, among others. The Bonferroni correction is a simple method that allows many t-tests to be made while still assuring an overall confidence level is maintained. For this, instead of using the standard threshold of <span class="math inline">\(\alpha = 5\)</span>% for the significance level, you can use <span class="math inline">\(\alpha = \frac{0.05}{m}\)</span> where <span class="math inline">\(m\)</span> is the number of t-tests. For example, if you perform 20 t-tests with a desired <span class="math inline">\(\alpha = 0.05\)</span>, the Bonferroni correction implies that you would reject the null hypothesis for each individual test when the p-value is smaller than <span class="math inline">\(\alpha = \frac{0.05}{20} = 0.0025\)</span>.</em></p>
-<p>Note also that there is no universally accepted approach for dealing with the problem of multiple comparisons. Usually, you should choose a <em>p</em>-value adjustment measure familiar to your audience or in your field of study. The Bonferroni correction is the most common way to take this into account and is easy to implement. It is however not appropriate if you have a very large number of tests to perform (imagine you want to do 10,000 t-tests, a <em>p</em>-value would have to be less than <span class="math inline">\(\frac{0.05}{10000} = 0.000005\)</span> to be significant). A more powerful method is also to adjust the false discovery rate using the Benjamini-Hochberg procedure <span class="citation">(McDonald <a href="#ref-mcdonald2014multiple" role="doc-biblioref">2014</a>)</span>. This article aims at presenting a way to perform multiple t-tests and ANOVA from a technical point of view (how to implement it in R). Discussion on which adjustment method to use or whether there is a more appropriate model to fit the data is beyond the scope of this article (so be sure to understand the implications of using the code below for your own analyses). Make sure also to test the <a href="/blog/anova-in-r/#underlying-assumptions-of-anova">assumptions</a> of the ANOVA before interpreting results.</p>
+<p><em><strong>Note</strong>: you must be very careful with the issue of <a href="/blog/anova-in-r/#issue-of-multiple-testing">multiple testing</a> (also referred as multiplicity) which can arise when you perform multiple t-tests. In short, when a large number of statistical tests are performed, some will have <span class="math inline">\(p\)</span>-values less than 0.05 purely by chance, even if all null hypotheses are in fact really true. This is known as multiplicity or multiple testing. You can tackle this problem by using the Bonferroni correction, among others. The Bonferroni correction is a simple method that allows many t-tests to be made while still assuring an overall confidence level is maintained. For this, instead of using the standard threshold of <span class="math inline">\(\alpha = 5\)</span>% for the significance level, you can use <span class="math inline">\(\alpha = \frac{0.05}{m}\)</span> where <span class="math inline">\(m\)</span> is the number of t-tests. For example, if you perform 20 t-tests with a desired <span class="math inline">\(\alpha = 0.05\)</span>, the Bonferroni correction implies that you would reject the null hypothesis for each individual test when the <span class="math inline">\(p\)</span>-value is smaller than <span class="math inline">\(\alpha = \frac{0.05}{20} = 0.0025\)</span>.</em></p>
+<p>Note also that there is no universally accepted approach for dealing with the problem of multiple comparisons. Usually, you should choose a <em>p</em>-value adjustment measure familiar to your audience or in your field of study. The Bonferroni correction is the most common way to take this into account and is easy to implement. It is however not appropriate if you have a very large number of tests to perform (imagine you want to do 10,000 t-tests, a <em>p</em>-value would have to be less than <span class="math inline">\(\frac{0.05}{10000} = 0.000005\)</span> to be significant). A more powerful method is also to adjust the false discovery rate using the Benjamini-Hochberg procedure <span class="citation">(<a href="#ref-mcdonald2014multiple" role="doc-biblioref">McDonald 2014</a>)</span>.</p>
+<p>This article aims at presenting a way to perform multiple t-tests and ANOVA from a technical point of view (how to implement it in R). Discussion on which adjustment method to use or whether there is a more appropriate model to fit the data is beyond the scope of this article (so be sure to understand the implications of using the code below for your own analyses). Make sure also to test the <a href="/blog/anova-in-r/#underlying-assumptions-of-anova">assumptions</a> of the ANOVA before interpreting results.</p>
 </div>
 <div id="perform-multiple-tests-at-once" class="section level1">
 <h1>Perform multiple tests at once</h1>
@@ -81,7 +86,7 @@ for (i in 1:4) { # variables to compare are variables 1 to 4
 ## 
 ## data:  dat[, i] by dat$Species
 ## t = -5.6292, df = 94.025, p-value = 1.866e-07
-## alternative hypothesis: true difference in means is not equal to 0
+## alternative hypothesis: true difference in means between group versicolor and group virginica is not equal to 0
 ## 95 percent confidence interval:
 ##  -0.8819731 -0.4220269
 ## sample estimates:
@@ -93,7 +98,7 @@ for (i in 1:4) { # variables to compare are variables 1 to 4
 ## 
 ## data:  dat[, i] by dat$Species
 ## t = -3.2058, df = 97.927, p-value = 0.001819
-## alternative hypothesis: true difference in means is not equal to 0
+## alternative hypothesis: true difference in means between group versicolor and group virginica is not equal to 0
 ## 95 percent confidence interval:
 ##  -0.33028364 -0.07771636
 ## sample estimates:
@@ -105,7 +110,7 @@ for (i in 1:4) { # variables to compare are variables 1 to 4
 ## 
 ## data:  dat[, i] by dat$Species
 ## t = -12.604, df = 95.57, p-value &lt; 2.2e-16
-## alternative hypothesis: true difference in means is not equal to 0
+## alternative hypothesis: true difference in means between group versicolor and group virginica is not equal to 0
 ## 95 percent confidence interval:
 ##  -1.49549 -1.08851
 ## sample estimates:
@@ -117,7 +122,7 @@ for (i in 1:4) { # variables to compare are variables 1 to 4
 ## 
 ## data:  dat[, i] by dat$Species
 ## t = -14.625, df = 89.043, p-value &lt; 2.2e-16
-## alternative hypothesis: true difference in means is not equal to 0
+## alternative hypothesis: true difference in means between group versicolor and group virginica is not equal to 0
 ## 95 percent confidence interval:
 ##  -0.7951002 -0.6048998
 ## sample estimates:
@@ -140,8 +145,8 @@ for (i in 1:4) { # variables to compare are variables 1 to 4
 <div id="t-test" class="section level2">
 <h2>T-test</h2>
 <p>Although it was working quite well and applicable to different projects with only minor changes, I was still unsatisfied with another point.</p>
-<p>Someone who is proficient in statistics and R can read and interpret the output of a t-test without any difficulty. However, as you may have noticed with your own statistical projects, most people do not know what to look for in the results and are sometimes a bit confused when they see so many graphs, code, output, results and numeric values in a document. They are quite easily overwhelmed by this mass of information.</p>
-<p>With my old R routine, the time I was saving by automating the process of t-tests and ANOVA was (partially) lost when I had to explain R outputs to my students so that they could interpret the results correctly. Although most of the time it simply boiled down to pointing out what to look for in the outputs (i.e., <em>p</em>-values), I was still losing quite a lot of time because these outputs were, in my opinion, too detailed for most real-life applications. In other words, too much information seemed to be confusing for many people so I was still not convinced that it was the most optimal way to share statistical results to nonscientists.</p>
+<p>Someone who is proficient in statistics and R can read and interpret the output of a t-test without any difficulty. However, as you may have noticed with your own statistical projects, most people do not know what to look for in the results and are sometimes a bit confused when they see so many graphs, code, output, results and numeric values in a document. They are quite easily overwhelmed by this mass of information and unable to extract the key message.</p>
+<p>With my old R routine, the time I was saving by automating the process of t-tests and ANOVA was (partially) lost when I had to explain R outputs to my students so that they could interpret the results correctly. Although most of the time it simply boiled down to pointing out what to look for in the outputs (i.e., <em>p</em>-values), I was still losing quite a lot of time because these outputs were, in my opinion, too detailed for most real-life applications and for students in introductory classes. In other words, too much information seemed to be confusing for many people so I was still not convinced that it was the most optimal way to share statistical results to nonscientists.</p>
 <p>Of course, they came to me for statistical advices, so they expected to have these results and I needed to give them answers to their questions and hypotheses. Nonetheless, I wanted to find a better way to communicate these results to this type of audience, with the minimum of information required to arrive at a conclusion. No more and no less than that.</p>
 <p>After a long time spent online trying to figure out a way to present results in a more concise and readable way, I discovered the <a href="https://cran.r-project.org/web/packages/ggpubr/index.html" target="_blank"><code>{ggpubr}</code> package</a>. This package allows to indicate the test used and the <em>p</em>-value of the test directly on a ggplot2-based graph. It also facilitates the creation of publication-ready plots for non-advanced statistical audiences.</p>
 <p>After many refinements and modifications of the initial code (available in this <a href="http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/" target="_blank">article</a>), I finally came up with a rather stable and robust process to perform t-tests and ANOVA for more than one variable at once, and more importantly, make the results concise and easily readable by anyone (statisticians or not).</p>
@@ -151,9 +156,9 @@ for (i in 1:4) { # variables to compare are variables 1 to 4
 # Edit from here #
 x &lt;- which(names(dat) == &quot;Species&quot;) # name of grouping variable
 y &lt;- which(names(dat) == &quot;Sepal.Length&quot; # names of variables to test
-| names(dat) == &quot;Sepal.Width&quot;
-| names(dat) == &quot;Petal.Length&quot;
-| names(dat) == &quot;Petal.Width&quot;)
+| names(dat) == &quot;Sepal.Width&quot; |
+  names(dat) == &quot;Petal.Length&quot; |
+  names(dat) == &quot;Petal.Width&quot;)
 method &lt;- &quot;t.test&quot; # one of &quot;wilcox.test&quot; or &quot;t.test&quot;
 paired &lt;- FALSE # if paired make sure that in the dataframe you have first all individuals at T1, then all individuals again at T2
 # Edit until here
@@ -196,7 +201,7 @@ for (i in y) {
 <li>the name of the statistical test</li>
 <li>the <em>p</em>-value of the test</li>
 </ul>
-<p>Of course, experts may be interested in more advanced results. However, this simple yet complete graph, which includes the name of the test and the <em>p</em>-value, gives all the necessary information to answer the question: “Are the groups different?”.</p>
+<p>Of course, experts may be interested in more advanced results. However, this simple yet complete graph, which includes the name of the test and the <em>p</em>-value, gives all the necessary information to answer the question: “Are the groups different?”</p>
 <p>In my experience, I have noticed that students and professionals (especially those from a less scientific background) understand way better these results than the ones presented in the previous section.</p>
 <p>The only lines of code that need to be modified for your own project is the name of the grouping variable (<code>Species</code> in the above code), the names of the variables you want to test (<code>Sepal.Length</code>, <code>Sepal.Width</code>, etc.),<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> whether you want to apply a t-test (<code>t.test</code>) or Wilcoxon test (<code>wilcox.test</code>) and whether the samples are paired or not (<code>FALSE</code> if samples are independent, <code>TRUE</code> if they are paired).</p>
 <p>Based on these graphs, it is easy, even for non-experts, to interpret the results and conclude that the <code>versicolor</code> and <code>virginica</code> species are significantly different in terms of all 4 variables (since all <em>p</em>-values <span class="math inline">\(&lt; \frac{0.05}{4} = 0.0125\)</span> (remind that the Bonferroni correction is applied to avoid the issue of multiple testing, so we divide the usual <span class="math inline">\(\alpha\)</span> level by 4 because there are 4 t-tests)).</p>
@@ -273,20 +278,14 @@ df</code></pre>
   out &lt;- lapply(dvs, function(x) {
     if (paired == FALSE &amp; wilcoxon == FALSE) {
       tres &lt;- t.test(data[[x]] ~ data[[iv]], var.equal = var_equal)
-    }
-
-    else if (paired == FALSE &amp; wilcoxon == TRUE) {
+    } else if (paired == FALSE &amp; wilcoxon == TRUE) {
       tres &lt;- wilcox.test(data[[x]] ~ data[[iv]])
-    }
-
-    else if (paired == TRUE &amp; wilcoxon == FALSE) {
+    } else if (paired == TRUE &amp; wilcoxon == FALSE) {
       tres &lt;- t.test(data[[x]] ~ data[[iv]],
         var.equal = var_equal,
         paired = TRUE
       )
-    }
-
-    else {
+    } else {
       tres &lt;- wilcox.test(data[[x]] ~ data[[iv]],
         paired = TRUE
       )
@@ -325,7 +324,7 @@ result</code></pre>
 ## 2  Sepal.Width   0.002 Reject H0 at 5%
 ## 3 Petal.Length  &lt;0.001 Reject H0 at 5%
 ## 4  Petal.Width  &lt;0.001 Reject H0 at 5%</code></pre>
-<p>And with the <span class="citation">Holm (<a href="#ref-holm1979simple" role="doc-biblioref">1979</a>)</span> adjustment method:</p>
+<p>And with the <span class="citation"><a href="#ref-holm1979simple" role="doc-biblioref">Holm</a> (<a href="#ref-holm1979simple" role="doc-biblioref">1979</a>)</span> adjustment method:</p>
 <pre class="r"><code>result &lt;- t_table(
   data = dat,
   c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;, &quot;Petal.Length&quot;, &quot;Petal.Width&quot;),
@@ -350,9 +349,9 @@ result</code></pre>
 # Edit from here
 x &lt;- which(names(dat) == &quot;Species&quot;) # name of grouping variable
 y &lt;- which(names(dat) == &quot;Sepal.Length&quot; # names of variables to test
-| names(dat) == &quot;Sepal.Width&quot;
-| names(dat) == &quot;Petal.Length&quot;
-| names(dat) == &quot;Petal.Width&quot;)
+| names(dat) == &quot;Sepal.Width&quot; |
+  names(dat) == &quot;Petal.Length&quot; |
+  names(dat) == &quot;Petal.Width&quot;)
 method1 &lt;- &quot;anova&quot; # one of &quot;anova&quot; or &quot;kruskal.test&quot;
 method2 &lt;- &quot;t.test&quot; # one of &quot;wilcox.test&quot; or &quot;t.test&quot;
 my_comparisons &lt;- list(c(&quot;setosa&quot;, &quot;versicolor&quot;), c(&quot;setosa&quot;, &quot;virginica&quot;), c(&quot;versicolor&quot;, &quot;virginica&quot;)) # comparisons for post-hoc tests
@@ -379,44 +378,159 @@ for (i in y) {
 }</code></pre>
 <p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-2.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-3.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-4.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Like the improved routine for the t-test, I have noticed that students and non-expert professionals understand ANOVA results presented this way much more easily compared to the default R outputs.</p>
-<p>With one graph for each variable, it is easy to see that all species are different from each other in terms of all 4 variables.</p>
-<p>If you want to apply the same automated process to your data, you will need to modify the name of the grouping variable (<code>Species</code>), the names of the variables you want to test (<code>Sepal.Length</code>, etc.), whether you want to perform an ANOVA (<code>anova</code>) or Kruskal-Wallis test (<code>kruskal.test</code>) and finally specify the comparisons for the post-hoc tests.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<p>With one graph for each variable, it is easy to see that all species are different from each other in terms of all 4 variables.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<p>If you want to apply the same automated process to your data, you will need to modify the name of the grouping variable (<code>Species</code>), the names of the variables you want to test (<code>Sepal.Length</code>, etc.), whether you want to perform an ANOVA (<code>anova</code>) or Kruskal-Wallis test (<code>kruskal.test</code>) and finally specify the comparisons for the <a href="/blog/anova-in-r/#post-hoc-test">post-hoc tests</a>.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 </div>
 </div>
 <div id="to-go-even-further" class="section level1">
 <h1>To go even further</h1>
 <p>As we have seen, these two improved R routines allow to:</p>
 <ol style="list-style-type: decimal">
-<li>Perform t-tests and ANOVA on a small or large number of variables with only minor changes to the code. I basically only have to replace the variable names and the name of the test I want to use. It takes almost the same time to test one or several variables so it is quite an improvement compared to testing one variable at a time</li>
-<li>Share test results in a much proper and cleaner way. This is possible thanks to a graph showing the observations by group and the <em>p</em>-value of the appropriate test included on this graph. This is particularily important when communicating results to a wider audience or to people from diverse backgrounds.</li>
+<li>Perform t-tests and ANOVA on a small or large number of variables with only minor changes to the code. I basically only have to replace the variable names and the name of the test I want to use. It takes almost the same time to test one or several variables so it is quite an improvement compared to testing one variable at a time.</li>
+<li>Share test results in a much proper and cleaner way. This is possible thanks to a graph showing the observations by group and the <em>p</em>-value of the appropriate test included directly on the graph. This is particularly important when communicating results to a wider audience or to people from diverse backgrounds.</li>
 </ol>
 <p>However, like most of my R routines, these two pieces of code are still a work in progress. Below are some additional features I have been thinking of and which could be added in the future to make the process of comparing two or more groups even more optimal:</p>
 <ul>
 <li>Add the possibility to select variables by their numbering in the dataframe. For the moment it is only possible to do it via their names. This will allow to automate the process even further because instead of typing all variable names one by one, we could simply type <code>4:25</code> (to test variables 4 to 25 for instance).</li>
-<li>Add the possibility to choose a <em>p</em>-value adjustment method. Currently, raw <em>p</em>-values are displayed in the graphs and I manually adjust them afterwards.</li>
+<li>Add the possibility to choose a <em>p</em>-value adjustment method. Currently, raw <em>p</em>-values are displayed in the graphs and I manually adjust them afterwards or adjust the <span class="math inline">\(\alpha\)</span>.</li>
 <li>When comparing more than two groups, it is only possible to apply an ANOVA or Kruskal-Wallis test at the moment. A major improvement would be to add the possibility to perform a repeated measures ANOVA (i.e., an ANOVA when the samples are dependent). It is currently already possible to do a t-test with two paired samples, but it is not yet possible to do the same with more than two groups.</li>
 <li>Another less important (yet still nice) feature when comparing more than 2 groups would be to automatically apply post-hoc tests only in the case where the null hypothesis of the ANOVA or Kruskal-Wallis test is rejected (so when there is at least one group different from the others, because if the null hypothesis of equal groups is not rejected we do not apply a post-hoc test). At the present time, I manually add or remove the code that displays the <em>p</em>-values of post-hoc tests depending on the global <em>p</em>-value of the ANOVA or Kruskal-Wallis test.</li>
 </ul>
 <p>I will try to add these features in the future, or I would be glad to help if the author of the <code>{ggpubr}</code> package needs help in including these features (I hope he will see this article!).</p>
 <p>Last but not least, the following packages may be of interest to some readers:</p>
 <ul>
-<li><p>If you want to report statistical results on a graph, I advise you to check the <a href="https://indrajeetpatil.github.io/ggstatsplot/" target="_blank"><code>{ggstatsplot}</code> package</a> and in particular the <a href="https://indrajeetpatil.github.io/ggstatsplot/articles/web_only/ggbetweenstats.html" target="_blank"><code>ggbetweenstats()</code></a> function. This function allows to compare a continuous variable across multiple groups or conditions. Note that many different statistical results are displayed on the graph, not only the name of the test and the <em>p</em>-value. However, it is still very convenient to be able to include tests results on a graph in order to combine the advantages of a visualization and a sound statistical analysis.</p></li>
-<li><p>The <a href="https://cloud.r-project.org/web/packages/compareGroups/index.html" target="_blank"><code>{compareGroups}</code> package</a> also provides a nice way to compare groups. It comes with a really complete Shiny app, available with:</p></li>
+<li>If you want to report statistical results on a graph, I advise you to check the <a href="https://indrajeetpatil.github.io/ggstatsplot/" target="_blank"><code>{ggstatsplot}</code> package</a> and in particular the <code>ggbetweenstats()</code> and <code>ggwithinstats()</code> functions. These functions allow to compare a continuous variable across multiple groups or conditions (for both independent and paired samples). Two advantages of the functions is that:
+<ul>
+<li>it is very easy to switch from parametric to nonparemetric tests and</li>
+<li>it automatically runs an ANOVA or t-test depending on the number of groups to compare</li>
+</ul></li>
+</ul>
+<p>Note that many different statistical results are displayed on the graph, not only the name of the test and the <em>p</em>-value so a bit of simplicity and clarity is lost for more precision. However, it is still very convenient to be able to include tests results on a graph in order to combine the advantages of a visualization and a sound statistical analysis. Something that I still need to figure out is how to run the code on several variables at once.</p>
+<ul>
+<li>The <a href="https://cloud.r-project.org/web/packages/compareGroups/index.html" target="_blank"><code>{compareGroups}</code> package</a> also provides a nice way to compare groups. It comes with a really complete Shiny app, available with:</li>
 </ul>
 <pre class="r"><code># install.packages(&quot;compareGroups&quot;)
 library(compareGroups)
 cGroupsWUI()</code></pre>
+</div>
+<div id="update-with-the-ggstatsplot-package" class="section level1">
+<h1>Update with the <code>{ggstatsplot}</code> package</h1>
+<p>Several months after having written this article, I finally found a way to plot and run analyses on several variables at once with the package <code>{ggstatsplot}</code> (this was the main feature I was missing and which prevented me from using it more often).</p>
+<p>Although I still find that too much statistical details are displayed (in particular for non experts), I still believe the <code>ggbetweenstats()</code> and <code>ggwithinstats()</code> functions are worth mentioning in this article. I actually now use those two functions almost as often as my previous routines because:</p>
+<ul>
+<li>I do not have to care about the number of groups to compare, the functions automatically choose the appropriate test according to the number of groups (ANOVA for 3 groups or more, and t-test for 2 groups)</li>
+<li>I can select variables based on their column numbering, and not based on their names anymore (which prevents me from writing those variable names manually)</li>
+<li>When comparing 3 or more groups (so for ANOVA, Kruskal-Wallis, repeated measure ANOVA or Friedman), <span class="math inline">\(p\)</span>-values of the post-hoc tests within each dependent variable are by default the adjusted <span class="math inline">\(p\)</span>-values (Holm is the default but many adjustment methods are available)</li>
+<li>It is possible to compare both independent and paired samples, no matter the number of groups (remember that with the <code>ggpubr</code> package I could only do paired samples for two samples, not for 3 samples)</li>
+<li>They allow to easily switch between the parametric and nonparametric version</li>
+<li>All this in a more concise manner using the <code>{purrr}</code> package</li>
+</ul>
+<p>For those of you who are interested, below my updated R routine which include these functions and applied this time on the <code>penguins</code> dataset.</p>
+<pre class="r"><code>library(palmerpenguins)
+
+dat &lt;- penguins
+str(dat)</code></pre>
+<pre><code>## tibble [344 × 8] (S3: tbl_df/tbl/data.frame)
+##  $ species          : Factor w/ 3 levels &quot;Adelie&quot;,&quot;Chinstrap&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ island           : Factor w/ 3 levels &quot;Biscoe&quot;,&quot;Dream&quot;,..: 3 3 3 3 3 3 3 3 3 3 ...
+##  $ bill_length_mm   : num [1:344] 39.1 39.5 40.3 NA 36.7 39.3 38.9 39.2 34.1 42 ...
+##  $ bill_depth_mm    : num [1:344] 18.7 17.4 18 NA 19.3 20.6 17.8 19.6 18.1 20.2 ...
+##  $ flipper_length_mm: int [1:344] 181 186 195 NA 193 190 181 195 193 190 ...
+##  $ body_mass_g      : int [1:344] 3750 3800 3250 NA 3450 3650 3625 4675 3475 4250 ...
+##  $ sex              : Factor w/ 2 levels &quot;female&quot;,&quot;male&quot;: 2 1 1 NA 1 2 1 2 NA NA ...
+##  $ year             : int [1:344] 2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...</code></pre>
+<p>We illustrate the routine for two groups with the variables <code>sex</code> (two factors) as independent variable, and the 4 quantitative continuous variables <code>bill_length_mm</code>, <code>bill_depth_mm</code>, <code>bill_depth_mm</code> and <code>body_mass_g</code> as dependent variables:</p>
+<pre class="r"><code>library(ggstatsplot)
+
+# Comparison between sexes
+
+# edit from here
+x &lt;- &quot;sex&quot;
+cols &lt;- 3:6 # the 4 continuous dependent variables
+type &lt;- &quot;parametric&quot; # given the large number of observations, we use the parametric version
+paired &lt;- FALSE # FALSE for independent samples, TRUE for paired samples
+# edit until here
+
+# edit at your own risk
+plotlist &lt;-
+  purrr::pmap(
+    .l = list(
+      data = list(as_tibble(dat)),
+      x = x,
+      y = as.list(colnames(dat)[cols]),
+      plot.type = &quot;box&quot;, # for boxplot
+      type = type, # parametric or nonparametric
+      pairwise.comparisons = TRUE, # to run post-hoc tests if more than 2 groups
+      pairwise.display = &quot;significant&quot;, # show only significant differences
+      bf.message = FALSE, # remove message about Bayes Factor
+      centrality.plotting = FALSE # remove central measure
+    ),
+    .f = ifelse(paired, # automatically use ggwithinstats if paired samples, ggbetweenstats otherwise
+      ggstatsplot::ggwithinstats,
+      ggstatsplot::ggbetweenstats
+    )
+  )
+
+# print all plots together with statistical results
+for (i in 1:length(plotlist)) {
+  print(plotlist[[i]])
+}</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-2.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-3.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-4.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We now illustrate the routine for 3 groups or more with the variable <code>species</code> (three factors) as independent variable, and the 4 same dependent variables:</p>
+<pre class="r"><code># Comparison between species
+
+# edit from here
+x &lt;- &quot;species&quot;
+cols &lt;- 3:6 # the 4 continuous dependent variables
+type &lt;- &quot;parametric&quot; # given the large number of observations, we use the parametric version
+paired &lt;- FALSE # FALSE for independent samples, TRUE for paired samples
+# edit until here
+
+# edit at your own risk
+plotlist &lt;-
+  purrr::pmap(
+    .l = list(
+      data = list(as_tibble(dat)),
+      x = x,
+      y = as.list(colnames(dat)[cols]),
+      plot.type = &quot;box&quot;, # for boxplot
+      type = type, # parametric or nonparametric
+      pairwise.comparisons = TRUE, # to run post-hoc tests if more than 2 groups
+      pairwise.display = &quot;significant&quot;, # show only significant differences
+      bf.message = FALSE, # remove message about Bayes Factor
+      centrality.plotting = FALSE # remove central measure
+    ),
+    .f = ifelse(paired, # automatically use ggwithinstats if paired samples, ggbetweenstats otherwise
+      ggstatsplot::ggwithinstats,
+      ggstatsplot::ggbetweenstats
+    )
+  )
+
+# print all plots together with statistical results
+for (i in 1:length(plotlist)) {
+  print(plotlist[[i]])
+}</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-2.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-3.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-4.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>As you can see, I only have to specify the name of the grouping variable (<code>sex</code> and <code>species</code>), the number of the dependent variables (variables 3 to 6 in the dataset), whether I want to use the parametric or nonparametric version and whether samples are independent (<code>paired = FALSE</code>) or paired (<code>paired = TRUE</code>). Everything else is automated—the outputs show a graphical representation of what we are comparing, together with the details of the statistical analyses in the subtitle of the plot (the <span class="math inline">\(p\)</span>-value among others).</p>
+<p>Note that the code shown above is actually the same if I want to compare 2 groups or more than 2 groups. I wrote twice the same code (once for 2 groups and once again for 3 groups) for illustrative purposes only, but they are the same and should be treated as one for your projects.</p>
+<p>I must admit I am quite <strong>satisfied</strong> with this routine, now that:</p>
+<ul>
+<li>I can automate it on many variables at once and I do not need to write the variable names manually anymore,</li>
+<li>at the same time, I can choose the appropriate test among all the available ones (depending on the number of groups, whether they are paired or not, and whether I want to use the parametric or nonparametric version).</li>
+</ul>
+<p>Nonetheless, I must also admit that I am still <strong>not satisfied</strong> with the level of details of the statistical results. As already mentioned, many students get confused and get lost in front of so much information (except the <span class="math inline">\(p\)</span>-value and the number of observations, most of it is rather obscure to them because uncovered in introductory statistic classes). I saved time thanks to all improvements in comparison to my previous routine, but I definitely lose time when I have to point out to them what they should look for. After discussing with other professors, I noticed that they have the same problem.</p>
+<p>For the moment, you can only print all results or none. I have opened an <a href="https://github.com/IndrajeetPatil/ggstatsplot/issues/669" target="_blank">issue</a> kindly requesting to add the possibility to display only a summary (with the <span class="math inline">\(p\)</span>-value and the name of the test for instance). I will update again this article if the maintainer of the package includes this feature in the future. So stay tuned!</p>
 <p>Thanks for reading. I hope this article will help you to perform t-tests and ANOVA for multiple variables at once and make the results more easily readable and interpretable by nonscientists. Learn more about the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">t-test</a> to compare two samples, or the <a href="/blog/anova-in-r/">ANOVA</a> to compare 3 samples or more.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
-<div id="refs" class="references">
-<div id="ref-holm1979simple">
-<p>Holm, Sture. 1979. “A Simple Sequentially Rejective Multiple Test Procedure.” <em>Scandinavian Journal of Statistics</em>, 65–70.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-holm1979simple" class="csl-entry">
+Holm, Sture. 1979. <span>“A Simple Sequentially Rejective Multiple Test Procedure.”</span> <em>Scandinavian Journal of Statistics</em>, 65–70.
 </div>
-<div id="ref-mcdonald2014multiple">
-<p>McDonald, JH. 2014. “Multiple Tests.” <em>Handbook of Biological Statistics. 3rd Ed Baltimore, Maryland: Sparky House Publishing</em>, 233–6.</p>
+<div id="ref-mcdonald2014multiple" class="csl-entry">
+McDonald, JH. 2014. <span>“Multiple Tests.”</span> <em>Handbook of Biological Statistics. 3rd Ed Baltimore, Maryland: Sparky House Publishing</em>, 233–36.
 </div>
 </div>
 </div>
@@ -425,6 +539,7 @@ cGroupsWUI()</code></pre>
 <ol>
 <li id="fn1"><p>In theory, an ANOVA can also be used to compare two groups as it will give the same results compared to a Student’s t-test, but in practice we use the Student’s t-test to compare two samples and the ANOVA to compare three samples or more.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>Do not forget to separate the variables you want to test with <code>|</code>.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>Post-hoc test is only the name used to refer to a specific type of statistical tests. Post-hoc test includes, among others, the Tukey HSD test, the Bonferroni correction, Dunnett’s test. Even if an ANOVA or a Kruskal-Wallis test can determine whether there is at least one group that is different from the others, it does not allow us to conclude <strong>which</strong> are different from each other. For this purpose, there are post-hoc tests that compare all groups two by two to determine which ones are different, after adjusting for multiple comparisons. Concretely, post-hoc tests are performed to each possible pair of groups <strong>after</strong> an ANOVA or a Kruskal-Wallis test has shown that there is at least one group which is different (hence “post” in the name of this type of test). The null and alternative hypotheses and the interpretations of these tests are similar to a Student’s t-test for two samples.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Do not forget to adjust the <span class="math inline">\(p\)</span>-values or the significance level <span class="math inline">\(\alpha\)</span>. If you use the Bonferroni correction, the adjusted <span class="math inline">\(\alpha\)</span> is simply the desired <span class="math inline">\(\alpha\)</span> level divided by the number of comparisons.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Post-hoc test is only the name used to refer to a specific type of statistical tests. Post-hoc test includes, among others, the Tukey HSD test, the Bonferroni correction, Dunnett’s test. Even if an ANOVA or a Kruskal-Wallis test can determine whether there is at least one group that is different from the others, it does not allow us to conclude <strong>which</strong> are different from each other. For this purpose, there are post-hoc tests that compare all groups two by two to determine which ones are different, after adjusting for multiple comparisons. Concretely, post-hoc tests are performed to each possible pair of groups <strong>after</strong> an ANOVA or a Kruskal-Wallis test has shown that there is at least one group which is different (hence “post” in the name of this type of test). The null and alternative hypotheses and the interpretations of these tests are similar to a Student’s t-test for two samples.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
