@@ -7,12 +7,12 @@ meta_img: LESPO2102_files/teaching.jpeg
 
 Ci-dessous vous trouverez les énoncés et solutions des TPs pour le cours LESPO2102 - Statistiques :
 
-- TP1
-- TP2
-- TP3
-- TP4
-- TP5
-- TP6
+- [TP1](/LESPO2102/tp1)
+- [TP2]()
+- [TP3]()
+- [TP4]()
+- [TP5]()
+- [TP6]()
 
 Ci-dessous les tables statistiques utilisées pour ce cours ainsi que le formulaire autorisé à l'examen :
 
