@@ -16,5 +16,5 @@ Ci-dessous vous trouverez les énoncés et solutions des TPs pour le cours LESPO
 
 Ci-dessous les tables statistiques utilisées pour ce cours ainsi que le formulaire autorisé à l'examen :
 
-- [Tables statistiques et formulaire](/files/formulaire_tables_LESPO2102.pdf)
+- [Tables statistiques et formulaire](/LESPO2102_files/formulaire_tables_LESPO2102.pdf)
 
