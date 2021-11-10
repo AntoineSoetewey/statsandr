@@ -12,6 +12,7 @@ tags:
   - Professional
   - Tips
   - Visualization
+  - Shiny app
 meta_img: blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way.jpeg
 description: Learn how to compare samples for multiple variables at once in R thanks to a Student t-test or ANOVA and communicate the results in a better way
 output:
@@ -463,7 +464,8 @@ plotlist &lt;-
       pairwise.comparisons = TRUE, # to run post-hoc tests if more than 2 groups
       pairwise.display = &quot;significant&quot;, # show only significant differences
       bf.message = FALSE, # remove message about Bayes Factor
-      centrality.plotting = FALSE # remove central measure
+      centrality.plotting = FALSE, # remove central measure
+      title = paste0(colnames(dat)[cols], &quot; by &quot;, x) # add title
     ),
     .f = ifelse(paired, # automatically use ggwithinstats if paired samples, ggbetweenstats otherwise
       ggstatsplot::ggwithinstats,
@@ -473,7 +475,8 @@ plotlist &lt;-
 
 # print all plots together with statistical results
 for (i in 1:length(plotlist)) {
-  print(plotlist[[i]])
+  print(plotlist[[i]] +
+    labs(caption = NULL)) # remove caption
 }</code></pre>
 <p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-2.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-3.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-4.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We now illustrate the routine for 3 groups or more with the variable <code>species</code> (three factors) as independent variable, and the 4 same dependent variables:</p>
@@ -498,7 +501,8 @@ plotlist &lt;-
       pairwise.comparisons = TRUE, # to run post-hoc tests if more than 2 groups
       pairwise.display = &quot;significant&quot;, # show only significant differences
       bf.message = FALSE, # remove message about Bayes Factor
-      centrality.plotting = FALSE # remove central measure
+      centrality.plotting = FALSE, # remove central measure
+      title = paste0(colnames(dat)[cols], &quot; by &quot;, x) # add title
     ),
     .f = ifelse(paired, # automatically use ggwithinstats if paired samples, ggbetweenstats otherwise
       ggstatsplot::ggwithinstats,
@@ -508,11 +512,13 @@ plotlist &lt;-
 
 # print all plots together with statistical results
 for (i in 1:length(plotlist)) {
-  print(plotlist[[i]])
+  print(plotlist[[i]] +
+    labs(caption = NULL)) # remove caption
 }</code></pre>
 <p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-2.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-3.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-4.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As you can see, I only have to specify the name of the grouping variable (<code>sex</code> and <code>species</code>), the number of the dependent variables (variables 3 to 6 in the dataset), whether I want to use the parametric or nonparametric version and whether samples are independent (<code>paired = FALSE</code>) or paired (<code>paired = TRUE</code>). Everything else is automated—the outputs show a graphical representation of what we are comparing, together with the details of the statistical analyses in the subtitle of the plot (the <span class="math inline">\(p\)</span>-value among others).</p>
 <p>Note that the code shown above is actually the same if I want to compare 2 groups or more than 2 groups. I wrote twice the same code (once for 2 groups and once again for 3 groups) for illustrative purposes only, but they are the same and should be treated as one for your projects.</p>
+<p>Feel free to discover the package and see how it works by yourself via this <a href="https://antoinesoetewey.shinyapps.io/ggstatsplotShiny/" target="_blank">Shiny app</a>.</p>
 <p>I must admit I am quite <strong>satisfied</strong> with this routine, now that:</p>
 <ul>
 <li>I can automate it on many variables at once and I do not need to write the variable names manually anymore,</li>

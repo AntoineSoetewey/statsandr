@@ -12,6 +12,7 @@ tags:
   - Professional
   - Tips
   - Visualization
+  - Shiny app
 meta_img: blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way.jpeg
 description: Learn how to compare samples for multiple variables at once in R thanks to a Student t-test or ANOVA and communicate the results in a better way
 output:
@@ -441,7 +442,8 @@ plotlist <-
       pairwise.comparisons = TRUE, # to run post-hoc tests if more than 2 groups
       pairwise.display = "significant", # show only significant differences
       bf.message = FALSE, # remove message about Bayes Factor
-      centrality.plotting = FALSE # remove central measure
+      centrality.plotting = FALSE, # remove central measure
+      title = paste0(colnames(dat)[cols], " by ", x) # add title
     ),
     .f = ifelse(paired, # automatically use ggwithinstats if paired samples, ggbetweenstats otherwise
                 ggstatsplot::ggwithinstats,
@@ -450,7 +452,8 @@ plotlist <-
 
 # print all plots together with statistical results
 for (i in 1:length(plotlist)) {
-  print(plotlist[[i]])
+  print(plotlist[[i]] +
+          labs(caption = NULL)) # remove caption
 }
 ```
 
@@ -478,7 +481,8 @@ plotlist <-
       pairwise.comparisons = TRUE, # to run post-hoc tests if more than 2 groups
       pairwise.display = "significant", # show only significant differences
       bf.message = FALSE, # remove message about Bayes Factor
-      centrality.plotting = FALSE # remove central measure
+      centrality.plotting = FALSE, # remove central measure
+      title = paste0(colnames(dat)[cols], " by ", x) # add title
     ),
     .f = ifelse(paired, # automatically use ggwithinstats if paired samples, ggbetweenstats otherwise
                 ggstatsplot::ggwithinstats,
@@ -487,13 +491,16 @@ plotlist <-
 
 # print all plots together with statistical results
 for (i in 1:length(plotlist)) {
-  print(plotlist[[i]])
+  print(plotlist[[i]] +
+          labs(caption = NULL)) # remove caption
 }
 ```
 
 As you can see, I only have to specify the name of the grouping variable (`sex` and `species`), the number of the dependent variables (variables 3 to 6 in the dataset), whether I want to use the parametric or nonparametric version and whether samples are independent (`paired = FALSE`) or paired (`paired = TRUE`). Everything else is automated---the outputs show a graphical representation of what we are comparing, together with the details of the statistical analyses in the subtitle of the plot (the $p$-value among others).
 
 Note that the code shown above is actually the same if I want to compare 2 groups or more than 2 groups. I wrote twice the same code (once for 2 groups and once again for 3 groups) for illustrative purposes only, but they are the same and should be treated as one for your projects.
+
+Feel free to discover the package and see how it works by yourself via this [Shiny app](https://antoinesoetewey.shinyapps.io/ggstatsplotShiny/){target="_blank"}.
 
 I must admit I am quite **satisfied** with this routine, now that:
 
