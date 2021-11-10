@@ -24,7 +24,3 @@ For you robots out there is an [XML version](/sitemap.xml) available for digesti
 * [Useful links](/links/)
 * [Terms and policies](/terms/)
 * [Sitemap](/sitemap/)
-
-### Teaching ressources
-
-- [LESPO2102](/lespo2102/)
