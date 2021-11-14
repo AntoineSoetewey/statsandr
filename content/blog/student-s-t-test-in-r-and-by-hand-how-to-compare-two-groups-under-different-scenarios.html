@@ -19,6 +19,7 @@ output:
 bibliography: bibliography.bib
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 <script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
 <script src="/rmarkdown-libs/viz/viz.js"></script>
 <link href="/rmarkdown-libs/DiagrammeR-styles/styles.css" rel="stylesheet" />
@@ -30,21 +31,30 @@ bibliography: bibliography.bib
 <li><a href="#null-and-alternative-hypothesis">Null and alternative hypothesis</a></li>
 <li><a href="#hypothesis-testing">Hypothesis testing</a></li>
 <li><a href="#different-versions-of-the-students-t-test">Different versions of the Student’s t-test</a></li>
-<li><a href="#how-to-compute-students-t-test-by-hand">How to compute Student’s t-test by hand?</a><ul>
+<li><a href="#how-to-compute-students-t-test-by-hand">How to compute Student’s t-test by hand?</a>
+<ul>
 <li><a href="#scenario-1-independent-samples-with-2-known-variances">Scenario 1: Independent samples with 2 known variances</a></li>
 <li><a href="#scenario-2-independent-samples-with-2-equal-but-unknown-variances">Scenario 2: Independent samples with 2 equal but unknown variances</a></li>
 <li><a href="#scenario-3-independent-samples-with-2-unequal-and-unknown-variances">Scenario 3: Independent samples with 2 unequal and unknown variances</a></li>
 <li><a href="#scenario-4-paired-samples-where-the-variance-of-the-differences-is-known">Scenario 4: Paired samples where the variance of the differences is known</a></li>
 <li><a href="#scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown">Scenario 5: Paired samples where the variance of the differences is unknown</a></li>
 </ul></li>
-<li><a href="#how-to-compute-students-t-test-in-r">How to compute Student’s t-test in R?</a><ul>
-<li><a href="#scenario-1-independent-samples-with-2-known-variances-1">Scenario 1: Independent samples with 2 known variances</a><ul>
+<li><a href="#how-to-compute-students-t-test-in-r">How to compute Student’s t-test in R?</a>
+<ul>
+<li><a href="#scenario-1-independent-samples-with-2-known-variances-1">Scenario 1: Independent samples with 2 known variances</a>
+<ul>
 <li><a href="#a-note-on-p-value-and-significance-level-alpha">A note on <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span></a></li>
 </ul></li>
 <li><a href="#scenario-2-independent-samples-with-2-equal-but-unknown-variances-1">Scenario 2: Independent samples with 2 equal but unknown variances</a></li>
 <li><a href="#scenario-3-independent-samples-with-2-unequal-and-unknown-variances-1">Scenario 3: Independent samples with 2 unequal and unknown variances</a></li>
 <li><a href="#scenario-4-paired-samples-where-the-variance-of-the-differences-is-known-1">Scenario 4: Paired samples where the variance of the differences is known</a></li>
 <li><a href="#scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown-1">Scenario 5: Paired samples where the variance of the differences is unknown</a></li>
+<li><a href="#combination-of-plot-and-statistical-test">Combination of plot and statistical test</a>
+<ul>
+<li><a href="#scenario-2">Scenario 2</a></li>
+<li><a href="#scenario-3">Scenario 3</a></li>
+<li><a href="#scenario-5">Scenario 5</a></li>
+</ul></li>
 </ul></li>
 <li><a href="#assumptions">Assumptions</a></li>
 <li><a href="#references">References</a></li>
@@ -86,7 +96,7 @@ bibliography: bibliography.bib
 <li><span class="math inline">\(H_1\)</span>: <span class="math inline">\(\mu_1 &lt; \mu_2\)</span></li>
 </ul>
 <p>In the first case, we want to test if the first population is significantly larger than the second, while in the latter case, we want to test if the first population is significantly smaller than the second. This type of test is referred as a <strong>one-sided</strong> or unilateral test.</p>
-<p>Some authors argue that one-sided tests should not be used in practice for the simple reason that, if a researcher is so sure that one population is larger (smaller) than the other and would never be smaller (larger) than the other, why would she needs to test for significance at all? This a rather philosophical question and it is beyond the scope of this article. Interested readers are invited to see part of the discussion in <span class="citation">Rowntree (<a href="#ref-rowntree2000statistics" role="doc-biblioref">2000</a>)</span>.</p>
+<p>Some authors argue that one-sided tests should not be used in practice for the simple reason that, if a researcher is so sure that one population is larger (smaller) than the other and would never be smaller (larger) than the other, why would she needs to test for significance at all? This a rather philosophical question and it is beyond the scope of this article. Interested readers are invited to see part of the discussion in <span class="citation"><a href="#ref-rowntree2000statistics" role="doc-biblioref">Rowntree</a> (<a href="#ref-rowntree2000statistics" role="doc-biblioref">2000</a>)</span>.</p>
 </div>
 <div id="hypothesis-testing" class="section level1">
 <h1>Hypothesis testing</h1>
@@ -645,12 +655,13 @@ test</code></pre>
 <pre class="r"><code>library(BSDA)
 
 z.test(dat1$sample1,
-       dat1$sample2,
-       alternative = &quot;two.sided&quot;,
-       mu = 0,
-       sigma.x = 1,
-       sigma.y = 1,
-       conf.level = 0.95)</code></pre>
+  dat1$sample2,
+  alternative = &quot;two.sided&quot;,
+  mu = 0,
+  sigma.x = 1,
+  sigma.y = 1,
+  conf.level = 0.95
+)</code></pre>
 <pre><code>## 
 ##  Two-sample z-Test
 ## 
@@ -668,7 +679,7 @@ z.test(dat1$sample1,
 <p>If the observations are not so extreme—not unlikely to occur if the null hypothesis were true—we do not reject this null hypothesis because it is deemed plausible to be true. And if the observations are considered too extreme—too unlikely to happen under the null hypothesis—we reject the null hypothesis because it is deemed too implausible to be true. Note that it does not mean that we are 100% sure that it is too unlikely, it happens sometimes that the null hypothesis is rejected although it is true (see the significance level <span class="math inline">\(\alpha\)</span> later on).</p>
 <p>In our example above, the observations are not really extreme and the difference between the two means is not extreme, so the test statistic is not extreme (since the test statistic is partially based on the difference of the means of the two samples). Having a test statistic which is not extreme is not unlikely and that is the reason why the <em>p</em>-value is quite high. The <em>p</em>-value of 0.95 actually tells us that the probability of having two samples with a difference in means of -0.04 (= 0.02 - 0.06), given that the difference in means in the populations is 0 (the null hypothesis), equals 95%. A probability of 95% is definitely considered as plausible, so we do not reject the null hypothesis of equal means in the populations.</p>
 <p>One may then wonder, “What is too extreme for a test statistic?” Most of the time, we consider that a test statistic is too extreme to happen just by chance when the probability of having such an extreme test statistic given that the null hypothesis is true is below 5%. The threshold of 5% (<span class="math inline">\(\alpha = 0.05\)</span>) that you very often see in statistic courses or textbooks is the threshold used in many fields. With a <em>p</em>-value under that threshold of 5%, we consider that the observations (and thus the test statistic) is <strong>too unlikely</strong> to happen just by chance if the null hypothesis were true, so the null hypothesis is rejected. With a <em>p</em>-value above that threshold of 5%, we consider that it is not really implausible to face the observations we have if the null hypothesis were true, and we therefore do not reject the null hypothesis.</p>
-<p>Note that I wrote “we do not reject the null hypothesis”, and not “we accept the null hypothesis”. This is because it may be the case that the null hypothesis is in fact false, but we failed to prove it with the samples. Suppose the analogy of a suspect accused of murder and we do not know the truth. On the one hand, if we have collected enough evidence that the suspect committed the murder, he is considered guilty: we reject the null hypothesis that he is innocent. On the other hand, if we have <em>not</em> collected enough evidence against the suspect, he is presumed to be innocent although he may in fact have committed the crime: we failed to reject the null hypothesis of him being innocent. We are never sure that he did not committed the crime even if he is released, we just did not find sufficient evidence against the null hypothesis of the suspect being innocent. This is the reason why we do not reject the null hypothesis instead of accepting it, and why you will often read things like “there is no sufficient evidence in the data to reject the null hypothesis” or “based on the samples we fail to reject the null hypothesis”.</p>
+<p>Note that I wrote “we do not reject the null hypothesis,” and not “we accept the null hypothesis.” This is because it may be the case that the null hypothesis is in fact false, but we failed to prove it with the samples. Suppose the analogy of a suspect accused of murder and we do not know the truth. On the one hand, if we have collected enough evidence that the suspect committed the murder, he is considered guilty: we reject the null hypothesis that he is innocent. On the other hand, if we have <em>not</em> collected enough evidence against the suspect, he is presumed to be innocent although he may in fact have committed the crime: we failed to reject the null hypothesis of him being innocent. We are never sure that he did not committed the crime even if he is released, we just did not find sufficient evidence against the null hypothesis of the suspect being innocent. This is the reason why we do not reject the null hypothesis instead of accepting it, and why you will often read things like “there is no sufficient evidence in the data to reject the null hypothesis” or “based on the samples we fail to reject the null hypothesis.”</p>
 <p>The <strong>significance level <span class="math inline">\(\alpha\)</span></strong>, derived from the threshold of 5% mentioned earlier, <strong>is the probability of rejecting the null hypothesis when it is in fact true</strong>. In this sense, it is an error (of 5%) that we accept to deal with, in order to be able to draw conclusions. If we would accept no error (an error of 0%), we would not be able to draw any conclusion about the population(s) since we only have access to a limited portion of the population(s) via the sample(s). As a consequence, we will never be 100% sure when interpreting the result of a hypothesis test unless we have access to the data for the entire population, but then there is no reason to do a hypothesis test anymore since we can simply compare the two populations. We usually allow this error (called Type I error) to be 5%, but in order to be a bit more certain when concluding that we reject the null hypothesis, the alpha level can also be set to 1% (or even to 0.1% in some rare cases).</p>
 <p><strong>To sum up</strong> what you need to remember about <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span>:</p>
 <ul>
@@ -726,7 +737,7 @@ test</code></pre>
 <pre class="r"><code>test$p.value</code></pre>
 <pre><code>## [1] 0.003866756</code></pre>
 <p>The <em>p</em>-value is 0.004 so at the 5% significance level we reject the null hypothesis of equal means. This result confirms what we found by hand.</p>
-<p>Unlike the first scenario, the <em>p</em>-value in this scenario is below 5% so we reject the null hypothesis. At the 5% significance level, we can conclude that the population 1 is larger than the population 2.</p>
+<p>Unlike the first scenario, the <em>p</em>-value in this scenario is below 5% so we reject the null hypothesis. At the 5% significance level, we can conclude that the mean of population 1 is larger than the mean of population 2.</p>
 <p>A nice and easy way to report results of a Student’s t-test in R is with the <code>report()</code> function from the <code>{report}</code> package:</p>
 <pre class="r"><code># install.packages(&quot;remotes&quot;)
 # remotes::install_github(&quot;easystats/report&quot;) # You only need to do that once
@@ -735,7 +746,7 @@ library(&quot;report&quot;) # Load the package every time you start R
 report(test)</code></pre>
 <pre><code>## Effect sizes were labelled following Cohen&#39;s (1988) recommendations.
 ## 
-## The Two Sample t-test testing the difference between dat2$sample1 and dat2$sample2 (mean of x = 1.25, mean of y = 0.10) suggests that the effect is positive, statistically significant, and large (difference = 1.15, 95% CI [0.53, Inf], t(9) = 3.41, p &lt; .01; Cohen&#39;s d = 2.07, 95% CI [0.52, 3.55])</code></pre>
+## The Two Sample t-test testing the difference between dat2$sample1 and dat2$sample2 (mean of x = 1.25, mean of y = 0.10) suggests that the effect is positive, statistically significant, and large (difference = 1.15, 95% CI [0.53, Inf], t(9) = 3.41, p = 0.004; Cohen&#39;s d = 2.07, 95% CI [0.75, Inf])</code></pre>
 <p>As you can see, the function interprets the test (together with the <em>p</em>-value) for you.</p>
 <p>Note that the <code>report()</code> function can be used for other analyses. See more <a href="/blog/tips-and-tricks-in-rstudio-and-r-markdown/">tips and tricks in R</a> if you find this one useful.</p>
 <p>If your data is formatted in the long format (which is even better), simply use the <code>~</code>. For instance, imagine the exact same data presented like this:</p>
@@ -768,7 +779,7 @@ test</code></pre>
 ## 
 ## data:  value by sample
 ## t = 3.4113, df = 9, p-value = 0.003867
-## alternative hypothesis: true difference in means is greater than 0
+## alternative hypothesis: true difference in means between group 1 and group 2 is greater than 0
 ## 95 percent confidence interval:
 ##  0.5304908       Inf
 ## sample estimates:
@@ -815,7 +826,7 @@ test</code></pre>
 ## 
 ## data:  value by sample
 ## t = -3.0841, df = 8.2796, p-value = 0.007206
-## alternative hypothesis: true difference in means is less than 0
+## alternative hypothesis: true difference in means between group 1 and group 2 is less than 0
 ## 95 percent confidence interval:
 ##        -Inf -0.3304098
 ## sample estimates:
@@ -985,6 +996,65 @@ test</code></pre>
 <pre><code>## [1] 0.005528247</code></pre>
 <p>The <em>p</em>-value is 0.006 so at the 5% significance level we reject the null hypothesis of the mean of the differences being equal to 0, meaning that we can conclude that the treatment is effective in increasing the running capabilities. This result confirms what we found by hand.</p>
 </div>
+<div id="combination-of-plot-and-statistical-test" class="section level2">
+<h2>Combination of plot and statistical test</h2>
+<p>After having written this article, I discovered the <code>{ggstatsplot}</code> package which I believe is worth mentioning here, in particular the <code>ggbetweenstats()</code> and <code>ggwithinstats()</code> functions for independent and paired samples, respectively.</p>
+<p>These two functions combine a plot—representing the distribution for each group—and the results of the statistical test displayed in the subtitle of the plot.</p>
+<p>See examples below for scenarios 2, 3 and 5. Unfortunately, the package does not allow to run tests for scenarios 1 and 4.</p>
+<div id="scenario-2" class="section level3">
+<h3>Scenario 2</h3>
+<p>The <code>ggbetweenstats()</code> function is used for independent samples:</p>
+<pre class="r"><code># load package
+library(ggstatsplot)
+library(ggplot2)
+
+# plot with statistical results
+ggbetweenstats(
+  data = dat2bis,
+  x = sample,
+  y = value,
+  plot.type = &quot;box&quot;, # for boxplot
+  type = &quot;parametric&quot;, # for student&#39;s t-test
+  var.equal = TRUE, # equal variances
+  centrality.plotting = FALSE # remove mean
+) +
+  labs(caption = NULL) # remove caption</code></pre>
+<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The <em>p</em>-value (displayed after <code>p =</code>) is two times as large as the one obtained with the <code>t.test()</code> function because when we ran <code>t.test()</code> we specified <code>alternative = "greater"</code> (i.e., a one-sided test). In our plot with the <code>ggbetweenstats()</code> function, it is a two-sided test that is performed by default, that is, <code>alternative = "two.sided"</code>.</p>
+</div>
+<div id="scenario-3" class="section level3">
+<h3>Scenario 3</h3>
+<p>We also have independent samples so we use the <code>ggbetweenstats()</code> function again, but this time the two populations variances are not assumed to be equal so we specify the argument <code>var.equal = FALSE</code>:</p>
+<pre class="r"><code># plot with statistical results
+ggbetweenstats(
+  data = dat3,
+  x = sample,
+  y = value,
+  plot.type = &quot;box&quot;, # for boxplot
+  type = &quot;parametric&quot;, # for student&#39;s t-test
+  var.equal = FALSE, # unequal variances
+  centrality.plotting = FALSE # remove mean
+) +
+  labs(caption = NULL) # remove caption</code></pre>
+<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-36-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Note that the <em>p</em>-value displayed in the subtitle of the plot is also two times larger than with the <code>t.test()</code> function for the same reason than above.</p>
+</div>
+<div id="scenario-5" class="section level3">
+<h3>Scenario 5</h3>
+<p>In this case, the samples are paired so we use the <code>ggwithinstats()</code> function:</p>
+<pre class="r"><code>ggwithinstats(
+  data = dat5,
+  x = time,
+  y = value,
+  type = &quot;parametric&quot;, # for student&#39;s t-test
+  centrality.plotting = FALSE # remove mean
+) +
+  labs(caption = NULL) # remove caption</code></pre>
+<p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-37-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Again the <em>p</em>-value in the subtitle of the plot is twice the one obtained with the <code>t.test()</code> function for the same reason than above.</p>
+<p>However, the point of this section was to illustrate how to easily draw plots together with statistical results, which is exactly the aim of the <code>{ggstatsplot}</code> package. See more details and examples in this <a href="/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/">article</a>.</p>
+</div>
+</div>
 </div>
 <div id="assumptions" class="section level1">
 <h1>Assumptions</h1>
@@ -1017,9 +1087,9 @@ test</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
-<div id="refs" class="references">
-<div id="ref-rowntree2000statistics">
-<p>Rowntree, Derek. 2000. <em>Statistics Without Tears</em>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-rowntree2000statistics" class="csl-entry">
+Rowntree, Derek. 2000. <em>Statistics Without Tears</em>.
 </div>
 </div>
 </div>

@@ -22,7 +22,10 @@ bibliography: bibliography.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   fig.align = "center",
-  out.width='100%'
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
@@ -448,7 +451,7 @@ test$p.value
 
 The *p*-value is `r round(test$p.value, 3)` so at the 5% significance level we `r ifelse(test$p.value < 0.05, "reject the null hypothesis of equal means", "do not reject the null hypothesis of equal means")`. This result confirms what we found by hand.
 
-Unlike the first scenario, the *p*-value in this scenario is below 5% so we reject the null hypothesis. At the 5% significance level, we can conclude that the population 1 is larger than the population 2.
+Unlike the first scenario, the *p*-value in this scenario is below 5% so we reject the null hypothesis. At the 5% significance level, we can conclude that the mean of population 1 is larger than the mean of population 2.
 
 A nice and easy way to report results of a Student's t-test in R is with the `report()` function from the `{report}` package:
 
@@ -651,6 +654,77 @@ test$p.value
 ```
 
 The *p*-value is `r round(test$p.value, 3)` so at the 5% significance level we `r ifelse(test$p.value < 0.05, "reject the null hypothesis of the mean of the differences being equal to 0", "do not reject the null hypothesis of the mean of the differences being equal to 0")`, meaning that we can conclude that the treatment is effective in increasing the running capabilities. This result confirms what we found by hand.
+
+## Combination of plot and statistical test
+
+After having written this article, I discovered the `{ggstatsplot}` package which I believe is worth mentioning here, in particular the `ggbetweenstats()` and `ggwithinstats()` functions for independent and paired samples, respectively.
+
+These two functions combine a plot---representing the distribution for each group---and the results of the statistical test displayed in the subtitle of the plot.
+
+See examples below for scenarios 2, 3 and 5. Unfortunately, the package does not allow to run tests for scenarios 1 and 4.
+
+### Scenario 2
+
+The `ggbetweenstats()` function is used for independent samples:
+
+```{r}
+# load package
+library(ggstatsplot)
+library(ggplot2)
+
+# plot with statistical results
+ggbetweenstats(
+  data = dat2bis,
+  x = sample,
+  y = value,
+  plot.type = "box", # for boxplot
+  type = "parametric", # for student's t-test
+  var.equal = TRUE, # equal variances
+  centrality.plotting = FALSE # remove mean
+) + 
+  labs(caption = NULL) # remove caption
+```
+
+The *p*-value (displayed after `p = `) is two times as large as the one obtained with the `t.test()` function because when we ran `t.test()` we specified `alternative = "greater"` (i.e., a one-sided test). In our plot with the `ggbetweenstats()` function, it is a two-sided test that is performed by default, that is, `alternative = "two.sided"`.
+
+### Scenario 3
+
+We also have independent samples so we use the `ggbetweenstats()` function again, but this time the two populations variances are not assumed to be equal so we specify the argument `var.equal = FALSE`:
+
+```{r}
+# plot with statistical results
+ggbetweenstats(
+  data = dat3,
+  x = sample,
+  y = value,
+  plot.type = "box", # for boxplot
+  type = "parametric", # for student's t-test
+  var.equal = FALSE, # unequal variances
+  centrality.plotting = FALSE # remove mean
+) + 
+  labs(caption = NULL) # remove caption
+```
+
+Note that the *p*-value displayed in the subtitle of the plot is also two times larger than with the `t.test()` function for the same reason than above.
+
+### Scenario 5
+
+In this case, the samples are paired so we use the `ggwithinstats()` function:
+
+```{r}
+ggwithinstats(
+  data = dat5,
+  x = time,
+  y = value,
+  type = "parametric", # for student's t-test
+  centrality.plotting = FALSE # remove mean
+) +
+  labs(caption = NULL) # remove caption
+```
+
+Again the *p*-value in the subtitle of the plot is twice the one obtained with the `t.test()` function for the same reason than above.
+
+However, the point of this section was to illustrate how to easily draw plots together with statistical results, which is exactly the aim of the `{ggstatsplot}` package. See more details and examples in this [article](/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/).
 
 # Assumptions
 
