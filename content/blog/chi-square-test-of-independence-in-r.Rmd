@@ -43,7 +43,7 @@ The Chi-square test of independence works by comparing the observed frequencies 
 
 # Data
 
-For our example, let's reuse the dataset introduced in the article "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)". This dataset is the well-known `iris` dataset slightly enhanced. Since there is only one categorical variable and the Chi-square test requires two categorical variables, we add the variable `size` which corresponds to `small` if the length of the petal is smaller than the median of all flowers, `big` otherwise:
+For our example, let's reuse the dataset introduced in the article "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)". This dataset is the well-known `iris` dataset slightly enhanced. Since there is only one categorical variable and the Chi-square test of independence requires two categorical variables, we add the variable `size` which corresponds to `small` if the length of the petal is smaller than the median of all flowers, `big` otherwise:
 
 ```{r}
 dat <- iris
@@ -79,7 +79,7 @@ ggplot(dat) +
  geom_bar(position = "fill")
 ```
 
-This second barplot is particularly useful if there are a different number of observations in each level of the variable drawn on the x-axis because it allows to compare the two variables on the same ground.
+This second barplot is particularly useful if there are a different number of observations in each level of the variable drawn on the $x$-axis because it allows to compare the two variables on the same ground.
 
 See the article "[Graphics in R with ggplot2](/blog/graphics-in-r-with-ggplot2/)" to learn how to create this kind of barplot in `{ggplot2}`.
 
@@ -112,7 +112,7 @@ If you need to find the expected frequencies, use `test$expected`.
 If a warning such as "Chi-squared approximation may be incorrect" appears, it means that the smallest expected frequencies is lower than 5. To avoid this issue, you can either:
 
 * gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or
-* use the Fisher's exact test
+* use the [Fisher's exact test](/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/)
 
 The Fisher's exact test does not require the assumption of a minimum of 5 expected counts. It can be applied in R thanks to the function `fisher.test()`. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results. Learn more about this test in this [article](/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/) dedicated to this type of test.
 
@@ -173,6 +173,28 @@ mosaic(~ Species + size,
 As you can see, the mosaic plot is similar to the barplot presented above, but the *p*-value of the Chi-square test is also displayed at the bottom right.
 
 Moreover, this mosaic plot with colored cases shows where the observed frequencies deviates from the expected frequencies if the variables were independent. The red cases means that the observed frequencies are *smaller* than the expected frequencies, whereas the blue cases means that the observed frequencies are *larger* than the expected frequencies.
+
+An alternative is the `ggbarstats()` function from the `{ggstatsplot}` package:
+
+```{r}
+# load packages
+library(ggstatsplot)
+library(ggplot2)
+
+# plot
+ggbarstats(
+  data = dat,
+  x = size,
+  y = Species
+) +
+  labs(caption = NULL) # remove caption
+```
+
+From the plot, it seems that big flowers are more likely to belong to the `virginica` species, while small flowers tend to belong to the `setosa` species. Species and size are thus expected to be dependent.
+
+This is confirmed thanks to the statistical results displayed in the subtitle of the plot. There are several results, but we can in this case focus on the $p$-value which is displayed after `p =`.
+
+As with the previous tests, we reject the null hypothesis and we conclude that species and size are dependent ($p$-value < 0.001).
 
 Thanks for reading. I hope the article helped you to perform the Chi-square test of independence in R and interpret its results. If you would like to learn how to do this test by hand and how it works, read the article "[Chi-square test of independence by hand](/blog/chi-square-test-of-independence-by-hand/)".
 
