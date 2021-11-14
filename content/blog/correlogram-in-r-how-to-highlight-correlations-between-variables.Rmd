@@ -22,7 +22,10 @@ bibliography: bibliography.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   fig.align = "center",
-  out.width='100%'
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
@@ -32,7 +35,7 @@ knitr::opts_chunk$set(
 
 [Correlation](/blog/correlation-coefficient-and-correlation-test-in-r/), often computed as part of [descriptive statistics](/blog/descriptive-statistics-in-r/), is a statistical tool used to study the relationship between two variables, that is, whether and how strongly couples of variables are associated.
 
-Correlations are measured between only 2 variables at a time. Therefore, for datasets with many variables, computing correlations can become quite cumbersome and time consuming.
+Correlations are measured between 2 variables at a time. Therefore, for datasets with many variables, computing correlations can become quite cumbersome and time consuming.
 
 # Correlation matrix
 
@@ -114,16 +117,16 @@ As a reminder, a negative correlation implies that the two variables under consi
 
 # Correlation test
 
-Finally, a white box in the correlogram indicates that the correlation is not significantly different from 0 at the specified significance level (in this example, at $\alpha = 5$%) for the couple of variables. A correlation not significantly different from 0 means that there is **no linear** relationship between the two variables considered (there could be another kind of association, but other than linear).
+Finally, a white box in the correlogram indicates that the correlation is not significantly different from 0 at the specified significance level (in this example, at $\alpha = 5$%) for the couple of variables. A correlation not significantly different from 0 means that there is **no linear** relationship between the two variables considered in the [population](/blog/what-is-the-difference-between-population-and-sample/) (there could be another kind of association, but not linear).
 
-To determine whether a specific correlation coefficient is significantly different from 0, a correlation test has been performed. Remind that the null and alternative hypotheses of this test are:
+To determine whether a specific correlation coefficient is significantly different from 0, a [correlation test](/blog/correlation-coefficient-and-correlation-test-in-r/) has been performed. Remind that the null and alternative hypotheses of this test are:
 
 * $H_0$: $\rho = 0$
 * $H_1$: $\rho \ne 0$
 
-where $\rho$ is the correlation coefficient. The correlation test is based on two factors: the number of observations and the correlation coefficient. The more observations and the stronger the correlation between 2 variables, the more likely it is to reject the null hypothesis of no correlation between these 2 variables.
+where $\rho$ is denotes the correlation. The correlation test is based on two factors: the number of observations and the correlation coefficient. The more observations and the stronger the correlation between 2 variables, the more likely it is to reject the null hypothesis of no correlation between these 2 variables.
 
-In the context of our example, the correlogram above shows that the variables `wt` (weight) and `hp` (horsepower) are positively correlated, while the variables `mpg` (miles per gallon) and `wt` (weight) are negatively correlated (both correlations make sense if we think about it). Furthermore, the variables `wt` and `qsec` are not correlated (indicated by a white box). Even if the correlation coefficient is -0.17 between the 2 variables, the correlation test has shown that we cannot reject the hypothesis of no correlation. This is the reason the box for these two variable is white.
+In the context of our example, the correlogram above shows that the variables `wt` (weight) and `hp` (horsepower) are positively correlated, while the variables `mpg` (miles per gallon) and `wt` (weight) are negatively correlated (both correlations make sense if we think about it). Furthermore, the variables `wt` and `qsec` are not correlated (indicated by a white box). Even if the correlation coefficient is -0.17 between the 2 variables, the correlation test has shown that we cannot reject the hypothesis of no correlation in the population. This is the reason the box for these two variable is white.
 
 Although this correlogram presents exactly the same information than the correlation matrix, the correlogram presents a visual representation of the correlation matrix, allowing to quickly scan through it to see which variables are correlated and which are not.
 
@@ -145,6 +148,26 @@ The main arguments in the `corrplot2()` function are the following:
 * (note that missing values in the dataset are automatically removed)
 
 You can also play with the arguments of the `corrplot2` function and see the results thanks to this [R Shiny app](https://antoinesoetewey.shinyapps.io/correlogram/){target="_blank"}.
+
+# `{ggstatsplot}` package
+
+An alternative to the correlogram presented above is possible with the `ggcorrmat()` function from the `{ggstatsplot}` package:
+
+```{r, eval = FALSE}
+# load package
+library(ggstatsplot)
+
+# correlogram
+ggstatsplot::ggcorrmat(
+  data = dat,
+  type = "parametric", # parametric for Pearson, nonparametric for Spearman's correlation
+  colors = c("darkred", "white", "steelblue") # change default colors
+)
+```
+
+![](/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/correlation-plot-in-R-ggstatsplot.pdf){width=100%}
+
+In this correlogram, the non-significant correlations (by default at the 5% significancel level) are shown by a cross on the correlation coefficients.
 
 # `{lares}` package
 

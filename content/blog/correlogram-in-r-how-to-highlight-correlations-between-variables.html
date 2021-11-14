@@ -19,6 +19,7 @@ output:
 bibliography: bibliography.bib
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
@@ -27,7 +28,9 @@ bibliography: bibliography.bib
 <li><a href="#correlogram">Correlogram</a></li>
 <li><a href="#correlation-test">Correlation test</a></li>
 <li><a href="#code">Code</a></li>
-<li><a href="#lares-package"><code>{lares}</code> package</a><ul>
+<li><a href="#ggstatsplot-package"><code>{ggstatsplot}</code> package</a></li>
+<li><a href="#lares-package"><code>{lares}</code> package</a>
+<ul>
 <li><a href="#all-possible-correlations">All possible correlations</a></li>
 <li><a href="#correlation-of-one-variable-against-all-others">Correlation of one variable against all others</a></li>
 </ul></li>
@@ -39,7 +42,7 @@ bibliography: bibliography.bib
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p><a href="/blog/correlation-coefficient-and-correlation-test-in-r/">Correlation</a>, often computed as part of <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a>, is a statistical tool used to study the relationship between two variables, that is, whether and how strongly couples of variables are associated.</p>
-<p>Correlations are measured between only 2 variables at a time. Therefore, for datasets with many variables, computing correlations can become quite cumbersome and time consuming.</p>
+<p>Correlations are measured between 2 variables at a time. Therefore, for datasets with many variables, computing correlations can become quite cumbersome and time consuming.</p>
 </div>
 <div id="correlation-matrix" class="section level1">
 <h1>Correlation matrix</h1>
@@ -59,21 +62,21 @@ round(cor(dat), 2)</code></pre>
 </div>
 <div id="correlogram" class="section level1">
 <h1>Correlogram</h1>
-<p>To tackle this issue and make it much more insightful, let’s transform the correlation matrix into a correlation plot. A correlation plot (also referred as a correlogram or corrgram in <span class="citation">Friendly (<a href="#ref-friendly2002corrgrams" role="doc-biblioref">2002</a>)</span>) allows to highlight the variables that are most (positively and negatively) correlated. Below an example with the same dataset presented above:</p>
+<p>To tackle this issue and make it much more insightful, let’s transform the correlation matrix into a correlation plot. A correlation plot (also referred as a correlogram or corrgram in <span class="citation"><a href="#ref-friendly2002corrgrams" role="doc-biblioref">Friendly</a> (<a href="#ref-friendly2002corrgrams" role="doc-biblioref">2002</a>)</span>) allows to highlight the variables that are most (positively and negatively) correlated. Below an example with the same dataset presented above:</p>
 <p><img src="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/figure-html/unnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The correlogram represents the correlations for all pairs of variables. Positive correlations are displayed in blue and negative correlations in red. The intensity of the color is proportional to the correlation coefficient so the stronger the correlation (i.e., the closer to -1 or 1), the darker the boxes. The color legend on the right hand side of the correlogram shows the correlation coefficients and the corresponding colors.</p>
 <p>As a reminder, a negative correlation implies that the two variables under consideration vary in opposite directions, that is, if one variable increases the other decreases and vice versa. A positive correlation implies that the two variables under consideration vary in the same direction, that is, if one variable increases the other increases and if one variable decreases the other decreases as well. Furthermore, the stronger the correlation, the stronger the association between the two variables.</p>
 </div>
 <div id="correlation-test" class="section level1">
 <h1>Correlation test</h1>
-<p>Finally, a white box in the correlogram indicates that the correlation is not significantly different from 0 at the specified significance level (in this example, at <span class="math inline">\(\alpha = 5\)</span>%) for the couple of variables. A correlation not significantly different from 0 means that there is <strong>no linear</strong> relationship between the two variables considered (there could be another kind of association, but other than linear).</p>
-<p>To determine whether a specific correlation coefficient is significantly different from 0, a correlation test has been performed. Remind that the null and alternative hypotheses of this test are:</p>
+<p>Finally, a white box in the correlogram indicates that the correlation is not significantly different from 0 at the specified significance level (in this example, at <span class="math inline">\(\alpha = 5\)</span>%) for the couple of variables. A correlation not significantly different from 0 means that there is <strong>no linear</strong> relationship between the two variables considered in the <a href="/blog/what-is-the-difference-between-population-and-sample/">population</a> (there could be another kind of association, but not linear).</p>
+<p>To determine whether a specific correlation coefficient is significantly different from 0, a <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation test</a> has been performed. Remind that the null and alternative hypotheses of this test are:</p>
 <ul>
 <li><span class="math inline">\(H_0\)</span>: <span class="math inline">\(\rho = 0\)</span></li>
 <li><span class="math inline">\(H_1\)</span>: <span class="math inline">\(\rho \ne 0\)</span></li>
 </ul>
-<p>where <span class="math inline">\(\rho\)</span> is the correlation coefficient. The correlation test is based on two factors: the number of observations and the correlation coefficient. The more observations and the stronger the correlation between 2 variables, the more likely it is to reject the null hypothesis of no correlation between these 2 variables.</p>
-<p>In the context of our example, the correlogram above shows that the variables <code>wt</code> (weight) and <code>hp</code> (horsepower) are positively correlated, while the variables <code>mpg</code> (miles per gallon) and <code>wt</code> (weight) are negatively correlated (both correlations make sense if we think about it). Furthermore, the variables <code>wt</code> and <code>qsec</code> are not correlated (indicated by a white box). Even if the correlation coefficient is -0.17 between the 2 variables, the correlation test has shown that we cannot reject the hypothesis of no correlation. This is the reason the box for these two variable is white.</p>
+<p>where <span class="math inline">\(\rho\)</span> is denotes the correlation. The correlation test is based on two factors: the number of observations and the correlation coefficient. The more observations and the stronger the correlation between 2 variables, the more likely it is to reject the null hypothesis of no correlation between these 2 variables.</p>
+<p>In the context of our example, the correlogram above shows that the variables <code>wt</code> (weight) and <code>hp</code> (horsepower) are positively correlated, while the variables <code>mpg</code> (miles per gallon) and <code>wt</code> (weight) are negatively correlated (both correlations make sense if we think about it). Furthermore, the variables <code>wt</code> and <code>qsec</code> are not correlated (indicated by a white box). Even if the correlation coefficient is -0.17 between the 2 variables, the correlation test has shown that we cannot reject the hypothesis of no correlation in the population. This is the reason the box for these two variable is white.</p>
 <p>Although this correlogram presents exactly the same information than the correlation matrix, the correlogram presents a visual representation of the correlation matrix, allowing to quickly scan through it to see which variables are correlated and which are not.</p>
 </div>
 <div id="code" class="section level1">
@@ -83,15 +86,30 @@ round(cor(dat), 2)</code></pre>
 <p>The main arguments in the <code>corrplot2()</code> function are the following:</p>
 <ul>
 <li><code>data</code>: name of your dataset</li>
-<li><code>method</code>: the correlation method to be computed, one of “pearson” (default), “kendall”, or “spearman”. As a rule of thumb, if your dataset contains <a href="/blog/variable-types-and-examples/#continuous">quantitative continuous</a> variables that have a linear relationship, you can keep the Pearson method. If you have <a href="/blog/variable-types-and-examples/#ordinal">qualitative ordinal</a> variables or quantitative variables with a partially linear link, the Spearman method is more appropriate</li>
+<li><code>method</code>: the correlation method to be computed, one of “pearson” (default), “kendall,” or “spearman.” As a rule of thumb, if your dataset contains <a href="/blog/variable-types-and-examples/#continuous">quantitative continuous</a> variables that have a linear relationship, you can keep the Pearson method. If you have <a href="/blog/variable-types-and-examples/#ordinal">qualitative ordinal</a> variables or quantitative variables with a partially linear link, the Spearman method is more appropriate</li>
 <li><code>sig.level</code>: the significance level for the correlation test, default is 0.05</li>
 <li><code>order</code>: order of the variables, one of “original” (default), “AOE” (angular order of the eigenvectors), “FPC” (first principal component order), “hclust” (hierarchical clustering order), “alphabet” (alphabetical order)</li>
 <li><code>diag</code>: display the correlation coefficients on the diagonal? The default is <code>FALSE</code></li>
-<li><code>type</code>: display the entire correlation matrix or simply the upper/lower part, one of “upper” (default), “lower”, “full”</li>
+<li><code>type</code>: display the entire correlation matrix or simply the upper/lower part, one of “upper” (default), “lower,” “full”</li>
 <li><code>tl.srt</code>: rotation of the variable labels</li>
 <li>(note that missing values in the dataset are automatically removed)</li>
 </ul>
 <p>You can also play with the arguments of the <code>corrplot2</code> function and see the results thanks to this <a href="https://antoinesoetewey.shinyapps.io/correlogram/" target="_blank">R Shiny app</a>.</p>
+</div>
+<div id="ggstatsplot-package" class="section level1">
+<h1><code>{ggstatsplot}</code> package</h1>
+<p>An alternative to the correlogram presented above is possible with the <code>ggcorrmat()</code> function from the <code>{ggstatsplot}</code> package:</p>
+<pre class="r"><code># load package
+library(ggstatsplot)
+
+# correlogram
+ggstatsplot::ggcorrmat(
+  data = dat,
+  type = &quot;parametric&quot;, # parametric for Pearson, nonparametric for Spearman&#39;s correlation
+  colors = c(&quot;darkred&quot;, &quot;white&quot;, &quot;steelblue&quot;) # change default colors
+)</code></pre>
+<p><embed src="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/correlation-plot-in-R-ggstatsplot.pdf" style="width:100.0%" /></p>
+<p>In this correlogram, the non-significant correlations (by default at the 5% significancel level) are shown by a cross on the correlation coefficients.</p>
 </div>
 <div id="lares-package" class="section level1">
 <h1><code>{lares}</code> package</h1>
@@ -107,7 +125,7 @@ corr_cross(dat, # name of dataset
   max_pvalue = 0.05, # display only significant correlations (at 5% level)
   top = 10 # display top 10 couples of variables (by correlation coefficient)
 )</code></pre>
-<p><img src="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Negative correlations are represented in red and positive correlations in blue.</p>
 </div>
 <div id="correlation-of-one-variable-against-all-others" class="section level2">
@@ -116,17 +134,17 @@ corr_cross(dat, # name of dataset
 <pre class="r"><code>corr_var(dat, # name of dataset
   mpg, # name of variable to focus on
   top = 5 # display top 5 correlations
-) </code></pre>
-<p><img src="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
+)</code></pre>
+<p><img src="/blog/correlogram-in-r-how-to-highlight-correlations-between-variables_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Thanks for reading. I hope this article will help you to visualize correlations between variables in a dataset and to make correlation matrices more insightful and more appealing. If you want to learn more about this topic, see how to compute <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlations coefficients and correlation tests in R</a>.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
-<div id="refs" class="references">
-<div id="ref-friendly2002corrgrams">
-<p>Friendly, Michael. 2002. “Corrgrams: Exploratory Displays for Correlation Matrices.” <em>The American Statistician</em> 56 (4): 316–24.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-friendly2002corrgrams" class="csl-entry">
+Friendly, Michael. 2002. <span>“Corrgrams: Exploratory Displays for Correlation Matrices.”</span> <em>The American Statistician</em> 56 (4): 316–24.
 </div>
 </div>
 </div>
