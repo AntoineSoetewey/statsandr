@@ -22,7 +22,10 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   fig.align = "center",
-  out.width='100%'
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
@@ -298,6 +301,37 @@ test$conf.int
 ```
 
 You can see that the 95% confidence interval for the population mean is $[6.01; \infty]$, meaning that, at the significance level $\alpha = 5$%, we reject the null hypothesis as long as the hypothesized value $\mu_0$ is below 6.01, otherwise the null hypothesis cannot be rejected.
+
+## Combination of plot and statistical test
+
+After having written this article, I discovered the `{ggstatsplot}` package which I believe is worth mentioning here, in particular the `gghistostats()` function for one-sample Student's t-test.
+
+This function combines a [histogram](/blog/descriptive-statistics-in-r/#histogram)---representing the distribution---and the results of the statistical test displayed in the subtitle of the plot.
+
+See examples below for scenario 2. Unfortunately, the package does not allow to run the test for scenario 1.
+
+### Scenario 2: variance of the population is unknown
+
+```{r}
+# load packages
+library(ggstatsplot)
+library(ggplot2)
+
+# plot with stat test
+gghistostats(
+  data = dat2, # dataframe from which variable is to be taken
+  x = value, # numeric variable whose distribution is of interest
+  type = "parametric", # for student's t-test
+  test.value = 5 # default value is 0
+) + 
+  labs(caption = NULL) # remove caption
+```
+
+The *p*-value is displayed after `p =` in the subtitle of the plot. Based on this plot and the *p*-value being lower than 5% (*p*-value = 0.008), we reject the null hypothesis that the population mean is equal to 5.
+
+Note that, the *p*-value is two times as large as the one obtained with the `t.test()` function because when we ran `t.test()` we specified `alternative = "greater"` (i.e., a one-sided test). In our plot with the `gghistostats()` function, it is a two-sided test that is performed by default, that is, `alternative = "two.sided"`.
+
+The point of this section was to illustrate how to easily draw plots together with statistical results, which is exactly the aim of the `{ggstatsplot}` package. See more details and examples in this [article](/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/).
 
 # Assumptions
 

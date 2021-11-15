@@ -19,6 +19,7 @@ output:
 # draft: true
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
@@ -26,15 +27,22 @@ output:
 <li><a href="#null-and-alternative-hypothesis">Null and alternative hypothesis</a></li>
 <li><a href="#hypothesis-testing">Hypothesis testing</a></li>
 <li><a href="#two-versions-of-the-one-sample-t-test">Two versions of the one sample t-test</a></li>
-<li><a href="#how-to-compute-the-one-sample-t-test-by-hand">How to compute the one sample t-test by hand?</a><ul>
+<li><a href="#how-to-compute-the-one-sample-t-test-by-hand">How to compute the one sample t-test by hand?</a>
+<ul>
 <li><a href="#scenario-1-variance-of-the-population-is-known">Scenario 1: variance of the population is known</a></li>
 <li><a href="#scenario-2-variance-of-the-population-is-unknown">Scenario 2: variance of the population is unknown</a></li>
 <li><a href="#different-underlying-distributions-for-the-critical-value">Different underlying distributions for the critical value</a></li>
 </ul></li>
-<li><a href="#how-to-compute-the-one-sample-t-test-in-r">How to compute the one sample t-test in R?</a><ul>
+<li><a href="#how-to-compute-the-one-sample-t-test-in-r">How to compute the one sample t-test in R?</a>
+<ul>
 <li><a href="#scenario-1-variance-of-the-population-is-known-1">Scenario 1: variance of the population is known</a></li>
-<li><a href="#scenario-2-variance-of-the-population-is-unknown-1">Scenario 2: variance of the population is unknown</a><ul>
+<li><a href="#scenario-2-variance-of-the-population-is-unknown-1">Scenario 2: variance of the population is unknown</a>
+<ul>
 <li><a href="#confidence-interval">Confidence interval</a></li>
+</ul></li>
+<li><a href="#combination-of-plot-and-statistical-test">Combination of plot and statistical test</a>
+<ul>
+<li><a href="#scenario-2-variance-of-the-population-is-unknown-2">Scenario 2: variance of the population is unknown</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#assumptions">Assumptions</a></li>
@@ -280,10 +288,11 @@ test</code></pre>
 <pre class="r"><code>library(BSDA)
 
 z.test(dat1$value,
-       alternative = &quot;two.sided&quot;,
-       mu = 0,
-       sigma.x = 1,
-       conf.level = 0.95)</code></pre>
+  alternative = &quot;two.sided&quot;,
+  mu = 0,
+  sigma.x = 1,
+  conf.level = 0.95
+)</code></pre>
 <pre><code>## 
 ##  One-sample z-Test
 ## 
@@ -355,6 +364,31 @@ test</code></pre>
 ## attr(,&quot;conf.level&quot;)
 ## [1] 0.95</code></pre>
 <p>You can see that the 95% confidence interval for the population mean is <span class="math inline">\([6.01; \infty]\)</span>, meaning that, at the significance level <span class="math inline">\(\alpha = 5\)</span>%, we reject the null hypothesis as long as the hypothesized value <span class="math inline">\(\mu_0\)</span> is below 6.01, otherwise the null hypothesis cannot be rejected.</p>
+</div>
+</div>
+<div id="combination-of-plot-and-statistical-test" class="section level2">
+<h2>Combination of plot and statistical test</h2>
+<p>After having written this article, I discovered the <code>{ggstatsplot}</code> package which I believe is worth mentioning here, in particular the <code>gghistostats()</code> function for one-sample Student’s t-test.</p>
+<p>This function combines a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a>—representing the distribution—and the results of the statistical test displayed in the subtitle of the plot.</p>
+<p>See examples below for scenario 2. Unfortunately, the package does not allow to run the test for scenario 1.</p>
+<div id="scenario-2-variance-of-the-population-is-unknown-2" class="section level3">
+<h3>Scenario 2: variance of the population is unknown</h3>
+<pre class="r"><code># load packages
+library(ggstatsplot)
+library(ggplot2)
+
+# plot with stat test
+gghistostats(
+  data = dat2, # dataframe from which variable is to be taken
+  x = value, # numeric variable whose distribution is of interest
+  type = &quot;parametric&quot;, # for student&#39;s t-test
+  test.value = 5 # default value is 0
+) +
+  labs(caption = NULL) # remove caption</code></pre>
+<p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The <em>p</em>-value is displayed after <code>p =</code> in the subtitle of the plot. Based on this plot and the <em>p</em>-value being lower than 5% (<em>p</em>-value = 0.008), we reject the null hypothesis that the population mean is equal to 5.</p>
+<p>Note that, the <em>p</em>-value is two times as large as the one obtained with the <code>t.test()</code> function because when we ran <code>t.test()</code> we specified <code>alternative = "greater"</code> (i.e., a one-sided test). In our plot with the <code>gghistostats()</code> function, it is a two-sided test that is performed by default, that is, <code>alternative = "two.sided"</code>.</p>
+<p>The point of this section was to illustrate how to easily draw plots together with statistical results, which is exactly the aim of the <code>{ggstatsplot}</code> package. See more details and examples in this <a href="/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/">article</a>.</p>
 </div>
 </div>
 </div>
