@@ -43,7 +43,7 @@ In the remaining of the article, we present the two scenarios of the Wilcoxon te
 
 # Two different scenarios
 
-As for the Student's t-test, the Wilcoxon test is used to compare two groups and see whether they are significantly different from each other.
+As for the Student's t-test, the Wilcoxon test is used to compare two groups and see whether they are significantly different from each other in terms of the variable of interest.
 
 The two groups to be compared are either:
 
@@ -52,7 +52,7 @@ The two groups to be compared are either:
 
 There are actually two versions of the Wilcoxon test:
 
-1. The **Mann-Withney-Wilcoxon** test (also referred as Wilcoxon rank sum test) is performed when the samples are independent (so this test is the non-parametric equivalent to the Student's t-test for independent samples).
+1. The **Mann-Withney-Wilcoxon** test (also referred as Wilcoxon rank sum test or Mann-Whitney U test) is performed when the samples are independent (so this test is the non-parametric equivalent to the Student's t-test for independent samples).
 1. The **Wilcoxon signed-rank** test (also sometimes referred as Wilcoxon test for paired samples) is performed when the samples are paired/dependent (so this test is the non-parametric equivalent to the Student's t-test for paired samples).
 
 Luckily, those two tests can be done in R with the same function: `wilcox.test()`. They are presented in the following sections.
@@ -98,10 +98,17 @@ shapiro.test(subset(dat, Sex == "Boy")$Grade)
 
 The histograms show that both distributions do not seem to follow a normal distribution and the *p*-values of the Shapiro-Wilk tests confirm it (since we reject the null hypothesis of normality for both distributions at the 5% significance level).
 
-We just showed that normality assumption is violated for both groups so it is now time to see how to perform the Wilcoxon test in R.^[Note that in order to use the Student's t-test (the parametric version of the Wilcoxon test), it is required that **both samples follow a normal distribution** (if samples are small). Therefore, even if one sample follows a normal distribution (and the other does not follow a normal distribution), it is recommended to use the non-parametric test.] Remember that the null and alternative hypothesis of the Wilcoxon test are as follows:
+We just showed that normality assumption is violated for both groups so it is now time to see how to perform the Wilcoxon test in R.^[Note that in order to use the Student's t-test (the parametric version of the Wilcoxon test), it is required that **both samples follow a normal distribution** (if samples are small). Therefore, even if one sample follows a normal distribution (and the other does not follow a normal distribution), it is recommended to use the non-parametric test.]
 
-* $H_0$: the 2 groups are similar
-* $H_1$: the 2 groups are different
+Remember that the null and alternative hypothesis of the Wilcoxon test are as follows:
+
+* $H_0$: the 2 groups are equal in terms of the variable of interest
+* $H_1$: the 2 groups are different in terms of the variable of interest
+
+Applied to our research question, we have:
+
+* $H_0$: grades of girls and boys are equal
+* $H_1$: grades of girls and boys are different
 
 ```{r}
 test <- wilcox.test(dat$Grade ~ dat$Sex)
@@ -127,17 +134,17 @@ The *p*-value is `r round(test$p.value, 3)`. Therefore, at the 5% significance l
 For this second scenario, consider that we administered a math test in a class of 12 students at the beginning of a semester, and that we administered a similar test at the end of the semester to the exact same students. We have the following data:
 
 ```{r}
-dat <- data.frame(Beginning = c(16, 5, 15, 2, 14, 15, 4, 7, 15, 6, 7, 14),
+dat2 <- data.frame(Beginning = c(16, 5, 15, 2, 14, 15, 4, 7, 15, 6, 7, 14),
                   End = c(19, 18, 9, 17, 8, 7, 16, 19, 20, 9, 11, 18))
 
-dat
+dat2
 ```
 
 We transform the dataset to have it in a [tidy format](/blog/how-to-import-an-excel-file-in-rstudio/#introduction):
 
 ```{r}
 dat2 <- data.frame(Time = c(rep("Before", 12), rep("After", 12)),
-                  Grade = c(dat$Beginning, dat$End))
+                  Grade = c(dat2$Beginning, dat2$End))
 dat2
 ```
 
@@ -157,7 +164,10 @@ ggplot(dat2) +
 
 (See the [`{esquisse}` and `{questionr}` addins](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/) to help you reorder levels of a factor variable and to easily draw plots with the [`{ggplot2}` package](/blog/graphics-in-r-with-ggplot2/).)
 
-In this example, it is clear that the two samples are not independent since the same 12 students took the exam before and after the semester. Supposing also that the normality assumption is violated, we thus use the Wilcoxon test for **paired samples**.^[Note that for paired samples (when in presence of a small sample), normality must be checked on the *difference* between the two paired samples, and not individually on the two samples like it is done for independent samples.]
+In this example, it is clear that the two samples are not independent since the same 12 students took the exam before and after the semester. Supposing also that the normality assumption is violated, we thus use the Wilcoxon test for **paired samples**, with the following hypotheses:^[Note that for paired samples (when in presence of a small sample), normality must be checked on the *differences* between the two paired samples, and not individually on the two samples like it is done for independent samples.]
+
+* $H_0$: grades before and after the semester are equal
+* $H_1$: grades before and after the semester are different
 
 The R code for this test is similar than for independent samples, except that we add the `paired = TRUE` argument to the `wilcox.test()` function to take into consideration the dependency between the 2 samples:
 
@@ -170,6 +180,57 @@ test
 We obtain the test statistic, the *p*-value and a reminder of the hypothesis tested.
 
 The *p*-value is `r round(test$p.value, 3)`. Therefore, at the 5% significance level, we do not reject the null hypothesis that the grades are similar before and after the semester.
+
+# Combination of plot and statistical test
+
+After having written this article, I discovered the `{ggstatsplot}` package which I believe is worth mentioning here, in particular the `ggbetweenstats()` and `ggwithinstats()` functions for independent and paired samples, respectively.
+
+These two functions combine a boxplot---representing the distribution for each group---and the results of the statistical test displayed in the subtitle of the plot.
+
+See examples below for independent and paired samples, using the same data than previously.
+
+## Independent samples
+
+For independent samples, it is the `ggbetweenstats()` function which is used:
+
+```{r}
+# load package
+library(ggstatsplot)
+
+# plot with statistical results
+ggbetweenstats( # independent samples
+  data = dat,
+  x = Sex,
+  y = Grade,
+  plot.type = "box", # for boxplot
+  type = "nonparametric", # for wilcoxon
+  centrality.plotting = FALSE # remove median
+)
+```
+
+The *p*-value (displayed after `p =` in the subtitle of the plot) indicates that we reject the null hypothesis, and we conclude that grades are significantly different between girls and boys (*p*-value = 0.021).
+
+## Paired samples
+
+For paired samples, it is the `ggwithinstats()` function which is used:
+
+```{r}
+# load package
+library(ggstatsplot)
+
+# plot with statistical results
+ggwithinstats( # paired samples
+  data = dat2,
+  x = Time,
+  y = Grade,
+  type = "nonparametric", # for wilcoxon
+  centrality.plotting = FALSE # remove median
+)
+```
+
+The *p*-value (displayed after `p =` in the subtitle of the plot) indicates that we do not reject the null hypothesis, so we do not reject the hypothesis that grades are equal before and after the semester (*p*-value = 0.169).
+
+The point of this section was to illustrate how to easily draw plots together with statistical results, which is exactly the aim of the `{ggstatsplot}` package. See more details and examples in this [article](/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/).
 
 # Assumption of equal variances
 

@@ -29,6 +29,11 @@ output:
 <li><a href="#independent-samples">Independent samples</a></li>
 <li><a href="#paired-samples">Paired samples</a></li>
 </ul></li>
+<li><a href="#combination-of-plot-and-statistical-test">Combination of plot and statistical test</a>
+<ul>
+<li><a href="#independent-samples-1">Independent samples</a></li>
+<li><a href="#paired-samples-1">Paired samples</a></li>
+</ul></li>
 <li><a href="#assumption-of-equal-variances">Assumption of equal variances</a></li>
 </ul>
 </div>
@@ -43,7 +48,7 @@ output:
 </div>
 <div id="two-different-scenarios" class="section level1">
 <h1>Two different scenarios</h1>
-<p>As for the Student’s t-test, the Wilcoxon test is used to compare two groups and see whether they are significantly different from each other.</p>
+<p>As for the Student’s t-test, the Wilcoxon test is used to compare two groups and see whether they are significantly different from each other in terms of the variable of interest.</p>
 <p>The two groups to be compared are either:</p>
 <ol style="list-style-type: decimal">
 <li>independent, or</li>
@@ -51,7 +56,7 @@ output:
 </ol>
 <p>There are actually two versions of the Wilcoxon test:</p>
 <ol style="list-style-type: decimal">
-<li>The <strong>Mann-Withney-Wilcoxon</strong> test (also referred as Wilcoxon rank sum test) is performed when the samples are independent (so this test is the non-parametric equivalent to the Student’s t-test for independent samples).</li>
+<li>The <strong>Mann-Withney-Wilcoxon</strong> test (also referred as Wilcoxon rank sum test or Mann-Whitney U test) is performed when the samples are independent (so this test is the non-parametric equivalent to the Student’s t-test for independent samples).</li>
 <li>The <strong>Wilcoxon signed-rank</strong> test (also sometimes referred as Wilcoxon test for paired samples) is performed when the samples are paired/dependent (so this test is the non-parametric equivalent to the Student’s t-test for paired samples).</li>
 </ol>
 <p>Luckily, those two tests can be done in R with the same function: <code>wilcox.test()</code>. They are presented in the following sections.</p>
@@ -125,10 +130,16 @@ ggplot(dat) +
 ## data:  subset(dat, Sex == &quot;Boy&quot;)$Grade
 ## W = 0.84313, p-value = 0.03023</code></pre>
 <p>The histograms show that both distributions do not seem to follow a normal distribution and the <em>p</em>-values of the Shapiro-Wilk tests confirm it (since we reject the null hypothesis of normality for both distributions at the 5% significance level).</p>
-<p>We just showed that normality assumption is violated for both groups so it is now time to see how to perform the Wilcoxon test in R.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> Remember that the null and alternative hypothesis of the Wilcoxon test are as follows:</p>
+<p>We just showed that normality assumption is violated for both groups so it is now time to see how to perform the Wilcoxon test in R.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>Remember that the null and alternative hypothesis of the Wilcoxon test are as follows:</p>
 <ul>
-<li><span class="math inline">\(H_0\)</span>: the 2 groups are similar</li>
-<li><span class="math inline">\(H_1\)</span>: the 2 groups are different</li>
+<li><span class="math inline">\(H_0\)</span>: the 2 groups are equal in terms of the variable of interest</li>
+<li><span class="math inline">\(H_1\)</span>: the 2 groups are different in terms of the variable of interest</li>
+</ul>
+<p>Applied to our research question, we have:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: grades of girls and boys are equal</li>
+<li><span class="math inline">\(H_1\)</span>: grades of girls and boys are different</li>
 </ul>
 <pre class="r"><code>test &lt;- wilcox.test(dat$Grade ~ dat$Sex)
 test</code></pre>
@@ -156,12 +167,12 @@ test</code></pre>
 <div id="paired-samples" class="section level2">
 <h2>Paired samples</h2>
 <p>For this second scenario, consider that we administered a math test in a class of 12 students at the beginning of a semester, and that we administered a similar test at the end of the semester to the exact same students. We have the following data:</p>
-<pre class="r"><code>dat &lt;- data.frame(
+<pre class="r"><code>dat2 &lt;- data.frame(
   Beginning = c(16, 5, 15, 2, 14, 15, 4, 7, 15, 6, 7, 14),
   End = c(19, 18, 9, 17, 8, 7, 16, 19, 20, 9, 11, 18)
 )
 
-dat</code></pre>
+dat2</code></pre>
 <pre><code>##    Beginning End
 ## 1         16  19
 ## 2          5  18
@@ -178,7 +189,7 @@ dat</code></pre>
 <p>We transform the dataset to have it in a <a href="/blog/how-to-import-an-excel-file-in-rstudio/#introduction">tidy format</a>:</p>
 <pre class="r"><code>dat2 &lt;- data.frame(
   Time = c(rep(&quot;Before&quot;, 12), rep(&quot;After&quot;, 12)),
-  Grade = c(dat$Beginning, dat$End)
+  Grade = c(dat2$Beginning, dat2$End)
 )
 dat2</code></pre>
 <pre><code>##      Time Grade
@@ -218,7 +229,11 @@ ggplot(dat2) +
   theme_minimal()</code></pre>
 <p><img src="/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>(See the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/"><code>{esquisse}</code> and <code>{questionr}</code> addins</a> to help you reorder levels of a factor variable and to easily draw plots with the <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code> package</a>.)</p>
-<p>In this example, it is clear that the two samples are not independent since the same 12 students took the exam before and after the semester. Supposing also that the normality assumption is violated, we thus use the Wilcoxon test for <strong>paired samples</strong>.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
+<p>In this example, it is clear that the two samples are not independent since the same 12 students took the exam before and after the semester. Supposing also that the normality assumption is violated, we thus use the Wilcoxon test for <strong>paired samples</strong>, with the following hypotheses:<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: grades before and after the semester are equal</li>
+<li><span class="math inline">\(H_1\)</span>: grades before and after the semester are different</li>
+</ul>
 <p>The R code for this test is similar than for independent samples, except that we add the <code>paired = TRUE</code> argument to the <code>wilcox.test()</code> function to take into consideration the dependency between the 2 samples:</p>
 <pre class="r"><code>test &lt;- wilcox.test(dat2$Grade ~ dat2$Time,
   paired = TRUE
@@ -232,6 +247,48 @@ test</code></pre>
 ## alternative hypothesis: true location shift is not equal to 0</code></pre>
 <p>We obtain the test statistic, the <em>p</em>-value and a reminder of the hypothesis tested.</p>
 <p>The <em>p</em>-value is 0.169. Therefore, at the 5% significance level, we do not reject the null hypothesis that the grades are similar before and after the semester.</p>
+</div>
+</div>
+<div id="combination-of-plot-and-statistical-test" class="section level1">
+<h1>Combination of plot and statistical test</h1>
+<p>After having written this article, I discovered the <code>{ggstatsplot}</code> package which I believe is worth mentioning here, in particular the <code>ggbetweenstats()</code> and <code>ggwithinstats()</code> functions for independent and paired samples, respectively.</p>
+<p>These two functions combine a boxplot—representing the distribution for each group—and the results of the statistical test displayed in the subtitle of the plot.</p>
+<p>See examples below for independent and paired samples, using the same data than previously.</p>
+<div id="independent-samples-1" class="section level2">
+<h2>Independent samples</h2>
+<p>For independent samples, it is the <code>ggbetweenstats()</code> function which is used:</p>
+<pre class="r"><code># load package
+library(ggstatsplot)
+
+# plot with statistical results
+ggbetweenstats( # independent samples
+  data = dat,
+  x = Sex,
+  y = Grade,
+  plot.type = &quot;box&quot;, # for boxplot
+  type = &quot;nonparametric&quot;, # for wilcoxon
+  centrality.plotting = FALSE # remove median
+)</code></pre>
+<p><img src="/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The <em>p</em>-value (displayed after <code>p =</code> in the subtitle of the plot) indicates that we reject the null hypothesis, and we conclude that grades are significantly different between girls and boys (<em>p</em>-value = 0.021).</p>
+</div>
+<div id="paired-samples-1" class="section level2">
+<h2>Paired samples</h2>
+<p>For paired samples, it is the <code>ggwithinstats()</code> function which is used:</p>
+<pre class="r"><code># load package
+library(ggstatsplot)
+
+# plot with statistical results
+ggwithinstats( # paired samples
+  data = dat2,
+  x = Time,
+  y = Grade,
+  type = &quot;nonparametric&quot;, # for wilcoxon
+  centrality.plotting = FALSE # remove median
+)</code></pre>
+<p><img src="/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The <em>p</em>-value (displayed after <code>p =</code> in the subtitle of the plot) indicates that we do not reject the null hypothesis, so we do not reject the hypothesis that grades are equal before and after the semester (<em>p</em>-value = 0.169).</p>
+<p>The point of this section was to illustrate how to easily draw plots together with statistical results, which is exactly the aim of the <code>{ggstatsplot}</code> package. See more details and examples in this <a href="/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/">article</a>.</p>
 </div>
 </div>
 <div id="assumption-of-equal-variances" class="section level1">
@@ -250,7 +307,7 @@ test</code></pre>
 <li id="fn2"><p>Note that in order to use the Student’s t-test (the parametric version of the Wilcoxon test), it is required that <strong>both samples follow a normal distribution</strong> (if samples are small). Therefore, even if one sample follows a normal distribution (and the other does not follow a normal distribution), it is recommended to use the non-parametric test.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 <li id="fn3"><p>Note that the presence of equal elements (ties) prevents an exact <em>p</em>-value calculation. This can be tackled by computing the exact or asymptotic Wilcoxon-Mann-Whitney test with adjustment for ties, using the <code>wilcox_test()</code> function from the <code>{coin}</code> package: <code>wilcox_test(dat$Grade ~ dat$Sex, distribution = exact())</code> or <code>wilcox_test(dat$Grade ~ dat$Sex)</code>. In our case, conclusions remain unchanged.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
 <li id="fn4"><p>We add <code>alternative = "less"</code> (and not <code>alternative = "greater"</code>) because we want to test that grades for boys are <strong>less</strong> than grade for girls. Using <code>"less"</code> or <code>"greater"</code> can be deducted from the reference level in the dataset.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>Note that for paired samples (when in presence of a small sample), normality must be checked on the <em>difference</em> between the two paired samples, and not individually on the two samples like it is done for independent samples.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Note that for paired samples (when in presence of a small sample), normality must be checked on the <em>differences</em> between the two paired samples, and not individually on the two samples like it is done for independent samples.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
 <li id="fn6"><p>See these three articles for a more detailed discussion on the assumption of equal variances in Wilcoxon test: <a href="https://statistics.laerd.com/statistical-guides/mann-whitney-u-test-assumptions.php">1</a>, <a href="https://influentialpoints.com/Training/Wilcoxon-Mann-Whitney_U_test_use_and_misuse.htm">2</a> &amp; <a href="https://influentialpoints.com/Training/Wilcoxon_matched_pairs_signed_rank_test_use_and_misuse.htm">3</a>.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
