@@ -23,7 +23,10 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   fig.align = "center",
-  out.width = "100%"
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
@@ -96,13 +99,21 @@ Considering (arbitrarily) that `big` is the success, we have:^[Choosing big or s
 test <- prop.test(
   x = 77, # number of successes
   n = 150, # total number of trials (77 + 73)
-  p = 0.5
-) # we test for equal proportion so prob = 0.5 in each group
+  p = 0.5 # we test for equal proportion so prob = 0.5 in each group
+)
 
 test
 ```
 
-We obtain an output with the null probability (`0.5`), the test statistic (`X-squared = 0.06`), the degrees of freedom (`df = 1`), the *p*-value (`p-value = 0.8065`), the alternative hypothesis (`true p is not equal to 0.5`), the 95% confidence interval (which can also be extracted with `test$conf.int`) and the proportion in the sample (`0.5133333`).
+We obtain an output with:
+
+- the null probability (`0.5`),
+- the test statistic (`X-squared = 0.06`),
+- the degrees of freedom (`df = 1`),
+- the *p*-value (`p-value = 0.8065`),
+- the alternative hypothesis (`true p is not equal to 0.5`),
+- the 95% confidence interval (which can also be extracted with `test$conf.int`) and
+- the proportion in the sample (`0.5133333`).
 
 The *p*-value is `r round(test$p.value, 3)` so, at the 5% significance level, we do not reject the null hypothesis that the proportions of small and big flowers are the same.
 
@@ -122,7 +133,7 @@ barplot(c(12, 3), # observed counts
 abline(
   h = 15 / 2, # expected counts in each level
   lty = 2 # dashed line
-) 
+)
 
 # exact binomial test
 test <- binom.test(
