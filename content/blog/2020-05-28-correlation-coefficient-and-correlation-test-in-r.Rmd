@@ -200,18 +200,18 @@ This test proves that even if the correlation coefficient is different from 0 (t
 
 Note that the *p*-value of a correlation test is based on the correlation coefficient **and** the sample size. The larger the sample size and the more extreme the correlation (closer to -1 or 1), the more likely the null hypothesis of no correlation will be rejected. With a small sample size, it is thus possible to obtain a *relatively* large correlation in the sample (based on the correlation coefficient), but still find a correlation not significantly different from 0 in the population (based on the correlation test). For this reason, it is recommended to always perform a correlation test before interpreting a correlation coefficient to avoid flawed conclusions.
 
-A nice and easy way to report results of a correlation test in R is with the `report()` function from the `{report}` package:
+<!-- A nice and easy way to report results of a correlation test in R is with the `report()` function from the `{report}` package: -->
 
-```{r}
+```{r, eval = FALSE, echo = FALSE}
 # install.packages("remotes")
 # remotes::install_github("easystats/report") # You only need to do that once
 library("report") # Load the package every time you start R
 report(test)
 ```
 
-As you can see, the function interprets the test (together with the correlation coefficient and the *p*-value) for you.
+<!-- As you can see, the function interprets the test (together with the correlation coefficient and the *p*-value) for you. -->
 
-Note that the `report()` function can be used for other analyses. See more examples in the package's [documentation](https://easystats.github.io/report/){target="_blank"}. See also more [tips and tricks in R](/blog/tips-and-tricks-in-rstudio-and-r-markdown/) if you find this one useful.
+<!-- Note that the `report()` function can be used for other analyses. See more examples in the package's [documentation](https://easystats.github.io/report/){target="_blank"}. See also more [tips and tricks in R](/blog/tips-and-tricks-in-rstudio-and-r-markdown/) if you find this one useful. -->
 
 ## For several pairs of variables
 
@@ -243,13 +243,16 @@ correlation::correlation(dat,
 
 As you can see, it gives, among other useful information, the correlation coefficients (column `r`) and the result of the correlation test (column `95% CI` for the confidence interval or `p` for the $p$-value) for all pairs of variables.
 
-This table is very useful and informative, but let see if it is possible to combine the concepts of correlation coefficients and correlations test in one single visualization. A visualization that would be easy to read and interpret.
+## Correlograms
+
+The table above is very useful and informative, but let see if it is possible to combine the concepts of correlation coefficients and correlations test in one single visualization. A visualization that would be easy to read and interpret.
 
 Ideally, we would like to have a concise overview of correlations between all possible pairs of variables present in a dataset, with a clear distinction for correlations that are significantly different from 0.
 
 The figure below, known as a [correlogram](/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/#correlogram) and adapted from the `corrplot()` function, does precisely this:
 
 ```{r, echo = TRUE}
+# do not edit
 corrplot2 <- function(data,
                       method = "pearson",
                       sig.level = 0.05,
@@ -293,6 +296,7 @@ corrplot2 <- function(data,
   )
 }
 
+# edit from here
 corrplot2(
   data = dat,
   method = "pearson",
@@ -308,9 +312,9 @@ The correlogram shows correlation coefficients for all pairs of variables (with 
 
 To learn more about this plot and the code used, I invite you to read the article entitled "[Correlogram in R: how to highlight the most correlated variables in a dataset](/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/)".
 
-For those of you who are still not completely satisfied, I recently found an alternative with the `ggpairs()` function from the `{GGally}` package.
+For those of you who are still not completely satisfied, I recently found two alternatives---one with the `ggpairs()` function from the `{GGally}` package and one with the `ggcormat()` function from the `{ggstatsplot}` package.
 
-Here is an example with the variables `mpg`, `hp` and `wt`:
+The two functions are illustrated with the variables `mpg`, `hp` and `wt`:
 
 ```{r}
 library(GGally)
@@ -318,7 +322,21 @@ library(GGally)
 ggpairs(dat[, c("mpg", "hp", "wt")])
 ```
 
-This plot combines correlation coefficients, correlation tests (via the asterisks next to the coefficients^[3 asterisks means that the coefficient is significant at the 5% level, 2 is at the 1% significance level, and 3 is at the 0.1% significance level.]) and scatterplots for all possible pairs of variables present in a dataset.
+The plot above combines correlation coefficients, correlation tests (via the asterisks next to the coefficients^[3 asterisks means that the coefficient is significant at the 5% level, 2 is at the 1% significance level, and 3 is at the 0.1% significance level.]) and scatterplots for all possible pairs of variables present in a dataset.
+
+```{r}
+library(ggstatsplot)
+
+ggcorrmat(
+  data = dat[, c("mpg", "hp", "wt")],
+  type = "parametric", # parametric for Pearson, nonparametric for Spearman's correlation
+  colors = c("darkred", "white", "steelblue") # change default colors
+)
+```
+
+The plot above also shows the correlation coefficients and if any, the non-significant correlations (by default at the 5% significance level with the Holm adjustment method) are shown by a big cross on the correlation coefficients.
+
+The advantage of these two alternatives compared to the first one is that it is directly available within a package, so you do not need to run the code of the function first in order to draw the correlogram.
 
 # Correlation does not imply causation
 
