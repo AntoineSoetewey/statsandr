@@ -55,7 +55,7 @@ bibliography: bibliography.bib
 </ul></li>
 <li><a href="#visualization-of-anova-and-post-hoc-tests-on-the-same-plot">Visualization of ANOVA and post-hoc tests on the same plot</a></li>
 <li><a href="#summary">Summary</a></li>
-<li><a href="#reference">Reference</a></li>
+<li><a href="#references">References</a></li>
 </ul>
 </div>
 
@@ -134,8 +134,12 @@ ggplot(dat) +
 <ul>
 <li><strong>Variable type</strong>: ANOVA requires a mix of one <a href="/blog/variable-types-and-examples/#continuous">continuous quantitative</a> dependent variable (which corresponds to the measurements to which the question relates) and one <a href="/blog/variable-types-and-examples/#qualitative">qualitative</a> independent variable (with at least 2 levels which will determine the groups to compare).</li>
 <li><strong>Independence</strong>: the data, collected from a representative and randomly selected portion of the total <a href="/blog/what-is-the-difference-between-population-and-sample/">population</a>, should be independent between groups and within each group. The assumption of independence is most often verified based on the design of the experiment and on the good control of experimental conditions rather than via a formal test. If you are still unsure about independence based on the experiment design, ask yourself if one observation is related to another (if one observation has an impact on another) within each group or between the groups themselves. If not, it is most likely that you have independent <a href="/blog/what-is-the-difference-between-population-and-sample/">samples</a>. If observations between samples (forming the different groups to be compared) are dependent (for example, if three measurements have been collected on the <strong>same individuals</strong> as it is often the case in medical studies when measuring a metric (i) before, (ii) during and (iii) after a treatment), the repeated measures ANOVA should be preferred in order to take into account the dependency between the samples.</li>
-<li><strong>Normality</strong>: Residuals<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> should follow approximately a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/"><strong>normal distribution</strong></a>. The normality assumption can be tested visually thanks to a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> and a <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a>, and/or formally via a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">normality test</a> such as the Shapiro-Wilk or Kolmogorov-Smirnov test. If, even after a transformation of your data (e.g., logarithmic transformation, square root, Box-Cox, etc.), the residuals still do not follow approximately a normal distribution, the Kruskal-Wallis test can be applied (<code>kruskal.test(variable ~ group, data = dat</code> in R). This non-parametric test, robust to non normal distributions, has the same goal than the ANOVA—compare 3 or more groups—but it uses sample medians instead of sample means to compare groups.</li>
-<li><strong>Equality of variances</strong>: the variances of the different groups should be equal in the populations (an assumption called homogeneity of the variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity if variances are different across groups). This assumption can be tested graphically (by comparing the dispersion in a <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> or <a href="/blog/descriptive-statistics-in-r/#dotplot">dotplot</a> for instance), or more formally via the Levene’s test (<code>leveneTest(variable ~ group)</code> from the <code>{car}</code> package) or Bartlett’s test, among others. If the hypothesis of equal variances is rejected, another version of the ANOVA can be used: the Welch ANOVA (<code>oneway.test(variable ~ group, var.equal = FALSE)</code>). Note that the Welch ANOVA does not require homogeneity of the variances, but the distributions should still follow approximately a normal distribution. Note that the Kruskal-Wallis test does not require the assumptions of normality nor homoscedasticity of the variances.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></li>
+<li><strong>Normality</strong>:
+<ul>
+<li>In case of small samples, residuals<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> should follow approximately a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/"><strong>normal distribution</strong></a>. The normality assumption can be tested visually thanks to a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> and a <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a>, and/or formally via a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">normality test</a> such as the Shapiro-Wilk or Kolmogorov-Smirnov test. If, even after a transformation of your data (e.g., logarithmic transformation, square root, Box-Cox, etc.), the residuals still do not follow approximately a normal distribution, the Kruskal-Wallis test can be applied (<code>kruskal.test(variable ~ group, data = dat</code> in R). This non-parametric test, robust to non normal distributions, has the same goal than the ANOVA—compare 3 or more groups—but it uses sample medians instead of sample means to compare groups.</li>
+<li>In case of large samples, <strong>normality is not required</strong> (this is a common misconception!). By the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">central limit theorem</a>, sample means of large samples are often well-approximated by a normal distribution even if the data are not normally distributed <span class="citation">(<a href="#ref-stevens2013intermediate" role="doc-biblioref">Stevens 2013</a>)</span>.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> It is therefore not required to test the normality assumption when the number of observations in each group/sample is large (usually <span class="math inline">\(n \ge 30\)</span>).</li>
+</ul></li>
+<li><strong>Equality of variances</strong>: the variances of the different groups should be equal in the populations (an assumption called homogeneity of the variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity if variances are different across groups). This assumption can be tested graphically (by comparing the dispersion in a <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> or <a href="/blog/descriptive-statistics-in-r/#dotplot">dotplot</a> for instance), or more formally via the Levene’s test (<code>leveneTest(variable ~ group)</code> from the <code>{car}</code> package) or Bartlett’s test, among others. If the hypothesis of equal variances is rejected, another version of the ANOVA can be used: the Welch ANOVA (<code>oneway.test(variable ~ group, var.equal = FALSE)</code>). Note that the Welch ANOVA does not require homogeneity of the variances, but the distributions should still follow approximately a normal distribution. Note that the Kruskal-Wallis test does not require the assumptions of normality nor homoscedasticity of the variances.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></li>
 <li><strong>Outliers</strong>: An <a href="/blog/outliers-detection-in-r/">outlier</a> is a value or an observation that is distant from the other observations. There should be <strong>no significant outliers in the different groups</strong>, or the conclusions of your ANOVA may be flawed. There are several methods to <a href="/blog/outliers-detection-in-r/">detect outliers</a> in your data but in order to deal with them, it is your choice to either:
 <ul>
 <li>use the non-parametric version (i.e., the Kruskal-Wallis test)</li>
@@ -146,7 +150,9 @@ ggplot(dat) +
 <p>Choosing the appropriate test depending on whether assumptions are met may be confusing so here is a brief summary:</p>
 <ol style="list-style-type: decimal">
 <li>Check that your observations are independent.</li>
-<li>If they are independent, test the normality of residuals:
+<li>Sample sizes:
+<ul>
+<li>In case of small samples, test the normality of residuals:
 <ul>
 <li>If normality is assumed, test the homogeneity of the variances:
 <ul>
@@ -154,6 +160,12 @@ ggplot(dat) +
 <li>If variances are not equal, use the <strong>Welch ANOVA</strong>.</li>
 </ul></li>
 <li>If normality is not assumed, use the <strong>Kruskal-Wallis test</strong>.</li>
+</ul></li>
+<li>In case of large samples normality is assumed, so test the homogeneity of the variances:
+<ul>
+<li>If variances are equal, use <strong>ANOVA</strong>.</li>
+<li>If variances are not equal, use the <strong>Welch ANOVA</strong>.</li>
+</ul></li>
 </ul></li>
 </ol>
 <p>Now that we have seen the underlying assumptions of the ANOVA, we review them specifically for our dataset before applying the appropriate version of the test.</p>
@@ -168,6 +180,7 @@ ggplot(dat) +
 </div>
 <div id="normality" class="section level2">
 <h2>Normality</h2>
+<p>Since the smallest sample size per group (i.e., per species) is 68, we have large samples. Therefore, we do not need to check normality. Normally, we would directly test the homogeneity of the variances without testing normality. However, for the sake of illustration, we act as if the sample sizes were small in order to illustrate what would need to be done in that case.</p>
 <p>Remember that <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normality</a> of residuals can be tested visually via a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> and a <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a>, and/or formally via a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">normality test</a> (Shapiro-Wilk test for instance).</p>
 <p>Before checking the normality assumption, we first need to compute the ANOVA (more on that in this <a href="/blog/anova-in-r/#anova-in-r">section</a>). We then save the results in <code>res_aov</code> :</p>
 <pre class="r"><code>res_aov &lt;- aov(flipper_length_mm ~ species,
@@ -398,7 +411,7 @@ report(res_aov)</code></pre>
 <p>If the <strong>null hypothesis is not rejected</strong> (<em>p</em>-value <span class="math inline">\(\ge\)</span> 0.05), it means that we do not reject the hypothesis that all groups are equal. The ANOVA more or less stops here. Other types of analyses can be performed of course, but—given the data at hand—we could not prove that at least one group was different so we usually do not go further with the ANOVA.</p>
 <p>On the contrary, if the <strong>null hypothesis is rejected</strong> (as it is our case since the <em>p</em>-value &lt; 0.05), we proved that at least one group is different. We can decide to stop here if we are only interested to test whether all species are equal in terms of flippers length.</p>
 <p>But most of the time, when we showed thanks to an ANOVA that at least one group is different, we are also interested in knowing <strong>which</strong> one(s) is(are) different. Results of an ANOVA, however, do <strong><em>NOT</em></strong> tell us which group(s) is(are) different from the others.</p>
-<p>To test this, we need to use other types of test, referred as post-hoc tests (in Latin, “after this,” so after obtaining statistically significant ANOVA results) or multiple pairwise-comparison tests.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> This family of statistical tests is the topic of the following sections.</p>
+<p>To test this, we need to use other types of test, referred as post-hoc tests (in Latin, “after this,” so after obtaining statistically significant ANOVA results) or multiple pairwise-comparison tests.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> This family of statistical tests is the topic of the following sections.</p>
 </div>
 </div>
 <div id="post-hoc-test" class="section level1">
@@ -423,7 +436,7 @@ P(\text{at least 1 sig. result}) &amp; = 1 - P(\text{no sig. results}) \\
 \end{equation}\]</span></p>
 <p>So, with as few as 3 tests being considered, we already have a 14.26% chance of observing at least one significant result, even if all of the tests are actually not significant.</p>
 <p>And as the number of groups increases, the number of comparisons increases as well, so the probability of having a significant result simply due to chance keeps increasing. For example, with 10 groups we need to make 45 comparisons and the probability of having at least one significant result by chance becomes <span class="math inline">\(1 - (1 - 0.05)^{45} = 90\%\)</span>. So it is very likely to observe a significant result just by chance when comparing 10 groups, and when we have 14 groups or more we are almost certain (99%) to have a false positive!</p>
-<p>Post-hoc tests take into account that multiple tests are done and deal with the problem by adjusting <span class="math inline">\(\alpha\)</span> in some way, so that the probability of observing at least one significant result due to chance remains below our desired significance level.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
+<p>Post-hoc tests take into account that multiple tests are done and deal with the problem by adjusting <span class="math inline">\(\alpha\)</span> in some way, so that the probability of observing at least one significant result due to chance remains below our desired significance level.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
 </div>
 <div id="post-hoc-tests-in-r-and-their-interpretation" class="section level2">
 <h2>Post-hoc tests in R and their interpretation</h2>
@@ -461,7 +474,7 @@ summary(post_test)</code></pre>
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</code></pre>
-<p>In the output of the Tukey HSD test, we are interested in the table displayed after <code>Linear Hypotheses:</code>, and more precisely, in the first and last column of the table. The first column shows the comparisons which have been made; the last column (<code>Pr(&gt;|t|)</code>) shows the adjusted<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> <em>p</em>-values for each comparison (with the null hypothesis being the two groups are equal and the alternative hypothesis being the two groups are different).</p>
+<p>In the output of the Tukey HSD test, we are interested in the table displayed after <code>Linear Hypotheses:</code>, and more precisely, in the first and last column of the table. The first column shows the comparisons which have been made; the last column (<code>Pr(&gt;|t|)</code>) shows the adjusted<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a> <em>p</em>-values for each comparison (with the null hypothesis being the two groups are equal and the alternative hypothesis being the two groups are different).</p>
 <p>It is these adjusted <em>p</em>-values that are used to test whether two groups are significantly different or not, and we can be confident that the entire set of comparisons collectively has an error rate of 0.05.</p>
 <p>In our example, we tested:</p>
 <ol style="list-style-type: decimal">
@@ -577,7 +590,7 @@ summary(post_test)</code></pre>
 plot(post_test)</code></pre>
 <p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>From the results above we conclude that Adelie and Chinstrap species are significantly different from Gentoo species in terms of flippers length (adjusted <em>p</em>-values &lt; 1e-10).</p>
-<p>Note that even if your study does not have a reference group which you can compare to the other groups, it is still often better to do multiple comparisons determined by some research questions than to do all-pairwise tests. By reducing the number of post-hoc comparisons to what is necessary only, and no more, you maximize the statistical power.<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
+<p>Note that even if your study does not have a reference group which you can compare to the other groups, it is still often better to do multiple comparisons determined by some research questions than to do all-pairwise tests. By reducing the number of post-hoc comparisons to what is necessary only, and no more, you maximize the statistical power.<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></p>
 </div>
 </div>
 <div id="other-p-values-adjustment-methods" class="section level2">
@@ -661,11 +674,14 @@ ggbetweenstats(
 <p>Thanks for reading.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
-<div id="reference" class="section level1 unnumbered">
-<h1>Reference</h1>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-hsu1996multiple" class="csl-entry">
 Hsu, Jason. 1996. <em>Multiple Comparisons: Theory and Methods</em>. CRC Press.
+</div>
+<div id="ref-stevens2013intermediate" class="csl-entry">
+Stevens, James P. 2013. <em>Intermediate Statistics: A Modern Approach</em>. Routledge.
 </div>
 </div>
 </div>
@@ -674,10 +690,11 @@ Hsu, Jason. 1996. <em>Multiple Comparisons: Theory and Methods</em>. CRC Press.
 <ol>
 <li id="fn1"><p>Note that it is called <em>one-way</em> or <em>one-factor</em> ANOVA because the means relate to the different modalities of a single independent variable, or factor.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>Residuals (denoted <span class="math inline">\(\epsilon\)</span>) are the differences between the observed values of the dependent variable (<span class="math inline">\(y\)</span>) and the predicted values (<span class="math inline">\(\hat{y}\)</span>). In the context of ANOVA, residuals correspond to the differences between the observed values and the mean of all values for that group.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>As long as you use the Kruskal-Wallis test to, <em>in fine</em>, compare groups, homoscedasticity is not required. If you wish to compare medians, the Kruskal-Wallis test requires homoscedasticity. See more information about the difference in this <a href="https://influentialpoints.com/Training/Kruskal-Wallis_ANOVA_use_and_misuse.htm" target="_blank">article</a>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>Note that, as discussed in the comments at the end of the article, post-hoc tests can under some circumstances be done directly (without an ANOVA). See the comments or <span class="citation"><a href="#ref-hsu1996multiple" role="doc-biblioref">Hsu</a> (<a href="#ref-hsu1996multiple" role="doc-biblioref">1996</a>)</span> for more details.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>Note that you could in principle apply the Bonferroni correction to all tests. For example, in the example above, with 3 tests and a global desired significance level of <span class="math inline">\(\alpha\)</span> = 0.05, we would only reject a null hypothesis if the <em>p</em>-value is less than <span class="math inline">\(\frac{0.05}{3}\)</span> = 0.0167. This method is, however, known to be quite conservative, leading to a potentially high rate of false negatives.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
-<li id="fn6"><p>The <em>p</em>-values are adjusted to keep the global significance level to the desired level.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
-<li id="fn7"><p>Thanks Michael Friendly for this suggestion.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p><span class="citation"><a href="#ref-stevens2013intermediate" role="doc-biblioref">Stevens</a> (<a href="#ref-stevens2013intermediate" role="doc-biblioref">2013</a>)</span> wrote, in p. 57, “Numerous studies have examined the effect of violations of assumptions in ANOVA, and an excellent summary of this literature has been provided by Glass, Peckham, and Sanders (1972). Their review indicates that non normality has only a slight effect on the type I error rate, even for very skewed or kurtotic distributions. For example, the actual <span class="math inline">\(\alpha\)</span>s for some very non-normal populations were only .055 or .06: very minor deviations from the nominal level of .05. […] The basic reason is the <em>Central Limit Theorem</em>, which states that the sum of independent observations having any distribution whatsoever approaches a normal distribution as the number of observations increases. To be somewhat more specific, Bock (1975) notes,”even for distributions which depart markedly from normality, sums of 50 or more observations approximate to normality. For moderately non-normal distributions the approximation is good with as few as 10 to 20 observations" (p. 111). Now since the sums of independent observations approach normality rapidly, so do the means, and the sampling distribution of <em>F</em> is based on means. Thus the sampling distribution of <em>F</em> is only slightly affected, and therefore the critical values when sampling from normal and non-normal distributions will not differ by much. Lack of normality due to skewness also has only a slight effect on power (a few hundredths)."<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>As long as you use the Kruskal-Wallis test to, <em>in fine</em>, compare groups, homoscedasticity is not required. If you wish to compare medians, the Kruskal-Wallis test requires homoscedasticity. See more information about the difference in this <a href="https://influentialpoints.com/Training/Kruskal-Wallis_ANOVA_use_and_misuse.htm" target="_blank">article</a>.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Note that, as discussed in the comments at the end of the article, post-hoc tests can under some circumstances be done directly (without an ANOVA). See the comments or <span class="citation"><a href="#ref-hsu1996multiple" role="doc-biblioref">Hsu</a> (<a href="#ref-hsu1996multiple" role="doc-biblioref">1996</a>)</span> for more details.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>Note that you could in principle apply the Bonferroni correction to all tests. For example, in the example above, with 3 tests and a global desired significance level of <span class="math inline">\(\alpha\)</span> = 0.05, we would only reject a null hypothesis if the <em>p</em>-value is less than <span class="math inline">\(\frac{0.05}{3}\)</span> = 0.0167. This method is, however, known to be quite conservative, leading to a potentially high rate of false negatives.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>The <em>p</em>-values are adjusted to keep the global significance level to the desired level.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>Thanks Michael Friendly for this suggestion.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

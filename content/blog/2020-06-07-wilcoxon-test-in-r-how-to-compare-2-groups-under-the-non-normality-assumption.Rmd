@@ -16,7 +16,7 @@ output:
     toc: true
     toc_depth: 6
 # draft: true
-# bibliography: bibliography.bib
+bibliography: bibliography.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -35,7 +35,7 @@ knitr::opts_chunk$set(
 
 In a previous article, we showed how to [compare two groups under different scenarios using the Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/). The Student's t-test requires that the distributions follow a [normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) when in presence of small samples.^[Remember that the normality assumption can be tested via 3 complementary methods: (i) histogram, (ii) QQ-plot and (iii) normality tests (with the most common being the Shapiro-Wilk test). See [how to determine if a distribution follows a normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) if you need a refresh.] In this article, we show how to **compare two groups when the normality assumption is violated**, using the **Wilcoxon test**.
 
-The Wilcoxon test is a **non-parametric test**, meaning that it does not rely on data belonging to any particular parametric family of probability distributions. Non-parametric tests have the same objective as their parametric counterparts. However, they have two advantages over parametric tests: they **do not require the assumption of normality** of distributions and they can deal with [outliers](/blog/outliers-detection-in-r/). A Student's t-test for instance is only applicable if the data are Gaussian or if the sample size is large enough (usually $n \ge 30$). A non-parametric test should be used in other cases.
+The Wilcoxon test is a **non-parametric test**, meaning that it does not rely on data belonging to any particular parametric family of probability distributions. Non-parametric tests have the same objective as their parametric counterparts. However, they have two advantages over parametric tests: they **do not require the assumption of normality** of distributions and they can deal with [outliers](/blog/outliers-detection-in-r/). A Student's t-test for instance is only applicable if the data are Gaussian or if the sample size is large enough (usually $n \ge 30$, thanks to the central limit theorem). A non-parametric test should be used in other cases.
 
 One may wonder why we would not always use a non-parametric test so we do not have to bother about testing for normality. The reason is that non-parametric tests are usually less powerful than corresponding parametric tests when the normality assumption holds. Therefore, all else being equal, with a non-parametric test you are less likely to reject the [null hypothesis](/blog/hypothesis-test-by-hand/#step-1-stating-the-null-and-alternative-hypothesis) when it is false if the data follows a normal distribution. It is thus preferred to use the parametric version of a statistical test when the assumptions are met.
 
@@ -98,7 +98,9 @@ shapiro.test(subset(dat, Sex == "Boy")$Grade)
 
 The histograms show that both distributions do not seem to follow a normal distribution and the *p*-values of the Shapiro-Wilk tests confirm it (since we reject the null hypothesis of normality for both distributions at the 5% significance level).
 
-We just showed that normality assumption is violated for both groups so it is now time to see how to perform the Wilcoxon test in R.^[Note that in order to use the Student's t-test (the parametric version of the Wilcoxon test), it is required that **both samples follow a normal distribution** (if samples are small). Therefore, even if one sample follows a normal distribution (and the other does not follow a normal distribution), it is recommended to use the non-parametric test.]
+We just showed that normality assumption is violated for both groups so it is now time to see how to perform the Wilcoxon test in R.
+
+Note that in order to use the Student's t-test (the parametric version of the Wilcoxon test), it is required that **both samples follow a normal distribution** if samples are small.^[In case of large samples, **normality is not required** (this is a common misconception!). By the [central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem){target="_blank"}, sample means of large samples are often well-approximated by a normal distribution even if the data are not normally distributed [@stevens2013intermediate].] Therefore, even if one sample follows a normal distribution (and the other does not follow a normal distribution), it is recommended to use the non-parametric test.
 
 Remember that the null and alternative hypothesis of the Wilcoxon test are as follows:
 
@@ -164,7 +166,7 @@ ggplot(dat2) +
 
 (See the [`{esquisse}` and `{questionr}` addins](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/) to help you reorder levels of a factor variable and to easily draw plots with the [`{ggplot2}` package](/blog/graphics-in-r-with-ggplot2/).)
 
-In this example, it is clear that the two samples are not independent since the same 12 students took the exam before and after the semester. Supposing also that the normality assumption is violated, we thus use the Wilcoxon test for **paired samples**, with the following hypotheses:^[Note that for paired samples (when in presence of a small sample), normality must be checked on the *differences* between the two paired samples, and not individually on the two samples like it is done for independent samples.]
+In this example, it is clear that the two samples are not independent since the same 12 students took the exam before and after the semester. Supposing also that the normality assumption is violated (and given the small sample size), we thus use the Wilcoxon test for **paired samples**, with the following hypotheses:^[Note that for paired samples (when in presence of a small sample), normality must be checked on the *differences* between the two paired samples, and not individually on the two samples like it is done for independent samples.]
 
 * $H_0$: grades before and after the semester are equal
 * $H_1$: grades before and after the semester are different
@@ -234,7 +236,7 @@ The point of this section was to illustrate how to easily draw plots together wi
 
 # Assumption of equal variances
 
-As written at the beginning of the article, the Wilcoxon test does not require the assumption of normality.
+As written at the beginning of the article, the Wilcoxon test does not require the assumption of normality in case of small samples.
 
 Regarding the assumption of equal variances, this assumption may or may not be needed depending on your goal. If you only want to compare the two groups, you do not have to test the equality of variances because the two distributions do not have to have the same shape. However, if your goal is to **compare medians of the two groups**, then you will need to make sure that the two distributions have the same shape (and thus, the same variance).^[See these three articles for a more detailed discussion on the assumption of equal variances in Wilcoxon test: [1](https://statistics.laerd.com/statistical-guides/mann-whitney-u-test-assumptions.php), [2](https://influentialpoints.com/Training/Wilcoxon-Mann-Whitney_U_test_use_and_misuse.htm) & [3](https://influentialpoints.com/Training/Wilcoxon_matched_pairs_signed_rank_test_use_and_misuse.htm).]
 
@@ -245,3 +247,5 @@ Note that this is equivalent when performing the Kruskal-Wallis test to compare 
 Thanks for reading. I hope this article helped you to compare two groups that do not follow a normal distribution in R using the Wilcoxon test. See the [Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) if you need to perform the parametric version of the Wilcoxon test, and the [ANOVA](/blog/anova-in-r/) if you need to compare 3 groups or more.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
+
+# References
