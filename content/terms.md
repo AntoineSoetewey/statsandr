@@ -4,7 +4,7 @@ date: "2019-12-25"
 description: "Terms and policies, privacy policy, disclosure policy, license and attribution for the blog Stats and R"
 ---
 
-This is my personal blog written and edited by me. Your use of this website, in any and all forms, constitutes an acceptance of these terms and policies. This page is reviewed and revised from time to time.
+This is my personal blog written and edited by me (Antoine Soetewey). Your use of this website, in any and all forms, constitutes an acceptance of these terms and policies. This page is reviewed and revised from time to time.
 
 All content provided is for informational purposes only. The articles and posts on this website are my own and do not necessarily represent the positions, strategies, or opinions of my employer or its subsidiaries. I make no representations as to the accuracy or completeness of any information found here or by following any links. I will not be liable for any errors or omissions in this information nor for the availability of this information. I will not be liable for any losses, injuries, or damages from the display or use of this information.
 
@@ -35,9 +35,9 @@ Third-party advertisers may also place and read cookies on your browser and/or u
 
 If you wish to [disable cookies](https://cookies.insites.com/disable-cookies/), you may do so through your web browser options. Instructions for doing so can be found on the specific web browsers' websites.
 
-#### Amazon
+<!---#### Amazon
 
-Amazon, a third party affiliate marketing network, uses cookies to help make sure I get a commission when you buy a product after clicking on a link or ad banner that takes you to the site of one of their merchants. Read [Amazon's Privacy Notice](https://www.amazon.com/gp/help/customer/display.html?nodeId=468496).
+Amazon, a third party affiliate marketing network, uses cookies to help make sure I get a commission when you buy a product after clicking on a link or ad banner that takes you to the site of one of their merchants. Read [Amazon's Privacy Notice](https://www.amazon.com/gp/help/customer/display.html?nodeId=468496).-->
 
 #### Google Analytics
 
@@ -47,7 +47,7 @@ Google Analytics is a web analytics tool I use to help understand how visitors e
 
 Netlify is a cloud computing company that offers hosting and serverless backend services for static websites. It features continuous deployment from Git across a global application delivery network, serverless form handling, support for AWS Lambda functions, and full integration with Let’s Encrypt. Read [Netlify’s Privacy Policy](https://www.netlify.com/privacy/).
 
-## Disclosure policy
+<!---## Disclosure policy
 
 I make money on this website through affiliate programs. If you click an affiliate link or ad banner and buy the product, you help support this website because I will get a percentage of that sale.
 
@@ -58,7 +58,7 @@ What this means for you:
 * I do not let the compensation I receive influence the content, topics, posts, or opinions expressed on this website.
 * I respect and value my readers too much to write anything other than my own genuine and objective opinions and advice.
 
-Just like this website, my disclosure policy is a work in progress. As the revenue streams evolve, so will this page.
+Just like this website, my disclosure policy is a work in progress. As the revenue streams evolve, so will this page.-->
 
 ## License
 
@@ -67,3 +67,7 @@ All original content (e.g. articles, blog posts, codes, files, illustrations, ar
 ### Attribution
 
 If you're inclined to give credit --- a link back to the source attributed to either [Antoine Soetewey](/) or [statsandr.com](/) is good enough for me. Talking about credits, thanks [Michael Rose](https://mademistakes.com) for the template of this page.
+
+## Contact
+
+You can contact me [here](/contact/).
