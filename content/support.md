@@ -1,19 +1,21 @@
 ---
-title: 'Support the blog'
+title: 'Support my work'
 date: "2020-01-21"
 description: "See the different ways you can support this blog so I can continue to provide free content. Any help is greatly appreciated. Thanks in advance!"
 ---
 
-On this blog, I provide free articles and tutorials about [statistics](/tags/statistics/) and [R](/tags/r/). My goal with the blog is to help people to understand statistical concepts (through examples and in plain English), and to apply them in R.
+On this blog, I share my knowledge in the form of free articles and tutorials about [statistics](/tags/statistics/) and [R](/tags/r/). My goal with the blog is to help people to understand statistical concepts (through examples and in plain English), and to apply them in R. When possible, I also contribute to open source projects on GitHub.
 
-All the [articles](/blog/), [Shiny apps](/tags/shiny/) and code are open source and available to everyone. I also try to reply to all questions I receive from readers by emails or as comments.
+All the [articles](/blog/), [Shiny apps](/tags/shiny/) and code are open source and available to everyone (code available directly in the articles or on [GitHub](https://github.com/AntoineSoetewey)). I also try to reply to all questions I receive from readers by emails or as comments.
 
-I work on the blog voluntarily in my spare time (when I am not too busy working on my PhD thesis). Your support will help me to:
+I work on the blog voluntarily in my spare time (when I am not too busy with my full-time job). Your support will help me to:
 
-* Cover the costs of hosting the blog and my [Shiny apps](/tags/shiny/), in order to keep its access free!
-* If your support becomes greater than the operating costs, it could also allow me to free up time to continue creating quality content and invest more time into the blog and the related [projects](https://github.com/AntoineSoetewey)
+* Cover the costs of hosting the blog and my [Shiny apps](/tags/shiny/), in order to keep its access **free** and with **no ads** at all!
+* If your support becomes greater than the operating costs, it could also allow me to free up time and **invest more time to offer you better quality content more often**
 
-Here are the different ways you can support the blog:
+I love coding, writing and showing what I learned during this continuous process. I love even more to share it for free and I am trying my best to keep it this way. However, costs are getting higher and I would not say no to a little help from you.
+
+So if you found something helpful on the blog and are feeling grateful today, here are the different ways you can support my work:
 
 1. [GitHub sponsor program, Paypal or Buy me a book](#github-sponsor-program-paypal-or-buy-me-a-book)
 1. [Link or share](#link-or-share)
@@ -24,22 +26,23 @@ Here are the different ways you can support the blog:
 
 If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via the [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey).
 
-If you cannot afford to donate a small amount each month, you can also consider making a one time donation via [PayPal](https://paypal.me/AntoineSoetewey), or by [buying me a book](https://www.buymeacoffee.com/statsandr).
+If you cannot afford to donate a small amount each month or do not want to be committed to a monthly subscription, you can also consider making a one time donation via [PayPal](https://paypal.me/AntoineSoetewey), or by [buying me a book](https://www.buymeacoffee.com/statsandr).
 
 ## Link or share
 
-If you have found any of the content on this blog useful please consider linking to [statsandr.com](/).
-
-You can also spread the word by sharing a note on your social media accounts.
+If you cannot support my blog with money but you have found any of the content useful, please consider spreading the word through your social media or linking the posts you appreciate. It helps tremendously!
 
 ## Follow the blog
 
-You can follow the blog via the following channels:
+You can also follow the blog via the following channels:
 
 * [Twitter](https://twitter.com/statsandr)
 * [Medium](https://antoinesoetewey.medium.com/)
 * [GitHub](https://github.com/AntoineSoetewey)
-* [Subscribe](/subscribe/) to this blog to receive new posts by email
+
+or [subscribe](/subscribe/) to this blog to receive new posts by email.
+
+Note that I am already very grateful for the community built with this blog and its related projects, and I am glad that it helped you in some ways.
 
 ## Recommendations
 
