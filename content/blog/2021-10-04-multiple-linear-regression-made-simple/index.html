@@ -53,6 +53,7 @@ bibliography: bibliography.bib
 <li><a href="#visualizations-1">Visualizations</a></li>
 <li><a href="#to-go-further">To go further</a>
 <ul>
+<li><a href="#print-models-parameters">Print model’s parameters</a></li>
 <li><a href="#extract-models-equation">Extract model’s equation</a></li>
 <li><a href="#automatic-reporting">Automatic reporting</a></li>
 <li><a href="#predictions">Predictions</a></li>
@@ -694,6 +695,423 @@ ggcoefstats(model4)</code></pre>
 <div id="to-go-further" class="section level2">
 <h2>To go further</h2>
 <p>Below some more advanced topics related to linear regression. Feel free to comment at the end of the article if you believe I missed an important one.</p>
+<div id="print-models-parameters" class="section level3">
+<h3>Print model’s parameters</h3>
+<p>Thanks to the <code>model_parameters()</code> function from the <code>{parameters}</code> package, you can print a summary of the model in a nicely formatted way to make the output more readable:</p>
+<pre class="r"><code>library(parameters)
+
+model_parameters(model4, summary = TRUE)</code></pre>
+<pre><code>## Parameter   | Coefficient |   SE |         95% CI | t(28) |      p
+## ------------------------------------------------------------------
+## (Intercept) |        9.62 | 6.96 | [-4.64, 23.87] |  1.38 | 0.178 
+## wt          |       -3.92 | 0.71 | [-5.37, -2.46] | -5.51 | &lt; .001
+## qsec        |        1.23 | 0.29 | [ 0.63,  1.82] |  4.25 | &lt; .001
+## am [Manual] |        2.94 | 1.41 | [ 0.05,  5.83] |  2.08 | 0.047 
+## 
+## Model: mpg ~ wt + qsec + am (32 Observations)
+## Residual standard deviation: 2.459 (df = 28)
+## R2: 0.850; adjusted R2: 0.834</code></pre>
+<p>And if you are using <a href="/blog/getting-started-in-r-markdown/">R Markdown</a>, you can use the <code>print_html()</code> function to get a compact and yet comprehensive summary table in your HTML file:</p>
+<pre class="r"><code>library(gt)
+
+print_html(model_parameters(model4, summary = TRUE))</code></pre>
+<div id="ukajtiexfk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#ukajtiexfk .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ukajtiexfk .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ukajtiexfk .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ukajtiexfk .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ukajtiexfk .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ukajtiexfk .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ukajtiexfk .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ukajtiexfk .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ukajtiexfk .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ukajtiexfk .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ukajtiexfk .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ukajtiexfk .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ukajtiexfk .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ukajtiexfk .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ukajtiexfk .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ukajtiexfk .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ukajtiexfk .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#ukajtiexfk .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ukajtiexfk .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#ukajtiexfk .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ukajtiexfk .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ukajtiexfk .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ukajtiexfk .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ukajtiexfk .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ukajtiexfk .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ukajtiexfk .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ukajtiexfk .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ukajtiexfk .gt_left {
+  text-align: left;
+}
+
+#ukajtiexfk .gt_center {
+  text-align: center;
+}
+
+#ukajtiexfk .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ukajtiexfk .gt_font_normal {
+  font-weight: normal;
+}
+
+#ukajtiexfk .gt_font_bold {
+  font-weight: bold;
+}
+
+#ukajtiexfk .gt_font_italic {
+  font-style: italic;
+}
+
+#ukajtiexfk .gt_super {
+  font-size: 65%;
+}
+
+#ukajtiexfk .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  <thead class="gt_header">
+    <tr>
+      <th colspan="6" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>Model Summary</th>
+    </tr>
+    
+  </thead>
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Parameter</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">Coefficient</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">SE</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">95% CI</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">t(28)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">p</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_center">9.62</td>
+<td class="gt_row gt_center">6.96</td>
+<td class="gt_row gt_center">(-4.64, 23.87)</td>
+<td class="gt_row gt_center">1.38</td>
+<td class="gt_row gt_center">0.178 </td></tr>
+    <tr><td class="gt_row gt_left">wt</td>
+<td class="gt_row gt_center">-3.92</td>
+<td class="gt_row gt_center">0.71</td>
+<td class="gt_row gt_center">(-5.37, -2.46)</td>
+<td class="gt_row gt_center">-5.51</td>
+<td class="gt_row gt_center">&lt; .001</td></tr>
+    <tr><td class="gt_row gt_left">qsec</td>
+<td class="gt_row gt_center">1.23</td>
+<td class="gt_row gt_center">0.29</td>
+<td class="gt_row gt_center">(0.63, 1.82)</td>
+<td class="gt_row gt_center">4.25</td>
+<td class="gt_row gt_center">&lt; .001</td></tr>
+    <tr><td class="gt_row gt_left">am (Manual)</td>
+<td class="gt_row gt_center">2.94</td>
+<td class="gt_row gt_center">1.41</td>
+<td class="gt_row gt_center">(0.05, 5.83)</td>
+<td class="gt_row gt_center">2.08</td>
+<td class="gt_row gt_center">0.047 </td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="6">Model: mpg ~ wt + qsec + am (32 Observations)</td>
+    </tr>
+    <tr>
+      <td class="gt_sourcenote" colspan="6">Residual standard deviation: 2.459 (df = 28)</td>
+    </tr>
+    <tr>
+      <td class="gt_sourcenote" colspan="6">R2: 0.850; adjusted R2: 0.834</td>
+    </tr>
+  </tfoot>
+  
+</table>
+</div>
+<p><br></p>
+</div>
 <div id="extract-models-equation" class="section level3">
 <h3>Extract model’s equation</h3>
 <p>You can easily extract the equation of your linear model in LaTeX or directly in your R Markdown document thanks to the <code>extract_eq()</code> function from the <code>{equatiomatic}</code> package:</p>
@@ -867,7 +1285,7 @@ summary(model6)</code></pre>
 <p>From the output we conclude that there is an interaction between the weight and the transmission (<span class="math inline">\(p\)</span>-value = 0.00102). This means that the effect of the weight on the distance traveled with a gallon <strong>depends on the transmission type</strong>.</p>
 <p>The easiest way to handle interaction is to visualize the relationship for each level of the categorical variable:</p>
 <pre class="r"><code>visreg(model6, &quot;wt&quot;, by = &quot;am&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-32-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the relationship between weight and miles/gallon is stronger (the slope is steeper) for cars with a manual transmission compared to cars with an automatic transmission.</p>
 <p>This is a good example to illustrate the point that when studying a relationship between two variables, say <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, if one also has data for other variables which are potentially associated with both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, it is important to include them in the regression and to analyze the relationship <strong>conditionally on these variables</strong>.</p>
 <p>Omitting some variables that should be included in the model may lead to erroneous and misleading conclusions, up to the point that the relationship is completely reversed (a phenomenon referred as <a href="https://en.wikipedia.org/wiki/Simpson%27s_paradox" target="_blank">Simpson’s paradox</a>).</p>

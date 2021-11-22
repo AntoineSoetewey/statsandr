@@ -299,17 +299,18 @@ This trick is particularly useful when writing in [R Markdown](/blog/getting-sta
 
 Another trick for the aesthetics is the `report()` function from the `{report}` package.
 
-Similar to `pander()`, the `report()` function allows to report test results in a more readable way---but it also interprets results for you. See for example with a [correlation test](/blog/correlation-coefficient-and-correlation-test-in-r/):
+Similar to `pander()`, the `report()` function allows to report test results in a more readable way---but it also interprets results for you. See for example with an [ANOVA](/blog/anova-in-r/):
 
 ```{r, message = FALSE, warning = FALSE}
 # install.packages("remotes")
 # remotes::install_github("easystats/report") # You only need to do that once
 library("report") # Load the package every time you start R
 
-report(cor.test(dat$price, dat$carat))
+report(aov(price ~ cut,
+              data = dat))
 ```
 
-Result of the test is displayed and interpreted for you, together with the *p*-value and the correlation coefficient. 
+In addition to the *p*-value and the test statistic, the result of the test is displayed and interpreted for you. 
 
 Note that the `report()` function can be used for other analyses. See more examples in the package's [documentation](https://easystats.github.io/report/){target="_blank"}.
 
@@ -363,6 +364,19 @@ extract_eq(model,
            wrap = TRUE,
            intercept = "beta")
 ```
+
+# Print model's parameters
+
+Thanks to the `print_html()` and `model_parameters()` functions from the `{parameters}` packages, you can print a summary of a model in a nicely formatted way to make the output more readable in your HTML file. See for instance with the multiple linear regression presented above:
+
+```{r}
+library(parameters)
+library(gt)
+
+print_html(model_parameters(model, summary = TRUE))
+```
+
+<br>
 
 # Pipe operator `%>%`
 
