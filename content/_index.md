@@ -11,16 +11,10 @@ From time to time, I (see more [about me](/about/)) also present some work relat
 
 **If you are new to this blog**, here is what you can do:
 
-* See:
-  + [all articles](/blog/)
-  + [articles by categories](/tags/)
+* See [all articles](/blog/) or articles by [categories](/tags/)
 * Learn more about [who is behind this blog](/about/)
-* Follow the blog on:
-  + [Twitter](https://twitter.com/statsandr)
-  + [Medium](https://antoinesoetewey.medium.com/)
-  + [GitHub](https://github.com/AntoineSoetewey)
 * [Subscribe to the newsletter](/subscribe/) to receive updates by email every time a new article is published
+* Follow the blog on [Twitter](https://twitter.com/statsandr)
 * Contribute by writing a [guest post](/contribute/) ([collaborations](/tags/collaboration/) are also welcome)
-* [Support the blog](/support/) so I can keep providing free content on an ad-free blog
-* See [press mentions](/press/)
+* [Support my work](/support/) so I can keep providing free content on an ad-free blog
 * [Contact me](/contact/) if you have any questions
