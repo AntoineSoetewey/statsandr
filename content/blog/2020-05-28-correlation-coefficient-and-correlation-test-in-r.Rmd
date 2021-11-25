@@ -66,7 +66,9 @@ head(dat, 5)
 
 ## Between two variables
 
-The correlation between 2 variables is found with the `cor()` function. Suppose we want to compute the correlation between horsepower (`hp`) and miles per gallon (`mpg`):
+The correlation between 2 variables is found with the `cor()` function.
+
+Suppose we want to compute the correlation between horsepower (`hp`) and miles per gallon (`mpg`):
 
 ```{r}
 # Pearson correlation between 2 variables
@@ -86,8 +88,8 @@ cor(dat$hp, dat$mpg,
 There are several correlation methods (Run `?cor` for more information about the different methods available in the `cor()` function):
 
 * **Pearson** correlation is often used for [quantitative continuous](/blog/variable-types-and-examples/#continuous) variables that have a linear relationship
-* **Spearman** correlation (which is actually similar to Pearson but based on the ranked values for each variable rather than on the raw data) is often used to evaluate relationships involving [qualitative ordinal](/blog/variable-types-and-examples/#ordinal) variables or quantitative variables if the link is partially linear
-* **Kendall** which is computed from the number of concordant and discordant pairs is often used for qualitative ordinal variables
+* **Spearman** correlation (which is actually similar to Pearson but based on the ranked values for each variable rather than on the raw data) is often used to evaluate relationships involving at least one [qualitative ordinal](/blog/variable-types-and-examples/#ordinal) variable or two quantitative variables if the link is partially linear
+* **Kendall's tau-b** which is computed from the number of concordant and discordant pairs is often used for qualitative ordinal variables
 
 ## Correlation matrix: correlations for all variables
 
@@ -115,9 +117,68 @@ Regarding the strength of the relationship: The **more extreme** the correlation
 
 As an illustration, the Pearson correlation between horsepower (`hp`) and miles per gallon (`mpg`) found above is `r round(cor(dat$hp, dat$mpg), 2)`, meaning that the 2 variables vary in opposite direction. This makes sense, cars with more horsepower tend to consume more fuel (and thus have a lower millage par gallon). On the contrary, from the correlation matrix we see that the correlation between miles per gallon (`mpg`) and the time to drive 1/4 of a mile (`qsec`) is `r round(cor(dat$mpg, dat$qsec), 2)`, meaning that fast cars (low `qsec`) tend to have a worse millage per gallon (low `mpg`). This again make sense as fast cars tend to consume more fuel.
 
-The correlation matrix is however not easily interpretable, especially when the dataset is composed of many variables. In the following sections, we present some alternatives to the correlation matrix.
+Note that it is a good practice to visualize the type of the relationship between the two variables *before* interpreting the correlation coefficients. The reason is that the correlation coefficient could be biased due to an [outlier](/blog/outliers-detection-in-r/) or due to the type of link between the two variables.
+
+For instance, see the two Pearson correlation coefficients (denoted by `R` in the following plots) when the outlier is excluded and included:
+
+```{r, echo = FALSE}
+dat_outlier <- data.frame(x = 1:7,
+                          y = c(1.5, 1.3, 1.4, 1.2, 1.15, 0.81, 0.92))
+
+library(ggplot2)
+library(ggpubr)
+
+# without outlier
+p1 <- ggplot(dat_outlier) +
+  aes(x = x, y = y) +
+  geom_point(color = "steelblue") +
+  theme_minimal() +
+  stat_cor(aes(label = ..r.label..), label.x = 0.5) +
+  labs(
+    title = "Outlier excluded"
+  ) +
+  ylim(c(0, 5)) +
+  xlim(c(0, 7.5))
+
+# with outlier
+dat_outlier <- rbind(dat_outlier, c(7.5, 5))
+p2 <- ggplot(dat_outlier) +
+  aes(x = x, y = y) +
+  geom_point(color = "steelblue") +
+  theme_minimal() +
+  stat_cor(aes(label = ..r.label..), label.x = 0.5) +
+  labs(
+    title = "Outlier included"
+  ) +
+  ylim(c(0, 5)) +
+  xlim(c(0, 7.5))
+
+library(patchwork)
+p1 + p2
+```
+
+The Pearson correlation coefficient changes drastically due to a single point, and thus the interpretation. It goes from a negative correlation coefficient, indicating a negative relationship between the 2 variables, to a positive coefficient, indicating a positive relationship. We would have missed this insight if we had not visualized the data in a scatterplot (see how to draw a scatterplot in this [section](/blog/correlation-coefficient-and-correlation-test-in-r/#visualizations)).
+
+A correlation coefficient may also miss a non-linear link between two variables:
+
+```{r, echo = FALSE}
+dat_link <- data.frame(x = -50:50)
+dat_link$y <- dat_link$x * dat_link$x
+
+ggplot(dat_link) +
+  aes(x = x, y = y) +
+  geom_point(color = "steelblue") +
+  theme_minimal() +
+  stat_cor(aes(label = ..r.label..), label.x = 0.5)
+```
+
+The Pearson correlation coefficient is equal to 0, indicating no relationship between the two variables, because it measures the **linear** relationship and it is clear from the plot that the link is non-linear.
+
+So to recap, it is a good practice to visualize the data via a scatterplot before interpreting a correlation coefficient (it does not tell the whole story) and see how the correlation coefficient changes when using the parametric (Pearson) or nonparametric version (Spearman or Kendall's tau-b).
 
 # Visualizations
+
+The correlation matrix presented above is not easily interpretable, especially when the dataset is composed of many variables. In the following sections, we present some alternatives to the correlation matrix for better readability.
 
 ## A scatterplot for 2 variables
 
@@ -185,6 +246,8 @@ Via this correlation test, what we are actually testing is whether:
 
 - the sample contains sufficient evidence to reject the null hypothesis and conclude that the correlation coefficient does not equal 0, so the relationship exists in the population.
 - or on the contrary, the sample does not contain enough evidence that the correlation coefficient does not equal 0, so in this case we do not reject the null hypothesis of no relationship between the variables in the population.
+
+Note that, for small sample sizes (usually $n < 30$), the two variables should follow a [normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) if you want to do a correlation test or estimate the confidence interval.
 
 Suppose that we want to test whether the rear axle ratio (`drat`) is correlated with the time to drive a quarter of a mile (`qsec`):
 
