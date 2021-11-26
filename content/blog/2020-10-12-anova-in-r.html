@@ -440,12 +440,15 @@ P(\text{at least 1 sig. result}) &amp; = 1 - P(\text{no sig. results}) \\
 </div>
 <div id="post-hoc-tests-in-r-and-their-interpretation" class="section level2">
 <h2>Post-hoc tests in R and their interpretation</h2>
-<p>Post-hoc tests are a family of statistical tests so there are several of them. The most often used are the <strong>Tukey HSD</strong> and <strong>Dunnett’s</strong> tests:</p>
+<p>Post-hoc tests are a family of statistical tests so there are several of them. The most common ones are:</p>
 <ul>
-<li>Tukey HSD is used to compare <strong>all groups</strong> to each other (so all possible comparisons of 2 groups).</li>
-<li>Dunnett is used to make comparisons with a <strong>reference group</strong>. For example, consider 2 treatment groups and one control group. If you only want to compare the 2 treatment groups with respect to the control group, and you do not want to compare the 2 treatment groups to each other, the Dunnett’s test is preferred.</li>
+<li><strong>Tukey HSD</strong>, used to compare <strong>all groups</strong> to each other (so all possible comparisons of 2 groups).</li>
+<li><strong>Dunnett</strong>, used to make comparisons with a <strong>reference group</strong>. For example, consider 2 treatment groups and one control group. If you only want to compare the 2 treatment groups with respect to the control group, and you do not want to compare the 2 treatment groups to each other, the Dunnett’s test is preferred.</li>
+<li><strong>Bonferroni correction</strong> if have a set of planned comparisons to do.</li>
 </ul>
-<p>Note that variances are assumed to be equal for both tests. They are presented in the next sections. If variances are not equal, you can use the Games-Howell test, among others.</p>
+<p>The Bonferroni correction is simple: you simply divide the desired global <span class="math inline">\(\alpha\)</span> level by the number of comparisons. In our example, we have 3 comparisons so if we want to keep a global <span class="math inline">\(\alpha = 0.05\)</span>, we have <span class="math inline">\(\alpha&#39; = \frac{0.05}{3} = 0.0167\)</span>. We can then simply perform a Student’s t-test for each comparison, and compare the obtained <span class="math inline">\(p\)</span>-values with this new <span class="math inline">\(\alpha&#39;\)</span>.</p>
+<p>The other two post-hoc tests are presented in the next sections.</p>
+<p>Note that variances are assumed to be equal for all three methods (unless you use the Welch’s t-test instead of the Student’s t-test with the Bonferroni correction). If variances are not equal, you can use the Games-Howell test, among others.</p>
 <div id="tukey-hsd-test" class="section level3">
 <h3>Tukey HSD test</h3>
 <p>In our case, since there is no “reference” species and we are interested in comparing all species, we are going to use the Tukey HSD test.</p>
@@ -468,9 +471,9 @@ summary(post_test)</code></pre>
 ## 
 ## Linear Hypotheses:
 ##                         Estimate Std. Error t value Pr(&gt;|t|)    
-## Chinstrap - Adelie == 0   5.8699     0.9699   6.052   &lt;1e-08 ***
-## Gentoo - Adelie == 0     27.2333     0.8067  33.760   &lt;1e-08 ***
-## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286   &lt;1e-08 ***
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 1.41e-08 ***
+## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &lt; 1e-08 ***
+## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286  &lt; 1e-08 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</code></pre>

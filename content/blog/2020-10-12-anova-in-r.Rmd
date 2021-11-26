@@ -456,12 +456,17 @@ Post-hoc tests take into account that multiple tests are done and deal with the 
 
 ## Post-hoc tests in R and their interpretation
 
-Post-hoc tests are a family of statistical tests so there are several of them. The most often used are the **Tukey HSD** and **Dunnett's** tests:
+Post-hoc tests are a family of statistical tests so there are several of them. The most common ones are:
 
-* Tukey HSD is used to compare **all groups** to each other (so all possible comparisons of 2 groups).
-* Dunnett is used to make comparisons with a **reference group**. For example, consider 2 treatment groups and one control group. If you only want to compare the 2 treatment groups with respect to the control group, and you do not want to compare the 2 treatment groups to each other, the Dunnett's test is preferred.
+- **Tukey HSD**, used to compare **all groups** to each other (so all possible comparisons of 2 groups).
+- **Dunnett**, used to make comparisons with a **reference group**. For example, consider 2 treatment groups and one control group. If you only want to compare the 2 treatment groups with respect to the control group, and you do not want to compare the 2 treatment groups to each other, the Dunnett's test is preferred.
+- **Bonferroni correction** if have a set of planned comparisons to do.
 
-Note that variances are assumed to be equal for both tests. They are presented in the next sections. If variances are not equal, you can use the Games-Howell test, among others.
+The Bonferroni correction is simple: you simply divide the desired global $\alpha$ level by the number of comparisons. In our example, we have 3 comparisons so if we want to keep a global $\alpha = 0.05$, we have $\alpha' = \frac{0.05}{3} = 0.0167$. We can then simply perform a Student's t-test for each comparison, and compare the obtained $p$-values with this new $\alpha'$.
+
+The other two post-hoc tests are presented in the next sections.
+
+Note that variances are assumed to be equal for all three methods (unless you use the Welch's t-test instead of the Student's t-test with the Bonferroni correction). If variances are not equal, you can use the Games-Howell test, among others.
 
 ### Tukey HSD test
 
