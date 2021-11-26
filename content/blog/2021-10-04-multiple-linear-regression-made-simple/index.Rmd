@@ -647,19 +647,21 @@ Last but not least, do not forget to also verify the [conditions of application]
 
 ## Visualizations
 
-There are many ways to visualize results of a linear regression. The 2 easiest ones I am aware of are:
+There are many ways to visualize results of a linear regression. The easiest ones I am aware of are:
 
-1. `visreg()` which illustrates the relationships between the dependent and independent variables in different plots (one for each independent variable unless you specify which relationship you want to illustrate):
+1. `visreg()` illustrates the relationships between the dependent and independent variables in different plots (one for each independent variable unless you specify which relationship you want to illustrate):
 
 ```{r}
 library(visreg)
+
 visreg(model4)
 ```
 
-2. `ggcoefstats()` which illustrates the results in one single plot:
+2. `ggcoefstats()` illustrates the results in one single plot, with many statistical details:
 
 ```{r, message = FALSE, warning = FALSE}
 library(ggstatsplot)
+
 ggcoefstats(model4)
 ```
 
@@ -668,6 +670,27 @@ In this plot:
 - when the solid line does not cross the vertical dashed line, the estimates is significantly different from 0 at the 5% significance level (i.e., $p$-value < 0.05)
 - furthermore, a point to the right (left) of the vertical dashed line means that there is a positive (negative) relationship between the two variables
 - the more extreme the point, the stronger the relationship
+
+3. `plot_summs()` which also illustrates the results but in a more concise way:
+
+```{r}
+library(jtools)
+library(ggstance)
+
+plot_summs(model4,
+           omit.coefs = NULL)
+```
+
+The advantage of this approach is that it is possible to compare coefficients of multiple models simultaneously (particularly interesting when the models are nested):
+
+```{r}
+model4bis <- lm(mpg ~ wt + qsec + am + hp,
+                data = dat)
+
+plot_summs(model4,
+           model4bis,
+           omit.coefs = NULL)
+```
 
 ## To go further
 

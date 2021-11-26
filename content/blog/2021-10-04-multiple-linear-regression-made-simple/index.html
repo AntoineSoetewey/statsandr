@@ -672,17 +672,19 @@ model4 &lt;- step(model4, trace = FALSE)</code></pre>
 </div>
 <div id="visualizations-1" class="section level2">
 <h2>Visualizations</h2>
-<p>There are many ways to visualize results of a linear regression. The 2 easiest ones I am aware of are:</p>
+<p>There are many ways to visualize results of a linear regression. The easiest ones I am aware of are:</p>
 <ol style="list-style-type: decimal">
-<li><code>visreg()</code> which illustrates the relationships between the dependent and independent variables in different plots (one for each independent variable unless you specify which relationship you want to illustrate):</li>
+<li><code>visreg()</code> illustrates the relationships between the dependent and independent variables in different plots (one for each independent variable unless you specify which relationship you want to illustrate):</li>
 </ol>
 <pre class="r"><code>library(visreg)
+
 visreg(model4)</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-2.png" width="100%" style="display: block; margin: auto;" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-21-3.png" width="100%" style="display: block; margin: auto;" /></p>
 <ol start="2" style="list-style-type: decimal">
-<li><code>ggcoefstats()</code> which illustrates the results in one single plot:</li>
+<li><code>ggcoefstats()</code> illustrates the results in one single plot, with many statistical details:</li>
 </ol>
 <pre class="r"><code>library(ggstatsplot)
+
 ggcoefstats(model4)</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>In this plot:</p>
@@ -691,6 +693,26 @@ ggcoefstats(model4)</code></pre>
 <li>furthermore, a point to the right (left) of the vertical dashed line means that there is a positive (negative) relationship between the two variables</li>
 <li>the more extreme the point, the stronger the relationship</li>
 </ul>
+<ol start="3" style="list-style-type: decimal">
+<li><code>plot_summs()</code> which also illustrates the results but in a more concise way:</li>
+</ol>
+<pre class="r"><code>library(jtools)
+library(ggstance)
+
+plot_summs(model4,
+  omit.coefs = NULL
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-23-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The advantage of this approach is that it is possible to compare coefficients of multiple models simultaneously (particularly interesting when the models are nested):</p>
+<pre class="r"><code>model4bis &lt;- lm(mpg ~ wt + qsec + am + hp,
+  data = dat
+)
+
+plot_summs(model4,
+  model4bis,
+  omit.coefs = NULL
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-24-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="to-go-further" class="section level2">
 <h2>To go further</h2>
@@ -1285,7 +1307,7 @@ summary(model6)</code></pre>
 <p>From the output we conclude that there is an interaction between the weight and the transmission (<span class="math inline">\(p\)</span>-value = 0.00102). This means that the effect of the weight on the distance traveled with a gallon <strong>depends on the transmission type</strong>.</p>
 <p>The easiest way to handle interaction is to visualize the relationship for each level of the categorical variable:</p>
 <pre class="r"><code>visreg(model6, &quot;wt&quot;, by = &quot;am&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-32-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-34-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the relationship between weight and miles/gallon is stronger (the slope is steeper) for cars with a manual transmission compared to cars with an automatic transmission.</p>
 <p>This is a good example to illustrate the point that when studying a relationship between two variables, say <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, if one also has data for other variables which are potentially associated with both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, it is important to include them in the regression and to analyze the relationship <strong>conditionally on these variables</strong>.</p>
 <p>Omitting some variables that should be included in the model may lead to erroneous and misleading conclusions, up to the point that the relationship is completely reversed (a phenomenon referred as <a href="https://en.wikipedia.org/wiki/Simpson%27s_paradox" target="_blank">Simpson’s paradox</a>).</p>
