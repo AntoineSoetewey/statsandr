@@ -81,6 +81,14 @@ ggplot(dat) +
 
 This second barplot is particularly useful if there are a different number of observations in each level of the variable drawn on the $x$-axis because it allows to compare the two variables on the same ground.
 
+If you prefer to have the bars next to each other:
+
+```{r}
+ggplot(dat) +
+  aes(x = Species, fill = size) +
+  geom_bar(position = "dodge")
+```
+
 See the article "[Graphics in R with ggplot2](/blog/graphics-in-r-with-ggplot2/)" to learn how to create this kind of barplot in `{ggplot2}`.
 
 # Chi-square test of independence in R
@@ -114,7 +122,11 @@ If a warning such as "Chi-squared approximation may be incorrect" appears, it me
 * gather some levels (especially those with a small number of observations) to increase the number of observations in the subgroups, or
 * use the [Fisher's exact test](/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/)
 
-The Fisher's exact test does not require the assumption of a minimum of 5 expected counts. It can be applied in R thanks to the function `fisher.test()`. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results. Learn more about this test in this [article](/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/) dedicated to this type of test.
+The Fisher's exact test does not require the assumption of a minimum of 5 expected counts in the contingency table. It can be applied in R thanks to the function `fisher.test()`. This test is similar to the Chi-square test in terms of hypothesis and interpretation of the results. Learn more about this test in this [article](/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/) dedicated to this type of test.
+
+Talking about assumptions, the Chi-square test of independence requires that the observations are independent. This is usually not tested formally, but rather verified based on the design of the experiment and on the good control of experimental conditions. If you are not sure, ask yourself if one observation is related to another (if one observation has an impact on another). If not, it is most likely that you have independent observations.
+
+If you have dependent observations (paired samples), the McNemar's or Cochran's Q tests should be used instead. The McNemar's test is used when we want to know if there is a significant change in two paired samples (typically in a study with a measure before and after on the same subject) when the variables have only two categories. The Cochran's Q tests is an extension of the McNemar's test when we have more than two related measures.
 
 For your information, there are three other methods to perform the Chi-square test of independence in R:
 
