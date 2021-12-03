@@ -132,7 +132,7 @@ test</code></pre>
 <div id="combination-of-plot-and-statistical-test" class="section level1">
 <h1>Combination of plot and statistical test</h1>
 <p>It is possible print the results of the Fisher’s exact test directly on a <a href="https://statsandr.com/blog/descriptive-statistics-in-r/#barplot">barplot</a> thanks to the <code>ggbarstats()</code> function from the <code>{ggstatsplot}</code> package (the function has been slightly edited to match our needs).</p>
-<p>This package requires that our data is not already in the form of a contingency table so we transform it to a data frame before plotting the results:</p>
+<p>It is easier to work with the package when our data is not already in the form of a contingency table so we transform it to a data frame before plotting the results:</p>
 <pre class="r"><code># create dataframe from contingency table
 x &lt;- c()
 for (row in rownames(dat)) {
@@ -172,6 +172,15 @@ ggbarstats(
   )
 )</code></pre>
 <p><img src="/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggbarstats(
+  df, Smoking_habits, Sport_habits,
+  results.subtitle = FALSE,
+  subtitle = paste0(
+    &quot;Fisher&#39;s exact test&quot;, &quot;, p-value = &quot;,
+    ifelse(test$p.value &lt; 0.001, &quot;&lt; 0.001&quot;, round(test$p.value, 3))
+  )
+)</code></pre>
+<p><img src="/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample_files/figure-html/unnamed-chunk-7-2.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>From the plot, it is clear that the proportion of smokers among non-athletes is higher than among athletes, suggesting that there is a relationship between the two variables.</p>
 <p>This is confirmed thanks to the <span class="math inline">\(p\)</span>-value displayed in the subtitle of the plot. As previously, we reject the null hypothesis and we conclude that the variables smoking habits and being an athlete or not are dependent (<span class="math inline">\(p\)</span>-value = 0.021).</p>
 <p>Thanks for reading. I hope the article helped you to perform the Fisher’s exact test of independence in R and interpret its results. Learn more about the Chi-square test of independence <a href="/blog/chi-square-test-of-independence-by-hand/">by hand</a> or <a href="/blog/chi-square-test-of-independence-in-r/">in R</a>.</p>

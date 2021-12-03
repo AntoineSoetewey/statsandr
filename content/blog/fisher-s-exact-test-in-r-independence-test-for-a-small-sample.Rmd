@@ -130,7 +130,7 @@ $\Rightarrow$ In our context, rejecting the null hypothesis for the Fisher's exa
 
 It is possible print the results of the Fisher's exact test directly on a [barplot](https://statsandr.com/blog/descriptive-statistics-in-r/#barplot) thanks to the `ggbarstats()` function from the `{ggstatsplot}` package (the function has been slightly edited to match our needs).
 
-This package requires that our data is not already in the form of a contingency table so we transform it to a data frame before plotting the results:
+It is easier to work with the package when our data is not already in the form of a contingency table so we transform it to a data frame before plotting the results:
 
 ```{r, message = FALSE, warning = FALSE}
 # create dataframe from contingency table
@@ -149,6 +149,15 @@ test <- fisher.test(table(df))
 
 # combine plot and statistical test with ggbarstats
 library(ggstatsplot)
+ggbarstats(
+  df, Smoking_habits, Sport_habits,
+  results.subtitle = FALSE,
+  subtitle = paste0(
+    "Fisher's exact test", ", p-value = ",
+    ifelse(test$p.value < 0.001, "< 0.001", round(test$p.value, 3))
+  )
+)
+
 ggbarstats(
   df, Smoking_habits, Sport_habits,
   results.subtitle = FALSE,
