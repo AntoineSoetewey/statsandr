@@ -8,6 +8,7 @@ tags:
   - R
   - Hypothesis test
   - Inferential statistics
+  - Statistics
 meta_img: blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample_files/0_73Z2pBxY4UbGaVXz.jpeg
 description: Learn the differences between the Chi-square test of independence and the Fisher's exact test. You will also learn how to implement the statistical test in R
 output:
@@ -70,6 +71,18 @@ colnames(dat) <- c("Non-smoker", "Smoker")
 dat
 ```
 
+It is also a good practice to draw a [mosaic plot](/blog/descriptive-statistics-in-r/#mosaic-plot) to visually represent the data: 
+
+```{r}
+mosaicplot(dat,
+           main = "Mosaic plot",
+           color = TRUE)
+```
+
+We can already see from the plot that the proportion of smokers in the [sample](/blog/what-is-the-difference-between-population-and-sample/) is higher among non-athletes than athlete. The plot is however not sufficient to conclude that there is such a significant association in the [population](/blog/what-is-the-difference-between-population-and-sample/).
+
+Like many [statistical tests](/blog/what-statistical-test-should-i-do/), this can be done via a [hypothesis test](/blog/hypothesis-test-by-hand/). But before seeing how to do it in R, let's see the concept of expected frequencies.
+
 ## Expected frequencies
 
 Remember that the Fisher's exact test is used when there is at least one cell in the contingency table of the expected frequencies below 5. To retrieve the expected frequencies, use the `chisq.test()` function together with `$expected`:
@@ -105,13 +118,50 @@ Note that if your data is not already presented as a contingency table, you can 
 fisher.test(table(dat$variable1, dat$variable2))
 ```
 
-where `dat` is the name of your dataset, `var1` and `var2` correspond to the names of the two variables of interest.
+where `dat` is the name of your dataset, `variable1` and `variable2` correspond to the names of the two variables of interest.
 
 ## Conclusion and interpretation
 
-From the output and from `test$p.value` we see that the $p$-value is less than the significance level of 5%. Like any other statistical test, if the $p$-value is less than the significance level, we can reject the null hypothesis. If you are not familiar with $p$-values, I invite you to read this [section](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha).
+From the output and from `test$p.value` we see that the $p$-value is less than the significance level of 5%. Like any other [statistical test](/blog/what-statistical-test-should-i-do/), if the $p$-value is less than the significance level, we can reject the null hypothesis. If you are not familiar with $p$-values, I invite you to read this [section](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha).
 
 $\Rightarrow$ In our context, rejecting the null hypothesis for the Fisher's exact test of independence means that there is a significant relationship between the two categorical variables (smoking habits and being an athlete or not). Therefore, knowing the value of one variable helps to predict the value of the other variable.
+
+# Combination of plot and statistical test
+
+It is possible print the results of the Fisher's exact test directly on a [barplot](https://statsandr.com/blog/descriptive-statistics-in-r/#barplot) thanks to the `ggbarstats()` function from the `{ggstatsplot}` package (the function has been slightly edited to match our needs).
+
+This package requires that our data is not already in the form of a contingency table so we transform it to a data frame before plotting the results:
+
+```{r, message = FALSE, warning = FALSE}
+# create dataframe from contingency table
+x <- c()
+for(row in rownames(dat)) {
+    for(col in colnames(dat)) {
+        x <- rbind(x, matrix(rep(c(row, col), dat[row,col]), ncol=2, byrow=TRUE))
+    }
+}
+df = as.data.frame(x)
+colnames(df) <- c("Sport_habits", "Smoking_habits")
+df
+
+# Fisher's exact test with raw data
+test <- fisher.test(table(df))
+
+# combine plot and statistical test with ggbarstats
+library(ggstatsplot)
+ggbarstats(
+  df, Smoking_habits, Sport_habits,
+  results.subtitle = FALSE,
+  subtitle = paste0(
+    "Fisher's exact test", ", p-value = ",
+    ifelse(test$p.value < 0.001, "< 0.001", round(test$p.value, 3))
+  )
+)
+```
+
+From the plot, it is clear that the proportion of smokers among non-athletes is higher than among athletes, suggesting that there is a relationship between the two variables.
+
+This is confirmed thanks to the $p$-value displayed in the subtitle of the plot. As previously, we reject the null hypothesis and we conclude that the variables smoking habits and being an athlete or not are dependent ($p$-value = `r round(test$p.value, 3)`).
 
 Thanks for reading. I hope the article helped you to perform the Fisher's exact test of independence in R and interpret its results. Learn more about the Chi-square test of independence [by hand](/blog/chi-square-test-of-independence-by-hand/) or [in R](/blog/chi-square-test-of-independence-in-r/).
 

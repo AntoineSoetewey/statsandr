@@ -8,6 +8,7 @@ tags:
   - R
   - Hypothesis test
   - Inferential statistics
+  - Statistics
 meta_img: blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample_files/0_73Z2pBxY4UbGaVXz.jpeg
 description: Learn the differences between the Chi-square test of independence and the Fisher's exact test. You will also learn how to implement the statistical test in R
 output:
@@ -32,6 +33,7 @@ bibliography: bibliography.bib
 <li><a href="#fishers-exact-test-in-r">Fisher’s exact test in R</a></li>
 <li><a href="#conclusion-and-interpretation">Conclusion and interpretation</a></li>
 </ul></li>
+<li><a href="#combination-of-plot-and-statistical-test">Combination of plot and statistical test</a></li>
 <li><a href="#references">References</a></li>
 </ul>
 </div>
@@ -77,6 +79,14 @@ dat</code></pre>
 <pre><code>##             Non-smoker Smoker
 ## Athlete              7      2
 ## Non-athlete          0      5</code></pre>
+<p>It is also a good practice to draw a <a href="/blog/descriptive-statistics-in-r/#mosaic-plot">mosaic plot</a> to visually represent the data:</p>
+<pre class="r"><code>mosaicplot(dat,
+  main = &quot;Mosaic plot&quot;,
+  color = TRUE
+)</code></pre>
+<p><img src="/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample_files/figure-html/unnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We can already see from the plot that the proportion of smokers in the <a href="/blog/what-is-the-difference-between-population-and-sample/">sample</a> is higher among non-athletes than athlete. The plot is however not sufficient to conclude that there is such a significant association in the <a href="/blog/what-is-the-difference-between-population-and-sample/">population</a>.</p>
+<p>Like many <a href="/blog/what-statistical-test-should-i-do/">statistical tests</a>, this can be done via a <a href="/blog/hypothesis-test-by-hand/">hypothesis test</a>. But before seeing how to do it in R, let’s see the concept of expected frequencies.</p>
 </div>
 <div id="expected-frequencies" class="section level2">
 <h2>Expected frequencies</h2>
@@ -111,15 +121,61 @@ test</code></pre>
 <pre><code>## [1] 0.02097902</code></pre>
 <p>Note that if your data is not already presented as a contingency table, you can simply use the following code:</p>
 <pre class="r"><code>fisher.test(table(dat$variable1, dat$variable2))</code></pre>
-<p>where <code>dat</code> is the name of your dataset, <code>var1</code> and <code>var2</code> correspond to the names of the two variables of interest.</p>
+<p>where <code>dat</code> is the name of your dataset, <code>variable1</code> and <code>variable2</code> correspond to the names of the two variables of interest.</p>
 </div>
 <div id="conclusion-and-interpretation" class="section level2">
 <h2>Conclusion and interpretation</h2>
-<p>From the output and from <code>test$p.value</code> we see that the <span class="math inline">\(p\)</span>-value is less than the significance level of 5%. Like any other statistical test, if the <span class="math inline">\(p\)</span>-value is less than the significance level, we can reject the null hypothesis. If you are not familiar with <span class="math inline">\(p\)</span>-values, I invite you to read this <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha">section</a>.</p>
+<p>From the output and from <code>test$p.value</code> we see that the <span class="math inline">\(p\)</span>-value is less than the significance level of 5%. Like any other <a href="/blog/what-statistical-test-should-i-do/">statistical test</a>, if the <span class="math inline">\(p\)</span>-value is less than the significance level, we can reject the null hypothesis. If you are not familiar with <span class="math inline">\(p\)</span>-values, I invite you to read this <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha">section</a>.</p>
 <p><span class="math inline">\(\Rightarrow\)</span> In our context, rejecting the null hypothesis for the Fisher’s exact test of independence means that there is a significant relationship between the two categorical variables (smoking habits and being an athlete or not). Therefore, knowing the value of one variable helps to predict the value of the other variable.</p>
+</div>
+</div>
+<div id="combination-of-plot-and-statistical-test" class="section level1">
+<h1>Combination of plot and statistical test</h1>
+<p>It is possible print the results of the Fisher’s exact test directly on a <a href="https://statsandr.com/blog/descriptive-statistics-in-r/#barplot">barplot</a> thanks to the <code>ggbarstats()</code> function from the <code>{ggstatsplot}</code> package (the function has been slightly edited to match our needs).</p>
+<p>This package requires that our data is not already in the form of a contingency table so we transform it to a data frame before plotting the results:</p>
+<pre class="r"><code># create dataframe from contingency table
+x &lt;- c()
+for (row in rownames(dat)) {
+  for (col in colnames(dat)) {
+    x &lt;- rbind(x, matrix(rep(c(row, col), dat[row, col]), ncol = 2, byrow = TRUE))
+  }
+}
+df &lt;- as.data.frame(x)
+colnames(df) &lt;- c(&quot;Sport_habits&quot;, &quot;Smoking_habits&quot;)
+df</code></pre>
+<pre><code>##    Sport_habits Smoking_habits
+## 1       Athlete     Non-smoker
+## 2       Athlete     Non-smoker
+## 3       Athlete     Non-smoker
+## 4       Athlete     Non-smoker
+## 5       Athlete     Non-smoker
+## 6       Athlete     Non-smoker
+## 7       Athlete     Non-smoker
+## 8       Athlete         Smoker
+## 9       Athlete         Smoker
+## 10  Non-athlete         Smoker
+## 11  Non-athlete         Smoker
+## 12  Non-athlete         Smoker
+## 13  Non-athlete         Smoker
+## 14  Non-athlete         Smoker</code></pre>
+<pre class="r"><code># Fisher&#39;s exact test with raw data
+test &lt;- fisher.test(table(df))
+
+# combine plot and statistical test with ggbarstats
+library(ggstatsplot)
+ggbarstats(
+  df, Smoking_habits, Sport_habits,
+  results.subtitle = FALSE,
+  subtitle = paste0(
+    &quot;Fisher&#39;s exact test&quot;, &quot;, p-value = &quot;,
+    ifelse(test$p.value &lt; 0.001, &quot;&lt; 0.001&quot;, round(test$p.value, 3))
+  )
+)</code></pre>
+<p><img src="/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>From the plot, it is clear that the proportion of smokers among non-athletes is higher than among athletes, suggesting that there is a relationship between the two variables.</p>
+<p>This is confirmed thanks to the <span class="math inline">\(p\)</span>-value displayed in the subtitle of the plot. As previously, we reject the null hypothesis and we conclude that the variables smoking habits and being an athlete or not are dependent (<span class="math inline">\(p\)</span>-value = 0.021).</p>
 <p>Thanks for reading. I hope the article helped you to perform the Fisher’s exact test of independence in R and interpret its results. Learn more about the Chi-square test of independence <a href="/blog/chi-square-test-of-independence-by-hand/">by hand</a> or <a href="/blog/chi-square-test-of-independence-in-r/">in R</a>.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
-</div>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
