@@ -62,7 +62,7 @@ bibliography: bibliography.bib
 <p><img src="/blog/2020-10-12-anova-in-r_files/anova-in-r.jpeg" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>ANOVA (ANalysis Of VAriance) is a statistical test to determine whether two or more population means are different. In other words, it is used to <strong>compare two or more groups</strong> to see if they are significantly <strong>different</strong>.</p>
+<p>ANOVA (ANalysis Of VAriance) is a <a href="/blog/what-statistical-test-should-i-do/">statistical test</a> to determine whether two or more population means are different. In other words, it is used to <strong>compare two or more groups</strong> to see if they are significantly <strong>different</strong>.</p>
 <p>In practice, however, the:</p>
 <ul>
 <li><a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/"><strong>Student t-test</strong></a> is used to compare <strong>2 groups</strong>;</li>
@@ -129,7 +129,7 @@ ggplot(dat) +
 </div>
 <div id="underlying-assumptions-of-anova" class="section level1">
 <h1>Underlying assumptions of ANOVA</h1>
-<p>As for many <a href="/tags/inferential-statistics/">statistical tests</a>, there are some assumptions that need to be met in order to be able to interpret the results. When one or several assumptions are not met, although it is technically possible to perform these tests, it would be incorrect to interpret the results and trust the conclusions.</p>
+<p>As for many <a href="/blog/what-statistical-test-should-i-do/">statistical tests</a>, there are some assumptions that need to be met in order to be able to interpret the results. When one or several assumptions are not met, although it is technically possible to perform these tests, it would be incorrect to interpret the results and trust the conclusions.</p>
 <p>Below are the assumptions of the ANOVA, how to test them and which other tests exist if an assumption is not met:</p>
 <ul>
 <li><strong>Variable type</strong>: ANOVA requires a mix of one <a href="/blog/variable-types-and-examples/#continuous">continuous quantitative</a> dependent variable (which corresponds to the measurements to which the question relates) and one <a href="/blog/variable-types-and-examples/#qualitative">qualitative</a> independent variable (with at least 2 levels which will determine the groups to compare).</li>
@@ -199,7 +199,7 @@ qqPlot(res_aov$residuals,
 )</code></pre>
 <p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>From the histogram and QQ-plot above, we can already see that the normality assumption seems to be met. Indeed, the histogram roughly form a bell curve, indicating that the residuals follow a normal distribution. Furthermore, points in the QQ-plots roughly follow the straight line and most of them are within the confidence bands, also indicating that residuals follow approximately a normal distribution.</p>
-<p>Some researchers stop here and assume that normality is met, while others also test the assumption via a formal statistical test. It is your choice to test it (i) only visually, (ii) only via a normality test, or (iii) both visually AND via a normality test. Bear in mind, however, the two following points:</p>
+<p>Some researchers stop here and assume that normality is met, while others also test the assumption via a formal <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">normality test</a>. It is your choice to test it (i) only visually, (ii) only via a normality test, or (iii) both visually AND via a normality test. Bear in mind, however, the two following points:</p>
 <ol style="list-style-type: decimal">
 <li>ANOVA is quite robust to small deviations from normality. This means that it is not an issue (from the perspective of the interpretation of the ANOVA results) if a small number of points deviates slightly from the normality,</li>
 <li>normality tests are sometimes quite conservative, meaning that the null hypothesis of normality may be rejected due to a limited deviation from normality. This is especially the case with large samples as power of the test increases with the sample size.</li>
@@ -425,7 +425,7 @@ report(res_aov)</code></pre>
 <li>Gentoo vs. Chinstrap</li>
 </ol>
 <p>In theory, we could compare species thanks to 3 <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-tests</a> since we need to compare 2 groups and a t-test is used precisely in that case.</p>
-<p>However, if several t-tests are performed, the issue of <strong>multiple testing</strong> (also referred as multiplicity) arises. In short, when several statistical tests are performed, some will have <em>p</em>-values less than <span class="math inline">\(\alpha\)</span> purely by chance, even if all null hypotheses are in fact true.</p>
+<p>However, if several t-tests are performed, the issue of <strong>multiple testing</strong> (also referred as multiplicity) arises. In short, when several <a href="/blog/what-statistical-test-should-i-do/">statistical tests</a> are performed, some will have <em>p</em>-values less than <span class="math inline">\(\alpha\)</span> purely by chance, even if all null hypotheses are in fact true.</p>
 <p>To demonstrate the problem, consider our case where we have 3 hypotheses to test and a desired significance level of 0.05. The probability of observing at least one significant result (at least one <em>p</em>-value &lt; 0.05) just due to chance is:</p>
 <p><span class="math display">\[\begin{equation}
 \begin{split}
@@ -471,9 +471,9 @@ summary(post_test)</code></pre>
 ## 
 ## Linear Hypotheses:
 ##                         Estimate Std. Error t value Pr(&gt;|t|)    
-## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 1.41e-08 ***
-## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &lt; 1e-08 ***
-## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286  &lt; 1e-08 ***
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052   &lt;1e-08 ***
+## Gentoo - Adelie == 0     27.2333     0.8067  33.760   &lt;1e-08 ***
+## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286   &lt;1e-08 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## (Adjusted p values reported -- single-step method)</code></pre>
