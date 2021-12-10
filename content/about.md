@@ -14,7 +14,7 @@ Given my experience, I also support:
 * **Professionals** in their research, data analysis and informed decision-making by bringing a statistical dimension to their projects, regardless of the sector or core business.
 * **University students** and academics in their studies through the success of their exam or the statistical part of their thesis, thanks to tailor-made courses and personalized support in statistics and probability.
 
-If you need help in statistics for your academic or work related projects, see more information on [easystat.be](https://easystat.be/) and feel free to contact me!
+If you need help in statistics or R for your academic or work related projects, see more information on [easystat.be](https://easystat.be/) and feel free to contact me!
 
 ## Blog - What?
 
