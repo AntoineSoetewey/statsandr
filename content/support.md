@@ -26,7 +26,7 @@ So if you found something helpful on the blog and are feeling grateful today, he
 
 If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via the [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey).
 
-If you cannot afford to donate a small amount each month or do not want to be committed to a monthly subscription, you can also consider making a one time donation via [PayPal](https://paypal.me/AntoineSoetewey), or by [buying me a book](https://www.buymeacoffee.com/statsandr).
+If you cannot afford to donate a small amount each month or do not want to be committed to a monthly subscription, you can also consider making a one time donation via [PayPal](https://paypal.me/AntoineSoetewey), or by [buying me a book](https://www.buymeacoffee.com/statsandr) (it is usually known as "buy me a coffee", but I enjoy books much more than coffee).
 
 ## Link or share
 
