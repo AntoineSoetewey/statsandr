@@ -1,0 +1,633 @@
+---
+title: Stats and R is 2 years old!
+author: Antoine Soetewey
+date: '2021-12-16'
+slug: statsandr-is-2-years-old
+categories: []
+tags:
+  - Blogging
+  - Package
+  - Professional
+  - R
+  - Review
+  - Web
+meta_img: blog/statsandr-is-2-years-old/images/statsandr-is-2-years-old.jpeg
+description: Statsandr.com is 2 years old! Learn how to track page views, sessions, users, engagement and more in R with the {googleAnayticsR} R package
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+# draft: true
+# bibliography: bibliography.bib
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#analytics">Analytics</a>
+<ul>
+<li><a href="#users-and-page-views">Users and page views</a></li>
+<li><a href="#page-views-over-time">Page views over time</a></li>
+<li><a href="#page-views-per-channel">Page views per channel</a></li>
+<li><a href="#page-views-per-day-of-week-and-month-of-year">Page views per day of week and month of year</a></li>
+<li><a href="#page-views-per-month-and-year">Page views per month and year</a></li>
+<li><a href="#top-performing-pages">Top performing pages</a></li>
+<li><a href="#page-views-by-country">Page views by country</a></li>
+<li><a href="#user-engagement-by-devices">User engagement by devices</a></li>
+<li><a href="#browser-information">Browser information</a></li>
+</ul></li>
+<li><a href="#end-note">End note</a></li>
+</ul>
+</div>
+
+<p><img src="images/statsandr-is-2-years-old.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Stats and R has been launched exactly two years ago. Like <a href="/blog/track-blog-performance-in-r/">last year</a>, I think it is a good time to do a review of the past 12 months by sharing some figures about the audience of the blog.</p>
+<p>This article is not about showing off my numbers, but rather a way to illustrate <strong>how to analyze your blog or your website’s traffic using Google Analytics data</strong>. Figures regarding the audience of my blog is probably useless to you (and I believe, should not be compared with). However, the code used in this post can be reused for your own blog or website (provided you also use Google Analytics to track your audience).</p>
+<p>Note that I use the <code>{googleAnalyticsR}</code> R package to analyze my blog’s Google Analytics data. If you are unfamiliar with this package, see the <a href="/blog/track-blog-performance-in-r/#prerequisites">prerequisites</a> first.</p>
+<p>If you have already used that package, you can select your account as followed (make sure to edit the code with your own property name):</p>
+<pre class="r"><code>library(googleAnalyticsR)
+
+accounts &lt;- ga_account_list()
+
+# select the view ID by property name
+view_id &lt;- accounts$viewId[which(accounts$webPropertyName == &quot;statsandr.com&quot;)]</code></pre>
+<p>On top of that, I also assume that you have basic knowledge of <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code></a>—a popular R package to draw nice plots and visualizations.</p>
+</div>
+<div id="analytics" class="section level1">
+<h1>Analytics</h1>
+<p>Last year, I mainly focused on the number of sessions. This year, I mainly concentrate on the number of page views to illustrate a different metrics.</p>
+<p>For your information, a <strong>session</strong> is a group of user interactions with your website that take place within a given time frame, whereas a <strong>page view</strong>, as the name suggests, is defined as a view of a page on your site.</p>
+<p>You can always change the metrics by editing <code>metrics = c("pageviews")</code> in the code below. See all available metrics provided by Google Analytics in this <a href="https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/" target="_blank">article</a>.</p>
+<div id="users-and-page-views" class="section level2">
+<h2>Users and page views</h2>
+<p>As for <a href="/blog/track-blog-performance-in-r/">last year’s review</a>, let’s start with some general numbers, such as the number of <strong>users and page views</strong> for the entire site.</p>
+<p>Note that we analyze traffic over the last year only so we extract data from December 16, 2020 to yesterday (December 15, 2021):</p>
+<pre class="r"><code># set date range
+start_date &lt;- as.Date(&quot;2020-12-16&quot;)
+end_date &lt;- as.Date(&quot;2021-12-15&quot;)
+
+# get Google Analytics (GA) data
+gadata &lt;- google_analytics(view_id,
+  date_range = c(start_date, end_date),
+  metrics = c(&quot;users&quot;, &quot;pageviews&quot;),
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+gadata</code></pre>
+<pre><code>##    users pageviews
+## 1 549360    876280</code></pre>
+<p>Over this past year, Stats and R has attracted <strong>549,360 users</strong> (number of new and returning people who visited the site), who generated a total of <strong>876,280 page views</strong>.</p>
+<p>That is an average of 2,401 page views per day in 2021, compared to 1,531 page views per day in 2020 (an increase of 56.81%).</p>
+</div>
+<div id="page-views-over-time" class="section level2">
+<h2>Page views over time</h2>
+<p>One of the first interesting metrics to analyze your blog’s audience is the evolution of traffic over time.</p>
+<p>The daily number of <strong>page views over time</strong> can be presented in a <a href="/blog/descriptive-statistics-in-r/#scatterplot">scatterplot</a>—together with a smoothed line—to analyze the <strong>evolution</strong> of the audience of your blog:</p>
+<pre class="r"><code># get the Google Analytics (GA) data
+gadata &lt;- google_analytics(view_id,
+  date_range = c(start_date, end_date),
+  metrics = c(&quot;pageviews&quot;), # edit for other metrics
+  dimensions = c(&quot;date&quot;),
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+# load required libraries
+library(dplyr)
+library(ggplot2)
+
+# scatter plot with a trend line
+gadata %&gt;%
+  ggplot(aes(x = date, y = pageviews)) +
+  geom_point(size = 1L, color = &quot;steelblue&quot;) + # change size and color of points
+  geom_smooth(color = &quot;steelblue&quot;, alpha = 0.25) + # change color of smoothed line and transparency of confidence interval
+  theme_minimal() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;&quot;,
+    title = &quot;Evolution of daily page views&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  theme(plot.margin = unit(c(5.5, 17.5, 5.5, 5.5), &quot;pt&quot;)) + # to avoid the plot being cut on the right edge
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Although the number of page views varies quite a bit (with an <a href="/blog/outliers-detection-in-r/">outlier</a> at more than 5,000 page views in a day and as low as less than 1,000 page views for some days), it seems to be cyclical with a dip during summer. It is worth noting that the same dip appeared last year, probably due to the fact that people are less likely to read posts about <a href="/tags/statistics/">statistics</a> and <a href="/tags/r/">R</a> during summer holidays.</p>
+<p>So if you write about technical stuff in your blog, low numbers during summer may be expected and does not necessarily mean something is broken on your website.</p>
+</div>
+<div id="page-views-per-channel" class="section level2">
+<h2>Page views per channel</h2>
+<p>Knowing <strong>how people come to your blog</strong> is also a pretty important factor.</p>
+<p>Here is how to visualize the evolution of daily page views per channel in a <a href="/blog/descriptive-statistics-in-r/#line-plot">line plot</a>:</p>
+<pre class="r"><code># Get the data
+trend_data &lt;- google_analytics(view_id,
+  date_range = c(start_date, end_date),
+  dimensions = c(&quot;date&quot;),
+  metrics = &quot;pageviews&quot;,
+  pivots = pivot_ga4(&quot;medium&quot;, &quot;pageviews&quot;),
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+# edit variable names
+names(trend_data) &lt;- c(&quot;Date&quot;, &quot;Total&quot;, &quot;Organic&quot;, &quot;Referral&quot;, &quot;Direct&quot;, &quot;Email&quot;, &quot;Social&quot;)
+
+# Change the data into a long format
+library(tidyr)
+trend_long &lt;- gather(trend_data, Channel, Page_views, -Date)
+
+# Build up the line plot
+trend_long %&gt;%
+  filter(Channel != &quot;Total&quot;) %&gt;%
+  ggplot() +
+  aes(x = Date, y = Page_views, group = Channel) +
+  theme_minimal() +
+  geom_line(aes(colour = Channel)) +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;&quot;,
+    title = &quot;Evolution of daily page views per channel&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>As we can see from the plot above, the large majority of page views come from the organic channel (so from search engines such as Google, Bing, etc.), with some peaks from referral (mainly from R-bloggers and RWeekly) when an article is published. (By the way, you can always <a href="/subscribe/">subscribe to the newsletter</a> if you want to be informed by email when a new post goes out.)</p>
+<p>If you happen to write tutorials, you can also expect that most visitors come from the organic channel. If you are very present on social media, you will most likely attract more visitors from the social channel.</p>
+</div>
+<div id="page-views-per-day-of-week-and-month-of-year" class="section level2">
+<h2>Page views per day of week and month of year</h2>
+<p>As seen in the previous plot, there are many ups and downs and traffic seems to be cyclical.</p>
+<p>To investigate this further, we draw a <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> of the number of page views for each <strong>day of the week</strong>:</p>
+<pre class="r"><code># get data
+gadata &lt;- google_analytics(view_id,
+  date_range = c(start_date, end_date),
+  metrics = &quot;pageviews&quot;,
+  dimensions = c(&quot;dayOfWeek&quot;, &quot;date&quot;),
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+## Recoding gadata$dayOfWeek following GA naming conventions
+gadata$dayOfWeek &lt;- recode_factor(gadata$dayOfWeek,
+  &quot;0&quot; = &quot;Sunday&quot;,
+  &quot;1&quot; = &quot;Monday&quot;,
+  &quot;2&quot; = &quot;Tuesday&quot;,
+  &quot;3&quot; = &quot;Wednesday&quot;,
+  &quot;4&quot; = &quot;Thursday&quot;,
+  &quot;5&quot; = &quot;Friday&quot;,
+  &quot;6&quot; = &quot;Saturday&quot;
+)
+
+## Reordering gadata$dayOfWeek to have Monday as first day of the week
+gadata$dayOfWeek &lt;- factor(gadata$dayOfWeek,
+  levels = c(
+    &quot;Monday&quot;, &quot;Tuesday&quot;, &quot;Wednesday&quot;, &quot;Thursday&quot;, &quot;Friday&quot;, &quot;Saturday&quot;,
+    &quot;Sunday&quot;
+  )
+)
+
+# Boxplot
+gadata %&gt;%
+  ggplot(aes(x = dayOfWeek, y = pageviews)) +
+  geom_boxplot(fill = &quot;steelblue&quot;) +
+  theme_minimal() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;&quot;,
+    title = &quot;Page views per day of week&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We can also compute the sum and the mean number of page views per day to have a numerical summary instead of a plot:</p>
+<pre class="r"><code># compute sum
+dat_sum &lt;- aggregate(pageviews ~ dayOfWeek,
+  data = gadata,
+  FUN = sum
+)
+
+# compute mean
+dat_mean &lt;- aggregate(pageviews ~ dayOfWeek,
+  data = gadata,
+  FUN = mean
+)
+
+# combine both in one table
+dat_summary &lt;- cbind(dat_sum, dat_mean[, 2])
+
+# rename columns
+names(dat_summary) &lt;- c(&quot;Day of week&quot;, &quot;Sum&quot;, &quot;Mean&quot;)
+
+# display table
+dat_summary</code></pre>
+<pre><code>##   Day of week    Sum     Mean
+## 1      Monday 141115 2713.750
+## 2     Tuesday 143145 2752.788
+## 3   Wednesday 146472 2763.623
+## 4    Thursday 140712 2706.000
+## 5      Friday 128223 2465.827
+## 6    Saturday  85766 1649.346
+## 7      Sunday  90847 1747.058</code></pre>
+<p>As expected, there are more readers during the week compared to the weekends.</p>
+<p>The same analysis can be done for each <strong>month of the year</strong> instead of days of the week:</p>
+<pre class="r"><code># get data
+gadata &lt;- google_analytics(view_id,
+  date_range = c(start_date, end_date),
+  metrics = &quot;pageviews&quot;,
+  dimensions = c(&quot;month&quot;, &quot;date&quot;),
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+# Boxplot
+gadata %&gt;%
+  ggplot(aes(x = month, y = pageviews)) +
+  geom_boxplot(fill = &quot;steelblue&quot;) +
+  theme_minimal() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;Month&quot;,
+    title = &quot;Page views per month&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># compute sum
+dat_sum &lt;- aggregate(pageviews ~ month,
+  data = gadata,
+  FUN = sum
+)
+
+# compute mean
+dat_mean &lt;- aggregate(pageviews ~ month,
+  data = gadata,
+  FUN = mean
+)
+
+# combine both in one table
+dat_summary &lt;- cbind(dat_sum, dat_mean[, 2])
+
+# rename columns
+names(dat_summary) &lt;- c(&quot;Month&quot;, &quot;Sum&quot;, &quot;Mean&quot;)
+
+# display table
+dat_summary</code></pre>
+<pre><code>##    Month   Sum     Mean
+## 1     01 68534 2210.774
+## 2     02 80953 2891.179
+## 3     03 92629 2988.032
+## 4     04 88679 2955.967
+## 5     05 81739 2636.742
+## 6     06 64460 2148.667
+## 7     07 49772 1605.548
+## 8     08 46389 1496.419
+## 9     09 68046 2268.200
+## 10    10 79237 2556.032
+## 11    11 77745 2591.500
+## 12    12 78097 2519.258</code></pre>
+<p>From the plots and the numerical summaries, it is clear that the number of page views in our <a href="/blog/what-is-the-difference-between-population-and-sample/">sample</a> differs between each day of the week and each month of the year.</p>
+<p>If you are interested to go further, you can always perform an <a href="/blog/anova-in-r/">ANOVA</a> to see whether the number of page views is <em>significantly</em> different between each day or each month.</p>
+</div>
+<div id="page-views-per-month-and-year" class="section level2">
+<h2>Page views per month and year</h2>
+<p>If you have data over more than a year, it could be useful to compare your monthly blog’s traffic over the years.</p>
+<p>With the following code, we create a <a href="/blog/descriptive-statistics-in-r/#barplot">barplot</a> of the number of <strong>daily page views per month and year</strong>:</p>
+<pre class="r"><code># set new date range
+start_date_launch &lt;- as.Date(&quot;2019-12-16&quot;)
+
+# get data
+df2 &lt;- google_analytics(view_id,
+  date_range = c(start_date_launch, end_date),
+  metrics = c(&quot;pageviews&quot;),
+  dimensions = c(&quot;date&quot;),
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+# add in year month columns to dataframe
+df2$month &lt;- format(df2$date, &quot;%m&quot;)
+df2$year &lt;- format(df2$date, &quot;%Y&quot;)
+
+# page views by month by year using dplyr then graph using ggplot2 barplot
+df2 %&gt;%
+  filter(year != 2019) %&gt;% # remove 2019 because there are data for December only
+  group_by(year, month) %&gt;%
+  summarize(pageviews = sum(pageviews)) %&gt;%
+  # print table steps by month by year
+  # print(n = 100) %&gt;%
+  # graph data by month by year
+  ggplot(aes(x = month, y = pageviews, fill = year)) +
+  geom_bar(position = &quot;dodge&quot;, stat = &quot;identity&quot;) +
+  theme_minimal() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;Month&quot;,
+    title = &quot;Page views per month and year&quot;,
+    subtitle = paste0(format(start_date_launch, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>This barplot allows to easily see the evolution of the number of page views over the months, but more importantly, compare this evolution across different years.</p>
+</div>
+<div id="top-performing-pages" class="section level2">
+<h2>Top performing pages</h2>
+<p>Another important factor when measuring the performance of your blog or website is the <strong>number of page views per pages</strong>.</p>
+<p>It is true that the top performing pages in terms of page views over the year can easily be found in Google Analytics (you can access it via <code>Behavior &gt; Site Content &gt; All pages</code>).</p>
+<p>However, for the interested reader, here is how to get the data in R (note that you can change <code>n = 7</code> in the code below to change the number of top performing pages to display):</p>
+<pre class="r"><code>## Make the request to GA
+data_fetch &lt;- google_analytics(view_id,
+  date_range = c(start_date, end_date),
+  metrics = c(&quot;pageviews&quot;),
+  dimensions = c(&quot;pageTitle&quot;),
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+## Create a table of the most viewed posts
+library(lubridate)
+library(reactable)
+library(stringr)
+
+most_viewed_posts &lt;- data_fetch %&gt;%
+  mutate(Title = str_trunc(pageTitle, width = 40)) %&gt;% # keep maximum 40 characters
+  count(Title, wt = pageviews, sort = TRUE)
+
+head(most_viewed_posts, n = 7) # edit n for more or less pages to display</code></pre>
+<pre><code>##                                      Title      n
+## 1    Outliers detection in R - Stats and R 119747
+## 2 Descriptive statistics in R - Stats a... 109473
+## 3 Variable types and examples - Stats a...  83025
+## 4 Correlation coefficient and correlati...  65703
+## 5 Chi-square test of independence in R ...  62100
+## 6 The complete guide to clustering anal...  40440
+## 7                 ANOVA in R - Stats and R  32914</code></pre>
+<p>If like me you prefer a visualization over a table, here is how to draw this table of top performing pages in a <a href="/blog/descriptive-statistics-in-r/#barplot">barplot</a>:</p>
+<pre class="r"><code># plot
+top_n(most_viewed_posts, n = 7, n) %&gt;% # edit n for more or less pages to display
+  ggplot(., aes(x = reorder(Title, n), y = n)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;steelblue&quot;) +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;Page title&quot;,
+    title = &quot;Top performing pages in terms of page views&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) + # better y labels
+  theme(plot.margin = unit(c(5.5, 17.5, 5.5, 5.5), &quot;pt&quot;)) # to avoid the plot being cut on the right edge</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>This gives me a good first overview on how posts performed in terms of page views, so in some sense, what people find useful. The top 3 articles in the past year were:</p>
+<ol style="list-style-type: decimal">
+<li><a href="/blog/outliers-detection-in-r/">Outliers detection in R</a></li>
+<li><a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a></li>
+<li><a href="/blog/variable-types-and-examples/">Variable types and examples</a></li>
+</ol>
+<p>Be careful that this ranking is based on the total number of page views over the last 12 months. A recent article may thus be found at the bottom of the list simply because it collected page views over a <em>shorter</em> period of time compared to an old article. So it is best to avoid comparing recent articles with older ones, or you can compare articles after having “time-normalized” the number of page views. See <a href="/blog/track-blog-performance-in-r/#time-normalized-page-views">previous year’s review</a> for more details and illustrations of this metrics.</p>
+<p>You could also be interested in knowing the worst performing ones (to eventually improve them or include them in higher quality posts):</p>
+<pre class="r"><code>tail(subset(most_viewed_posts, n &gt; 1000),
+  n = 7
+)</code></pre>
+<pre><code>##                                       Title    n
+## 49 A guide on how to read statistical ta... 1477
+## 50                      About - Stats and R 1470
+## 51 How to embed a Shiny app in blogdown?... 1455
+## 52                   About me - Stats and R 1277
+## 53 One-proportion and chi-square goodnes... 1226
+## 54 Running pace calculator in R Shiny - ... 1049
+## 55                      Shiny - Stats and R 1018</code></pre>
+<p>Note that I intentionally excluded pages with less than 1000 views to remove deleted or hidden pages from the ranking.</p>
+<p>Another issue with this ranking is that it may be biased due to some pages which have been duplicated (if you edited the title for example), but at least you have a broad idea of the worst performing pages.</p>
+</div>
+<div id="page-views-by-country" class="section level2">
+<h2>Page views by country</h2>
+<p>Knowing the <strong>country where your readers come from</strong> may also be handy for some content creators or marketers.</p>
+<p>Location of my readers is not really important for me because I intend to write for everyone, but this may be completely the opposite if you are selling things or running a business/ecommerce.</p>
+<pre class="r"><code># get GA data
+data_fetch &lt;- google_analytics(view_id,
+  date_range = c(start_date, end_date),
+  metrics = &quot;pageviews&quot;,
+  dimensions = &quot;country&quot;,
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+# table
+countries &lt;- data_fetch %&gt;%
+  mutate(Country = str_trunc(country, width = 40)) %&gt;% # keep maximum 40 characters
+  count(Country, wt = pageviews, sort = TRUE)
+
+head(countries, n = 10) # edit n for more or less countries to display</code></pre>
+<pre><code>##           Country      n
+## 1   United States 244752
+## 2           India  71797
+## 3  United Kingdom  53272
+## 4         Germany  38322
+## 5          Canada  33812
+## 6         Belgium  26421
+## 7       Australia  26225
+## 8     Philippines  23193
+## 9     Netherlands  21944
+## 10         Brazil  17956</code></pre>
+<p>Again, if you prefer a plot over a table, you can visualize the top countries in terms of page views in a <a href="/blog/descriptive-statistics-in-r/#barplot">barplot</a>:</p>
+<pre class="r"><code># plot
+top_n(countries, n = 10, n) %&gt;% # edit n for more or less countries to display
+  ggplot(., aes(x = reorder(Country, n), y = n)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;steelblue&quot;) +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;Country&quot;,
+    title = &quot;Top performing countries in terms of page views&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) + # better y labels
+  theme(plot.margin = unit(c(5.5, 7.5, 5.5, 5.5), &quot;pt&quot;)) # to avoid the plot being cut on the right edge</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We see that a large share of readers are from the US—and Belgium (my country) comes only in <span class="math inline">\(6^{th}\)</span> place in terms of number of page views.</p>
+<p>Be careful that, as the number of people located in different countries differs widely, this ranking may hide some insights if you are comparing page views by countries in absolute terms. See why in this <a href="/blog/track-blog-performance-in-r/#page-views-by-country">section</a> of last year’s review.</p>
+</div>
+<div id="user-engagement-by-devices" class="section level2">
+<h2>User engagement by devices</h2>
+<p>One may also be interested in checking <strong>how users are engaged</strong> depending on device’s type. To investigate this, we plot 3 charts describing:</p>
+<ol style="list-style-type: decimal">
+<li>How <strong>page views</strong> are distributed by type of device?</li>
+<li>The <strong>average time on page</strong> (in seconds) by type of device</li>
+<li>The <strong>number of page views per session</strong> by device type</li>
+</ol>
+<p>So first, how page views are distributed by device type?</p>
+<pre class="r"><code># GA data
+gadata &lt;- google_analytics(view_id,
+  date_range = c(start_date, end_date),
+  metrics = c(&quot;pageviews&quot;, &quot;avgTimeOnPage&quot;),
+  dimensions = c(&quot;date&quot;, &quot;deviceCategory&quot;),
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+# plot pageviews by deviceCategory
+gadata %&gt;%
+  ggplot(aes(deviceCategory, pageviews)) +
+  geom_bar(aes(fill = deviceCategory), stat = &quot;identity&quot;) +
+  theme_minimal() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;&quot;,
+    title = &quot;Page views per device&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;,
+    fill = &quot;Device&quot; # edit legend title
+  ) +
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>From the above plot, we see that the large majority of readers visited the blog from a desktop and only a very small proportion comes from a tablet.</p>
+<p>This makes sense since I guess many visitors are reading my articles or tutorials while using R (which is only available on desktop).</p>
+<p>However, this information of total number of page views per device type does not tell me anything about the time spent on each page and thus the engagement by device type. The following plot answers this question:</p>
+<pre class="r"><code># add median of average time on page per device
+gadata &lt;- gadata %&gt;%
+  group_by(deviceCategory) %&gt;%
+  mutate(med = median(avgTimeOnPage))
+
+# plot avgTimeOnPage by deviceCategory
+ggplot(gadata) +
+  aes(x = avgTimeOnPage, fill = deviceCategory) +
+  geom_histogram(bins = 30L) +
+  scale_fill_hue() +
+  theme_minimal() +
+  theme(legend.position = &quot;none&quot;) +
+  facet_wrap(vars(deviceCategory)) +
+  labs(
+    y = &quot;Frequency&quot;,
+    x = &quot;Average time on page (in seconds)&quot;,
+    title = &quot;Average time on page per device&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) + # better y labels
+  geom_vline(aes(xintercept = med, group = deviceCategory),
+    color = &quot;darkgrey&quot;,
+    linetype = &quot;dashed&quot;
+  ) +
+  geom_text(aes(
+    x = med, y = 125,
+    label = paste0(&quot;Median = &quot;, round(med), &quot; seconds&quot;)
+  ),
+  angle = 90,
+  vjust = 3,
+  color = &quot;darkgrey&quot;,
+  size = 3
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>From the above plot, we see that:</p>
+<ul>
+<li>Most readers coming from a tablet actually leave the page very quickly (see the peak around 0 second in the tablet facet).</li>
+<li>Distributions of the average time on page for readers on desktop and mobile were quite similar, with an average time on page mostly between 125 seconds (= 2 minutes and 5 seconds) and 375 seconds (= 6 minutes and 15 seconds).</li>
+<li>Quite surprisingly, the <a href="/blog/descriptive-statistics-in-r/#median">median</a> of the average time spent on page is slightly higher for visitors on mobile than on desktop (median = 316 seconds on mobile and 266 seconds on desktop, see the dashed vertical lines representing the medians in the desktop and mobile facets). This indicates that, although more people visit the blog from desktop (as shown by the total number of page views by device), it seems that <strong>people on mobile spend more time per page</strong>. I find this result quite surprising given that most of my articles include R code and require a computer to run the code. Therefore, I expected that people would spend more time on desktop than on mobile because on mobile they would quickly scan the article, while on desktop they would read the article more carefully and try to reproduce the code on their own computer. At least that is what I do when I read blogs on mobile versus reading them on desktop. What is even more intriguing, is that it was already the case <a href="/blog/track-blog-performance-in-r/#user-engagement-by-devices">last year</a>. If someone finds similar results and have a possible explanation, I would be glad to hear from her (if possible, in the comments at the end of the article so everyone can benefit from the discussion).</li>
+<li>As a side note, we see that these medians are higher this year compared to last year (266, 316 and 114 seconds in 2021 compared to 190, 228 and 106 seconds in 2020 on desktop, mobile and tablet, respectively). This is somewhat encouraging because it indicates that people spend more time on each page (which is an indication, at least partially, of the quality of the blog for Google).<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></li>
+</ul>
+<p>Given this result, I also believe it is helpful to illustrate the <strong>number of page views during a session</strong> by device type.</p>
+<p>In fact, it may be the case that visitors on mobile spend, on average, more time on each page <em>but people on desktop visit more pages per session</em> (remember that a session is a set of interactions with your website that take place within a given time frame).</p>
+<p>We verify this belief via a <a href="/blog/descriptive-statistics-in-r/#density-plot">density plot</a>, and for better readability we exclude visits from tablet:</p>
+<pre class="r"><code># GA data
+gadata &lt;- google_analytics(view_id,
+  date_range = c(start_date, end_date),
+  metrics = c(&quot;pageviewsPerSession&quot;),
+  dimensions = c(&quot;date&quot;, &quot;deviceCategory&quot;),
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+# add median of number of page views/session
+gadata &lt;- gadata %&gt;%
+  group_by(deviceCategory) %&gt;%
+  mutate(med = median(pageviewsPerSession))
+
+## Reordering gadata$deviceCategory
+gadata$deviceCategory &lt;- factor(gadata$deviceCategory,
+  levels = c(&quot;mobile&quot;, &quot;desktop&quot;, &quot;tablet&quot;)
+)
+
+# plot pageviewsPerSession by deviceCategory
+gadata %&gt;%
+  filter(deviceCategory != &quot;tablet&quot;) %&gt;% # filter out pageviewsPerSession &gt; 2.5 and visits from tablet
+  ggplot(aes(x = pageviewsPerSession, fill = deviceCategory, color = deviceCategory)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_hue() +
+  theme_minimal() +
+  labs(
+    y = &quot;Frequency&quot;,
+    x = &quot;Page views per session&quot;,
+    title = &quot;Page views per session by device&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com\nDashed lines represent the medians&quot;,
+    color = &quot;Device&quot;, # edit legend title
+    fill = &quot;Device&quot; # edit legend title
+  ) +
+  scale_y_continuous(labels = scales::comma) + # better y labels
+  geom_vline(aes(xintercept = med, group = deviceCategory, color = deviceCategory),
+    linetype = &quot;dashed&quot;,
+    show.legend = FALSE # remove legend
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>This last plot shows that readers on desktop and mobile visit approximately the same number of pages per session, as indicated by the fact that the two distributions overlap each other and are not distant from each other. It is true that the median is higher for people on desktop than on mobile, but to a very small margin only (and the difference between the two is smaller than in last year’s review).</p>
+<p>So to summarize what we learned based on the 3 last plots, we now know that:</p>
+<ul>
+<li>most readers visited the blog from desktop;</li>
+<li>readers on mobile spent more time on each page than readers on desktop (and even more compared to readers on tablet);</li>
+<li>users on desktop and mobile seem to have visited approximately the same number of pages per session.</li>
+</ul>
+<p>One may wonder why I chose to compare medians instead of means. The main reason is that the median is a more robust way to represent <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">non-normal</a> data. For the interested reader, see a note on the <a href="/blog/descriptive-statistics-by-hand/#mean-vs.-median">difference between mean and median</a>, and the context in which each measure is more appropriate.</p>
+<p>If you want to go further, you could also perform a <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test</a> to test if the mean number of page views per session is <em>significantly</em> different between the mobile and desktop groups.</p>
+</div>
+<div id="browser-information" class="section level2">
+<h2>Browser information</h2>
+<p>From a more technical perspective, you could also be interested in the number of <strong>page views by browser</strong>. I am personally not really interested in knowing which browser my visitors are using the most (mostly because this blog is available on all common browsers), but the most geeky among you may be so.</p>
+<p>This information can be visualized with the following <a href="/blog/descriptive-statistics-in-r/#barplot">barplot</a>:</p>
+<pre class="r"><code># get data
+browser_info &lt;- google_analytics(view_id,
+  date_range = c(start_date, end_date),
+  metrics = c(&quot;pageviews&quot;),
+  dimensions = c(&quot;browser&quot;),
+  anti_sample = TRUE # slows down the request but ensures data isn&#39;t sampled
+)
+
+# table
+browser &lt;- browser_info %&gt;%
+  mutate(Browser = str_trunc(browser, width = 40)) %&gt;% # keep maximum 40 characters
+  count(Browser, wt = pageviews, sort = TRUE)
+
+# plot
+top_n(browser, n = 10, n) %&gt;% # edit n for more or less browser to display
+  ggplot(., aes(x = reorder(Browser, n), y = n)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;steelblue&quot;) +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;Browser&quot;,
+    title = &quot;Which browsers are our visitors using?&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Most readers visited the site using <em>Chrome</em>, <em>Safari</em> and <em>Firefox</em> (this was expected since they are the most common browsers).</p>
+<p>This was the last metrics presented in this review. Of course, many more are possible depending on your R skills (mainly, <a href="/blog/data-manipulation-in-r/">data manipulation</a> and <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code></a>) and your expertise in SEO or analyzing Google Analytics data. Hopefully, thanks to this review and possibly from <a href="/blog/track-blog-performance-in-r/">last year</a> too, you will be able to analyze your own blog or website using R and the <code>{googleAnalyticsR}</code> package. At least, this was the aim of the present article.</p>
+<p>For those of you who are interested in a more condensed analysis, see my <a href="/blog/files/google-analytics-dashboard/">custom Google Analytics dashboard</a>.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+</div>
+</div>
+<div id="end-note" class="section level1">
+<h1>End note</h1>
+<p>I would also like to add that these figures are not done to be compared with. Every website or blog is unique, every author is unique (with different priorities and different agendas) and more is not always better. I <a href="/blog/7-benefits-of-sharing-your-code-in-a-data-science-blog/#learn-by-writing">learn a lot</a> thanks to this blog, I use it for <a href="/blog/7-benefits-of-sharing-your-code-in-a-data-science-blog/#personal-note-to-remind-my-future-self">personal purposes</a> and for my students as part of my <a href="https://antoinesoetewey.com/teaching/">teaching</a> tasks. I will keep writing on it as long as I enjoy it and as long as I have the time to do so, not matter how low or high the number of clicks.</p>
+<p>Thanks to all readers of the past year, and see you in a year for another review! In the meantime, if you maintain a blog I would be really happy to hear how you track its performance.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>More time spend on each page is a favorable factor for Google because it means that people are reading it more carefully. If the blog or the post is of mediocre quality, users tend to bounce back quickly (known as bounce rate) and look for an answer to their question somewhere else (leading ultimately to less time spend on the page or site).<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Thanks to the <a href="https://blog.rstudio.com/2021/01/06/google-analytics-part2/" target="_blank">RStudio blog</a> for the inspiration.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

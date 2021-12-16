@@ -83,7 +83,7 @@ accounts
 accounts$webPropertyName
 ```
 
-As you can see I have two accounts linked to my Google Analytics profile: one for my personal website ([www.antoinesoetewey.com](https://www.antoinesoetewey.com/){target="_blank"}) and one for this blog.
+As you can see I have two accounts linked to my Google Analytics profile: one for my personal website ([antoinesoetewey.com](https://antoinesoetewey.com/){target="_blank"}) and one for this blog.
 
 Of course, I select the account linked to this blog:
 
@@ -113,10 +113,11 @@ gadata <- google_analytics(view_id,
   metrics = c("users", "sessions", "pageviews"),
   anti_sample = TRUE # slows down the request but ensures data isn't sampled
 )
+
 gadata
 ```
 
-In its first year, Stats and R has attracted **`r format(gadata$users, big.mark = ",")` users**, who generated a total of **`r format(gadata$sessions, big.mark = ",")` sessions** and **`r format(gadata$pageviews, big.mark = ",")` page views**.
+In its first year, Stats and R has attracted **`r format(gadata$users, big.mark = ",")` users**, who generated a total of **`r format(gadata$sessions, big.mark = ",")` sessions** and **`r format(gadata$pageviews, big.mark = ",")` page views** (that is an average of `r format(gadata$pageviews / (as.numeric(end_date - start_date) + 1), big.mark = ",", digits = 0)` page views per day).
 
 For those unfamiliar with Google Analytics data and the difference between these metrics, remember that:
 
@@ -164,7 +165,7 @@ gadata %>%
 
 As you can see, there was a huge peak of traffic around end of April, with almost 12,000 users in a single day. Yes, you read it well and there is no bug. The blog post "[A package to download free Springer books during Covid-19 quarantine](/blog/a-package-to-download-free-springer-books-during-covid-19-quarantine/)" went viral and generated a massive traffic for a few days. The daily number of sessions returned to a more normal level after a couple of days. We also observe an upward trend in the last months (since end of August/beginning of September), which indicates that the blog is growing in terms of number of daily sessions.
 
-Note that I decided to focus on the number of sessions and the number of page views in this section and the following ones, but you can always change to your preferred metrics by editing `metrics = c("sessions")` in the code. See all available metrics provided Google Analytics in this [article](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/){target="_blank"}.
+Note that I decided to focus on the number of sessions and the number of page views in this section and the following ones, but you can always change to your preferred metrics by editing `metrics = c("sessions")` in the code. See all available metrics provided by Google Analytics in this [article](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/){target="_blank"}.
 
 ## Sessions per channel
 
@@ -804,7 +805,7 @@ top_n(browser, n = 10, n) %>% # edit n for more or less browser to display
   scale_y_continuous(labels = scales::comma) # better y labels
 ```
 
-Most visits were, as expected, from Chrome, Safari and Firefox browsers.
+Most visits were, as expected, from `r pander(top_n(browser, n = 3, n)$Browser)` browsers.
 
 ## User engagement by devices
 
