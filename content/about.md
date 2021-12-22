@@ -7,7 +7,7 @@ menu: "main"
 
 My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a PhD student in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences. My [research](https://antoinesoetewey.com/research/) interests focus on survival analysis and bio-statistical procedures applied to cancer patients.
 
-In parallel with my doctoral thesis, I am [teaching assistant](https://antoinesoetewey.com/teaching/) for several courses in statistics and probability at bachelor and master’s level. I also provide trainings/workshops and consulting in statistics and R programming as part of UCLouvain's technology platform for Statistical Methodology and Computing Service. See my [CV](https://antoinesoetewey.com/cv.pdf) for a more detailed overview of my academic and professional background.
+In parallel with my doctoral thesis, I am [teaching assistant](https://antoinesoetewey.com/teaching/) for several courses in statistics and probability at bachelor and master’s level. I also provide trainings/workshops and consulting in data science, statistics and R programming as part of UCLouvain's technology platform for Statistical Methodology and Computing Service. See my [CV](https://antoinesoetewey.com/cv.pdf) for a more detailed overview of my academic and professional background.
 
 Given my experience, I also support:
 
@@ -22,7 +22,7 @@ This blog is, as its name suggests, about [statistics](/tags/statistics/) and [R
 
 When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R (and share the code). I also occasionally present some work related to data science & [data visualization](/tags/visualization/) using R, news about my [research](/tags/research/) and, to a smaller extent, my journey in the [blogging](/tags/blogging/) world.
 
-(For the interested reader, see a [review of the blog after one year](/blog/track-blog-performance-in-r/)---and some thoughts about the future plans. In this review, I track its performance in R by analyzing page views, sessions, users and engagement using the `{googleAnalyticsR}` package.)
+(For the interested reader, see [reviews](/tags/review/) of the blog---and some thoughts about the future plans. In this review, I track its performance in R by analyzing page views, sessions, users and engagement using the `{googleAnalyticsR}` package.)
 
 ## Why?
 
