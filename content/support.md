@@ -40,7 +40,11 @@ Note that I am already very grateful for the community built with this blog and 
 
 ## Recommendations
 
-If you know someone who needs help for their statistical analyses, feel free to refer her to [easystat.be](https://easystat.be/) or to give her my [contact details](/contact/) so the person can reach out to me.
+If you know someone who needs a private lesson or needs help for their statistical analyses, feel free to refer her to:
+
+- [easystat.be](https://easystat.be/) if she is a student,
+- [datanalyze.be](https://datanalyze.be/) if she is a professional,
+- or to give her my [contact details](/contact/) so the person can reach out to me.
 
 **Thanks in advance for your support**, it is greatly appreciated and every contribution counts!
 

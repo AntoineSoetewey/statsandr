@@ -18,3 +18,8 @@ From time to time, I (see more [about me](/about/)) also present some work relat
 * Contribute by writing a [guest post](/contribute/) ([collaborations](/tags/collaboration/) are also welcome)
 * [Support my work](/support/) so I can keep providing free content on an ad-free blog
 * [Contact me](/contact/) if you have any questions
+
+If you need help in performing statistical data analyses for your thesis or work related projects, or if you need a private lesson in statistics or R:
+
+- **Students** and academics, see more information at [easystat.be](https://easystat.be/)
+- **Professionals** or companies, see more information at [datanalyze.be](https://datanalyze.be/)
