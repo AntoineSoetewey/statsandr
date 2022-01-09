@@ -23,3 +23,4 @@ If you need help in performing statistical data analyses for your thesis or work
 
 - **Students** and academics, see more information at [easystat.be](https://easystat.be/)
 - **Professionals** or companies, see more information at [datanalyze.be](https://datanalyze.be/)
+<br>
