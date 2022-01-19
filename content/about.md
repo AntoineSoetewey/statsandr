@@ -22,7 +22,7 @@ This blog is, as its name suggests, about [statistics](/tags/statistics/) and [R
 
 When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R (and share the code). I also occasionally present some work related to data science & [data visualization](/tags/visualization/) using R, news about my [research](/tags/research/) and, to a smaller extent, my journey in the [blogging](/tags/blogging/) world.
 
-(For the interested reader, see [reviews](/tags/review/) of the blog---and some thoughts about the future plans. In this review, I track its performance in R by analyzing page views, sessions, users and engagement using the `{googleAnalyticsR}` package.)
+(For the interested reader, see [reviews](/tags/review/) of the blog---and some thoughts about the future plans. In these reviews, I track its performance in R by analyzing page views, sessions, users and engagement using the `{googleAnalyticsR}` package.)
 
 ## Why?
 
