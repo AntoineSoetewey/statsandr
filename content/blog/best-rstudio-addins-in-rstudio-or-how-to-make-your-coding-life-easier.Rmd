@@ -104,7 +104,51 @@ install.packages("esquisse")
 
 ![Step 6: Retrieve the code to use it in your script](/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier_files/esquisse-rstudio-addin4.png)
 
-If you chose the second option, the code should appear where your cursor was located. Many different options and customizations are possible (e.g., axis labels, colors, legend position, theme, data filtering, etc.). For this, use the buttons located at the bottom of the window ("Labels & title", "Plot options" and "Data"). You can see the changes instantly in the window, and when the plot corresponds to your needs, export the code into your script. I will not go into more details regarding the different types of plots and the customizations, but make sure to try other types of plots by moving variables and customize it to see what is possible.
+If you chose the second option, the following code should appear where your cursor was located:
+
+```{r, echo = FALSE}
+library(ggplot2)
+```
+
+```{r}
+ggplot(dat) +
+  aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
+  geom_point(shape = "circle", size = 1.5) +
+  scale_color_hue(direction = 1) +
+  theme_minimal()
+```
+
+Many different options and customizations are possible (e.g., axis labels, colors, legend position, theme, data filtering, etc.). For this, use the buttons located at the bottom of the window ("Labels & title", "Plot options" and "Data"). You can see the changes instantly in the window, and when the plot corresponds to your needs, export the code into your script.
+
+I will not go into more details regarding the different types of plots and the customizations, but make sure to try other types of plots by moving variables and customize it to see what is possible.
+
+### ggThemeAssist
+
+Note that there is another addin called `{ggThemeAssist}` which helps you to edit the `theme()` layer of a `{ggplot2}` plot.
+
+This layer allows you to modify the appearance of the background, grids, axes, labels, legend, (sub)title, caption, etc.
+
+To use this addin:
+
+- Write the code of the plot in `{ggplot2}` (it does not work for a plot written in base R)
+- Highlight the code
+- Select the `{ggThemeAssist}` addin in the addins menu
+- Customize your plot according to your needs
+- Click on the button Done and your code will be edited with your changes:
+
+```{r}
+ggplot(dat) +
+  aes(x = Sepal.Length, y = Petal.Length, colour = Species) +
+  geom_point(shape = "circle", size = 1.5) +
+  scale_color_hue(direction = 1) +
+  theme_minimal() + theme(panel.grid.major = element_line(linetype = "blank"),
+    panel.grid.minor = element_line(linetype = "blank"),
+    legend.position = c(0.88, 0.22)) + theme(plot.caption = element_text(face = "italic")) +labs(title = "Sepal & petal length by species",
+    x = "Sepal length", y = "Petal length",
+    caption = "Data: iris")
+```
+
+Find more information about the `theme()` layer in this [cheatsheet](/blog/best-rstudio-addins-in-rstudio-or-how-to-make-your-coding-life-easier_files/ggplot_theme_system_cheatsheet.pdf).
 
 ## Questionr
 
