@@ -66,6 +66,8 @@ output:
 </ul></li>
 <li><a href="#describeby-from-the-psych-package"><code>describeBy()</code> from the <code>{psych}</code> package</a></li>
 <li><a href="#aggregate-function"><code>aggregate()</code> function</a></li>
+<li><a href="#summaryby-from-doby"><code>summaryBy()</code> from <code>{doBy}</code></a></li>
+<li><a href="#group_by-and-summarise-from-dplyr"><code>group_by()</code> and <code>summarise()</code> from <code>{dplyr}</code></a></li>
 </ul></li>
 </ul>
 </div>
@@ -893,6 +895,62 @@ describeBy(
 ## 4     setosa small     4.989796    3.416327
 ## 5 versicolor small     5.457143    2.633333
 ## 6  virginica small     5.400000    2.600000</code></pre>
+</div>
+<div id="summaryby-from-doby" class="section level2">
+<h2><code>summaryBy()</code> from <code>{doBy}</code></h2>
+<p>An alternative is the <code>summaryBy()</code> function from the <code>{doBy}</code> package:</p>
+<pre class="r"><code># summary statistics by group
+library(doBy)
+summaryBy(Sepal.Length + Sepal.Width ~ Species,
+  data = dat,
+  FUN = summary
+)</code></pre>
+<pre><code>##      Species Sepal.Length.Min. Sepal.Length.1st Qu. Sepal.Length.Median
+## 1     setosa               4.3                4.800                 5.0
+## 2 versicolor               4.9                5.600                 5.9
+## 3  virginica               4.9                6.225                 6.5
+##   Sepal.Length.Mean Sepal.Length.3rd Qu. Sepal.Length.Max. Sepal.Width.Min.
+## 1             5.006                  5.2               5.8              2.3
+## 2             5.936                  6.3               7.0              2.0
+## 3             6.588                  6.9               7.9              2.2
+##   Sepal.Width.1st Qu. Sepal.Width.Median Sepal.Width.Mean Sepal.Width.3rd Qu.
+## 1               3.200                3.4            3.428               3.675
+## 2               2.525                2.8            2.770               3.000
+## 3               2.800                3.0            2.974               3.175
+##   Sepal.Width.Max.
+## 1              4.4
+## 2              3.4
+## 3              3.8</code></pre>
+<p>If you are interested in some specific descriptive statistics, you can easily specify them via the <code>FUN</code> argument:</p>
+<pre class="r"><code>summaryBy(Sepal.Length + Sepal.Width ~ Species,
+  data = dat,
+  FUN = c(mean, var)
+)</code></pre>
+<pre><code>##      Species Sepal.Length.mean Sepal.Width.mean Sepal.Length.var
+## 1     setosa             5.006            3.428        0.1242490
+## 2 versicolor             5.936            2.770        0.2664327
+## 3  virginica             6.588            2.974        0.4043429
+##   Sepal.Width.var
+## 1      0.14368980
+## 2      0.09846939
+## 3      0.10400408</code></pre>
+</div>
+<div id="group_by-and-summarise-from-dplyr" class="section level2">
+<h2><code>group_by()</code> and <code>summarise()</code> from <code>{dplyr}</code></h2>
+<p>Another alternative is with the <code>summarise()</code> and <code>group_by()</code> functions from the <code>{dplyr}</code> package:</p>
+<pre class="r"><code>library(dplyr)
+
+group_by(dat, Species) %&gt;%
+  summarise(
+    mean = mean(Sepal.Length, na.rm = TRUE),
+    sd = sd(Sepal.Length, na.rm = TRUE)
+  )</code></pre>
+<pre><code>## # A tibble: 3 × 3
+##   Species     mean    sd
+##   &lt;fct&gt;      &lt;dbl&gt; &lt;dbl&gt;
+## 1 setosa      5.01 0.352
+## 2 versicolor  5.94 0.516
+## 3 virginica   6.59 0.636</code></pre>
 <p>Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, I invite you to read the article “<a href="/blog/descriptive-statistics-by-hand/">Descriptive statistics by hand</a>”.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>

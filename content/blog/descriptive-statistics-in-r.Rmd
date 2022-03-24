@@ -683,6 +683,38 @@ aggregate(cbind(Sepal.Length, Sepal.Width) ~ Species + size,
           mean)
 ```
 
+## `summaryBy()` from `{doBy}`
+
+An alternative is the `summaryBy()` function from the `{doBy}` package:
+
+```{r}
+# summary statistics by group
+library(doBy)
+summaryBy(Sepal.Length + Sepal.Width ~ Species, data=dat,
+          FUN = summary)
+```
+
+If you are interested in some specific descriptive statistics, you can easily specify them via the `FUN` argument:
+
+```{r}
+summaryBy(Sepal.Length + Sepal.Width ~ Species, data=dat,
+          FUN = c(mean, var))
+```
+
+## `group_by()` and `summarise()` from `{dplyr}`
+
+Another alternative is with the `summarise()` and `group_by()` functions from the `{dplyr}` package:
+
+```{r}
+library(dplyr)
+
+group_by(dat, Species) %>%
+  summarise(
+    mean = mean(Sepal.Length, na.rm = TRUE),
+    sd = sd(Sepal.Length, na.rm = TRUE)
+  )
+```
+
 Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, I invite you to read the article "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)".
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.

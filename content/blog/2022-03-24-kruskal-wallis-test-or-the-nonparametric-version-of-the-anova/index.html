@@ -1,0 +1,232 @@
+---
+title: Kruskal-Wallis test, or the nonparametric version of the ANOVA
+author: Antoine Soetewey
+date: '2022-03-24'
+slug: kruskal-wallis-test-nonparametric-version-anova
+categories: []
+tags:
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: images/kruskal-wallis-test-nonparametric-version-anova.jpeg
+description: Learn how to perform the Kruskal-Wallis test in R (the nonparametric version of the ANOVA) to compare 3 groups or more under the non-normality assumption
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+# draft: true
+bibliography: bibliography.bib
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#data">Data</a></li>
+<li><a href="#kruskal-wallis-test">Kruskal-Wallis test</a>
+<ul>
+<li><a href="#aim-and-hypotheses">Aim and hypotheses</a></li>
+<li><a href="#assumptions">Assumptions</a></li>
+<li><a href="#in-r">In R</a></li>
+<li><a href="#interpretations">Interpretations</a></li>
+</ul></li>
+<li><a href="#post-hoc-tests">Post-hoc tests</a>
+<ul>
+<li><a href="#dunn-test">Dunn test</a></li>
+<li><a href="#pairwise-wilcoxon-test">Pairwise Wilcoxon test</a></li>
+</ul></li>
+<li><a href="#combination-of-statistical-results-and-plot">Combination of statistical results and plot</a></li>
+<li><a href="#summary">Summary</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+
+<p><img src="images/kruskal-wallis-test-nonparametric-version-anova.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In a previous article, we showed how to do an <a href="/blog/anova-in-r/">ANOVA in R</a> to compare three or more groups.</p>
+<p>Remember that, as for many <a href="/blog/what-statistical-test-should-i-do/">statistical tests</a>, the one-way ANOVA requires that some assumptions are satisfied in order to be able to use and interpret the results. In particular, the ANOVA requires that residuals follow approximately a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normal distribution</a>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>Luckily, if the normality assumption is not satisfied, there is the nonparametric version of the ANOVA: the <strong>Kruskal-Wallis</strong> test.</p>
+<p>In the rest of the article, we show how to perform the Kruskal-Wallis test in R and how to interpret its results. We will also briefly show how to do post-hoc tests and how to present all necessary statistical results directly on a plot.</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>Data for the present article is based on the <code>penguins</code> dataset (an alternative to the well-known <code>iris</code> dataset), accessible via the <code>{palmerpenguins}</code> package:</p>
+<pre class="r"><code># install.packages(&quot;palmerpenguins&quot;)
+library(palmerpenguins)</code></pre>
+<p>The original dataset contains data for 344 penguins of 3 different species (Adelie, Chinstrap and Gentoo). It contains 8 variables, but we focus only on the flipper length and the species for this article, so we keep only those 2 variables:</p>
+<pre class="r"><code>library(tidyverse)
+
+dat &lt;- penguins %&gt;%
+  select(species, flipper_length_mm)</code></pre>
+<p>(If you are unfamiliar with the pipe operator (<code>%&gt;%</code>), you can also select variables with <code>penguins[, c("species", "flipper_length_mm")]</code>. Learn more ways to select variables in the article about <a href="/blog/data-manipulation-in-r/">data manipulation</a>.)</p>
+<p>It is always a good practice to do some <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> for the entire sample and by group before doing the test, so we have a broad overview of the data at hand.</p>
+<pre class="r"><code># entire sample
+summary(dat)</code></pre>
+<pre><code>##       species    flipper_length_mm
+##  Adelie   :152   Min.   :172.0    
+##  Chinstrap: 68   1st Qu.:190.0    
+##  Gentoo   :124   Median :197.0    
+##                  Mean   :200.9    
+##                  3rd Qu.:213.0    
+##                  Max.   :231.0    
+##                  NA&#39;s   :2</code></pre>
+<pre class="r"><code># by group
+library(doBy)
+summaryBy(flipper_length_mm ~ species,
+  data = dat,
+  FUN = median,
+  na.rm = TRUE
+)</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   species   flipper_length_mm.median
+##   &lt;fct&gt;                        &lt;dbl&gt;
+## 1 Adelie                         190
+## 2 Chinstrap                      196
+## 3 Gentoo                         216</code></pre>
+<pre class="r"><code># boxplot by species
+ggplot(dat) +
+  aes(x = species, y = flipper_length_mm, fill = species) +
+  geom_boxplot() +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Based on the boxplots and the summary statistics, we already see that, in our <a href="/blog/what-is-the-difference-between-population-and-sample/">sample</a>, penguins from the Adelie species seem to have the smallest flippers, while those from the Gentoo species seem to have the biggest flippers. However, only a sound statistical test will tell us whether we can infer this conclusion to our <a href="/blog/what-is-the-difference-between-population-and-sample/">population</a>.</p>
+</div>
+<div id="kruskal-wallis-test" class="section level1">
+<h1>Kruskal-Wallis test</h1>
+<div id="aim-and-hypotheses" class="section level2">
+<h2>Aim and hypotheses</h2>
+<p>As mentioned earlier, the Kruskal-Wallis test allows to compare three or more groups. More precisely, it is used to compare three or more groups in terms of a <a href="/blog/variable-types-and-examples/#quantitative">quantitative variable</a>. It can be seen as the extension to the <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/">Mann-Whitney</a> test which allows to compare 2 groups under the non-normality assumption.</p>
+<p>In the context of our example, we are going to use the Kruskal-Wallis test to help us answer the following question: “Is the length of the flippers different between the 3 species of penguins?”</p>
+<p>The null and alternative hypotheses of the Kruskal-Wallis test are:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: The 3 species are equal in terms of flipper length</li>
+<li><span class="math inline">\(H_1\)</span>: At least one species is different from the other 2 species in terms of flipper length</li>
+</ul>
+<p>Be careful that, as for the ANOVA, the alternative hypothesis is <strong><em>not</em></strong> that all species are different in terms of flipper length. The opposite of all species being equal (<span class="math inline">\(H_0\)</span>) is that <em>at least</em> one species is different from the others (<span class="math inline">\(H_1\)</span>). In this sense, if the null hypothesis is rejected, it means that at least one species is different from the other 2, but not necessarily that all 3 species are different from each other. It could be that flipper length for the species Gentoo is different than for the species Chinstrap and Adelie, but flipper length is similar between Chinstrap and Adelie. Other types of test (known as post-hoc tests and covered later) must be performed to test whether all 3 species differ.</p>
+</div>
+<div id="assumptions" class="section level2">
+<h2>Assumptions</h2>
+<p>First, the Kruskal-Wallis test compares several groups in terms of a quantitative variable. So there must be one quantitative dependent variable (which corresponds to the measurements to which the question relates) and one qualitative independent variable (with at least 2 levels which will determine the groups to compare).<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>Second, remember that the Kruskal-Wallis test is a nonparametric test, so the <strong>normality assumption is not required</strong>. However, the <strong>independence assumption still holds</strong>.</p>
+<p>This means that the data, collected from a representative and randomly selected portion of the total population, should be independent between groups and within each group. The assumption of independence is most often verified based on the design of the experiment and on the good control of experimental conditions rather than via a formal test. If you are still unsure about independence based on the experiment design, ask yourself if one observation is related to another (if one observation has an impact on another) within each group or between the groups themselves. If not, it is most likely that you have independent samples. If observations between samples (forming the different groups to be compared) are dependent (for example, if three measurements have been collected on the <strong>same individuals</strong> as it is often the case in medical studies when measuring a metric (i) before, (ii) during and (iii) after a treatment), the Friedman test should be preferred in order to take into account the dependency between the samples.</p>
+<p>Regarding the homoscedasticity (i.e., equality of the variances): As long as you use the Kruskal-Wallis test to, <em>in fine</em>, compare groups, homoscedasticity is not required. If you wish to compare medians, the Kruskal-Wallis test requires homoscedasticity.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<p>In our example, independence is assumed and we do not need to compare medians (we are only interested in comparing groups), so we can proceed to how to do the test in R. Note that the normality assumption may or may not hold, but for this article we assume it is <em>not</em> satisfied.</p>
+</div>
+<div id="in-r" class="section level2">
+<h2>In R</h2>
+<p>The Kruskal-Wallis test in R can be done with the <code>kruskal.test()</code> function:</p>
+<pre class="r"><code>kruskal.test(flipper_length_mm ~ species,
+  data = dat
+)</code></pre>
+<pre><code>## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  flipper_length_mm by species
+## Kruskal-Wallis chi-squared = 244.89, df = 2, p-value &lt; 2.2e-16</code></pre>
+<p>The most important result in this output is the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha"><em>p</em>-value</a>. We show how to interpret it in the next section.</p>
+</div>
+<div id="interpretations" class="section level2">
+<h2>Interpretations</h2>
+<p>Based on the Kruskal-Wallis test, we reject the null hypothesis and we conclude that at least one species is different in terms of flippers length (<em>p</em>-value &lt; 0.001).</p>
+<p>(<em>For the sake of illustration</em>, if the <em>p</em>-value was larger than the significance level <span class="math inline">\(\alpha = 0.05\)</span>: we cannot reject the null hypothesis so we cannot reject the hypothesis that the 3 considered species of penguins are equal in terms of flippers length.)</p>
+</div>
+</div>
+<div id="post-hoc-tests" class="section level1">
+<h1>Post-hoc tests</h1>
+<p>We have just showed that at least one species is different from the others in terms of flippers length. Nonetheless, here comes the limitations of the Kruskal-Wallis test: it does not say which group(s) is(are) different from the others.</p>
+<p>To know this, we need to use other types of test, referred as post-hoc tests (in Latin, “after this,” so after obtaining statistically significant Kruskal-Wallis results) or multiple pairwise-comparison tests. For the interested reader, a more detailed explanation of post-hoc tests can be found <a href="/blog/anova-in-r/#post-hoc-test">here</a>.</p>
+<p>The most common post-hoc tests after a significant Kruskal-Wallis test are:</p>
+<ul>
+<li>Dunn test</li>
+<li>Pairwise Wilcoxont test</li>
+<li>Conover test</li>
+<li>Nemenyi test</li>
+</ul>
+<p>The Dunn test and pairwise Wilcoxon test being the most common ones among the four, here is how to do them in R.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<div id="dunn-test" class="section level2">
+<h2>Dunn test</h2>
+<pre class="r"><code>library(FSA)
+
+dunnTest(flipper_length_mm ~ species,
+  data = dat,
+  method = &quot;holm&quot;
+)</code></pre>
+<pre><code>##           Comparison          Z      P.unadj        P.adj
+## 1 Adelie - Chinstrap  -3.629336 2.841509e-04 2.841509e-04
+## 2    Adelie - Gentoo -15.476612 4.990733e-54 1.497220e-53
+## 3 Chinstrap - Gentoo  -8.931938 4.186100e-19 8.372200e-19</code></pre>
+<p>It is the last column (the adjusted <em>p</em>-values, adjusted for multiple comparisons) that is of interest. These <em>p</em>-values should be compared to your desired <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha">significance level</a> (usually 5%).</p>
+<p>Based on the output, we conclude that:</p>
+<ul>
+<li>Adelie and Chinstrap differ significantly (p &lt; 0.001)</li>
+<li>Adelie and Gentoo differ significantly (p &lt; 0.001)</li>
+<li>Chinstrap and Gentoo differ significantly (p &lt; 0.001)</li>
+</ul>
+<p>Therefore, based on the Dunn test, we can now conclude that <strong>all 3 species differ in terms of flipper length</strong>.</p>
+</div>
+<div id="pairwise-wilcoxon-test" class="section level2">
+<h2>Pairwise Wilcoxon test</h2>
+<pre class="r"><code>pairwise.wilcox.test(dat$flipper_length_mm, dat$species,
+  p.adjust.method = &quot;holm&quot;
+)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using Wilcoxon rank sum test with continuity correction 
+## 
+## data:  dat$flipper_length_mm and dat$species 
+## 
+##           Adelie Chinstrap
+## Chinstrap 3e-08  -        
+## Gentoo    &lt;2e-16 &lt;2e-16   
+## 
+## P value adjustment method: holm</code></pre>
+<p>Here again, we conclude that all 3 species are significantly different in terms of flipper length (<em>p</em>-values &lt; 0.001).</p>
+</div>
+</div>
+<div id="combination-of-statistical-results-and-plot" class="section level1">
+<h1>Combination of statistical results and plot</h1>
+<p>A very good alternative for performing a Kruskal-Wallis and the post-hoc tests in R is with the <code>ggbetweenstats()</code> function from the <code>{ggstatsplot}</code> package:</p>
+<pre class="r"><code>library(ggstatsplot)
+
+ggbetweenstats(
+  data = dat,
+  x = species,
+  y = flipper_length_mm,
+  type = &quot;nonparametric&quot;, # ANOVA or Kruskal-Wallis
+  plot.type = &quot;box&quot;,
+  pairwise.comparisons = TRUE,
+  pairwise.display = &quot;significant&quot;,
+  centrality.plotting = FALSE,
+  bf.message = FALSE
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>This method has the advantage that all necessary statistical results are displayed directly on the plot.</p>
+<p>The results of the Kruskal-Wallis test are shown in the subtitle above the plot (the <em>p</em>-value is after <code>p =</code>). Moreover, the results of the post-hoc test are displayed between each group via accolades, and the boxplots allow to visualize the distribution for each species.</p>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>In this post, we reviewed the aim and hypotheses of the Kruskal-Wallis test and its underlying assumptions. We then showed how to do the test in R and how to interpret the results.</p>
+<p>We also showed the most common post-hoc tests after a significant Kruskal-Wallis test—the Dunn and pairwise Wilcoxon tests.</p>
+<p>Last but not least, we presented a concise way to present both the data by group and all the statistical results on the same plot.</p>
+<p>Thanks for reading.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-stevens2013intermediate" class="csl-entry">
+Stevens, James P. 2013. <em>Intermediate Statistics: A Modern Approach</em>. Routledge.
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>This is the case for small sample sizes. For large sample sizes, normality is not required (this is a common misconception!). By the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">central limit theorem</a>, sample means of large samples are often well-approximated by a normal distribution even if the data are not normally distributed <span class="citation">(<a href="#ref-stevens2013intermediate" role="doc-biblioref">Stevens 2013</a>)</span>. See more details in this <a href="/blog/anova-in-r/#fn3">note</a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Note that in theory, Kruskal-Wallis test can also be used for only two groups. However, in practice we use the <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/">Mann-Whitney test</a> for two groups and Kruskal-Wallis for three or more groups.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>See more information about the difference in this <a href="https://influentialpoints.com/Training/Kruskal-Wallis_ANOVA_use_and_misuse.htm" target="_blank">article</a>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Note that there are other <em>p</em>-value adjustment methods. See <code>?dunnTest</code> and <code>?pairwise.wilcox.test</code> for more options.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
