@@ -34,11 +34,13 @@ Before submitting your article, please read the following points:
 
 ## After publishing
 
-In addition to be published on this blog, all articles that are accepted will be published on:
+In addition to be published on this blog, all articles that are accepted will be cross-posted on:
 
 - [Medium](https://antoinesoetewey.medium.com/)
 - [R Weekly](https://rweekly.org/live)
-- [R-Bloggers](https://www.r-bloggers.com/author/r-on-stats-and-r/) if it is related to R
+- [R-Bloggers](https://www.r-bloggers.com/author/r-on-stats-and-r/) (if it is related to R)
+
+and shared on my Twitter account ([@statsandr](https://twitter.com/statsandr)).
 
 Once your post is published, I encourage you to **share it on the social networks** of your choice. Bear in mind that the more popular the guest post is, the more referral traffic your website will receive.
 
