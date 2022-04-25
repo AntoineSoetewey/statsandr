@@ -152,6 +152,17 @@ test</code></pre>
 <li>the proportion in the sample (<code>0.5133333</code>).</li>
 </ul>
 <p>The <em>p</em>-value is 0.806 so, at the 5% significance level, we do not reject the null hypothesis that the proportions of small and big flowers are the same.</p>
+<p>An alternative is the <code>ggpiestats()</code> function from the <code>{ggstatsplot}</code> package:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<pre class="r"><code>## plot with statistical results
+library(ggstatsplot)
+ggpiestats(
+  data = dat,
+  x = size,
+  bf.message = FALSE
+)</code></pre>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Note that the <span class="math inline">\(p\)</span>-value is slightly different because Yates’ continuity correction is not applied in <code>ggpiestats()</code> while it is applied by default in <code>prop.test()</code>.</p>
+<p>The conclusion remains however the same, that is, we do not reject the null hypothesis that proportions of big and small flowers are equal.</p>
 <div id="assumption-of-prop.test-and-binom.test" class="section level3">
 <h3>Assumption of <code>prop.test()</code> and <code>binom.test()</code></h3>
 <p>Note that <code>prop.test()</code> uses a normal approximation to the binomial distribution. Therefore, one assumption of this test is that the sample size is large enough (usually, <em>n &gt; 30</em>). If the sample size is small, it is recommended to use the exact binomial test.</p>
@@ -166,7 +177,7 @@ abline(
   h = 15 / 2, # expected counts in each level
   lty = 2 # dashed line
 )</code></pre>
-<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># exact binomial test
 test &lt;- binom.test(
   x = 12, # counts of successes
@@ -187,7 +198,7 @@ test</code></pre>
 ## probability of success 
 ##                    0.8</code></pre>
 <p>The <em>p</em>-value is 0.035 so, at the 5% significance level, we reject the null hypothesis and we conclude that the proportions of small and big flowers are significantly different. This is equivalent than concluding that the proportion of big flowers is significantly different from 0.5 (since there are only two sizes).</p>
-<p>If you want to test that the proportion of big flowers is greater than 50%, add the <code>alternative = "greater"</code> argument into the <code>binom.test()</code> function:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>If you want to test that the proportion of big flowers is greater than 50%, add the <code>alternative = "greater"</code> argument into the <code>binom.test()</code> function:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <pre class="r"><code>test &lt;- binom.test(
   x = 12, # counts of successes
   n = 15, # total counts (12 + 3)
@@ -218,7 +229,7 @@ ggplot(dat) +
   aes(x = Species) +
   geom_bar(fill = &quot;#0c4c8a&quot;) +
   theme_minimal()</code></pre>
-<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># counts by Species
 table(dat$Species)</code></pre>
 <pre><code>## 
@@ -229,7 +240,7 @@ table(dat$Species)</code></pre>
 <p>The hypotheses are now:</p>
 <ul>
 <li><span class="math inline">\(H_0\)</span>: proportions of each species are equal</li>
-<li><span class="math inline">\(H_1\)</span>: there is at least one species with a different proportion<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></li>
+<li><span class="math inline">\(H_1\)</span>: there is at least one species with a different proportion<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></li>
 </ul>
 <p>This test can be done with the <code>chisq.test()</code> function, accepting the following arguments:</p>
 <ul>
@@ -250,6 +261,14 @@ test</code></pre>
 ## X-squared = 0, df = 2, p-value = 1</code></pre>
 <p>The <em>p</em>-value is 1 so, at the 5% significance level, we do not reject the null hypothesis that the proportions are equal among all species.</p>
 <p>This was quite obvious even before doing the <a href="/blog/what-statistical-test-should-i-do/">statistical test</a> given that there are exactly 50 flowers of each species, so it was easy to see that the species are equally common. We however still did the test to show how it works in practice.</p>
+<p>Note that the alternative proposed by the <code>{ggstatsplot}</code> package can also be used for a Chi-square goodness of fit test:</p>
+<pre class="r"><code>## plot with statistical results
+ggpiestats(
+  data = dat,
+  x = Species,
+  bf.message = FALSE
+)</code></pre>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <div id="assumptions" class="section level3">
 <h3>Assumptions</h3>
 <p>One of the assumptions of the chi-square goodness of fit test is that the sample size is large enough in order for the chi-square approximation to be valid.</p>
@@ -271,7 +290,7 @@ test</code></pre>
 <div id="observed-frequencies" class="section level4">
 <h4>Observed frequencies</h4>
 <p>Here is the distribution of the number of girls per family in our sample of 100 families of 5 children:</p>
-<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>And the corresponding frequencies and relative frequencies (remember that the relative frequency is the frequency divided by the total sample size):</p>
 <pre class="r"><code># counts
 dat</code></pre>
@@ -302,7 +321,7 @@ p &lt;- ggplot(df, aes(x = Girls, y = Expected_freq)) +
   labs(title = &quot;Binomial distribution Bi(x, n = 5, p = 0.5)&quot;) +
   theme_minimal()
 p</code></pre>
-<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre class="r"><code># expected relative frequencies and (absolute) frequencies
 df</code></pre>
 <pre><code>##   Girls Expected_relative_freq Expected_freq
@@ -338,7 +357,7 @@ ggplot() +
   xlab(&quot;Number of girls per family&quot;) +
   theme_minimal() +
   theme(legend.title = element_blank()) # remove legend title</code></pre>
-<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We see that the observed and expected frequencies are quite similar, so we expect that the number of girls in families of 5 children follows a binomial distribution. However, only the goodness of fit test will confirm our belief:</p>
 <pre class="r"><code># chi-square goodness of fit test
 test &lt;- chisq.test(dat$Freq, # observed frequencies
@@ -378,7 +397,7 @@ test</code></pre>
 </ul>
 <p>where <span class="math inline">\(p_0\)</span> is the expected proportion of landing on heads.</p>
 <p><strong>Step 2.</strong></p>
-<p>The test statistic is:<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<p>The test statistic is:<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
 <p><span class="math display">\[z_{obs} = \frac{\hat{p} - p_0}{\sqrt{\frac{p_0(1 - p_0)}{n}}} = \frac{0.67 - 0.5}{\sqrt{\frac{0.5 \cdot (1 - 0.5)}{100}}} = 3.4\]</span></p>
 <p>(See how to perform <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand/">hypothesis tests in a Shiny app</a> if you need more help in computing the test statistic.)</p>
 <p><strong>Step 3.</strong></p>
@@ -387,7 +406,7 @@ test</code></pre>
 <p><span class="math display">\[\pm z_{\alpha/2} = \pm z_{0.025} = \pm 1.96\]</span></p>
 <p><strong>Step 4.</strong></p>
 <p>We compare the test statistic (found in step 2) with the rejection region (found in step 3) and we conclude. Visually, we have:</p>
-<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The test statistic lies within the rejection region (i.e., the grey shaded areas). Therefore, at the 5% significance level, we reject the null hypothesis and we conclude that the proportion of heads (and thus tails) is significantly different than 50%. In other words, still at the 5% significance level, we conclude that the coin is unfair.</p>
 <p>If you prefer to compute the <em>p</em>-value instead of comparing the t-stat and the rejection region, you can use this <a href="/blog/a-guide-on-how-to-read-statistical-tables/">Shiny app to easily compute <em>p</em>-values</a> for different probability distributions. After having opened the app, set the t-stat, the corresponding alternative and you will find the <em>p</em>-value at the top of the page.</p>
 <div id="verification-in-r" class="section level3">
@@ -419,7 +438,7 @@ test</code></pre>
 <h2>Goodness of fit test</h2>
 <p>We now illustrate the chi-square goodness of fit test by hand with the following example.</p>
 <p>Suppose that we toss a dice 100 times, we note how many times it lands on each face (1 to 6) and we test whether the dice is fair. Here are the observed counts by dice face:</p>
-<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>## dice_face
 ##  1  2  3  4  5  6 
 ## 15 24 10 19 19 13</code></pre>
@@ -453,7 +472,7 @@ test</code></pre>
 <p>The test statistic is:</p>
 <p><span class="math display">\[\chi^2 = \sum_{i = 1}^k \frac{(O_i - E_i)^2}{E_i}\]</span></p>
 <p>where <span class="math inline">\(O_i\)</span> is the observed frequency, <span class="math inline">\(E_i\)</span> is the expected frequency and <span class="math inline">\(k\)</span> is the number of categories (in our case, there are 6 categories, representing the 6 dice faces).</p>
-<p>This <span class="math inline">\(\chi^2\)</span> statistic is obtained by calculating the difference between the observed number of cases and the expected number of cases in each category. This difference is squared (to avoid negative and positive differences being compensated) and divided by the expected number of cases in that category. These values are then summed for all categories, and the total is referred to as the <span class="math inline">\(\chi^2\)</span> statistic. Large values of this test statistic lead to the rejection of the null hypothesis, small values mean that the null hypothesis cannot be rejected.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
+<p>This <span class="math inline">\(\chi^2\)</span> statistic is obtained by calculating the difference between the observed number of cases and the expected number of cases in each category. This difference is squared (to avoid negative and positive differences being compensated) and divided by the expected number of cases in that category. These values are then summed for all categories, and the total is referred to as the <span class="math inline">\(\chi^2\)</span> statistic. Large values of this test statistic lead to the rejection of the null hypothesis, small values mean that the null hypothesis cannot be rejected.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
 <p>Given our data, we have:</p>
 <p><span class="math display">\[\chi^2 = \frac{(15 - 16.67)^2}{16.67} + \frac{(24 - 16.67)^2}{16.67} + \\
 \frac{(10 - 16.67)^2}{16.67} +\frac{(19 - 16.67)^2}{16.67} + \\
@@ -464,7 +483,7 @@ test</code></pre>
 <p><span class="math display">\[\chi^2_{\alpha; k-1} = \chi^2_{0.05; 5} = 11.0705\]</span></p>
 <p><strong>Step 4.</strong></p>
 <p>We compare the test statistic (found in step 2) with the rejection region (found in step 3) and we conclude. Visually, we have:</p>
-<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The test statistic does not lie within the rejection region (i.e., the grey shaded area). Therefore, at the 5% significance level, we do not reject the null hypothesis that there is no significant difference between the observed and the expected frequencies. In other words, still at the 5% significance level, we cannot reject the hypothesis that the dice is fair.</p>
 <p>Again, you can use the <a href="/blog/a-guide-on-how-to-read-statistical-tables/">Shiny app</a> to easily compute the <em>p</em>-value given the test statistic if you prefer this method over the comparison between the t-stat and the rejection region.</p>
 <div id="verification-in-r-1" class="section level3">
@@ -491,9 +510,10 @@ test</code></pre>
 <hr />
 <ol>
 <li id="fn1"><p>Choosing big or small as the success event gives the exact same conclusion.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>Similarly, this argument can also be added to the <code>prop.test()</code> function to test whether the observed proportion is larger than the expected proportion. Use <code>alternative = "less"</code> if you want to test whether the observed proportion is smaller than the expected one.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>Be careful that the alternative hypothesis is not that <em>all</em> proportions are different. One different from the others is sufficient to reject the null hypothesis. It is, in some sense, similar to the alternative hypothesis of the <a href="/blog/anova-in-r/">ANOVA</a> which says that at least one mean is different than another.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>One assumption of this test is that <span class="math inline">\(n \cdot p \ge 5\)</span> and <span class="math inline">\(n \cdot (1 - p) \ge 5\)</span>. The assumption is met so we can use the normal approximation to the binomial distribution.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>Source: <a href="http://uregina.ca/~gingrich/ch10.pdf" target="_blank">http://uregina.ca/~gingrich/ch10.pdf</a>.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Note that if possible, it is best to avoid pie charts and use bar charts instead. Unfortunately, the <code>ggbarstats()</code> function works only for the <a href="/blog/chi-square-test-of-independence-in-r/">independence Chi-square test</a>.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Similarly, this argument can also be added to the <code>prop.test()</code> function to test whether the observed proportion is larger than the expected proportion. Use <code>alternative = "less"</code> if you want to test whether the observed proportion is smaller than the expected one.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Be careful that the alternative hypothesis is not that <em>all</em> proportions are different. One different from the others is sufficient to reject the null hypothesis. It is, in some sense, similar to the alternative hypothesis of the <a href="/blog/anova-in-r/">ANOVA</a> which says that at least one mean is different than another.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>One assumption of this test is that <span class="math inline">\(n \cdot p \ge 5\)</span> and <span class="math inline">\(n \cdot (1 - p) \ge 5\)</span>. The assumption is met so we can use the normal approximation to the binomial distribution.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>Source: <a href="http://uregina.ca/~gingrich/ch10.pdf" target="_blank">http://uregina.ca/~gingrich/ch10.pdf</a>.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

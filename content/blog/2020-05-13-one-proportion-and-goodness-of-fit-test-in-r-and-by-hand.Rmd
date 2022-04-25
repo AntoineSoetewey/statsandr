@@ -117,6 +117,22 @@ We obtain an output with:
 
 The *p*-value is `r round(test$p.value, 3)` so, at the 5% significance level, we do not reject the null hypothesis that the proportions of small and big flowers are the same.
 
+An alternative is the `ggpiestats()` function from the `{ggstatsplot}` package:^[Note that if possible, it is best to avoid pie charts and use bar charts instead. Unfortunately, the `ggbarstats()` function works only for the [independence Chi-square test](/blog/chi-square-test-of-independence-in-r/).]
+
+```{r}
+## plot with statistical results
+library(ggstatsplot)
+ggpiestats(
+  data = dat,
+  x = size,
+  bf.message = FALSE
+)
+```
+
+Note that the $p$-value is slightly different because Yates' continuity correction is not applied in `ggpiestats()` while it is applied by default in `prop.test()`.
+
+The conclusion remains however the same, that is, we do not reject the null hypothesis that proportions of big and small flowers are equal.
+
 ### Assumption of `prop.test()` and `binom.test()`
 
 Note that `prop.test()` uses a normal approximation to the binomial distribution. Therefore, one assumption of this test is that the sample size is large enough (usually, *n > 30*). If the sample size is small, it is recommended to use the exact binomial test.
@@ -205,6 +221,17 @@ test
 The *p*-value is `r round(test$p.value, 3)` so, at the 5% significance level, we do not reject the null hypothesis that the proportions are equal among all species.
 
 This was quite obvious even before doing the [statistical test](/blog/what-statistical-test-should-i-do/) given that there are exactly 50 flowers of each species, so it was easy to see that the species are equally common. We however still did the test to show how it works in practice.
+
+Note that the alternative proposed by the `{ggstatsplot}` package can also be used for a Chi-square goodness of fit test:
+
+```{r}
+## plot with statistical results
+ggpiestats(
+  data = dat,
+  x = Species,
+  bf.message = FALSE
+)
+```
 
 ### Assumptions
 
