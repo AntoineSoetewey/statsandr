@@ -300,7 +300,24 @@ Only correlations with *p*-values smaller than the significance level (usually $
 
 Now that we covered the concepts of correlation coefficients and correlation tests, let see if we can combine the two concepts.
 
-The `correlation` function from the [easystats `{correlation}` package](https://easystats.github.io/correlation/){target="_blank"} allows to combine correlation coefficients and correlation tests in a single table (thanks to [krzysiektr](https://github.com/AntoineSoetewey/statsandr/issues/8){target="_blank"} for pointing it out to me):
+If you need to do this for a few pairs of variables, I recommend using the `ggscatterstats()` function from the `{ggstatsplot}` package. Let's see it in practice with one pair of variables---`wt` and `mpg`:
+
+```{r}
+## plot with statistical results
+library(ggstatsplot)
+ggscatterstats(
+  data = dat,
+  x = wt,
+  y = mpg,
+  bf.message = FALSE
+)
+```
+
+Based on the result of the test, we conclude that there is a negative correlation between the weight and the number of miles per gallon ($r = - 0.87$, $p$-value < 0.001).
+
+If you need to do it for many pairs of variables, I recommend using the the `correlation` function from the [easystats `{correlation}` package](https://easystats.github.io/correlation/){target="_blank"}.
+
+This function allows to combine correlation coefficients and correlation tests for *several pairs* of variables, all in a single table (thanks to [krzysiektr](https://github.com/AntoineSoetewey/statsandr/issues/8){target="_blank"} for pointing it out to me):
 
 ```{r}
 library(correlation)

@@ -258,7 +258,19 @@ round(res$P, 3)</code></pre>
 <div id="combination-of-correlation-coefficients-and-correlation-tests" class="section level1">
 <h1>Combination of correlation coefficients and correlation tests</h1>
 <p>Now that we covered the concepts of correlation coefficients and correlation tests, let see if we can combine the two concepts.</p>
-<p>The <code>correlation</code> function from the <a href="https://easystats.github.io/correlation/" target="_blank">easystats <code>{correlation}</code> package</a> allows to combine correlation coefficients and correlation tests in a single table (thanks to <a href="https://github.com/AntoineSoetewey/statsandr/issues/8" target="_blank">krzysiektr</a> for pointing it out to me):</p>
+<p>If you need to do this for a few pairs of variables, I recommend using the <code>ggscatterstats()</code> function from the <code>{ggstatsplot}</code> package. Let’s see it in practice with one pair of variables—<code>wt</code> and <code>mpg</code>:</p>
+<pre class="r"><code>## plot with statistical results
+library(ggstatsplot)
+ggscatterstats(
+  data = dat,
+  x = wt,
+  y = mpg,
+  bf.message = FALSE
+)</code></pre>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Based on the result of the test, we conclude that there is a negative correlation between the weight and the number of miles per gallon (<span class="math inline">\(r = - 0.87\)</span>, <span class="math inline">\(p\)</span>-value &lt; 0.001).</p>
+<p>If you need to do it for many pairs of variables, I recommend using the the <code>correlation</code> function from the <a href="https://easystats.github.io/correlation/" target="_blank">easystats <code>{correlation}</code> package</a>.</p>
+<p>This function allows to combine correlation coefficients and correlation tests for <em>several pairs</em> of variables, all in a single table (thanks to <a href="https://github.com/AntoineSoetewey/statsandr/issues/8" target="_blank">krzysiektr</a> for pointing it out to me):</p>
 <pre class="r"><code>library(correlation)
 
 correlation::correlation(dat,
@@ -367,7 +379,7 @@ corrplot2(
   type = &quot;upper&quot;,
   tl.srt = 75
 )</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The correlogram shows correlation coefficients for all pairs of variables (with more intense colors for more extreme correlations), and correlations not significantly different from 0 are represented by a white box.</p>
 <p>To learn more about this plot and the code used, I invite you to read the article entitled “<a href="/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/">Correlogram in R: how to highlight the most correlated variables in a dataset</a>.”</p>
 <p>For those of you who are still not completely satisfied, I recently found two alternatives—one with the <code>ggpairs()</code> function from the <code>{GGally}</code> package and one with the <code>ggcormat()</code> function from the <code>{ggstatsplot}</code> package.</p>
@@ -375,7 +387,7 @@ corrplot2(
 <pre class="r"><code>library(GGally)
 
 ggpairs(dat[, c(&quot;mpg&quot;, &quot;hp&quot;, &quot;wt&quot;)])</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The plot above combines correlation coefficients, correlation tests (via the asterisks next to the coefficients<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>) and scatterplots for all possible pairs of variables present in a dataset.</p>
 <pre class="r"><code>library(ggstatsplot)
 
@@ -384,7 +396,7 @@ ggcorrmat(
   type = &quot;parametric&quot;, # parametric for Pearson, nonparametric for Spearman&#39;s correlation
   colors = c(&quot;darkred&quot;, &quot;white&quot;, &quot;steelblue&quot;) # change default colors
 )</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>The plot above also shows the correlation coefficients and if any, the non-significant correlations (by default at the 5% significance level with the Holm adjustment method) are shown by a big cross on the correlation coefficients.</p>
 <p>The advantage of these two alternatives compared to the first one is that it is directly available within a package, so you do not need to run the code of the function first in order to draw the correlogram.</p>
 </div>
