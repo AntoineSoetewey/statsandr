@@ -68,11 +68,14 @@ bibliography: bibliography.bib
 summary(dat$hwy)</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   12.00   18.00   24.00   23.44   27.00   44.00</code></pre>
-<p>where the minimum and maximum are respectively the first and last values in the output above. Alternatively, they can also be computed with the <code>min()</code> and <code>max()</code> functions:</p>
+<p>where the minimum and maximum are respectively the first and last values in the output above.</p>
+<p>Alternatively, they can also be computed with the <code>min()</code> and <code>max()</code>, or <code>range()</code> functions:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <pre class="r"><code>min(dat$hwy)</code></pre>
 <pre><code>## [1] 12</code></pre>
 <pre class="r"><code>max(dat$hwy)</code></pre>
 <pre><code>## [1] 44</code></pre>
+<pre class="r"><code>range(dat$hwy)</code></pre>
+<pre><code>## [1] 12 44</code></pre>
 <p>Some clear encoding mistake like a weight of 786 kg (1733 pounds) for a human will already be easily detected by this very simple technique.</p>
 </div>
 <div id="histogram" class="section level2">
@@ -204,11 +207,11 @@ dat[outlier_ind, ]</code></pre>
 </div>
 <div id="hampel-filter" class="section level1">
 <h1>Hampel filter</h1>
-<p>Another method, known as Hampel filter, consists of considering as outliers the values outside the interval (<span class="math inline">\(I\)</span>) formed by the median, plus or minus 3 median absolute deviations (<span class="math inline">\(MAD\)</span>):<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>Another method, known as Hampel filter, consists of considering as outliers the values outside the interval (<span class="math inline">\(I\)</span>) formed by the median, plus or minus 3 median absolute deviations (<span class="math inline">\(MAD\)</span>):<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
 <p><span class="math display">\[I = [median - 3 \cdot MAD; median + 3 \cdot MAD]\]</span></p>
 <p>where <span class="math inline">\(MAD\)</span> is the median absolute deviation and is defined as the median of the absolute deviations from the data’s median <span class="math inline">\(\tilde{X} = median(X)\)</span>:</p>
 <p><span class="math display">\[MAD = median(|X_i - \tilde{X}|)\]</span></p>
-<p>For this method we first set the interval limits thanks to the <code>median()</code> and <code>mad()</code> functions:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>For this method we first set the interval limits thanks to the <code>median()</code> and <code>mad()</code> functions:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <pre class="r"><code>lower_bound &lt;- median(dat$hwy) - 3 * mad(dat$hwy, constant = 1)
 lower_bound</code></pre>
 <pre><code>## [1] 9</code></pre>
@@ -342,7 +345,7 @@ test</code></pre>
 </ol>
 <p>Unlike Dixon test, note that Rosner test is most appropriate when the sample size is large (<span class="math inline">\(n \ge 20\)</span>). We therefore use again the initial dataset <code>dat</code>, which includes 234 observations.</p>
 <p>To perform the Rosner test we use the <code>rosnerTest()</code> function from the <code>{EnvStats}</code> package. This function requires at least 2 arguments: the data and the number of suspected outliers <code>k</code> (with <code>k = 3</code> as the default number of suspected outliers).</p>
-<p>For this example, we set the number of suspected outliers to be equal to 3, as suggested by the number of potential outliers outlined in the boxplot at the beginning of the article.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<p>For this example, we set the number of suspected outliers to be equal to 3, as suggested by the number of potential outliers outlined in the boxplot at the beginning of the article.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 <pre class="r"><code>library(EnvStats)
 test &lt;- rosnerTest(dat$hwy,
   k = 3
@@ -446,8 +449,9 @@ Enderlein, G. 1987. <span>“Hawkins, DM: Identification of Outliers. Chapman an
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>The default is 3 (according to Pearson’s rule), but another value is also possible.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>The constant in the <code>mad()</code> function is 1.4826 by default, so it has to be set to 1 to find the median absolute deviation. See <code>help(mad)</code> for more details. Thanks to Elisei for pointing this out to me.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>In order to avoid flawed conclusions, it is important to pre-screen the data (graphically with a boxplot for example) to make the selection of the number of potential outliers as accurate as possible prior to running Rosner’s test.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>Thanks to Victor for pointing out the <code>range()</code> function.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>The default is 3 (according to Pearson’s rule), but another value is also possible.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>The constant in the <code>mad()</code> function is 1.4826 by default, so it has to be set to 1 to find the median absolute deviation. See <code>help(mad)</code> for more details. Thanks to Elisei for pointing this out to me.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>In order to avoid flawed conclusions, it is important to pre-screen the data (graphically with a boxplot for example) to make the selection of the number of potential outliers as accurate as possible prior to running Rosner’s test.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
