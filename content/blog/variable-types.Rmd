@@ -19,11 +19,38 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   fig.align = "center",
-  out.width='100%'
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
-This article presents the different variable types from a statistical point of view. To learn about the different data types in R, read "[Data types in R](/blog/data-types-in-r/)".
+# Introduction
+
+If you happen to work with datasets frequently, you probably know that each row of your dataset represents a different experimental unit (also called **observation**) and each column represents a different characteristic (called **variable**):
+
+![Structure of a dataset. Source: R for Data Science by Hadley Wickham & Garrett Grolemund](/blog/how-to-import-an-excel-file-in-rstudio_files/structure-of-dataset.png)
+
+If you do some research on the weight and height of 100 students of your university, for example, you will most likely have a dataset containing 100 rows and three columns:
+
+1. one for the student's ID (could be anonymized or not),
+1. one for the weight,
+1. and one for the height.
+
+These three columns represent three characteristics of the 100 students. They are called **variables**.
+
+In this article, we are going to focus on variables, and in particular to the different types of variable that exist in statistics. (To learn about the different data types in R, read "[Data types in R](/blog/data-types-in-r/)".)
+
+## Different types of variables for different types of statistical analysis
+
+First, one may wonder why we are interested in defining the types of our variables of interest.
+
+The reason why we often class variables into different types is because not all statistical analyses can be performed on all variable types. For instance, it is impossible to compute the [mean](/blog/descriptive-statistics-in-r/#mean) of the variable "hair color" as you cannot sum brown and blond hair.
+
+On the other hand, finding the [mode](/blog/descriptive-statistics-in-r/#mode) of a continuous variable does not really make any sense because most of the time there will not be two exact same values, so there will be no mode. And even in the case there is a mode, there will be very few observations with this value. As an example, try finding the mode of the height of the students in your class. If you are lucky, a couple of students will have the same size. However, most of the time, every student will have a different size (especially if heights have been measured in millimeters) and thus there will be no mode. To see what kind of analysis is possible on each type of variable, see more details in the articles "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)" and "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)".
+
+Similarly, some [statistical tests](/blog/what-statistical-test-should-i-do/) can only be performed on certain type of variables. For example, the Pearson [correlation](/blog/correlation-coefficient-and-correlation-test-in-r/) is usually computed on quantitative variables, while a [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/) is done with qualitative variables, and a [Student t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) or [ANOVA](/blog/anova-in-r/) requires a mix of quantitative and qualitative variables.
 
 # Big picture
 
@@ -121,17 +148,11 @@ Same goes for age when age is transformed to a qualitative ordinal variable with
 
 # Additional notes
 
-## Different types of variables for different types of statistical analysis
-
-The reason why we often class variables into different types is because not all statistical analyses can be performed on all variable types. For instance, it is impossible to compute the [mean](/blog/descriptive-statistics-in-r/#mean) of the variable "hair color" as you cannot sum brown and blond hair.
-
-On the other hand, finding the [mode](/blog/descriptive-statistics-in-r/#mode) of a continuous variable does not really make any sense because most of the time there will not be two exact same values, so there will be no mode. And even in the case there is a mode, there will be very few observations with this value. As an example, try finding the mode of the height of the students in your class. If you are lucky, a couple of students will have the same size. However, most of the time, every student will have a different size (especially if heights have been measured in millimeters) and thus there will be no mode. To see what kind of analysis is possible on each type of variable, see more details in the articles "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)" and "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)".
-
-Similarly, some [statistical tests](/blog/what-statistical-test-should-i-do/) can only be performed on certain type of variables. For example, a [correlation](/blog/correlation-coefficient-and-correlation-test-in-r/) can only be computed on quantitative variables, while a [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/) is done with qualitative variables, and a [Student t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) or [ANOVA](/blog/anova-in-r/) requires a mix of quantitative and qualitative variables.
-
 ## Misleading data encoding
 
 Last but not least, in datasets it is very often the case that numbers are used for qualitative variables. For instance, a researcher may assign the number "1" to women and the number "2" to men (or "0" to the answer "No" and "1" to the answer "Yes"). Despite the numerical classification, the variable gender is still a qualitative variable and not a discrete variable as it may look. The numerical classification is only used to facilitate data collection and data management. It is indeed easier to write the number "1" or "2" instead of "women" or "men", and thus less prone to encoding errors.
+
+The same goes for the identification of each observation. Suppose you collected information on 100 students. You may use their student's ID to identify them in the dataset (so that you can trace them back). Most of the time, students' ID (or ID in general) are encoded as numeric values. At first sight, it may thus look like a quantitative variable. However, ID is clearly not a quantitative variable because it actually corresponds to an anonymized version of the student's first and last name. If you think about it, it would make no sense to compute the mean or median on the IDs, as it does represent a measurement (but rather just an easy way to identify students).
 
 If you face this kind of setup, do not forget to [transform](/blog/data-manipulation-in-r/#categorical-variables-and-labels-management) your variable into the right type before performing any statistical analyses. Usually, a basic [descriptive analysis](/blog/descriptive-statistics-in-r/) (and knowledge about the variables which have been measured) prior to the main statistical analyses is enough to check that all variable types are correct.
 
