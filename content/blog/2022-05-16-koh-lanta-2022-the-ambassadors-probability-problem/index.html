@@ -1,0 +1,685 @@
+---
+title: 'Koh-Lanta 2022: the ambassadors probability problem'
+author: Antoine Soetewey
+date: '2022-05-16'
+slug: koh-lanta-2022-ambassadors-probability-problem
+categories: []
+tags:
+  - Probability
+  - R
+  - Statistics
+meta_img: blog/koh-lanta-2022-ambassadors-probability-problem/images/koh-lanta-2022-ambassadors-probability-problem.jpeg
+description: What are the probability of winning for each ambassador in the television show Koh-Lanta 2022? Learn how to compute it in R through simulations and examples
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#before-2022">Before 2022</a></li>
+<li><a href="#in-2022">In 2022</a></li>
+<li><a href="#probabilities-computation-in-r">Probabilities computation in R</a>
+<ul>
+<li><a href="#first-draw">First draw</a></li>
+<li><a href="#second-draw">Second draw</a></li>
+<li><a href="#third-draw">Third draw</a></li>
+<li><a href="#game-limited-to-3-draws">Game limited to 3 draws</a></li>
+<li><a href="#game-limited-to-5-draws">Game limited to 5 draws</a></li>
+<li><a href="#game-limited-to-100-draws">Game limited to 100 draws</a></li>
+<li><a href="#game-limited-to-the-number-of-necessary-draws">Game limited to the number of necessary draws</a></li>
+<li><a href="#final-winning-probabilities">Final winning probabilities</a></li>
+<li><a href="#visual-representations">Visual representations</a></li>
+<li><a href="#coded-into-a-function">Coded into a function</a></li>
+</ul></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+</div>
+
+<p><img src="images/koh-lanta-2022-ambassadors-probability-problem.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>There is a popular TV show broadcasted in France and the french-speaking part of Belgium called “<strong>Koh-Lanta</strong>”.</p>
+<p>In this show, several adventurers are dropped off on a desert island with almost no food nor equipment (just a personal backpack with their clothes and a small portion of rice). They must learn to survive on the hostile island by building their hut, finding water and food, etc.</p>
+<p>Each season, adventurers are divided into teams (called tribes), and the teams compete against each other in games involving ability, strength, thinking and endurance. Every other game, the winning tribe receives some food or survival equipment (something to fish or something to make a fire, for instance). The losing tribe receives nothing. For the other half of the games, each member of the losing tribe has to elect an adventurer. The adventurer with the most votes leaves the show definitely. The winning tribe goes back to its island with all of its members.</p>
+<p>At some point during the show, the two competing tribes are grouped together into one single tribe, and it continues this time with each adventurer competing against each other (so they play individually). The winner of the show is the last one to “survive”.</p>
+<p>The 2022 season started with 24 adventurers. Just before being grouped together, each tribe has to select an adventurer in the opposing tribe. The two selected adventurers become ambassadors of their tribe. The two ambassadors must then go to another island in order to choose the adventurer who is going to leaves the show definitely. The adventurer selected by the two ambassadors will not be part of the reunification of the two tribes and her adventure stops there.</p>
+<p>Of course, both ambassadors want to eliminate a member of the opposing tribe (to arrive at the reunification with the most allies). If the two ambassadors cannot agree, they have to play a game that will determine which of the 2 ambassadors must leave the show. This game is entirely based on luck. For the rest of the article, we call this game the <em>ambassadors’ game</em>.</p>
+</div>
+<div id="before-2022" class="section level1">
+<h1>Before 2022</h1>
+<p>Here were the rules of the ambassadors’ game <em>before</em> the 2022 season:</p>
+<p>There are two identical urns, one in front of each ambassador. Each urn contains exactly <strong>one black ball</strong> and <strong>one white ball</strong>. Each ambassador has to draw a ball among the 2 from his urn. Both urns are of course closed, so no one sees which ball is picked (nor which one is not picked). The winner of the game (remember that the winner stays in the show, the loser has to leave definitely) is the one who picks a white ball while the other ambassador draws a black ball. If both ambassadors draw the same ball (both black or both white), the balls are put back in the urns and the game start over (with the exact same conditions) until the two ambassadors draw a ball of different color.</p>
+<p>For each draw, there are thus four possible results:</p>
+<ol style="list-style-type: decimal">
+<li>Ambassador from tribe A draws a white ball and ambassador from tribe B draws a black ball: ambassador from tribe A wins.</li>
+<li>Ambassador from tribe A draws a black ball and ambassador from tribe B draws a white ball: ambassador from tribe B wins.</li>
+<li>Both ambassadors draw a black ball: the game start over.</li>
+<li>Both ambassadors draw a white ball: the game start over.</li>
+</ol>
+<p>Let’s compute the probability for each result to occur. Since the two events are <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#independence-of-two-events">independent</a> (the fact that ambassador A draws a white ball does not change the probability for ambassador B to draw a white ball makes the two events independent), we can multiply the probabilities to compute the joint probability of the two events.</p>
+<p>With <span class="math inline">\(P_A\)</span> (<span class="math inline">\(P_B\)</span>) denoting the probability that ambassador from tribe A (B) draws a white ball, we have:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(P_A \cdot (1 - P_B) = 0.5 \cdot 0.5 = 0.25\)</span></li>
+<li><span class="math inline">\((1 - P_A) \cdot P_B = 0.5 \cdot 0.5 = 0.25\)</span></li>
+<li><span class="math inline">\((1 - P_A) \cdot (1 - P_B) = 0.5 \cdot 0.5 = 0.25\)</span></li>
+<li><span class="math inline">\(P_A \cdot P_B = 0.5 \cdot 0.5 = 0.25\)</span></li>
+</ol>
+<p>The sum of the 4 probabilities gives 1 (i.e., 100%), which makes sense since it covers all possible outcomes.</p>
+<p>This means that, <em>on the first draw</em>, each ambassador has a probability of 25% to win the game (outcome 1 for ambassador A, outcome 2 for ambassador B).</p>
+<p>Of course, since the game is repeated until there is a winner, probabilities for outcomes 3 and 4 tend, in the long run, to decrease until it becomes null (0%). If this statement is not straightforward to you, think about it like this: if you play that game with your friend up to 100 times, what is the probability that there is still no winner, meaning that you and your friend drew the same ball (never a different color) 100 times in a row. You conceive that it is highly unlikely.</p>
+<p>In this context, since both urns are identical and the game is played indefinitely until there is a winner, ambassadors have exactly the same probability of winning that game. It is indeed a 50-50 chance for each of them.</p>
+</div>
+<div id="in-2022" class="section level1">
+<h1>In 2022</h1>
+<p>Of course, I would not write an article about that ambassadors’ game if it is was this easy and straightforward.</p>
+<p>The 2022 season differs from the previous ones in the sense that for each game, the losing tribe receives an additional punishment (called a curse in the show). As a consequence, this year, the two urns at the ambassadors’ game were <strong>not</strong> identical.</p>
+<p>To give you some context, the red tribe won against the yellow tribe in the last game before the ambassadors’ negotiation. The punishment for the yellow tribe was the following:</p>
+<ul>
+<li>The yellow tribe (with its ambassador Colin) had an urn with <strong>2 black balls</strong> and 1 white ball.</li>
+<li>The red tribe (with its ambassador Louana) had an urn with <strong>1 black ball</strong> and 1 white ball.</li>
+</ul>
+<p>This is indeed a punishment for the yellow tribe since the game is not fair anymore: the ambassador of the red tribe clearly has a higher chance of winning that game compared to the ambassador of the yellow tribe.</p>
+<p>For the curious among you, here is how it happened:</p>
+<ul>
+<li>The two ambassadors were informed by the presenter Denis Brogniart about the composition of the urns for each tribe.</li>
+<li>Knowing that the odds were not in his favor, Colin (ambassador of the yellow tribe), chose not to play the game.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></li>
+<li>They finally agreed on the name of the adventurer who would leave the show (an adventurer of the yellow tribe).</li>
+</ul>
+<p>You guessed it by now, the reason for writing this article is of course not to explain you what actually happened—the news sites do it better and much faster than me. The reason is that I wanted to compute the chance of winning the game for each ambassador if they had not agreed on an adventurer to eliminate.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>Moreover, I wanted to compute these probabilities in R through simulation. And why not, reuse the code in case organizers of Koh-Lanta decide to change the rules again in the future.</p>
+<p>Even if you do not watch Koh-Lanta (because it is not broadcasted in your country, or you do not like the show), it could be of interest to those of you who want to see:</p>
+<ul>
+<li>how a real life example can be transferred into R,</li>
+<li>and how a <code>for loop</code> and a function can be used to answer the initial question.</li>
+</ul>
+</div>
+<div id="probabilities-computation-in-r" class="section level1">
+<h1>Probabilities computation in R</h1>
+<p>For the remaining of this article, we denote:</p>
+<ul>
+<li><span class="math inline">\(p_c\)</span>, the probability that Colin (ambassador of the yellow tribe) draws a white ball,</li>
+<li><span class="math inline">\(p_l\)</span>, the probability that Louana (ambassador of the red tribe) draws a white ball,</li>
+<li><span class="math inline">\(q_c\)</span>, the probability that Colin draws a black ball,</li>
+<li><span class="math inline">\(q_l\)</span>, the probability that Louana draws a black ball.</li>
+</ul>
+<p>Based on the composition of the urns given by Denis Brogniart, we have:</p>
+<pre class="r"><code>p_c &lt;- 1 / 3
+p_l &lt;- 1 / 2
+q_c &lt;- (1 - p_c)
+q_l &lt;- (1 - p_l)</code></pre>
+<div id="first-draw" class="section level2">
+<h2>First draw</h2>
+<p>To start easy, let’s first compute the winning probabilities for each ambassador <em>on the first draw only</em>. Remember that to have a winner, balls must be of different colors.</p>
+<p>Louana wins if and only if Colin draws a black ball and Louana draws a white ball:</p>
+<pre class="r"><code># Louana winning on first draw
+l_win &lt;- q_c * p_l
+l_win</code></pre>
+<pre><code>## [1] 0.3333333</code></pre>
+<p>Louana has a 33.33% chance of winning on the first draw.</p>
+<p>On the other hand, Colin wins if and only if Louana draws a black ball and Colin draws a white ball:</p>
+<pre class="r"><code># Colin winning on first draw
+c_win &lt;- q_l * p_c
+c_win</code></pre>
+<pre><code>## [1] 0.1666667</code></pre>
+<p>Colin has a 16.67% chance of winning on the first draw.</p>
+<p>You can already see that the game is in favor of Louana, as expected. Let’s see now how it evolves when playing several times.</p>
+</div>
+<div id="second-draw" class="section level2">
+<h2>Second draw</h2>
+<p>To win exactly on the second draw, it must be a tie on the first draw.</p>
+<pre class="r"><code># Louana winning on second draw
+tie &lt;- (p_c * p_l) + (q_c * q_l)
+
+l_win2 &lt;- tie * l_win
+l_win2</code></pre>
+<pre><code>## [1] 0.1666667</code></pre>
+<pre class="r"><code># Colin winning on second draw
+c_win2 &lt;- tie * c_win
+c_win2</code></pre>
+<pre><code>## [1] 0.08333333</code></pre>
+<ul>
+<li>Louana has a 16.67% chance of winning on the second draw.</li>
+<li>Colin has a 8.33% chance of winning on the second draw.</li>
+</ul>
+</div>
+<div id="third-draw" class="section level2">
+<h2>Third draw</h2>
+<p>To win exactly on the third draw, it must be a tie on the first two draws.</p>
+<pre class="r"><code># Louana winning on third draw
+l_win3 &lt;- (tie^2) * l_win
+l_win3</code></pre>
+<pre><code>## [1] 0.08333333</code></pre>
+<pre class="r"><code># Colin winning on third draw
+c_win3 &lt;- (tie^2) * c_win
+c_win3</code></pre>
+<pre><code>## [1] 0.04166667</code></pre>
+<ul>
+<li>Louana has a 8.33% chance of winning on the third draw.</li>
+<li>Colin has a 4.17% chance of winning on the third draw.</li>
+</ul>
+<p>A pattern seems to emerge in the code.</p>
+</div>
+<div id="game-limited-to-3-draws" class="section level2">
+<h2>Game limited to 3 draws</h2>
+<p>We can already compute the probabilities of winning for each ambassador as if the game was limited to three draws, by summing the probabilities for each of the first three draws:</p>
+<pre class="r"><code># Louana winning on draw 1, 2 or 3
+l_win_tot &lt;- l_win + l_win2 + l_win3
+l_win_tot</code></pre>
+<pre><code>## [1] 0.5833333</code></pre>
+<pre class="r"><code># Colin winning on draw 1, 2 or 3
+c_win_tot &lt;- c_win + c_win2 + c_win3
+c_win_tot</code></pre>
+<pre><code>## [1] 0.2916667</code></pre>
+<ul>
+<li>Louana has a 58.33% chance of winning if the game is limited to three draws.</li>
+<li>Colin has a 29.17% chance of winning if the game is limited to three draws.</li>
+</ul>
+</div>
+<div id="game-limited-to-5-draws" class="section level2">
+<h2>Game limited to 5 draws</h2>
+<p>Now if we compute the probabilities as if the game was limited to 5 draws and generalize the computation to see the pattern even more clearly, we have:</p>
+<pre class="r"><code># Louana winning
+l_win_tot &lt;- ((tie^0) * l_win) +
+  ((tie^1) * l_win) +
+  ((tie^2) * l_win) +
+  ((tie^3) * l_win) +
+  ((tie^4) * l_win)
+
+l_win_tot</code></pre>
+<pre><code>## [1] 0.6458333</code></pre>
+<pre class="r"><code># Colin winning
+c_win_tot &lt;- ((tie^0) * c_win) +
+  ((tie^1) * c_win) +
+  ((tie^2) * c_win) +
+  ((tie^3) * c_win) +
+  ((tie^4) * c_win)
+
+c_win_tot</code></pre>
+<pre><code>## [1] 0.3229167</code></pre>
+<ul>
+<li>Louana has a 64.58% chance of winning if the game is limited to 5 draws.</li>
+<li>Colin has a 32.29% chance of winning if the game is limited to 5 draws.</li>
+</ul>
+</div>
+<div id="game-limited-to-100-draws" class="section level2">
+<h2>Game limited to 100 draws</h2>
+<p>We could continue like this for a long time, but for now let’s compute it for up to 100 draws, using a <code>for loop</code>. Using a <code>for loop</code> is necessary here in order to avoid to copy-paste our computations a hundred times.</p>
+<p>For the ease of illustration, we compute only the probability of winning for Louana. We will show later on how the probability for Colin can easily be computed.</p>
+<pre class="r"><code>n_draws &lt;- 100 # number of draws
+l_win_tot &lt;- c() # set empty vector
+
+for (i in 1:n_draws) {
+  l_win_tot[i] &lt;- ((tie^(i - 1)) * l_win) # prob of Louana winning up to n_draws
+  print(paste0(&quot;Draw &quot;, i, &quot;: &quot;, sum(l_win_tot))) # print sum of winning up to n_draws
+}</code></pre>
+<pre><code>## [1] &quot;Draw 1: 0.333333333333333&quot;
+## [1] &quot;Draw 2: 0.5&quot;
+## [1] &quot;Draw 3: 0.583333333333333&quot;
+## [1] &quot;Draw 4: 0.625&quot;
+## [1] &quot;Draw 5: 0.645833333333333&quot;
+## [1] &quot;Draw 6: 0.65625&quot;
+## [1] &quot;Draw 7: 0.661458333333333&quot;
+## [1] &quot;Draw 8: 0.6640625&quot;
+## [1] &quot;Draw 9: 0.665364583333333&quot;
+## [1] &quot;Draw 10: 0.666015625&quot;
+## [1] &quot;Draw 11: 0.666341145833333&quot;
+## [1] &quot;Draw 12: 0.66650390625&quot;
+## [1] &quot;Draw 13: 0.666585286458333&quot;
+## [1] &quot;Draw 14: 0.6666259765625&quot;
+## [1] &quot;Draw 15: 0.666646321614583&quot;
+## [1] &quot;Draw 16: 0.666656494140625&quot;
+## [1] &quot;Draw 17: 0.666661580403646&quot;
+## [1] &quot;Draw 18: 0.666664123535156&quot;
+## [1] &quot;Draw 19: 0.666665395100911&quot;
+## [1] &quot;Draw 20: 0.666666030883789&quot;
+## [1] &quot;Draw 21: 0.666666348775228&quot;
+## [1] &quot;Draw 22: 0.666666507720947&quot;
+## [1] &quot;Draw 23: 0.666666587193807&quot;
+## [1] &quot;Draw 24: 0.666666626930237&quot;
+## [1] &quot;Draw 25: 0.666666646798452&quot;
+## [1] &quot;Draw 26: 0.666666656732559&quot;
+## [1] &quot;Draw 27: 0.666666661699613&quot;
+## [1] &quot;Draw 28: 0.66666666418314&quot;
+## [1] &quot;Draw 29: 0.666666665424903&quot;
+## [1] &quot;Draw 30: 0.666666666045785&quot;
+## [1] &quot;Draw 31: 0.666666666356226&quot;
+## [1] &quot;Draw 32: 0.666666666511446&quot;
+## [1] &quot;Draw 33: 0.666666666589056&quot;
+## [1] &quot;Draw 34: 0.666666666627862&quot;
+## [1] &quot;Draw 35: 0.666666666647264&quot;
+## [1] &quot;Draw 36: 0.666666666656966&quot;
+## [1] &quot;Draw 37: 0.666666666661816&quot;
+## [1] &quot;Draw 38: 0.666666666664241&quot;
+## [1] &quot;Draw 39: 0.666666666665454&quot;
+## [1] &quot;Draw 40: 0.66666666666606&quot;
+## [1] &quot;Draw 41: 0.666666666666364&quot;
+## [1] &quot;Draw 42: 0.666666666666515&quot;
+## [1] &quot;Draw 43: 0.666666666666591&quot;
+## [1] &quot;Draw 44: 0.666666666666629&quot;
+## [1] &quot;Draw 45: 0.666666666666648&quot;
+## [1] &quot;Draw 46: 0.666666666666657&quot;
+## [1] &quot;Draw 47: 0.666666666666662&quot;
+## [1] &quot;Draw 48: 0.666666666666664&quot;
+## [1] &quot;Draw 49: 0.666666666666666&quot;
+## [1] &quot;Draw 50: 0.666666666666666&quot;
+## [1] &quot;Draw 51: 0.666666666666666&quot;
+## [1] &quot;Draw 52: 0.666666666666667&quot;
+## [1] &quot;Draw 53: 0.666666666666667&quot;
+## [1] &quot;Draw 54: 0.666666666666667&quot;
+## [1] &quot;Draw 55: 0.666666666666667&quot;
+## [1] &quot;Draw 56: 0.666666666666667&quot;
+## [1] &quot;Draw 57: 0.666666666666667&quot;
+## [1] &quot;Draw 58: 0.666666666666667&quot;
+## [1] &quot;Draw 59: 0.666666666666667&quot;
+## [1] &quot;Draw 60: 0.666666666666667&quot;
+## [1] &quot;Draw 61: 0.666666666666667&quot;
+## [1] &quot;Draw 62: 0.666666666666667&quot;
+## [1] &quot;Draw 63: 0.666666666666667&quot;
+## [1] &quot;Draw 64: 0.666666666666667&quot;
+## [1] &quot;Draw 65: 0.666666666666667&quot;
+## [1] &quot;Draw 66: 0.666666666666667&quot;
+## [1] &quot;Draw 67: 0.666666666666667&quot;
+## [1] &quot;Draw 68: 0.666666666666667&quot;
+## [1] &quot;Draw 69: 0.666666666666667&quot;
+## [1] &quot;Draw 70: 0.666666666666667&quot;
+## [1] &quot;Draw 71: 0.666666666666667&quot;
+## [1] &quot;Draw 72: 0.666666666666667&quot;
+## [1] &quot;Draw 73: 0.666666666666667&quot;
+## [1] &quot;Draw 74: 0.666666666666667&quot;
+## [1] &quot;Draw 75: 0.666666666666667&quot;
+## [1] &quot;Draw 76: 0.666666666666667&quot;
+## [1] &quot;Draw 77: 0.666666666666667&quot;
+## [1] &quot;Draw 78: 0.666666666666667&quot;
+## [1] &quot;Draw 79: 0.666666666666667&quot;
+## [1] &quot;Draw 80: 0.666666666666667&quot;
+## [1] &quot;Draw 81: 0.666666666666667&quot;
+## [1] &quot;Draw 82: 0.666666666666667&quot;
+## [1] &quot;Draw 83: 0.666666666666667&quot;
+## [1] &quot;Draw 84: 0.666666666666667&quot;
+## [1] &quot;Draw 85: 0.666666666666667&quot;
+## [1] &quot;Draw 86: 0.666666666666667&quot;
+## [1] &quot;Draw 87: 0.666666666666667&quot;
+## [1] &quot;Draw 88: 0.666666666666667&quot;
+## [1] &quot;Draw 89: 0.666666666666667&quot;
+## [1] &quot;Draw 90: 0.666666666666667&quot;
+## [1] &quot;Draw 91: 0.666666666666667&quot;
+## [1] &quot;Draw 92: 0.666666666666667&quot;
+## [1] &quot;Draw 93: 0.666666666666667&quot;
+## [1] &quot;Draw 94: 0.666666666666667&quot;
+## [1] &quot;Draw 95: 0.666666666666667&quot;
+## [1] &quot;Draw 96: 0.666666666666667&quot;
+## [1] &quot;Draw 97: 0.666666666666667&quot;
+## [1] &quot;Draw 98: 0.666666666666667&quot;
+## [1] &quot;Draw 99: 0.666666666666667&quot;
+## [1] &quot;Draw 100: 0.666666666666667&quot;</code></pre>
+<p>The probabilities found up to draw 1, 3 and 5 are coherent with what we found in the previous sections. Moreover, we see that from draw 52 onwards, the probability of Louana winning remains constant at 66.67%. This is referred as the limit.</p>
+</div>
+<div id="game-limited-to-the-number-of-necessary-draws" class="section level2">
+<h2>Game limited to the number of necessary draws</h2>
+<p>Without printing the results of the above <code>for loop</code>, we do not know how many draws are necessary to reach the limit.</p>
+<p>Let’s now try to include the information about the number of necessary draws in order to avoid computing unnecessary draws:</p>
+<pre class="r"><code>n_draws &lt;- 9999 # initial number of draws, set intentionally to a high number
+p_tie &lt;- c() # set empty vector for prob of ties
+l_win_tot &lt;- c() # set empty vector for prob of Louana winning
+
+# find number of necessary draws:
+for (i in 1:n_draws) {
+  p_tie[i] &lt;- tie^i # prob of tie for each draw
+  limit_ndraws &lt;- sum(p_tie &gt; 2.2e-16) # number of necessary draws
+}
+
+# compute Louana winning probabilities with the smallest number of necessary draws
+for (i in 1:limit_ndraws) {
+  l_win_tot[i] &lt;- ((tie^(i - 1)) * l_win) # prob of Louana winning up to limited number of draws
+  print(paste0(&quot;Draw &quot;, i, &quot;: &quot;, sum(l_win_tot))) # sum of winning up to limited number of draws
+}</code></pre>
+<pre><code>## [1] &quot;Draw 1: 0.333333333333333&quot;
+## [1] &quot;Draw 2: 0.5&quot;
+## [1] &quot;Draw 3: 0.583333333333333&quot;
+## [1] &quot;Draw 4: 0.625&quot;
+## [1] &quot;Draw 5: 0.645833333333333&quot;
+## [1] &quot;Draw 6: 0.65625&quot;
+## [1] &quot;Draw 7: 0.661458333333333&quot;
+## [1] &quot;Draw 8: 0.6640625&quot;
+## [1] &quot;Draw 9: 0.665364583333333&quot;
+## [1] &quot;Draw 10: 0.666015625&quot;
+## [1] &quot;Draw 11: 0.666341145833333&quot;
+## [1] &quot;Draw 12: 0.66650390625&quot;
+## [1] &quot;Draw 13: 0.666585286458333&quot;
+## [1] &quot;Draw 14: 0.6666259765625&quot;
+## [1] &quot;Draw 15: 0.666646321614583&quot;
+## [1] &quot;Draw 16: 0.666656494140625&quot;
+## [1] &quot;Draw 17: 0.666661580403646&quot;
+## [1] &quot;Draw 18: 0.666664123535156&quot;
+## [1] &quot;Draw 19: 0.666665395100911&quot;
+## [1] &quot;Draw 20: 0.666666030883789&quot;
+## [1] &quot;Draw 21: 0.666666348775228&quot;
+## [1] &quot;Draw 22: 0.666666507720947&quot;
+## [1] &quot;Draw 23: 0.666666587193807&quot;
+## [1] &quot;Draw 24: 0.666666626930237&quot;
+## [1] &quot;Draw 25: 0.666666646798452&quot;
+## [1] &quot;Draw 26: 0.666666656732559&quot;
+## [1] &quot;Draw 27: 0.666666661699613&quot;
+## [1] &quot;Draw 28: 0.66666666418314&quot;
+## [1] &quot;Draw 29: 0.666666665424903&quot;
+## [1] &quot;Draw 30: 0.666666666045785&quot;
+## [1] &quot;Draw 31: 0.666666666356226&quot;
+## [1] &quot;Draw 32: 0.666666666511446&quot;
+## [1] &quot;Draw 33: 0.666666666589056&quot;
+## [1] &quot;Draw 34: 0.666666666627862&quot;
+## [1] &quot;Draw 35: 0.666666666647264&quot;
+## [1] &quot;Draw 36: 0.666666666656966&quot;
+## [1] &quot;Draw 37: 0.666666666661816&quot;
+## [1] &quot;Draw 38: 0.666666666664241&quot;
+## [1] &quot;Draw 39: 0.666666666665454&quot;
+## [1] &quot;Draw 40: 0.66666666666606&quot;
+## [1] &quot;Draw 41: 0.666666666666364&quot;
+## [1] &quot;Draw 42: 0.666666666666515&quot;
+## [1] &quot;Draw 43: 0.666666666666591&quot;
+## [1] &quot;Draw 44: 0.666666666666629&quot;
+## [1] &quot;Draw 45: 0.666666666666648&quot;
+## [1] &quot;Draw 46: 0.666666666666657&quot;
+## [1] &quot;Draw 47: 0.666666666666662&quot;
+## [1] &quot;Draw 48: 0.666666666666664&quot;
+## [1] &quot;Draw 49: 0.666666666666666&quot;
+## [1] &quot;Draw 50: 0.666666666666666&quot;
+## [1] &quot;Draw 51: 0.666666666666666&quot;
+## [1] &quot;Draw 52: 0.666666666666667&quot;</code></pre>
+</div>
+<div id="final-winning-probabilities" class="section level2">
+<h2>Final winning probabilities</h2>
+<p>Remember that the initial question was:</p>
+<blockquote>
+<p>What is the probability of winning the game for each ambassador?</p>
+</blockquote>
+<p>The probability that Louana wins the game can easily be extracted as follows:</p>
+<pre class="r"><code>sum(l_win_tot)</code></pre>
+<pre><code>## [1] 0.6666667</code></pre>
+<p>And since the game only stops when there is a winner, the sum of the winning probabilities for Louana and Colin must be equal to 1, so the probability that Colin wins the game is:</p>
+<pre class="r"><code>c_win_tot &lt;- 1 - sum(l_win_tot)
+c_win_tot</code></pre>
+<pre><code>## [1] 0.3333333</code></pre>
+<p><strong>To summarize:</strong></p>
+<ul>
+<li>Louana has 66.67% chance to win the ambassadors’ game.</li>
+<li>Colin has 33.33% chance to win the ambassadors’ game.</li>
+</ul>
+</div>
+<div id="visual-representations" class="section level2">
+<h2>Visual representations</h2>
+<p>To visualize the probabilities for each ambassador, we miss the probabilities of winning for Colin so let’s compute them first:</p>
+<pre class="r"><code>c_win_tot &lt;- c() # set empty vector for prob of Colin winning
+
+# compute Colin winning probabilities with the smallest number of necessary draws
+for (i in 1:limit_ndraws) {
+  c_win_tot[i] &lt;- ((tie^(i - 1)) * c_win) # prob of Colin winning
+  print(paste0(&quot;Draw &quot;, i, &quot;: &quot;, sum(c_win_tot))) # print sum of winning
+}</code></pre>
+<pre><code>## [1] &quot;Draw 1: 0.166666666666667&quot;
+## [1] &quot;Draw 2: 0.25&quot;
+## [1] &quot;Draw 3: 0.291666666666667&quot;
+## [1] &quot;Draw 4: 0.3125&quot;
+## [1] &quot;Draw 5: 0.322916666666667&quot;
+## [1] &quot;Draw 6: 0.328125&quot;
+## [1] &quot;Draw 7: 0.330729166666667&quot;
+## [1] &quot;Draw 8: 0.33203125&quot;
+## [1] &quot;Draw 9: 0.332682291666667&quot;
+## [1] &quot;Draw 10: 0.3330078125&quot;
+## [1] &quot;Draw 11: 0.333170572916667&quot;
+## [1] &quot;Draw 12: 0.333251953125&quot;
+## [1] &quot;Draw 13: 0.333292643229167&quot;
+## [1] &quot;Draw 14: 0.33331298828125&quot;
+## [1] &quot;Draw 15: 0.333323160807292&quot;
+## [1] &quot;Draw 16: 0.333328247070312&quot;
+## [1] &quot;Draw 17: 0.333330790201823&quot;
+## [1] &quot;Draw 18: 0.333332061767578&quot;
+## [1] &quot;Draw 19: 0.333332697550456&quot;
+## [1] &quot;Draw 20: 0.333333015441895&quot;
+## [1] &quot;Draw 21: 0.333333174387614&quot;
+## [1] &quot;Draw 22: 0.333333253860474&quot;
+## [1] &quot;Draw 23: 0.333333293596903&quot;
+## [1] &quot;Draw 24: 0.333333313465118&quot;
+## [1] &quot;Draw 25: 0.333333323399226&quot;
+## [1] &quot;Draw 26: 0.33333332836628&quot;
+## [1] &quot;Draw 27: 0.333333330849806&quot;
+## [1] &quot;Draw 28: 0.33333333209157&quot;
+## [1] &quot;Draw 29: 0.333333332712452&quot;
+## [1] &quot;Draw 30: 0.333333333022892&quot;
+## [1] &quot;Draw 31: 0.333333333178113&quot;
+## [1] &quot;Draw 32: 0.333333333255723&quot;
+## [1] &quot;Draw 33: 0.333333333294528&quot;
+## [1] &quot;Draw 34: 0.333333333313931&quot;
+## [1] &quot;Draw 35: 0.333333333323632&quot;
+## [1] &quot;Draw 36: 0.333333333328483&quot;
+## [1] &quot;Draw 37: 0.333333333330908&quot;
+## [1] &quot;Draw 38: 0.333333333332121&quot;
+## [1] &quot;Draw 39: 0.333333333332727&quot;
+## [1] &quot;Draw 40: 0.33333333333303&quot;
+## [1] &quot;Draw 41: 0.333333333333182&quot;
+## [1] &quot;Draw 42: 0.333333333333258&quot;
+## [1] &quot;Draw 43: 0.333333333333295&quot;
+## [1] &quot;Draw 44: 0.333333333333314&quot;
+## [1] &quot;Draw 45: 0.333333333333324&quot;
+## [1] &quot;Draw 46: 0.333333333333329&quot;
+## [1] &quot;Draw 47: 0.333333333333331&quot;
+## [1] &quot;Draw 48: 0.333333333333332&quot;
+## [1] &quot;Draw 49: 0.333333333333333&quot;
+## [1] &quot;Draw 50: 0.333333333333333&quot;
+## [1] &quot;Draw 51: 0.333333333333333&quot;
+## [1] &quot;Draw 52: 0.333333333333333&quot;</code></pre>
+<p>We create a dataset with the probabilities for both ambassadors:</p>
+<pre class="r"><code>dat &lt;- data.frame(
+  Draw = rep(1:limit_ndraws, 2),
+  Probability = c(cumsum(l_win_tot), cumsum(c_win_tot)),
+  Ambassador = c(rep(&quot;Louana&quot;, limit_ndraws), rep(&quot;Colin&quot;, limit_ndraws))
+)</code></pre>
+<p>We can now visualize these probabilities up to the number of necessary draws:</p>
+<pre class="r"><code># load package
+library(ggplot2)
+
+# plot
+ggplot(dat) +
+  aes(x = Draw, y = Probability, colour = Ambassador) +
+  geom_line(size = 2L) +
+  labs(
+    y = &quot;Probability of winning&quot;,
+    caption = &quot;Source: Koh-Lanta 2022&quot;
+  ) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1)) +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>But I believe the most appropriate plot to answer the initial question is with a <a href="/blog/descriptive-statistics-in-r/#barplot">barplot</a>:</p>
+<pre class="r"><code># create dataset
+dat_barplot &lt;- data.frame(
+  Ambassador = c(&quot;Louana&quot;, &quot;Colin&quot;),
+  Probability = c(sum(l_win_tot), sum(c_win_tot))
+)
+
+# plot
+ggplot(data = dat_barplot, aes(x = Ambassador, y = Probability)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;steelblue&quot;) +
+  labs(
+    y = &quot;Probability of winning&quot;,
+    caption = &quot;Source: Koh-Lanta 2022&quot;
+  ) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1)) +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="coded-into-a-function" class="section level2">
+<h2>Coded into a function</h2>
+<p>Let’s try to implement this problem in a function to be able to reuse it with other initial probabilities.</p>
+<p>With:</p>
+<ul>
+<li><code>p_a</code> and <code>p_b</code> denoting, respectively, the probability that ambassador A and ambassador B draw a white ball,</li>
+<li><code>n_draws</code> denoting the maximum number of draws that is allowed (default = 9999),</li>
+</ul>
+<p>we have the following function:</p>
+<pre class="r"><code>ambassadors_game &lt;- function(p_a, p_b, n_draws = 9999) {
+  q_a &lt;- (1 - p_a)
+  q_b &lt;- (1 - p_b)
+
+  a_win &lt;- q_b * p_a
+  b_win &lt;- q_a * p_b
+
+  tie &lt;- (p_a * p_b) + (q_a * q_b)
+
+  p_tie &lt;- c() # set empty vector for prob of ties
+  a_win_tot &lt;- c() # set empty vector for prob of A winning
+  b_win_tot &lt;- c() # set empty vector for prob of B winning
+
+  # find number of necessary draws:
+  for (i in 1:n_draws) {
+    p_tie[i] &lt;- tie^i # prob of tie for each draw
+    limit_ndraws &lt;- sum(p_tie &gt; 2.2e-16) # number of necessary draws
+  }
+
+  # compute A and B winning probabilities with the smallest number of necessary draws:
+  for (i in 1:limit_ndraws) {
+    a_win_tot[i] &lt;- ((tie^(i - 1)) * a_win) # prob of A winning up to limited number of draws
+    b_win_tot[i] &lt;- ((tie^(i - 1)) * b_win) # prob of B winning up to limited number of draws
+  }
+
+  # save P(A), P(B) and number of necessary draws:
+  res &lt;- list(
+    &quot;p_a&quot; = sum(a_win_tot),
+    &quot;p_b&quot; = sum(b_win_tot),
+    &quot;ndraws&quot; = limit_ndraws
+  )
+  # print results:
+  return(res)
+}</code></pre>
+<p>We test the function to see if it matches results found above.</p>
+<p>First, if both ambassadors have identical urns as it was the case before the 2022 season:</p>
+<pre class="r"><code>ambassadors_game(
+  p_a = 1 / 2,
+  p_b = 1 / 2
+)</code></pre>
+<pre><code>## $p_a
+## [1] 0.5
+## 
+## $p_b
+## [1] 0.5
+## 
+## $ndraws
+## [1] 52</code></pre>
+<p>The game is indeed fair, with a 50% chance of winning for each ambassador.</p>
+<p>Second, with the urns presented to Louana and Colin, but for the first draw only (setting arbitrarily that Louana is ambassador A and Colin is ambassador B):</p>
+<pre class="r"><code># first draw only
+ambassadors_game(
+  p_a = 1 / 2,
+  p_b = 1 / 3,
+  n_draws = 1
+)</code></pre>
+<pre><code>## $p_a
+## [1] 0.3333333
+## 
+## $p_b
+## [1] 0.1666667
+## 
+## $ndraws
+## [1] 1</code></pre>
+<p>Third, still with the urns presented to Louana and Colin, but for a game limited to exactly 3 and 5 draws:</p>
+<pre class="r"><code># up to 3 draws
+ambassadors_game(
+  p_a = 1 / 2,
+  p_b = 1 / 3,
+  n_draws = 3
+)</code></pre>
+<pre><code>## $p_a
+## [1] 0.5833333
+## 
+## $p_b
+## [1] 0.2916667
+## 
+## $ndraws
+## [1] 3</code></pre>
+<pre class="r"><code># up to 5 draws
+ambassadors_game(
+  p_a = 1 / 2,
+  p_b = 1 / 3,
+  n_draws = 5
+)</code></pre>
+<pre><code>## $p_a
+## [1] 0.6458333
+## 
+## $p_b
+## [1] 0.3229167
+## 
+## $ndraws
+## [1] 5</code></pre>
+<p>And now, the final verification with the real situation of Louana and Colin in Koh-Lanta 2022:</p>
+<pre class="r"><code># Koh-Lanta 2022 situation
+out &lt;- ambassadors_game(
+  p_a = 1 / 2,
+  p_b = 1 / 3
+)
+
+out</code></pre>
+<pre><code>## $p_a
+## [1] 0.6666667
+## 
+## $p_b
+## [1] 0.3333333
+## 
+## $ndraws
+## [1] 52</code></pre>
+<p>All results match the ones presented above.</p>
+<p>(Note that the probabilities for each ambassador can be extracted as follows:)</p>
+<pre class="r"><code># prob ambassador A
+out$p_a</code></pre>
+<pre><code>## [1] 0.6666667</code></pre>
+<pre class="r"><code># prob ambassador B
+out$p_b</code></pre>
+<pre><code>## [1] 0.3333333</code></pre>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>The initial question, coming from the television show Koh-Lanta, was “what is the probability of winning for each participant if they play the ambassadors’ game?”.</p>
+<p>In this article, we have shown how to compute these probabilities. Moreover, we have illustrated the process of how a simple probability problem could be generalized to suit many real life situations, and how a <code>for loop</code> and a function could be used to implement a real life situation into R.</p>
+<p>Last but not least, I would like to focus on something Denis Brogniart (the well-known presenter of the show) said just after the two ambassadors came back to the island to announce their choice to the other adventurers. He mentioned that, due to the punishment afflicted to the yellow tribe, there was a difference of chances of 16% between Louana and Colin.</p>
+<p>This comes naturally from the following two situations:</p>
+<p><em>First situation:</em></p>
+<ul>
+<li>Louana has a 50% chance of picking a white ball.</li>
+<li>Colin has a 33.33% chance of picking a white ball.</li>
+<li>The difference is 50 - 33.33 = 16.67%, rounded to 16%.</li>
+</ul>
+<p>Or, if the game is limited to the first draw only:</p>
+<p><em>Second situation:</em></p>
+<ul>
+<li>Louana has 33.33% chance of winning the game.</li>
+<li>Colin has a 16.67% chance of winning the game.</li>
+<li>The difference is 33.33 - 16.67 = 16.66%, rounded to 16%.</li>
+</ul>
+<p>It is true that, seeing the problem from those two angles, the difference is ~16%. Denis Brogniart is right in mentioning this 16% difference.</p>
+<p>However, the difference of chances between the two ambassadors is larger <em>if we see the game from a broader perspective</em>. The rules of the game say that it stops only when there is a winner. From that point of view, as demonstrated above:</p>
+<ul>
+<li>Louana has 66.67% chance of winning the game.</li>
+<li>Colin has 33.33% chance of winning the game.</li>
+</ul>
+<p>In this situation, the difference in probability of winning between the 2 ambassadors is 66.67 - 33.33 = 33.34%!</p>
+<p>I must admit that I was not expecting such a large difference between the two ambassadors. Seeing the ambassadors’ game from that perspective looks different to what we were told, or to what we thought before actually computing the probabilities. (Denis Brogniart, if you happen to read this, feel free to let me know whether this relatively large difference was intended or not.)</p>
+<p>For those of you who do not watch the show: upon the return of the ambassadors on the island with all adventurers, Colin has been heavily criticized by the members of his tribe. His decision not to play the ambassadors’ game (and the decision to eliminate one member of his tribe with the aim of saving himself) was seen as a betrayal. As a consequence of this, he was eliminated by the reunited tribe directly after that episode.</p>
+<p>I am going to conclude this article with the following question:</p>
+<blockquote>
+<p>If you were an ambassador in the 2022 Koh-Lanta season and given that now you know the exact probabilites of winning for each tribe, what would you have done?</p>
+</blockquote>
+<p>Thanks for reading.</p>
+<p>As always, if you have any question related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>We will never know if he would have played the game if the chances of winning were equal for both ambassadors. Since I started to watch this television show, I have never seen any ambassadors’ negotiation leading to the ambassadors’ game, they all ended with the designation of an adventurer.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>And to be honest, I wanted to compute these probabilities because while I was watching the show with my girlfriend, she looked at me and asked “what are the probabilities for each of them?”. I am now able to give her a precise answer.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
