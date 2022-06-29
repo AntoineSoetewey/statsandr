@@ -158,6 +158,8 @@ ggplot(dat) +
   geom_line()
 ```
 
+(Note that this might not be the most appropriate plot since there are multiple points for each value of `displ`, but this is just an example to show how to create a line plot.)
+
 ## Combination of line and points
 
 An advantage of `{ggplot2}` is the ability to combine several types of plots and its flexibility in designing it. For instance, we can add a line to a scatter plot by simply adding a layer to the initial scatter plot:
@@ -294,13 +296,21 @@ ggplot(dat) +
 
 Bars' heights correspond to the observed frequencies (i.e., the number of observations) for each level of the variable of interest (`drv` in our case).
 
-**Tip**: by default, the order of the bars follows the initial order (by alphabetical order or numerical order if you did not change it). If you want to order the levels by frequency (largest first), use the `fct_infreq()` function from the `{forcats}` package:
+**Tip**: by default, the order of the bars follows the initial order (by alphabetical order or numerical order if you did not change it). If you want to order the levels by frequency (largest first), use the `fct_infreq()` function from the `{forcats}` package.
 
 ```{r}
 library(forcats)
 
 ggplot(dat) +
   aes(x = fct_infreq(drv)) + # order by frequency
+  geom_bar()
+```
+
+If you want to order levels in an increasing order (i.e., category with the smallest frequency first), use the `fct_rev()` in addition to the `fct_infreq()` function:
+
+```{r}
+ggplot(dat) +
+  aes(x = fct_rev(fct_infreq(drv))) + # order by frequency
   geom_bar()
 ```
 
@@ -826,6 +836,45 @@ If labels displayed on the X-axis are unreadable because they overlap each other
 ```{r}
 p + scale_x_date(date_breaks = "10 days", date_labels = "%d %b") +
   theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+
+### Highlight data with `{gghighlight}`
+
+The `{gghighlight}` package allows, as its name suggests, to highlight some data directly on your ggplot. The highlighted data (that you define) are shown in bright color and the rest in gray.
+
+Below example of how it works for a scatter plot, boxplot, barplot and histogram.
+
+```{r}
+library(gghighlight)
+
+# scatter plot
+ggplot(mpg, aes(x = displ, y = hwy, color = cyl)) +
+  geom_point() +
+  gghighlight(cyl == "8") +
+  theme(legend.position = "none") # remove legend
+
+# boxplot
+ggplot(dat) +
+  aes(x = drv, y = hwy, fill = drv) +
+  geom_boxplot() +
+  gghighlight(drv %in% c("r", "4")) +
+  theme(legend.position = "none") # remove legend
+
+# barplot
+ggplot(dat) +
+  aes(x = drv, fill = drv) +
+  geom_bar() +
+  gghighlight(drv == "f")
+```
+
+As you can see, the `gghighlight()` layer accepts different types of conditions, but also several of them at the same time:
+
+```{r}
+# histogram
+ggplot(dat) +
+  aes(x = hwy, fill = year) +
+  geom_histogram() +
+  gghighlight(displ > 2 & year == "1999")
 ```
 
 # Tip
