@@ -1,0 +1,208 @@
+---
+title: "One-sample Wilcoxon test in R"
+author: Antoine Soetewey
+date: '2022-07-07'
+slug: one-sample-wilcoxon-test-in-r
+categories: []
+tags:
+  - Basics
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: blog/one-sample-wilcoxon-test-in-r/images/one-sample-wilcoxon-test-in-r.jpeg
+description: Learn when and how to do a one-sample Wilcoxon test in R. See also how to visualize and interpret the results with a concrete example.
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+bibliography: bibliography.bib
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#when">When?</a></li>
+<li><a href="#data">Data</a></li>
+<li><a href="#how">How?</a></li>
+<li><a href="#combine-statistical-test-and-plot">Combine statistical test and plot</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+
+<p><img src="images/one-sample-wilcoxon-test-in-r.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In a previous article, we showed how to do a <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/">two-sample Wilcoxon test</a> in R. Remember that there are actually two versions of this test:</p>
+<ol style="list-style-type: decimal">
+<li>The <strong>Mann-Whitney-Wilcoxon test</strong> (also referred as Wilcoxon rank sum test or Mann-Whitney U test), used to compare two <strong>independent</strong> samples. This test is the non-parametric version of the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test for independent samples</a>.</li>
+<li>The <strong>Wilcoxon signed-rank test</strong> (also referred as Wilcoxon test for paired samples), used to compare two paired samples. This test is the non-parametric version of the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test for paired samples</a>.</li>
+</ol>
+<p>In another article, we also showed how to do a <a href="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/">one-sample t-test</a> by hand and in R. This test is used to determine whether the mean of a measurement variable is different from a specified value (a value that you specify based on your beliefs or a theoretical expectation for example). Since it is a parametric test, the data should follow a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normal distribution</a> (or sample size should be large enough (i.e., above 30), thanks to the central limit theorem) for the results to be valid.</p>
+<p>Unlike the one-sample t-test, the <strong>one-sample Wilcoxon test</strong> (also referred as the one-sample Wilcoxon signed-rank test) is a non-parametric test, meaning that it does not rely on data belonging to any particular parametric family of probability distributions. Non-parametric tests usually have the same goal as their parametric counterparts (in this case, compare data to a given value). Nonetheless, they do not require the assumption of normality and they can deal with <a href="/blog/outliers-detection-in-r/">outliers</a> and Likert scales.</p>
+<p>In this article, we show when to perform the one-sample Wilcoxon test, how to do it in R and how to interpret its results. We will also briefly show some appropriate visualizations.</p>
+</div>
+<div id="when" class="section level1">
+<h1>When?</h1>
+<p>The <strong>one-sample Wilcoxon test is used to compare our observations to a given default value</strong>—a value that you specify based on your beliefs or a theoretical expectation for example. In other words, it is used to determine if a group is significantly different from a known or hypothesized population value on the variable of interest.</p>
+<p>Since the test statistic is computed based on the ranks of the difference between the observed values and the default value (making it a non-parametric test), the one-sample Wilcoxon test is more appropriate than a one-sample t-test when the observations do not follow a normal distribution.</p>
+<p>The goal of this test is to verify whether the observations are significantly different from our default value. In terms of null and alternative hypotheses, we have (for a two-tailed test):</p>
+<ul>
+<li><span class="math inline">\(H_0:\)</span> location of the data is <em>equal</em> to the chosen value</li>
+<li><span class="math inline">\(H_1:\)</span> location of the data is <em>different</em> from the chosen value</li>
+</ul>
+<p>In other words, a significant result (i.e., a rejection of the null hypothesis) suggests that the location of the data is <em>different</em> from the chosen value.</p>
+<p>Note that some authors suggest that this test is a test of the median, that is (for a two-tailed test):</p>
+<ul>
+<li><span class="math inline">\(H_0:\)</span> the median is <em>equal</em> to the chosen value</li>
+<li><span class="math inline">\(H_1:\)</span> the median is <em>different</em> from the chosen value</li>
+</ul>
+<p>However, this is the case only if the data are symmetric. Without further assumptions about the distribution of the data, the one-sample Wilcoxon test is not a test of the median but a test about the location of the data.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>Note that although the normality assumption is not required, the independence assumption must still be verified. This means that observations must be independent of one another (usually, random sampling is sufficient to have independence).</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>For our illustration, suppose we want to test whether the scores at an exam differ from 10, that is:</p>
+<ul>
+<li><span class="math inline">\(H_0:\)</span> scores at the exam <span class="math inline">\(= 10\)</span></li>
+<li><span class="math inline">\(H_1:\)</span> scores at the exam <span class="math inline">\(\ne 10\)</span></li>
+</ul>
+<p>To verify this, we have a sample of 15 students and their score at the exam:</p>
+<pre class="r"><code>dat</code></pre>
+<pre><code>##    Student_ID Score
+## 1           1    17
+## 2           2     5
+## 3           3     1
+## 4           4    10
+## 5           5     4
+## 6           6    18
+## 7           7    17
+## 8           8    15
+## 9           9     7
+## 10         10     4
+## 11         11     5
+## 12         12    14
+## 13         13    20
+## 14         14    18
+## 15         15    15</code></pre>
+<p>Scores between students are assumed to be independent (a student’s score is not impacted or influenced by the score of another student). Therefore, the independence assumption is met.</p>
+<p>Moreover, sample size is small (n &lt; 30) and based on the <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> the data do not follow a normal distribution:</p>
+<pre class="r"><code># histogram
+hist(dat$Score)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Note that we refrain from verifying the normality via a normality test (such as the <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">Shapiro-Wilk test</a> for instance) because for small sample sizes, normality tests have little power to reject the null hypothesis and therefore small samples most often pass normality tests <span class="citation">(<a href="#ref-oztuna2006investigation" role="doc-biblioref">Öztuna, Elhan, and Tüccar 2006</a>; <a href="#ref-ghasemi2012normality" role="doc-biblioref">Ghasemi and Zahediasl 2012</a>)</span>.</p>
+<p>Note also that although we use a <a href="/blog/variable-types-and-examples/#quantitative">quantitative variable</a> for the illustration, the one-sample Wilcoxon test is also appropriate for interval data and Likert scales.</p>
+</div>
+<div id="how" class="section level1">
+<h1>How?</h1>
+<p>The one-sample Wilcoxon test can be done in R with the <code>wilcox.test()</code> function.</p>
+<p>But first, it is a good practice to visualize our data in a <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> and compute some <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> to compare our observations with our default value:</p>
+<pre class="r"><code># boxplot
+boxplot(dat$Score,
+  ylab = &quot;Score&quot;
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>If like me you prefer to use the <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code> package</a> for your plots:</p>
+<pre class="r"><code># boxplot
+library(ggplot2)
+
+ggplot(dat, aes(y = Score)) +
+  geom_boxplot() +
+  labs(y = &quot;Score&quot;) +
+  theme( # remove axis text and ticks
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank()
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Some basic descriptive statistics (rounded to two decimals):</p>
+<pre class="r"><code>round(summary(dat$Score),
+  digits = 2
+)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    1.00    5.00   14.00   11.33   17.00   20.00</code></pre>
+<p>From the boxplot and the descriptive statistics above, we see that the mean and median of the scores in our sample are respectively 11.33 and 14.</p>
+<p>The one-sample Wilcoxon test will tell us whether the scores are <em>significantly</em> different from 10 or not (and thus whether they are different from 10 in the population or not):</p>
+<pre class="r"><code>wilcox.test(dat$Score,
+  mu = 10 # default value
+)</code></pre>
+<pre><code>## 
+##  Wilcoxon signed rank test with continuity correction
+## 
+## data:  dat$Score
+## V = 67, p-value = 0.3779
+## alternative hypothesis: true location is not equal to 10</code></pre>
+<p>The output presents several information such as the:</p>
+<ul>
+<li>title of the test</li>
+<li>data</li>
+<li>test statistic</li>
+<li><span class="math inline">\(p\)</span>-value</li>
+<li>alternative hypothesis</li>
+</ul>
+<p>We focus on the <span class="math inline">\(p\)</span>-value to interpret and conclude the test.</p>
+<p><strong>Interpretation:</strong></p>
+<p>Based on the results of the test, (at the significance level of 0.05) we do not reject the null hypothesis, so we do not reject the hypothesis that the scores at this exam are equal to 10, and we cannot conclude that the scores are significantly different from 10 (<span class="math inline">\(p\)</span>-value = 0.378).</p>
+<p>By default, it is a two-tailed test that is done. As for the <code>t.test()</code> function, we can specify that a one-sided test is required by using either the <code>alternative = "greater"</code> or <code>alternative = "less</code> argument in the <code>wilcox.test()</code> function.</p>
+<p>For example, if we want to test that the scores are <em>higher</em> than 10:</p>
+<pre class="r"><code>wilcox.test(dat$Score,
+  mu = 10, # default value
+  alternative = &quot;greater&quot; # H1: scores &gt; 10
+)</code></pre>
+<pre><code>## 
+##  Wilcoxon signed rank test with continuity correction
+## 
+## data:  dat$Score
+## V = 67, p-value = 0.189
+## alternative hypothesis: true location is greater than 10</code></pre>
+<p><strong>Interpretation:</strong></p>
+<p>In this case, we still do not reject the hypothesis that scores are equal to 10 and we cannot conclude that scores are significantly higher than 10 (<span class="math inline">\(p\)</span>-value = 0.189).</p>
+<p>For more information about the arguments available in the function, see <code>?wilcox.test</code>.</p>
+<p>Note that you may encounter the following warnings when using <code>wilcox.test()</code>:</p>
+<pre><code>Warning messages:
+1: In wilcox.test.default(dat$Score, mu = 10) :
+  cannot compute exact p-value with ties
+2: In wilcox.test.default(dat$Score, mu = 10) :
+  cannot compute exact p-value with zeroes</code></pre>
+<p>It is a warning rather than an indication that your results are incorrect. R is informing you that it is reporting a <span class="math inline">\(p\)</span>-value based on a normal approximation rather than an exact <span class="math inline">\(p\)</span>-value based on the data because there are ties (some values are the same). Use the <code>exact = FALSE</code> option if you want to remove the warning.</p>
+</div>
+<div id="combine-statistical-test-and-plot" class="section level1">
+<h1>Combine statistical test and plot</h1>
+<p>If you are a frequent user of the blog, you know that I like to present results of a test directly on a plot. This allows me to visualize the data and conclude the test in a concise manner.</p>
+<p>This is possible thanks to the <code>gghistostats()</code> function within the <code>{ggstatsplot}</code> package:</p>
+<pre class="r"><code># load package
+library(ggstatsplot)
+
+# combine plot and test
+gghistostats(
+  data = dat, # dataframe
+  x = Score, # variable
+  type = &quot;nonparametric&quot;, # nonparemetric = Wilcoxon, parametric = t-test
+  test.value = 10 # default value
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The histogram<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> shows the distribution of the scores and results of the test is shown in the title of the plot.</p>
+<p>As you can see, results of the test are the same, that is, there is not enough evidence in the data to conclude that scores are significantly different from 10 (<span class="math inline">\(p\)</span>-value = 0.378).</p>
+<p>Thanks for reading. I hope this article helped you to understand the one-sample Wilcoxon test and how to do it in R.</p>
+<p>As always, if you have any question related to the topic covered in this paper, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-ghasemi2012normality" class="csl-entry">
+Ghasemi, Asghar, and Saleh Zahediasl. 2012. <span>“Normality Tests for Statistical Analysis: A Guide for Non-Statisticians.”</span> <em>International Journal of Endocrinology and Metabolism</em> 10 (2): 486.
+</div>
+<div id="ref-oztuna2006investigation" class="csl-entry">
+Öztuna, Derya, Atilla Halil Elhan, and Ersöz Tüccar. 2006. <span>“Investigation of Four Different Normality Tests in Terms of Type 1 Error Rate and Power Under Different Distributions.”</span> <em>Turkish Journal of Medical Sciences</em> 36 (3): 171–76.
+</div>
+</div>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>See more information in this <a href="https://rcompanion.org/handbook/F_02.html">article</a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>This histogram looks different than the previous one because the number of bins is different (4 versus 5 bins).<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
