@@ -1,5 +1,5 @@
 ---
-title: "How to perform a one sample t-test by hand and in R: test on one mean"
+title: "How to perform a one-sample t-test by hand and in R: test on one mean"
 author: Antoine Soetewey
 date: '2020-03-09'
 slug: how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean
@@ -11,7 +11,7 @@ tags:
   - R
   - Statistics
 meta_img: blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/how-to-perform-a-one-sample-t-test-by-hand-and-in-r.jpeg
-description: Learn how to perform the one sample t-test by hand and in R in order to compare a sample to a hypothesized value, with known or unknown population variance
+description: Learn how to perform the one-sample t-test by hand and in R in order to compare a sample to a hypothesized value, with known or unknown population variance
 output:
   blogdown::html_page:
     toc: true
@@ -27,14 +27,14 @@ bibliography: bibliography.bib
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#null-and-alternative-hypothesis">Null and alternative hypothesis</a></li>
 <li><a href="#hypothesis-testing">Hypothesis testing</a></li>
-<li><a href="#two-versions-of-the-one-sample-t-test">Two versions of the one sample t-test</a></li>
-<li><a href="#how-to-compute-the-one-sample-t-test-by-hand">How to compute the one sample t-test by hand?</a>
+<li><a href="#two-versions-of-the-one-sample-t-test">Two versions of the one-sample t-test</a></li>
+<li><a href="#how-to-compute-the-one-sample-t-test-by-hand">How to compute the one-sample t-test by hand?</a>
 <ul>
 <li><a href="#scenario-1-variance-of-the-population-is-known">Scenario 1: variance of the population is known</a></li>
 <li><a href="#scenario-2-variance-of-the-population-is-unknown">Scenario 2: variance of the population is unknown</a></li>
 <li><a href="#different-underlying-distributions-for-the-critical-value">Different underlying distributions for the critical value</a></li>
 </ul></li>
-<li><a href="#how-to-compute-the-one-sample-t-test-in-r">How to compute the one sample t-test in R?</a>
+<li><a href="#how-to-compute-the-one-sample-t-test-in-r">How to compute the one-sample t-test in R?</a>
 <ul>
 <li><a href="#scenario-1-variance-of-the-population-is-known-1">Scenario 1: variance of the population is known</a></li>
 <li><a href="#scenario-2-variance-of-the-population-is-unknown-1">Scenario 2: variance of the population is unknown</a>
@@ -54,23 +54,23 @@ bibliography: bibliography.bib
 <p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/how-to-perform-a-one-sample-t-test-by-hand-and-in-r.jpeg" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>After having written an article on the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test for two samples</a> (independent and paired samples), I believe it is time to explain in details how to perform one sample t-tests by hand and in R.</p>
-<p>One sample t-test is an important part of inferential statistics (probably one of the first <a href="/blog/what-statistical-test-should-i-do/">statistical test</a> that students learn). Remind that, unlike <a href="/blog/descriptive-statistics-by-hand/">descriptive statistics</a>, inferential statistics is a branch of statistics aiming at drawing conclusions about one or two <a href="/blog/what-is-the-difference-between-population-and-sample/">populations</a>, based on a subset (or two) of that population (called samples). In other words, we first collect a random set of observations from a population, and then some measurements are calculated in order to generalize to the population the information found through the sample.</p>
-<p>In this context, the <strong>one sample t-test is used to determine whether the mean of a measurement variable is different from a specified value</strong> (a belief or a theoretical expectation for example). It works as follows: if the mean of the sample is too distant from the specified value (the value under the null hypothesis), it is considered that the mean of the population is different from what is expected. On the contrary, if the mean of the sample is close to the specified value, we cannot reject the hypothesis that the population mean is equal to what is expected.</p>
-<p>Like the Student’s t-test for two samples and the <a href="/blog/anova-in-r/">ANOVA</a> (for 3 or more samples), there are also different versions of the one sample t-test. Luckily, there are only two different versions for this test (the Student’s t-test for two samples has 5 versions!). The difference between the two versions of the one sample t-test lies in the fact that one version is used when the variance of the population (not the variance of the sample!) is known, the other version being used when the variance of the population is unknown.</p>
-<p>In this article, I will first detail step by step how to perform both versions of the one sample t-test by hand. The analyses will be done on a small set of observations for the sake of illustration and easiness. I will then show how to perform this test in R with the exact same data in order to verify the results found by hand. Reminders about the reasoning behind <a href="/blog/hypothesis-test-by-hand/">hypothesis tests</a>, interpretations of the <em>p</em>-value and the results, and assumptions of this test will also be presented.</p>
-<p>Note that the aim of this article is to show how to compute the one sample t-test by hand and in R, so we refrain from testing the assumptions and we assume all assumptions are met for this exercise. For completeness, we still mention the assumptions and how to test them. Interested readers are invited to have a look at the <a href="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/#assumptions">end of the article</a> for more information about these assumptions.</p>
+<p>After having written an article on the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test for two samples</a> (independent and paired samples), I believe it is time to explain in details how to perform one-sample t-tests by hand and in R.</p>
+<p>One-sample t-test is an important part of inferential statistics (probably one of the first <a href="/blog/what-statistical-test-should-i-do/">statistical test</a> that students learn). Remind that, unlike <a href="/blog/descriptive-statistics-by-hand/">descriptive statistics</a>, inferential statistics is a branch of statistics aiming at drawing conclusions about one or two <a href="/blog/what-is-the-difference-between-population-and-sample/">populations</a>, based on a subset (or two) of that population (called samples). In other words, we first collect a random set of observations from a population, and then some measurements are calculated in order to generalize to the population the information found through the sample.</p>
+<p>In this context, the <strong>one-sample t-test is used to determine whether the mean of a measurement variable is different from a specified value</strong> (a belief or a theoretical expectation for example). It works as follows: if the mean of the sample is too distant from the specified value (the value under the null hypothesis), it is considered that the mean of the population is different from what is expected. On the contrary, if the mean of the sample is close to the specified value, we cannot reject the hypothesis that the population mean is equal to what is expected.</p>
+<p>Like the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test for two samples</a> and the <a href="/blog/anova-in-r/">ANOVA</a> (for 3 or more samples), there are also different versions of the one-sample t-test. Luckily, there are only two different versions for this test (the Student’s t-test for two samples has 5 versions!). The difference between the two versions of the one-sample t-test lies in the fact that one version is used when the variance of the <em>population</em> (not the variance of the sample!) is known, the other version being used when the variance of the population is unknown.</p>
+<p>In this article, I will first detail step by step how to perform both versions of the one-sample t-test by hand. The analyses will be done on a small set of observations for the sake of illustration and easiness. I will then show how to perform this test in R with the exact same data in order to verify the results found by hand. Reminders about the reasoning behind <a href="/blog/hypothesis-test-by-hand/">hypothesis tests</a>, interpretations of the <em>p</em>-value and the results, and assumptions of this test will also be presented.</p>
+<p>Note that the aim of this article is to show how to compute the one-sample t-test by hand and in R, so we refrain from testing the assumptions and we assume all assumptions are met for this exercise. For completeness, we still mention the assumptions and how to test them. Interested readers are invited to have a look at the <a href="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/#assumptions">end of the article</a> for more information about these assumptions.</p>
 </div>
 <div id="null-and-alternative-hypothesis" class="section level1">
 <h1>Null and alternative hypothesis</h1>
-<p>Before diving into the computations of the one sample t-test by hand, let’s recap the null and alternative hypotheses of this test:</p>
+<p>Before diving into the computations of the one-sample t-test by hand, let’s recap the null and alternative hypotheses of this test:</p>
 <ul>
 <li><span class="math inline">\(H_0\)</span>: <span class="math inline">\(\mu = \mu_0\)</span></li>
 <li><span class="math inline">\(H_1\)</span>: <span class="math inline">\(\mu \ne \mu_0\)</span></li>
 </ul>
 <p>where <span class="math inline">\(\mu\)</span> is the population mean and <span class="math inline">\(\mu_0\)</span> is the known or <strong>hypothesized</strong> value of the mean in the population.</p>
 <p>This is in the general case where we simply want to determine whether the population mean is <strong>different</strong> (in terms of the dependent variable) compared to the hypothesized value. In this sense, we have no prior belief about the population mean being larger or smaller than the hypothesized value. This type of test is referred as a <strong>two-sided</strong> or bilateral test.</p>
-<p>If we have some prior beliefs about the population mean being larger or smaller than the hypothesized value, the one sample t-test also allows to test the following hypotheses:</p>
+<p>If we have some prior beliefs about the population mean being larger or smaller than the hypothesized value, the one-sample t-test also allows to test the following hypotheses:</p>
 <ul>
 <li><span class="math inline">\(H_0\)</span>: <span class="math inline">\(\mu = \mu_0\)</span></li>
 <li><span class="math inline">\(H_1\)</span>: <span class="math inline">\(\mu &gt; \mu_0\)</span></li>
@@ -87,19 +87,19 @@ bibliography: bibliography.bib
 <p>In statistics, many statistical tests is in the form of <a href="/blog/hypothesis-test-by-hand/">hypothesis tests</a>. Hypothesis tests are used to determine whether a certain belief can be deemed as true (plausible) or not, based on the data at hand (i.e., the sample(s)). Most hypothesis tests boil down to the following 4 steps:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <ol style="list-style-type: decimal">
 <li>State the null and alternative hypothesis.</li>
-<li>Compute the test statistic, denoted t-stat. Formulas to compute the test statistic differ among the different versions of the one sample t-test but they have the same structure. See scenarios 1 and 2 below to see the different formulas.</li>
-<li>Find the critical value given the theoretical statistical distribution of the test, the parameters of the distribution and the significance level <span class="math inline">\(\alpha\)</span>. For the two versions of the one sample t-test, it is either the normal or the Student’s t distribution (<em>t</em> denoting the Student distribution and <em>z</em> denoting the normal distribution).</li>
+<li>Compute the test statistic, denoted t-stat. Formulas to compute the test statistic differ among the different versions of the one-sample t-test but they have the same structure. See scenarios 1 and 2 below to see the different formulas.</li>
+<li>Find the critical value given the theoretical statistical distribution of the test, the parameters of the distribution and the significance level <span class="math inline">\(\alpha\)</span>. For the two versions of the one-sample t-test, it is either the normal or the Student’s t distribution (<em>t</em> denoting the Student distribution and <em>z</em> denoting the normal distribution).</li>
 <li>Conclude by comparing the t-stat (found in step 2.) with the critical value (found in step. 3). If the t-stat lies in the rejection region (determined thanks to the critical value and the direction of the test), we reject the null hypothesis, otherwise we do not reject the null hypothesis. These two alternatives (reject or do not reject the null hypothesis) are the only two possible solutions, we never “accept” an hypothesis. It is also a good practice to always interpret the decision in the terms of the initial question.</li>
 </ol>
 <p>For the interested reader, see these 4 steps of hypothesis testing in more details in this <a href="/blog/hypothesis-test-by-hand/">article</a>.</p>
 </div>
 <div id="two-versions-of-the-one-sample-t-test" class="section level1">
-<h1>Two versions of the one sample t-test</h1>
-<p>There are two versions of the one sample t-test, depending on whether the variance of the population (not the variance of the sample!) is known or unknown. This criteria is rather straightforward, we either know the variance of the population or we do not. The variance of the population cannot be computed because if you can compute the variance of a population, it means you have the data for the whole population, then there is no need to do a hypothesis test anymore…</p>
+<h1>Two versions of the one-sample t-test</h1>
+<p>There are two versions of the one-sample t-test, depending on whether the variance of the population (not the variance of the sample!) is known or unknown. This criteria is rather straightforward, we either know the variance of the population or we do not. The variance of the population cannot be computed because if you can compute the variance of a population, it means you have the data for the whole population, then there is no need to do a hypothesis test anymore…</p>
 <p>So the variance of the population is either given in the statement (use them in that case), or there is no information about the variance and in that case, it is assumed that the variance is unknown. In practice, the variance of the population is most of the time unknown. However, we still illustrate how to do both versions of this test by hand and in R in the next sections following the 4 steps of a hypothesis test.</p>
 </div>
 <div id="how-to-compute-the-one-sample-t-test-by-hand" class="section level1">
-<h1>How to compute the one sample t-test by hand?</h1>
+<h1>How to compute the one-sample t-test by hand?</h1>
 <p>Note that the data are artificial and do not represent any real variable. Furthermore, remind that the assumptions may or may not be met. The point of the article is to detail how to compute the different versions of the test by hand and in R, so all assumptions are assumed to be met. Moreover, we assume that for all tests the significance level, that is, the type I error is <span class="math inline">\(\alpha = 5\)</span>%.</p>
 <p>If you are interested in applying these tests by hand without having to do the computations yourself, here is a <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand/">Shiny app</a> which does it for you. You just need to enter the data and choose the appropriate version of the test thanks to the sidebar menu. There is also a graphical representation that helps you to visualize the test statistic and the rejection region. I hope you will find it useful!</p>
 <div id="scenario-1-variance-of-the-population-is-known" class="section level2">
@@ -191,7 +191,7 @@ bibliography: bibliography.bib
 <li>Critical value: <span class="math inline">\(t_{\alpha, n - 1} = t_{0.05, 4} = 2.132\)</span> (see a guide on <a href="/blog/a-guide-on-how-to-read-statistical-tables/">how to read statistical tables</a> if you struggle to find the critical value)</li>
 <li>Conclusion: The rejection region is thus from 2.132 to <span class="math inline">\(+\infty\)</span>. The test statistic lies within the rejection region so we reject the null hypothesis <span class="math inline">\(H_0\)</span>. In terms of the initial question: At the 5% significance level, we conclude that the population mean is larger than 5.</li>
 </ol>
-<p>This concludes how to perform the two versions of the one sample t-test by hand. In the next sections, we detail how to perform the exact same tests in R.</p>
+<p>This concludes how to perform the two versions of the one-sample t-test by hand. In the next sections, we detail how to perform the exact same tests in R.</p>
 </div>
 <div id="different-underlying-distributions-for-the-critical-value" class="section level2">
 <h2>Different underlying distributions for the critical value</h2>
@@ -201,8 +201,8 @@ bibliography: bibliography.bib
 </div>
 </div>
 <div id="how-to-compute-the-one-sample-t-test-in-r" class="section level1">
-<h1>How to compute the one sample t-test in R?</h1>
-<p>A good practice before doing t-tests in R is to visualize the data thanks to a <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> (or a <a href="/blog/descriptive-statistics-in-r/#density-plot">density plot</a>, or eventually both). A boxplot gives a first indication on the location of the sample, and thus, a first indication on whether the null hypothesis is likely to be rejected or not. However, even if a boxplot or a density plot is great in showing the distribution of a sample, only a sound statistical test will confirm our first impression.</p>
+<h1>How to compute the one-sample t-test in R?</h1>
+<p>A good practice before doing t-tests in R is to visualize the data thanks to a <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> (or eventually a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> or a <a href="/blog/descriptive-statistics-in-r/#density-plot">density plot</a>). A boxplot gives a first indication on the location of the sample, and thus, a first indication on whether the null hypothesis is likely to be rejected or not. However, even if a boxplot or a density plot is great in showing the distribution of a sample, only a sound statistical test will confirm our first impression.</p>
 <p>After a visualization of the data, we replicate in R the results found by hand. Note that we use the same data, the same assumptions and the same question for both scenarios to facilitate the comparison between the tests performed by hand and in R.</p>
 <div id="scenario-1-variance-of-the-population-is-known-1" class="section level2">
 <h2>Scenario 1: variance of the population is known</h2>
@@ -334,7 +334,7 @@ dat2</code></pre>
   theme_minimal()</code></pre>
 <p><img src="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Unlike the previous scenario, the box is quite distant from the hypothesized value of 5. From this boxplot, we can expect the test to reject the null hypothesis of the population mean being equal to 5. Nonetheless, only a formal statistical test will confirm this expectation.</p>
-<p>There is a function in R, and it is simply the <code>t.test()</code> function. This version of the test is actually the “standard” t-test for one sample. Note that in our case the alternative hypothesis is <span class="math inline">\(H_1: \mu &gt; 5\)</span> so we need to add the arguments <code>mu = 5</code> and <code>alternative = "greater"</code> to the function because the default arguments are <code>mu = 0</code> and the two-sided test:</p>
+<p>There is a function in R, and it is simply the <code>t.test()</code> function. This version of the test is actually the “standard” t-test for one-sample. Note that in our case the alternative hypothesis is <span class="math inline">\(H_1: \mu &gt; 5\)</span> so we need to add the arguments <code>mu = 5</code> and <code>alternative = "greater"</code> to the function because the default arguments are <code>mu = 0</code> and the two-sided test:</p>
 <pre class="r"><code>test &lt;- t.test(dat2$value,
   mu = 5,
   alternative = &quot;greater&quot;
@@ -396,17 +396,17 @@ gghistostats(
 </div>
 <div id="assumptions" class="section level1">
 <h1>Assumptions</h1>
-<p>As for many <a href="/blog/what-statistical-test-should-i-do/">statistical tests</a>, there are some assumptions that need to be met in order to be able to interpret the results. When one or several assumptions are not met, although it is technically possible to perform these tests, it would be incorrect to interpret the results. Below are the assumptions of the one sample t-test and how to test them:</p>
+<p>As for many <a href="/blog/what-statistical-test-should-i-do/">statistical tests</a>, there are some assumptions that need to be met in order to be able to interpret the results. When one or several assumptions are not met, although it is technically possible to perform these tests, it would be incorrect to interpret the results. Below are the assumptions of the one-sample t-test and how to test them:</p>
 <ul>
 <li><strong>Variable type</strong>: The dependent variable (i.e., the measured variable) must be measured on a <a href="/blog/variable-types-and-examples/#continuous">continuous</a> or <a href="/blog/variable-types-and-examples/#ordinal">ordinal scale</a>.</li>
 <li><strong>Independence</strong>: The data, collected from a representative and randomly selected portion of the <a href="/blog/what-is-the-difference-between-population-and-sample/">population</a>, should be independent of one another. The assumption of independence is most often verified based on the design of the experiment and on the good control of experimental conditions rather than via a formal test. If you are still unsure about independence based on the experiment design, ask yourself if one observation is related to another (if one observation has an impact on another). If not, it is most likely that you have independent <a href="/blog/what-is-the-difference-between-population-and-sample/">samples</a>.</li>
 <li><strong>Normality</strong>:
 <ul>
-<li>With a small sample size (usually <span class="math inline">\(n &lt; 30\)</span>), observations should follow a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/"><strong>normal distribution</strong></a>. The normality assumption can be tested visually thanks to a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> and a <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a>, and/or formally via a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">normality test</a> such as the Shapiro-Wilk or Kolmogorov-Smirnov test. Some transformations, such as among others, the logarithm, the square root or the Box-Cox transformation can be applied on the observations to transform you data to better fit the normal distribution. If, even after a transformation, your data still do not follow a normal distribution, the one-sample Wilcoxon test (<code>wilcox.test(variable_name, data = dat</code> in R) can be applied. This non-parametric test is robust to non normal distributions so it does not require normality of the data.</li>
+<li>With a small sample size (usually <span class="math inline">\(n &lt; 30\)</span>), observations should follow a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/"><strong>normal distribution</strong></a>. The normality assumption can be tested visually thanks to a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> and a <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a>, and/or formally via a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">normality test</a> such as the Shapiro-Wilk or Kolmogorov-Smirnov test. Some transformations, such as among others, the logarithm, the square root or the Box-Cox transformation can be applied on the observations to transform you data to better fit the normal distribution. If, even after a transformation, your data still do not follow a normal distribution, the <a href="/blog/one-sample-wilcoxon-test-in-r/">one-sample Wilcoxon test</a> (<code>wilcox.test(variable_name, data = dat</code> in R) can be applied. This non-parametric test is robust to non normal distributions so it does not require normality of the data.</li>
 <li>With a large sample size (<span class="math inline">\(n \ge 30\)</span>), <strong>normality of the data is not required</strong> (this is a common misconception!). By the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">central limit theorem</a>, sample means of large samples are often well-approximated by a normal distribution even if the data are not normally distributed <span class="citation">(<a href="#ref-stevens2013intermediate" role="doc-biblioref">Stevens 2013</a>)</span>. It is therefore not required to test the normality assumption when the number of observations is large.</li>
 </ul></li>
 </ul>
-<p>Thanks for reading. I hope this article helped you to understand how the different versions of the one sample t-test work and how to perform them by hand and in R. If you are interested, here is a <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand/">Shiny app</a> to perform these tests by hand easily (you just need to enter your data and select the appropriate version of the test thanks to the sidebar menu). Moreover, read <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">this article</a> if you would like to know how to compute the Student’s t-test but this time, for two samples—in order to compare two dependent or independent groups—or this <a href="/blog/anova-in-r/">article</a> if you want to use an ANOVA to compare 3 or more groups.</p>
+<p>Thanks for reading. I hope this article helped you to understand how the different versions of the one-sample t-test work and how to perform them by hand and in R. If you are interested, here is a <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand/">Shiny app</a> to perform these tests by hand easily (you just need to enter your data and select the appropriate version of the test thanks to the sidebar menu). Moreover, read <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">this article</a> if you would like to know how to compute the Student’s t-test but this time, for two samples—in order to compare two dependent or independent groups—or this <a href="/blog/anova-in-r/">article</a> if you want to use an ANOVA to compare 3 or more groups.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
@@ -417,10 +417,10 @@ Stevens, James P. 2013. <em>Intermediate Statistics: A Modern Approach</em>. Rou
 </div>
 </div>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
-<li id="fn1"><p>It is a least the case regarding parametric hypothesis tests. A parametric test means that it is based on a theoretical statistical distribution, which depends on some defined parameters. In the case of the one sample t-test, it is based on the Student’s t distribution with a single parameter, the degrees of freedom (<span class="math inline">\(df = n - 1\)</span> where <span class="math inline">\(n\)</span> is the sample size), or the normal distribution.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>It is a least the case regarding parametric hypothesis tests. A parametric test means that it is based on a theoretical statistical distribution, which depends on some defined parameters. In the case of the one-sample t-test, it is based on the Student’s t distribution with a single parameter, the degrees of freedom (<span class="math inline">\(df = n - 1\)</span> where <span class="math inline">\(n\)</span> is the sample size), or the normal distribution.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>Thanks gmacar for pointing it out to me.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
