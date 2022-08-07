@@ -38,7 +38,112 @@ output:
 <div id="minimal-reproducible-example" class="section level1">
 <h1>Minimal reproducible example</h1>
 <p>Here is the code and the result of a minimal reproducible example:</p>
-<script src="https://gist.github.com/AntoineSoetewey/c6e83ad501a4b8c12b32cf9d5c06e9f9.js"></script>
+<!-- <script src="https://gist.github.com/AntoineSoetewey/c6e83ad501a4b8c12b32cf9d5c06e9f9.js"></script> -->
+<pre class="r"><code># All packages used below must be installed first
+library(devtools)
+# devtools::install_github(&quot;laresbernardo/lares&quot;)
+library(lares)
+library(ggplot2)
+
+
+today &lt;- as.character(Sys.Date())
+
+
+### Edit from here ###
+cv &lt;- data.frame(rbind(
+  c(&quot;PhD in Statistics&quot;, &quot;University3&quot;, &quot;Academic&quot;, &quot;2017-09-01&quot;, today),
+  c(&quot;MSc in Econometrics&quot;, &quot;University2&quot;, &quot;Academic&quot;, &quot;2015-09-01&quot;, &quot;2017-08-31&quot;),
+  c(&quot;BSc in Economics&quot;, &quot;University1&quot;, &quot;Academic&quot;, &quot;2010-09-01&quot;, &quot;2013-08-31&quot;),
+  c(&quot;Job title2&quot;, &quot;Company2&quot;, &quot;Work Experience&quot;, &quot;2016-09-01&quot;, today),
+  c(&quot;Job title1&quot;, &quot;Company1&quot;, &quot;Work Experience&quot;, &quot;2013-08-31&quot;, &quot;2015-08-31&quot;),
+  c(&quot;Extra1&quot;, &quot;Place1&quot;, &quot;Extra&quot;, &quot;2015-05-01&quot;, today),
+  c(&quot;Extra2&quot;, &quot;Place2&quot;, &quot;Extra&quot;, &quot;2019-01-01&quot;, today),
+  c(&quot;Extra3&quot;, NA, &quot;Extra&quot;, &quot;2019-12-01&quot;, today)
+))
+### Edit until here ###
+
+
+order &lt;- c(&quot;Role&quot;, &quot;Place&quot;, &quot;Type&quot;, &quot;Start&quot;, &quot;End&quot;)
+colnames(cv) &lt;- order
+
+
+plot_timeline2 &lt;- function(event, start, end = start + 1, label = NA, group = NA,
+                           title = &quot;Curriculum Vitae Timeline&quot;, subtitle = &quot;Antoine Soetewey&quot;,
+                           size = 7, colour = &quot;orange&quot;, save = FALSE, subdir = NA) {
+  df &lt;- data.frame(
+    Role = as.character(event), Place = as.character(label),
+    Start = lubridate::date(start), End = lubridate::date(end),
+    Type = group
+  )
+  cvlong &lt;- data.frame(pos = rep(
+    as.numeric(rownames(df)),
+    2
+  ), name = rep(as.character(df$Role), 2), type = rep(factor(df$Type,
+    ordered = TRUE
+  ), 2), where = rep(
+    as.character(df$Place),
+    2
+  ), value = c(df$Start, df$End), label_pos = rep(df$Start +
+    floor((df$End - df$Start) / 2), 2))
+  maxdate &lt;- max(df$End)
+  p &lt;- ggplot(cvlong, aes(
+    x = value, y = reorder(name, -pos),
+    label = where, group = pos
+  )) +
+    geom_vline(
+      xintercept = maxdate,
+      alpha = 0.8, linetype = &quot;dotted&quot;
+    ) +
+    labs(
+      title = title,
+      subtitle = subtitle, x = NULL, y = NULL, colour = NULL
+    ) +
+    theme_minimal() +
+    theme(panel.background = element_rect(
+      fill = &quot;white&quot;,
+      colour = NA
+    ), axis.ticks = element_blank(), panel.grid.major.x = element_line(
+      size = 0.25,
+      colour = &quot;grey80&quot;
+    ))
+  if (!is.na(cvlong$type)[1] | length(unique(cvlong$type)) &gt;
+    1) {
+    p &lt;- p + geom_line(aes(color = type), size = size) +
+      facet_grid(type ~ ., scales = &quot;free&quot;, space = &quot;free&quot;) +
+      guides(colour = &quot;none&quot;) +
+      scale_colour_manual(values = c(&quot;#F8766D&quot;, &quot;#00BA38&quot;, &quot;#619CFF&quot;)) +
+      theme(strip.text.y = element_text(size = 10))
+  } else {
+    p &lt;- p + geom_line(size = size)
+  }
+  p &lt;- p + geom_label(aes(x = label_pos),
+    colour = &quot;black&quot;,
+    size = 2, alpha = 0.7
+  )
+  if (save) {
+    file_name &lt;- &quot;cv_timeline.png&quot;
+    if (!is.na(subdir)) {
+      dir.create(file.path(getwd(), subdir), recursive = T)
+      file_name &lt;- paste(subdir, file_name, sep = &quot;/&quot;)
+    }
+    p &lt;- p + ggsave(file_name, width = 8, height = 6)
+    message(paste(&quot;Saved plot as&quot;, file_name))
+  }
+  return(p)
+}
+
+
+
+
+plot_timeline2(
+  event = cv$Role,
+  start = cv$Start,
+  end = cv$End,
+  label = cv$Place,
+  group = cv$Type,
+  save = FALSE,
+  subtitle = &quot;Antoine Soetewey&quot; # replace with your name
+)</code></pre>
 <p><img src="/blog/how-to-construct-a-timeline-of-your-cv-in-r_files/figure-html/unnamed-chunk-1-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="how-to-personalize-it" class="section level1">
