@@ -35,7 +35,7 @@ options(scipen = 999)
 
 This article explains how to compute the main descriptive statistics by hand and how to interpret them. To learn how to compute these measures in R, read the article "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)".
 
-Descriptive statistics (in the broad sense of the term) is a branch of statistics aiming at summarizing, describing and presenting a series of values or a dataset. Long series of values without any preparation or without any summary measures are often not informative due to the difficulty of recognizing any pattern in the data. Below an example with the height (in cm) of a population of 100 adults:
+**Descriptive statistics** (in the broad sense of the term) is a branch of statistics aiming at **summarizing, describing and presenting a series of values or a dataset**. Long series of values without any preparation or without any summary measures are often not informative due to the difficulty of recognizing any pattern in the data. Below an example with the height (in cm) of a population of 100 adults:
 
 ```{r, echo = FALSE, message = FALSE}
 library(pander)
@@ -51,7 +51,9 @@ Descriptive statistics is often the first step and an important part in any stat
 
 # Location versus dispersion measures
 
-Several different measures (called statistics if we are analyzing a sample) are used to summarize the data. Some of them give an understanding about the location of the data, others give and understanding about the dispersion of the data. In practice, both types of measures are often used together in order to summarize the data in the most concise but complete way. We illustrate this point with the graph below, representing the height (in cm) of 100 persons divided into two groups (50 persons in each group):
+Several different measures (called statistics if we are analyzing a sample) are used to summarize the data. Some of them give an understanding about the **location** of the data, others give and understanding about the **dispersion** of the data. In practice, both types of measures are often used together in order to summarize the data in the most concise but complete way.
+
+We illustrate this point with the graph below, representing the height (in cm) of 100 persons divided into two groups (50 persons in each group):
 
 ```{r}
 set.seed(42)
@@ -76,7 +78,7 @@ In the following sections, we detail the most common location and dispersion mea
 
 # Location
 
-Location measures allow to see "where" the data are located, around which values. In other words, location measures give an understanding on what is the central tendency, the "position" of the data as a whole. It includes the following statistics (others exist but we focus on the most common ones):
+Location measures allow to see "where" the data are located, around which values. In other words, location measures give an understanding on **what is the central tendency**, the "position" of the data as a whole. It includes the following statistics (others exist but we focus on the most common ones):
 
 * minimum
 * maximum
@@ -101,12 +103,13 @@ The minimum is `r round(min(sub_height), 1)` cm and the maximum is `r round(max(
 
 ## Mean
 
-The mean, also known as average, is probably the most common statistics. It gives an idea on what is the average value, that is, the central value of the data or in other words the center of gravity. The mean is found by summing all values and dividing this sum by the number of observations (denoted $n$):
-
-$$mean = \bar{x} = \frac{\text{sum of all values}}{\text{number of values}} = \frac{1}{n}\sum^{n}_{i = 1} x_i$$
-Below a visual representation of the mean:
+The mean, also known as average, is probably the most common statistics. It gives an idea on what is the average value, that is, the central value of the data or in other words the center of gravity:
 
 ![Mean. Source: LFSAB1105 at UCLouvain](/blog/descriptive-statistics-by-hand_files/mean.png)
+
+The mean is found by summing all values and dividing the total by the number of observations (denoted $n$):
+
+$$mean = \bar{x} = \frac{\text{sum of all values}}{\text{number of values}} = \frac{1}{n}\sum^{n}_{i = 1} x_i$$
 
 Given our sample of 6 adults presented above, the mean is:
 
@@ -166,7 +169,7 @@ Given that the number of observations $n$ is even (since $n = 6$), the median is
 
 $$med(x) = \frac{1}{2}\big(x_{\frac{6}{2}} + x_{\frac{6}{2} + 1}\big) = \frac{1}{2}\big(x_{3} + x_{4}\big)$$
 
-So we sum the third and fourth values from the sorted values and divide this sum by 2 (which is equivalent than taking the mean of these two middle values):
+So we sum the third and fourth values from the sorted values and divide the total by 2 (which is equivalent than taking the mean of these two middle values):
 
 $$\frac{1}{2}(178.6 + 179) = 178.8$$
 
@@ -179,9 +182,11 @@ salaries_3 <- c(1800, 2000, 2100)
 salaries_4 <- c(salaries_3, 1000000)
 ```
 
-Although the mean and median are often relatively close to each other they should not be confused since they both have advantages and disadvantages in different contexts. Besides the fact that almost everyone knows (or at least have heard about) the mean, it has the advantage that it gives a unique picture for each different series of data. However, it has the disadvantage that the mean is sensible to outliers (i.e., extreme values). On the other hand, the advantage of the median is that it is resistant to outliers and the inconvenient is that it may be the exact same value for very different series of data (so not unique to the data).
+Although the mean and median are often relatively close to each other they should not be confused since they both have advantages and disadvantages in different contexts. Besides the fact that almost everyone knows (or at least have heard about) the mean, it has the advantage that it gives a unique picture for each different series of data. However, it has the disadvantage that the mean is sensible to [outliers](/blog/outliers-detection-in-r/) (i.e., extreme values). On the other hand, the advantage of the median is that it is resistant to outliers and the inconvenient is that it may be the exact same value for very different series of data (so not unique to the data).
 
-To illustrate the "sensible to outlier" argument, consider 3 friends in a bar comparing their salaries. Their salaries are `r pander(salaries_3)`€, for an average (mean) salary of `r pander(mean(salaries_3))`€. A friend of them (who happens to be friend with Bill Gates as well) joins them in the bar. Their salaries are now `r pander(salaries_4)`€. The average salary of the 4 friends is now `r pander(mean(salaries_4))`€, compared to `r pander(mean(salaries_3))`€ without the rich friend. Although it is statistically correct to say that the average salary of the 4 friends is `r pander(mean(salaries_4))`€, you will concede that this measure does not represent a fair image of the salaries of the 4 friends, as 3 of them earn much less than the average salary. As we have just seen, the mean is sensible to outliers. On the other hand, if we report the medians, we see that the median salary of the 3 first friends is `r pander(median(salaries_3))`€, and the median salary of the 4 friends is `r pander(median(salaries_4))`€. As you can see with this example, the median is not sensible to outliers and for series with such extreme value(s), the median is more appropriate compared to the mean as it often gives a better representation of the data. (*Note:* this example also shows how a large majority of people earn less than the average salary reported in the news. This is however beyond the scope of the article.)
+To illustrate the "sensible to outlier" argument, consider 3 friends in a bar comparing their salaries. Their salaries are `r pander(salaries_3)`€, for an average (mean) salary of `r pander(mean(salaries_3))`€. A friend of them (who happens to be friend with Bill Gates as well) joins them in the bar. Their salaries are now `r pander(salaries_4)`€. The average salary of the 4 friends is now `r pander(mean(salaries_4))`€, compared to `r pander(mean(salaries_3))`€ without the rich friend. Although it is statistically correct to say that the mean salary of the 4 friends is `r pander(mean(salaries_4))`€, you will concede that this measure does not represent a fair image of the salaries of the 4 friends, as 3 of them earn much less than the mean salary. As we have just seen, the mean is sensible to outliers. (*Note:* this example also shows how a large majority of citizens earn less than the mean salary reported in the news. For the french-speaking readers, see this [video](https://www.youtube.com/watch?v=uIx2xvdwIIo) for more information.)
+
+On the other hand, if we report the medians, we see that the median salary of the 3 first friends is `r pander(median(salaries_3))`€, and the median salary of the 4 friends is `r pander(median(salaries_4))`€. As you can see with this example, the median is not sensible to outliers and for series with such extreme value(s), the median is more appropriate compared to the mean as it often gives a better representation of the data.
 
 Given the previous example, one may then choose to always use the median instead of the mean. However, the median has it own inconvenient which the mean does not have: the median is less unique and less specific to its underlying data than the mean. Consider the following data, representing the grades of 5 students taking a statistics and economics exam:
 
@@ -190,13 +195,17 @@ dat <- data.frame(studentID = c(1:5), economics = c(10, 10, 10, 18, 20), statist
 pander(dat)
 ```
 
-The median of the grades is the same in economics and statistics (median = `r pander(median(dat$statistics))`). Therefore, had we computed only the medians, we could have concluded that the students performed as well in economics as in statistics. However, although the medians are exactly the same for both classes, it is clear that students performed better in economics than in statistics. In fact, the mean of the grades in economics is `r pander(mean(dat$economics))` and the mean of the grades in statistics is `r pander(mean(dat$statistics))`. What we have just shown here is that the median is based only on one single value, the middle value, or on the two middle values if there are an even number of observations, while the mean is based on all values (and thus includes more information). The median is therefore not sensible to outliers, but it is also not unique (i.e., not specific) to different series of data, whereas the mean is much more likely to be different and unique for different series of data. This difference in terms of specificity and uniqueness between the two measures may make the mean more useful for data with no outlier.
+The median of the grades is the same in economics and statistics (median = `r pander(median(dat$statistics))`). Therefore, had we computed only the medians, we could have concluded that the students performed as well in economics as in statistics. However, although the medians are exactly the same for both classes, it is clear that students performed better in economics than in statistics (compare both grades for each student to see for yourself). In fact, the mean of the grades in economics is `r pander(mean(dat$economics))` and the mean of the grades in statistics is `r pander(mean(dat$statistics))`.
 
-In conclusion, depending on the context and the data, it is often more interesting to report the mean or the median, or both. As a last remark regarding the comparison between the two most important location measures, note that when the mean and median are equal, the distribution of your data can often be considered to follow a [normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) (also referred as Gaussian distribution).
+What we have just shown here is that the median is based only on one single value, the middle value, or on the two middle values if there are an even number of observations, while the mean is based on all values (and thus includes more information). The median is therefore not sensible to outliers, but it is also not unique (i.e., not specific) to different series of data, whereas the mean is much more likely to be different and unique for different series of data. This difference in terms of specificity and uniqueness between the two measures may make the mean more useful for data with no outlier.
+
+In conclusion, depending on the context and the data, it is often more interesting to report the mean or the median, or both. As a last remark regarding the comparison between the two most important location measures, note that when the mean and median are equal, the distribution of your data can often be considered to follow a [normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) (also referred as a Gaussian distribution).
 
 ## $1^{st}$ and $3^{rd}$ quartiles
 
-The first and third quartiles are similar to the median in the sense that they also divide the observations into two parts, except that these parts are not equal. Remind that the median divides the data into two equal parts (with 50% of the observations below and 50% above the median). The first quartile cuts the observations such that there are 25% of the observations **below** and thus 75% **above** the first quartile. The third quartile, as you have guessed by now, represents the value with 75% of the observations below it and thus 25% of the observations above it. There exists several methods to compute the first and third quartile (which sometimes give slight differences, R for instance uses a different method), but here is I believe the easiest one when computing these statistics by hand:
+The first and third quartiles are similar to the median in the sense that they also divide the observations into two parts, except that these parts are not equal. Remind that the median divides the data into two equal parts (with 50% of the observations below and 50% above the median).
+
+The first quartile cuts the observations such that there are 25% of the observations **below** and thus 75% **above** the first quartile. The third quartile, as you have guessed by now, represents the value with 75% of the observations below it and thus 25% of the observations above it. There exists several methods to compute the first and third quartile (which sometimes give slight differences, R for instance uses a different method), but here is I believe the easiest one when computing these statistics by hand:
 
 1. sort the data in ascending order
 1. compute $0.25 \cdot n$ and $0.75 \cdot n$ (i.e., 0.25 and 0.75 times the number of observations)
@@ -228,7 +237,9 @@ Note that the first quartile is denoted $q_{0.25}$ and the third quartile is den
 
 ### A note on deciles and percentiles
 
-Deciles and percentiles are similar to quartiles except that they cuts the data in 10 and 100 equal parts. For instance, the $4^{th}$ decile ($q_{0.4}$) is the value such that there are 40% of the observations below it and thus 60% of the observations above it. Furthermore, the $98^{th}$ percentile ($q_{0.98}$, also sometimes denoted $P98$) is the value such that there are 98% of the observations below it and thus 2% of the observations above it. Percentiles are often used for the weight and height of babies, giving precise information to the parents about where their child stands compared to other children of the same age.
+Deciles and percentiles are similar to quartiles except that they cuts the data in 10 and 100 equal parts. For instance, the $4^{th}$ decile ($q_{0.4}$) is the value such that there are 40% of the observations below it and thus 60% of the observations above it.
+
+Percentiles follow the same logic. For example, the $98^{th}$ percentile ($q_{0.98}$, also sometimes denoted $P98$) is the value such that there are 98% of the observations below it and thus 2% of the observations above it. Percentiles are often used for the weight and height of babies, giving precise information to the parents about where their child stands compared to other children of the same age.
 
 ## Mode
 
@@ -246,7 +257,10 @@ pander(c(170, 168, 171, 170, 182, 165, 170, 189, 167))
 
 The mode is 170 because it is the most common value with 3 occurrences. All other values appear only once.
 
-Note that it is possible that a series has no mode (e.g., `r pander(c(4,7,2,10))`) or more than one mode (e.g., `r pander(c(4, 2, 2, 8, 11, 11))`).
+Note that it is possible that a series has no mode or more than one mode:
+
+- the series `r pander(c(4, 7, 2, 10))` has no mode,
+- the series `r pander(c(4, 2, 2, 8, 11, 11))` has two modes.
 
 Data with two modes are often called bimodal and data with more than two modes are often called multimodal, as opposed to series with one mode which are referred as unimodal.
 
@@ -263,7 +277,7 @@ Brown is the most frequent color, so the mode is brown.
 
 # Dispersion
 
-All previous descriptive statistics helps to get a sense of the location and position of the data. We now present the most common dispersion measures, which help to get a sense of the dispersion and the variability of the data (to which extent a distribution is squeezed or stretched):
+All previous descriptive statistics helps to get a sense of the location and position of the data. We now present the most common dispersion measures, which help to get a sense of the **dispersion and the variability** of the data (to which extent a distribution is squeezed or stretched):
 
 * range
 * standard deviation
@@ -285,11 +299,13 @@ Given the height (in cm) of our sample of 6 adults:
 pander(sub_height)
 ```
 
-The range is `r max(sub_height)` $-$ `r min(sub_height)` $=$ `r max(sub_height) - min(sub_height)` cm. The advantage of the range is that it is extremely easy to compute it and it gives a precise idea on what are the possible values in the data. The disadvantage is that it relies on the two most extreme values only.
+The range is `r max(sub_height)` $-$ `r min(sub_height)` $=$ `r max(sub_height) - min(sub_height)` cm. The advantage of the range is that it is extremely easy to compute it and it gives a precise idea about the "length" of the data. The disadvantage is that it relies on the two most extreme values only, so it is highly sensible to [outliers](/blog/outliers-detection-in-r/).
 
 ## Standard deviation
 
-The standard deviation is the most common dispersion measure in statistics. Like the mean for the location measures, if we have to present one statistics which summarizes the spread of the data, it is usually the standard deviation. As its name suggests, the standard deviation tells what is the "normal" deviation of the data. It actually computes the average deviation from the **mean**. The larger the standard deviation, the more scattered the data are. On the contrary, the smaller the standard deviation, the more the data are centred around the mean. Below a visual representation of the standard deviation:
+The standard deviation is the most common dispersion measure in statistics. Like the mean for the location measures, if we have to present one statistics which summarizes the spread of the data, it is usually the standard deviation.
+
+As its name suggests, the standard deviation tells what is the "normal" deviation of the data. It actually computes the **mean deviation from the global mean**. The larger the standard deviation, the more scattered the data are. On the contrary, the smaller the standard deviation, the more the data are centered around the mean. Below a visual representation of the standard deviation:
 
 ![Standard deviation. Source: LFSAB1105 at UCLouvain](/blog/descriptive-statistics-by-hand_files/standard-deviation.png)
 
@@ -301,7 +317,7 @@ The standard deviation for a population, denoted $\sigma$, is:
 
 $$\sigma = \sqrt{\frac{1}{n}\sum^n_{i = 1}(x_i - \mu)^2}$$
 
-As you can see from the formula, the standard deviation is actually the average deviation of the data from their mean $\mu$. Note the square for the difference between the observations and the mean to avoid that negative differences are compensated by positive differences.
+As you can see from the formula, the standard deviation is actually the mean deviation of the data from the global mean $\mu$. Note the square for the difference between the observations ($x_i$) and the mean ($\mu$) to avoid that negative differences are compensated by positive differences.
 
 For the sake of easiness, imagine a population of only 3 adults (the steps are the same with a large population, the computation is just longer). Below their heights (in cm):
 
@@ -337,7 +353,7 @@ In conclusion, the standard deviation for the heights of these 3 adults is `r ro
 
 ## Variance
 
-The variance is simply the square of the standard deviation. Put it another way, the standard deviation is the square root of the variance. We also distinguish between the variance for a population and for a sample.
+The variance is simply the square of the standard deviation. Put it another way, the standard deviation is the square root of the variance. We also distinguish between the variance for a population and for a sample in the next sections.
 
 ### Variance for a population
 
@@ -381,7 +397,9 @@ $$s^2 = \frac{1}{3 - 1} \big[(160.4 - 172.6)^2 \\ + (175.8 - 172.6)^2 \\ + (181.
 
 ## Standard deviation vs. variance
 
-Standard deviation and variance are often used interchangeably and both quantify the spread of a given dataset by measuring how far the observations are from their mean. However, the standard deviation can be more easily interpreted because the unit for the standard deviation is the same than the unit of measurement of the data (while it is the $unit^2$ for the variance). Following our example of adult heights in cm, the standard deviation is measured in cm while the variance is measured in $cm^2$. The fact that the standard deviation keeps the same unit than the initial unit of measurement makes it more interpretable and thus often more used in practice.
+Standard deviation and variance are often used interchangeably and both quantify the spread of a given dataset by measuring how far the observations are from their mean. However, the standard deviation can be more easily interpreted because the unit for the standard deviation is the same than the unit of measurement of the data (while it is the $unit^2$ for the variance).
+
+Following our example of adult heights in cm, the standard deviation is measured in cm while the variance is measured in $cm^2$. The fact that the standard deviation keeps the same unit than the initial unit of measurement makes it more interpretable and thus more often used in practice.
 
 ### Notations
 
@@ -430,16 +448,28 @@ The mean is $\bar{x} =$ `r round(mean(tail(height, 4)), 2)` cm and the standard 
 
 $$CV = \frac{9.95 \text{ cm}}{170.35 \text{ cm}} = 0.058 = 5.8\%$$
 
-In conclusion, the coefficient of variation is 5.8%. Note that, as a rule of thumb, a coefficient of variation greater than 15% usually means that the data are heterogeneous while a coefficient of variation equal to or less than 15% means that the data are homogeneous. Given that the coefficient of variation equals 5.8% in this case, we can conclude that these 4 adults are homogeneous in terms of height.
+In conclusion, the coefficient of variation is 5.8%. Note that, as a rule of thumb, a coefficient of variation greater than 15% usually means that the data are **heterogeneous** while a coefficient of variation equal to or less than 15% means that the data are **homogeneous**. Given that the coefficient of variation equals 5.8% in this case, we can conclude that these 4 adults are homogeneous in terms of height.
+
+Note that the coefficient of variation for a population follows the same formula, except that notations for the mean and the standard deviation differ:
+
+$$CV = \frac{\sigma}{\mu}$$
+
+The interpretation is also the same as for a sample.
 
 ## Coefficient of variation vs. standard deviation
 
 Although the coefficient of variation is rather unknown to the public, it is, in fact, worth presenting when making descriptive statistics.
 
-The standard deviation should always be understood in the context of the mean of the data and is dependent on its unit. The standard deviation has the advantage that it tells by how far on average the data is from the mean in terms of unit in which the data has been measured. Standard deviation is useful when considering variables with same units and approximately same means. However, standard deviation becomes less useful when comparing variables with different units or widely different means. For instance, a variable with a standard deviation of 10 cm cannot be compared to a variable with a standard deviation of 10€ to conclude which one is the most dispersed.
+The standard deviation should always be understood in the context of the mean of the data and is dependent on its unit. The standard deviation has the advantage that it tells by how far on average the data is from the mean in terms of unit in which the data has been measured. Standard deviation is useful when considering variables with same units and approximately same means. However, standard deviation becomes less useful when comparing variables with different units or widely different means. For instance, a variable with a standard deviation of 10 cm cannot be compared to a variable with a standard deviation of 12€ to conclude which one of the two is the most dispersed.
 
-The coefficient of variation is a ratio of two statistics with the same units. It has thus no unit and is independent of the unit in which the data has been measured. Being unit-free, coefficients of variation computed on datasets or variables with different units or widely different means can be compared to conclude, in fine, which data or variables is more (or less) dispersed. For instance, consider a sample of 10 women with their heights in cm and their salaries in €. The coefficients of variation are 0.032 and 0.061 respectively for the height and the salary. We can conclude that, relative to their respective average, their salaries vary more than their heights for these women (since the coefficient of variation is larger for the salary compared to the coefficient variation for the height).
+The coefficient of variation is a ratio of two statistics with the same units. It has thus no unit and is independent of the unit in which the data has been measured. Being unit-free, coefficients of variation computed on datasets or variables with different units or widely different means can be compared to conclude, in fine, which data or variables is more (or less) dispersed. For instance, consider a sample of 10 women with their heights in cm and their salaries in €. We cannot compare the dispersion of their weights with the dispersion of their salaries because it is not measured on the same unit/scale. Now suppose that the coefficients of variation are 0.032 and 0.061 respectively for the height and the salary. Based on that, we can conclude that, relative to their respective average, their salaries vary more than their heights for these women. This is the case because the coefficient of variation is larger for the salary compared to the coefficient variation for the height, and a coefficient of variation has no unit (it is a ratio).
 
-This concludes a relatively long article, thanks for reading! I hope the article helped you to understand and compute the different descriptive statistics by hand. If you would like to learn how to compute these measures in R, read the article "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)".
+# Conclusion
+
+Remember that descriptive statistics are useful to describe and present a series of observations in a concise and informative way. There are two families of descriptive statistics: location and dispersion measures. Location measures give information about the position of the data, whereas dispersion measures give information about the variability of the data.
+
+We showed how to compute the most common descriptive statistics by hand with concrete examples. We also discussed differences between some measures and when it is more appropriate to use one or the other depending on the context and the data at hand.
+
+This concludes a relatively long article, thanks for reading! If you would like to learn how to compute these measures in R, read the article "[Descriptive statistics in R](/blog/descriptive-statistics-in-r/)".
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
