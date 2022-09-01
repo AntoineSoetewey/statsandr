@@ -33,7 +33,7 @@ The normal distribution is a function that defines how a set of measurements is 
 
 The normal distribution is a mount-shaped, unimodal and symmetric distribution where most measurements gather around the mean. Moreover, the further a measure deviates from the mean, the lower the probability of occurring. In this sense, for a given variable, it is common to find values close to the mean, but less and less likely to find values as we move away from the mean. Last but not least, since the normal distribution is symmetric around its mean, extreme values in both tails of the distribution are equivalently unlikely. For instance, given that adult height follows a normal distribution, most adults are close to the average height and extremely short adults occur as infrequently as extremely tall adults.
 
-In this article, the focus is on understanding the normal distribution, the associated empirical rule, its parameters and how to compute $Z$ scores to find probabilities under the curve (illustrated with examples). As it is a requirement in some statistical tests, we also show 4 complementary methods to test the normality assumption in R.
+In this article, the focus is on understanding the normal distribution, the associated empirical rule, its parameters and how to compute $Z$-scores to find probabilities under the curve (illustrated with examples). As it is a requirement in some [statistical tests](/blog/what-statistical-test-should-i-do/) and [hypothesis tests](/blog/hypothesis-test-by-hand/), we also show 4 complementary methods to test the normality assumption in R.
 
 # Empirical rule
 
@@ -47,13 +47,22 @@ Data possessing an approximately normal distribution have a definite variation, 
 
 where $\mu$ and $\sigma$ correspond to the population mean and population standard deviation, respectively.
 
-The empirical rule, also known as the 68-95-99.7% rule, is illustrated by the following 2 examples. Suppose that the scores of an exam in statistics given to all students in a Belgian university are known to have, approximately, a normal distribution with mean $\mu = 67$ and standard deviation $\sigma = 9$. It can then be deduced that approximately 68% of the scores are between 58 and 76, that approximately 95% of the scores are between 49 and 85, and that almost all of the scores (99.7%) are between 40 and 94. Thus, knowing the mean and the standard deviation gives us a fairly good picture of the distribution of scores. Now suppose that a single university student is randomly selected from those who took the exam. What is the probability that her score will be between 49 and 85? Based on the empirical rule, we find that 0.95 is a reasonable answer to this probability question.
+The empirical rule, also known as the 68-95-99.7% rule, is illustrated by the following 2 examples.
+
+Suppose that the scores of an exam in statistics given to all students in a Belgian university are known to have, approximately, a normal distribution with mean $\mu = 67$ and standard deviation $\sigma = 9$. It can then be deduced that approximately 68% of the scores are between 58 and 76, that approximately 95% of the scores are between 49 and 85, and that almost all of the scores (99.7%) are between 40 and 94. Thus, knowing the mean and the standard deviation gives us a fairly good picture of the distribution of scores.
+
+Now suppose that a single university student is randomly selected from those who took the exam. What is the probability that her score will be between 49 and 85? Based on the empirical rule, we find that 0.95 is a reasonable answer to this probability question.
 
 The utility and value of the empirical rule are due to the common occurrence of approximately normal distributions of measurements in nature. For example, IQ, shoe size, height, birth weight, etc. are approximately normally-distributed. You will find that approximately 95% of these measurements will be within $2\sigma$ of their mean [@wackerly2014mathematical].
 
 # Parameters
 
-Like many probability distributions, the shape and probabilities of the normal distribution is defined entirely by some parameters. The normal distribution has two parameters: (i) the [mean $\mu$](/blog/descriptive-statistics-by-hand/#mean) and (ii) the [variance $\sigma^2$](/blog/descriptive-statistics-by-hand/#variance) (i.e., the square of the [standard deviation $\sigma$](/blog/descriptive-statistics-by-hand/#standard-deviation)). The mean $\mu$ locates the center of the distribution, that is, the central tendency of the observations, and the variance $\sigma^2$ defines the width of the distribution, that is, the spread of the observations.
+Like many probability distributions, the shape and probabilities of the normal distribution is defined entirely by some parameters. The normal distribution has two parameters:
+
+1. the [mean $\mu$](/blog/descriptive-statistics-by-hand/#mean), and
+1. the [variance $\sigma^2$](/blog/descriptive-statistics-by-hand/#variance) (i.e., the square of the [standard deviation $\sigma$](/blog/descriptive-statistics-by-hand/#standard-deviation)).
+
+The mean $\mu$ locates the center of the distribution, that is, the central tendency of the observations, and the variance $\sigma^2$ defines the width of the distribution, that is, the spread of the observations.
 
 The mean $\mu$ can take on any finite value (i.e., $-\infty < \mu < \infty$), whereas the variance $\sigma^2$ can assume any positive finite value (i.e., $\sigma^2 > 0$). The shape of the normal distribution changes based on these two parameters. Since there is an infinite number of combinations of the mean and variance, there is an infinite number of normal distributions, and thus an infinite number of forms.
 
@@ -117,17 +126,21 @@ We have seen that, although different normal distributions have different shapes
 
 # Probabilities and standard normal distribution
 
-Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions `pnorm()` and `qnorm()`. Probabilities associated with a normal distribution can also be found using this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank" rel="noopener">Shiny app</a>. However, before computing probabilities, we need to learn more about the standard normal distribution and the $Z$ score.
+Probabilities and quantiles for random variables with normal distributions are easily found using R via the functions `pnorm()` and `qnorm()`. Probabilities associated with a normal distribution can also be found using this <a href="https://antoinesoetewey.shinyapps.io/statistics-101/" target="_blank" rel="noopener">Shiny app</a>. However, before computing probabilities, we need to learn more about the standard normal distribution and the $Z$-score.
 
-Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table to find the probabilities under the normal curve: the **standard normal distribution**. The normal standard distribution is a special case of the normal distribution where the mean is equal to 0 and the variance is equal to 1. A normal random variable $X$ can always be transformed to a standard normal random variable $Z$, a process known as "scaling" or "standardization", by subtracting the mean from the observation, and dividing the result by the standard deviation. Formally:
+Although there are infinitely many normal distributions (since there is a normal distribution for every combination of mean and variance), we need only one table to find the probabilities under the normal curve: the **standard normal distribution**.
 
-$$Z = \frac{X - \mu}{\sigma}$$
+The normal standard distribution is a special case of the normal distribution where the mean is equal to 0 and the variance is equal to 1. A normal random variable $X$ can always be transformed to a standard normal random variable $Z$, a process known as "scaling" or "standardization", by subtracting the mean from the observation, and dividing the result by the standard deviation. Formally:
 
-where $X$ is the observation, $\mu$ and $\sigma$ the mean and standard deviation of the population from which the observation was drawn. So the mean of the standard normal distribution is 0, and its variance is 1, denoted $Z ~ \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)$.
+$$Z = \frac{x - \mu}{\sigma}$$
 
-From this formula, we see that $Z$, referred as standard score or $Z$ score, allows to see how far away one specific observation is from the mean of all observations, with the distance expressed in standard deviations. In other words, the $Z$ score corresponds to the number of standard deviations one observation is away from the mean. A positive $Z$ score means that the specific observation is above the mean, whereas a negative $Z$ score means that the specific observation is below the mean. $Z$ scores are often used to compare an individual to her peers, or more generally, a measurement compared to its distribution.
+where $x$ is the observation, $\mu$ and $\sigma$ the mean and standard deviation of the population from which the observation was drawn. So the mean of the standard normal distribution is 0, and its variance is 1, denoted $Z ~ \sim \mathcal{N}(\mu = 0, \sigma^2 = 1)$.
 
-For instance, suppose a student scoring 60 at a statistics exam with the mean score of the class being 40, and scoring 65 at an economics exam with the mean score of the class being 80. Given the "raw" scores, one would say that the student performed better in economics than in statistics. However, taking into consideration her peers, it is clear that the student performed relatively better in statistics than in economics. Computing $Z$ scores allows to take into consideration all other students (i.e., the entire distribution) and gives a better measure of comparison. Let's compute the $Z$ scores for the two exams, assuming that the score for both exams follow a normal distribution with the following parameters:
+From this formula, we see that $Z$, referred as standard score or $Z$-score, allows to see how far away one specific observation is from the mean of all observations, with the distance expressed in standard deviations. In other words, the $Z$-score corresponds to the number of standard deviations an observation is away from the mean. A positive $Z$-score means that the specific observation is above the mean, whereas a negative $Z$-score means that the specific observation is below the mean. $Z$-scores are often used to compare an individual to her peers, or more generally, a measurement compared to its distribution.
+
+For instance, suppose a student scoring 60 at a statistics exam with the mean score of the class being 40, and scoring 65 at an economics exam with the mean score of the class being 80. Given the "raw" scores, one would say that the student performed better in economics than in statistics. However, taking into consideration her peers, it is clear that the student performed *relatively* better in statistics than in economics.
+
+Computing $Z$-scores allows to take into consideration all other students (i.e., the entire distribution) and gives a better measure of comparison. Let's compute the $Z$-scores for the two exams, assuming that the score for both exams follow a normal distribution with the following parameters:
 
 <center>
 |                    |   | Statistics | Economics |
@@ -139,18 +152,18 @@ For instance, suppose a student scoring 60 at a statistics exam with the mean sc
 
 <br>
 
-$Z$ scores for:
+$Z$-scores for:
 
-* Statistics: $Z_{stat} = \frac{60 - 40}{8} = 2.5$
-* Economics: $Z_{econ} = \frac{65 - 80}{12.5} = -1.2$
+* Statistics: $z_{stat} = \frac{60 - 40}{8} = 2.5$
+* Economics: $z_{econ} = \frac{65 - 80}{12.5} = -1.2$
 
-On the one hand, the $Z$ score for the exam in statistics is positive ($Z_{stat} = 2.5$) which means that she performed better than average. On the other hand, her score for the exam in economics is negative ($Z_{econ} = -1.2$) which means that she performed worse than average. Below an illustration of her grades in a standard normal distribution for better comparison:
+On the one hand, the $Z$-score for the exam in statistics is positive ($z_{stat} = 2.5$) which means that she performed better than average. On the other hand, her score for the exam in economics is negative ($z_{econ} = -1.2$) which means that she performed worse than average. Below an illustration of her grades in a standard normal distribution for better comparison:
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 library(cowplot)
 ggplot(data = data.frame(x = c(-4, 4)), aes(x)) +
   stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 1)) +
-  labs(title = "Comparing statistics and economics grades using Z scores", fill = "Distributions", subtitle = "Standard normal distribution: mean = 0, variance = 1", x = "Z score", y = "density") +
+  labs(title = "Comparing statistics and economics grades using Z-scores", fill = "Distributions", subtitle = "Standard normal distribution: mean = 0, variance = 1", x = "Z-score", y = "density") +
   scale_y_continuous(breaks = NULL) +
   # theme_set(theme_cowplot()) +
   theme_minimal() +
@@ -162,13 +175,13 @@ ggplot(data = data.frame(x = c(-4, 4)), aes(x)) +
 
 Although the score in economics is better in absolute terms, the score in statistics is actually relatively better when comparing each score within its own distribution.
 
-Furthermore, $Z$ score also enables to compare observations that would otherwise be impossible because they have different units for example. Suppose you want to compare a salary in € with a weight in kg. Without standardization, there is no way to conclude whether someone is more extreme in terms of her wage or in terms of her weight. Thanks to $Z$ scores, we can compare two values that were in the first place not comparable to each other.
+Furthermore, $Z$-score also enables to compare observations that would otherwise be impossible because they have different units for example. Suppose you want to compare a salary in € with a weight in kg. Without standardization, there is no way to conclude whether someone is more extreme in terms of her wage or in terms of her weight. Thanks to $Z$-scores, we can compare two values that were in the first place not comparable to each other.
 
-Final remark regarding the interpretation of a $Z$ score: a rule of thumb is that an observation with a $Z$ score between -3 and -2 or between 2 and 3 is considered as a rare value. An observation with a $Z$ score smaller than -3 or larger than 3 is considered as an extremely rare value. A value with any other $Z$ score is considered as not rare nor extremely rare. 
+Final remark regarding the interpretation of a $Z$-score: a rule of thumb is that an observation with a $z$-score between -3 and -2 or between 2 and 3 is considered as a rare value. An observation with a $z$-score smaller than -3 or larger than 3 is considered as an extremely rare value. A value with any other $z$-score is considered as not rare nor extremely rare. 
 
 ## Areas under the normal distribution in R and by hand
 
-Now that we have covered the $Z$ score, we are going to use it to determine the area under the curve of a normal distribution.
+Now that we have covered the $Z$-score, we are going to use it to determine the area under the curve of a normal distribution.
 
 *Note that there are several ways to arrive at the solution in the following exercises. You may therefore use other steps than the ones presented to obtain the same result.*
 
@@ -328,7 +341,9 @@ In this section, we show 4 complementary methods to determine whether your data 
 
 ## Histogram
 
-A histogram displays the spread and shape of a distribution, so it is a good starting point to evaluate normality. Let's have a look at the histogram of a distribution that we would expect to follow a normal distribution, the height of 1,000 adults in cm:
+A [histogram](/blog/descriptive-statistics-in-r/#histogram) displays the spread and shape of a distribution, so it is a good starting point to evaluate normality.
+
+Let's have a look at the histogram of a distribution that we would expect to follow a normal distribution, the height of 1,000 adults in cm:
 
 ```{r, echo = FALSE}
 set.seed(42)
@@ -367,7 +382,7 @@ ggplot(iris) +
   geom_histogram()
 ```
 
-Histograms are however not sufficient, particularly in the case of small samples because the number of bins greatly change its appearance. Histograms are not recommended when the number of observations is less than 20 because it does not always correctly illustrate the distribution. See two examples below with dataset of 10 and 12 observations:
+Histograms are however not sufficient, particularly in the case of small samples because the number of bins greatly change its appearance. Histograms are not recommended when the number of observations is less than 20 because it does not always correctly illustrate the distribution. See two examples below with datasets of 10 and 12 observations:
 
 ```{r, echo = FALSE}
 set.seed(2)
@@ -407,7 +422,7 @@ ggplot(dat_hist, aes(value)) +
   labs(x = "Height (cm)", title = "Histogram of adult height and normal curve", subtitle = paste0("N = ", N, ", mean = ", round(mu, 2), ", variance = ", round(variance, 2)))
 ```
 
-Can you tell whether these datasets follow a normal distribution? Surprisingly, both follow a normal distribution!
+Can you tell whether these datasets follow a normal distribution? Surprisingly, both series are generated from a normal distribution!
 
 In the remaining of the article, we will use the dataset of the 12 adults. If you would like to follow my code in your own script, here is how I generated the data:
 
@@ -422,7 +437,11 @@ The `rnorm()` function generates random numbers from a normal distribution (12 r
 
 ## Density plot
 
-Density plots also provide a visual judgment about whether the data follow a normal distribution. They are similar to histograms as they also allow to analyze the spread and the shape of the distribution. However, they are a smoothed version of the histogram. Here is the density plot drawn from the dataset on the height of the 12 adults discussed above:
+[Density plots](/blog/descriptive-statistics-in-r/#density-plot) also provide a visual judgment about whether the data follow a normal distribution.
+
+They are similar to histograms as they also allow to analyze the spread and the shape of the distribution. However, they are a smoothed version of the histogram.
+
+Here is the density plot drawn from the dataset on the height of the 12 adults discussed above:
 
 ```{r}
 plot(density(dat_hist$value))
@@ -431,7 +450,7 @@ plot(density(dat_hist$value))
 In `{ggpubr}`:
 
 ```{r, message = FALSE, warning = FALSE}
-library("ggpubr") # package must be installed first
+library(ggpubr) # package must be installed first
 ggdensity(dat_hist$value,
   main = "Density plot of adult height",
   xlab = "Height (cm)"
@@ -442,7 +461,9 @@ Since it is hard to test for normality from histograms and density plots only, i
 
 ## QQ-plot
 
-Like histograms and density plots, QQ-plots allow to visually evaluate the normality assumption. Here is the QQ-plot drawn from the dataset on the height of the 12 adults discussed above:
+Like histograms and density plots, [QQ-plots](/blog/descriptive-statistics-in-r/#qq-plot) allow to visually evaluate the normality assumption.
+
+Here is the QQ-plot drawn from the dataset on the height of the 12 adults discussed above:
 
 ```{r, message = FALSE}
 library(car)
@@ -458,20 +479,24 @@ ggqqplot(dat_hist$value)
 
 Instead of looking at the spread of the data (as it is the case with histograms and density plots), with QQ-plots we only need to ascertain whether the data points follow the line (sometimes referred as Henry's line).
 
-If points are close to the reference line and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The height of these 12 adults seem to follow a normal distribution because all points lie within the confidence bands.
+If points are close to the reference line and within the confidence bands, the normality assumption can be considered as met. The bigger the deviation between the points and the reference line and the more they lie outside the confidence bands, the less likely that the normality condition is met. The height of these 12 adults seem to follow a normal distribution because points follow the line and all of them lie within the confidence bands.
 
-When facing a non-normal distribution as shown by the QQ-plot below (systematic departure from the reference line), the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed. If this is the case, the data are said to follow a *log-normal distribution*. Applying the logarithm transformation can be done in R with the `log()` function.
+When facing a non-normal distribution as shown by the QQ-plot below (systematic departure from the reference line), the first step is usually to apply the logarithm transformation on the data and recheck to see whether the log-transformed data are normally distributed.
 
 ```{r, echo = FALSE}
 set.seed(3)
 ggqqplot(rbeta(100, 2, 0.5))
 ```
 
+If this is the case, the data are said to follow a *log-normal* distribution. Applying the logarithm transformation can be done in R with the `log()` function.
+
 Note that QQ-plots are also a convenient way to assess whether residuals from [linear regression](/blog/multiple-linear-regression-made-simple/) follow a normal distribution.
 
 ## Normality test
 
-The 3 tools presented above were a visual inspection of the normality. Nonetheless, visual inspection may sometimes be unreliable so it is also possible to formally test whether the data follow a normal distribution with statistical tests. These normality tests compare the distribution of the data to a normal distribution in order to assess whether observations show an important deviation from normality.
+The 3 tools presented above were a visual inspection of the normality. Nonetheless, visual inspection may sometimes be unreliable so it is also possible to formally test whether the data follow a normal distribution with statistical tests.
+
+These normality tests compare the distribution of the data to a normal distribution in order to assess whether observations show an important deviation from normality.
 
 The two most common normality tests are Shapiro-Wilk's test and Kolmogorov-Smirnov test. Both tests have the same hypotheses, that is:
 
@@ -486,7 +511,9 @@ shapiro.test(dat_hist$value)
 
 From the output, we see that the $p$-value $> 0.05$ implying that we do not reject the null hypothesis that the data follow a normal distribution. This test goes in the same direction than the QQ-plot, which showed no significant deviation from the normality (as all points lied within the confidence bands).
 
-It is important to note that, in practice, normality tests are often considered as too conservative in the sense that for large sample size ($n > 50$), a small deviation from the normality may cause the normality condition to be violated. A normality test is a [hypothesis test](/blog/hypothesis-test-by-hand/), so as the sample size increases, their capacity of detecting smaller differences increases. So as the number of observations increases, the Shapiro-Wilk test becomes very sensitive even to a small deviation from normality. As a consequence, it happens that according to the normality test the data do not follow a normal distribution although the departures from the normal distribution is negligible so the data could in fact be considered to follow approximately a normal distribution. For this reason, it is often the case that the normality condition is verified based on a combination of all methods presented in this article, that is, visual inspections (with histograms and QQ-plots) and a formal inspection (with the Shapiro-Wilk test for instance).
+It is important to note that, in practice, normality tests are often considered as too conservative in the sense that for large sample size ($n > 50$), a small deviation from the normality may cause the normality condition to be violated.
+
+A normality test is a [hypothesis test](/blog/hypothesis-test-by-hand/), so as the sample size increases, their capacity of detecting smaller differences increases. So as the number of observations increases, the Shapiro-Wilk test becomes very sensitive even to a small deviation from normality. As a consequence, it happens that according to the normality test the data do not follow a normal distribution although the departures from the normal distribution is negligible so the data could in fact be considered to follow approximately a normal distribution. For this reason, it is often the case that the normality condition is verified based on a combination of all methods presented in this article, that is, visual inspections (with histograms and QQ-plots) and a formal inspection (with the Shapiro-Wilk test for instance).
 
 I personally tend to prefer QQ-plots over histograms and normality tests so I do not have to bother about the sample size. This article showed the different methods that are available, your choice will of course depends on the type of your data and the context of your analyses.
 
