@@ -33,18 +33,18 @@ A probability is a number that reflects the **chance that a particular event wil
 
 Probability is a branch of mathematics that provides models to describe random processes. These mathematical tools allow to establish theoretical models for random phenomena and to use them to make predictions. Like every model, the probabilistic model is a simplification of the world. However, the model is useful as soon as it captures the essential features.
 
-In this article, we present 9 fundamental formulas and concepts in probability that every data scientist should understand and master in order to appropriately handle any project in probability.
+In this article, we present 9 fundamental formulas and concepts in probability that every data scientist should understand and master in order to appropriately handle any project involving probabilities.
 
 # 1. A probability is always between 0 and 1
 
-The probability of an event is always between 0 and 1 (or 0% and 100%),
+The probability of an event is always between 0 and 1 (or 0% and 100%). If we denote the probability that an event A (which could be any event) occurs by $P(A)$, we have:
 
 $$0 \le P(A) \le 1$$
 
 * If an event is impossible: $P(A) = 0$
 * If an event is certain: $P(A) = 1$
 
-For example, throwing a 7 with a standard six-sided dice (with faces ranging from 1 to 6) is impossible so its probability is equal to 0. Throwing head or tail with a coin is certain, so its probability is equal to 1.
+For example, throwing a 7 with a standard six-sided dice (with faces ranging from 1 to 6) is impossible so its probability is equal to 0. Throwing head *or* tail with a coin is certain, so its probability is equal to 1.
 
 # 2. Compute a probability
 
@@ -64,7 +64,7 @@ The probability of the complement (or opposite) of an event is:
 
 $$P(\text{not A}) = P(\bar{A}) = 1 - P(A)$$
 
-For instance, the probability of not throwing a 3 with a dice is:
+For instance, the probability of *not* throwing a 3 with a dice is:
 
 $$P(\bar{A}) = 1 - P(A) = 1 - \frac{1}{6} = \frac{5}{6}$$
 
@@ -106,7 +106,7 @@ $$= 0.6 + 0.45 - 0.25 = 0.8$$
 
 By summing $P(A)$ and $P(B)$, the intersection of A and B, i.e. $P(A \cap B)$, is counted twice. This is the reason we subtract it to count it only once.
 
-If two events are mutually exclusive (i.e., two events that cannot occur simultaneously), the probability of both events occurring is equal to 0, so the above formula becomes
+If two events are mutually exclusive (i.e., two events that cannot occur simultaneously), the probability of both events occurring $P(A \cap B)$ is equal to 0, so the above formula becomes
 
 $$P(A \cup B) = P(A) + P(B)$$
 
@@ -116,13 +116,16 @@ $$P(3 \cup 6) = P(3) + P(6) = \frac{1}{6} + \frac{1}{6} = \frac{1}{3}$$
 
 # 5. Intersection of two events
 
-If two events are independent, the probability of the intersection of the two events (i.e., the joint probability) is the probability of the two events occurring:
+**If two events are independent**, the probability of the intersection of the two events (i.e., the joint probability) is the probability of the two events occurring:
 
 $$P(\text{A and B)} = P(A \cap B) = P(A) \cdot P(B)$$
 
 For instance, if two coins are flipped, the probability of both coins being tails is
 
 $$P(T_1 \cap T_2) = P(T_1) \cdot P(T_2) = \frac{1}{2} \cdot \frac{1}{2} = \frac{1}{4}$$
+
+where $T_1$ ($T_2$) denotes the event that the first (second) coin is tail.
+
 Note that $P(A \cap B) = P(B \cap A)$.
 
 If two events are mutually exclusive, their joint probability is equal to 0:
@@ -131,9 +134,11 @@ $$P(A \cap B) = 0$$
 
 # 6. Independence of two events
 
-The independence of two events can be verified thanks to the above formula. If the equality holds, the two events are said to be independent, otherwise the two events are said to be dependent. Formally, the events A and B are independent if and only if
+Another important concept in probability is the independence of two events. Formally, the events A and B are independent if and only if
 
 $$P(A \cap B) = P(A) \cdot P(B)$$
+
+If the equality holds, the two events are said to be independent, otherwise the two events are said to be dependent.
 
 * In the example of the two coins:
 
@@ -217,7 +222,7 @@ P(B | A) &= \frac{P(B | A) \cdot P(A)}{P(B)} \\
 
 In order to illustrate the conditional probability and the Bayes' theorem, suppose the following problem:
 
-In order to determine the presence of a disease in a person, a blood test is performed. When a person has the disease, the test can reveal the disease in 80% of cases. When the disease is not present, the test is negative in 90% of cases. Experience has shown that the probability of the disease being present is 10%. A researcher would like to know the probability that an individual has the disease given that the result of the test is positive.
+In order to determine the presence of a disease in a person, a blood test is performed. When a person has the disease, the test can reveal the disease in 80% of cases. When the disease is not present, the test is negative in 90% of cases. Experience has shown that the probability of the disease being present is 10%. A researcher would like to know the probability that an individual has the disease *given that the result of the test is positive*.
 
 To answer this question, the following events are defined:
 
@@ -228,9 +233,11 @@ Moreover, we use a tree diagram to illustrate the statement:
 
 ![](/blog/the-7-formulas-in-probability-that-every-data-scientist-should-know_files/Screenshot 2020-03-03 at 13.54.24.png){width=100%}
 
-(The sum of all 4 scenarios must be equal to 1 since these 4 scenarios include all possible cases.)
+(The sum of all 4 scenarios must be equal to 1 since these 4 scenarios cover all possible cases.)
 
-We are looking for the probability that an individual has the disease given that the result of the test is positive, $P(D | P)$. Following the formula of the conditional probability (Eq. 1) we have:
+We are looking for the probability that an individual has the disease given that the result of the test is positive, $P(D | P)$. 
+
+Following the formula of the conditional probability (Eq. 1) we have:
 
 $$P(A | B) = \frac{P(A \cap B)}{P(B)}$$
 
@@ -239,7 +246,12 @@ In terms of our problem:
 $$P(D | P) = \frac{P(D \cap P)}{P(P)}$$
 $$P(D | P) = \frac{0.08}{P(P)} \text{ (Eq. 4)}$$
 
-From the tree diagram, we can see that a positive test result is possible under two scenarios: (i) when a person has the disease, or (ii) when the person does not actually have the disease (because the test is not always correct). In order to find the probability of a positive test result, $P(P)$, we need to sum up those two scenarios:
+From the tree diagram, we can see that a positive test result is possible under two scenarios:
+
+1. when a person has the disease, or
+1. when the person does not actually have the disease (because the test is not always correct).
+
+In order to find the probability of a positive test result, $P(P)$, we need to sum up those two scenarios:
 
 \begin{align}
 P(P) &= P(D \cap P) + P(\bar{D} \cap P) \\
@@ -251,9 +263,11 @@ Eq. 4 then becomes
 
 $$P(D | P) = \frac{0.08}{0.17} = 0.4706$$
 
-The probability of having the disease given that the result of the test is positive is only 47.06%. This means that in this specific case (with the same percentages), an individual has less than 1 chance out of 2 of having the disease knowing that his test is positive!
+The probability of having the disease given that the result of the test is positive is only 47.06%. This means that in this specific case (with the same percentages), an individual with a positive test has less than 1 chance out of 2 of having the disease!
 
-This relatively small percentage is due to the facts that the disease is quite rare (only 10% of the population is affected) and that the test is not always correct (sometimes it detects the disease although it is not present, and sometimes it does not detect it although it is present). As a consequence, a higher percentage of healthy people have a positive result (9%) compared to the percentage of people who have a positive result and who actually have the disease (8%). This explains why several diagnostic tests are often performed before announcing the result of the test, especially for rare diseases.
+This relatively small percentage is due to the facts that the disease is quite rare (only 10% of the population is affected) and that the test is not always correct (sometimes it detects the disease although it is not present, and sometimes it does not detect it although it is present).
+
+As a consequence, a higher percentage of healthy people have a positive result (9%) compared to the percentage of people who have a positive result and who actually have the disease (8%). This explains why several diagnostic tests are often performed before announcing the diagnosis, especially for rare diseases.
 
 # 8. Accuracy measures
 
@@ -378,7 +392,7 @@ NPV &= \frac{TN}{TN + FN} \\
 
 # 9. Counting techniques
 
-In order to use the formula in [section 2](/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#compute-a-probability), one must know how to count the number of possible elements.
+In order to use the formula in [section 2](/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#compute-a-probability), one must know how to count the number of possible elements (both for favorable and possible cases).
 
 There are 3 main counting techniques in probability:
 
@@ -400,7 +414,7 @@ where $\#$ is the number of elements.
 
 In a restaurant, a customer has to choose a starter, a main course and a dessert. The restaurant offers 2 starters, 3 main courses and 2 desserts. How many different choices are possible?
 
-There are 12 different possible choices (i.e., $2 \cdot 3 \cdot 2$).
+There are $2 \cdot 3 \cdot 2 = 12$ different possible choices.
 
 ## Permutation
 
