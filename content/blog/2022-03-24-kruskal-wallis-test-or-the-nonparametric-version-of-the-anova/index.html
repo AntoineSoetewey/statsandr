@@ -23,23 +23,22 @@ bibliography: bibliography.bib
 
 <div id="TOC">
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#data">Data</a></li>
-<li><a href="#kruskal-wallis-test">Kruskal-Wallis test</a>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#data" id="toc-data">Data</a></li>
+<li><a href="#kruskal-wallis-test" id="toc-kruskal-wallis-test">Kruskal-Wallis test</a>
 <ul>
-<li><a href="#aim-and-hypotheses">Aim and hypotheses</a></li>
-<li><a href="#assumptions">Assumptions</a></li>
-<li><a href="#in-r">In R</a></li>
-<li><a href="#interpretations">Interpretations</a></li>
+<li><a href="#aim-and-hypotheses" id="toc-aim-and-hypotheses">Aim and hypotheses</a></li>
+<li><a href="#assumptions" id="toc-assumptions">Assumptions</a></li>
+<li><a href="#in-r" id="toc-in-r">In R</a></li>
+<li><a href="#interpretations" id="toc-interpretations">Interpretations</a></li>
 </ul></li>
-<li><a href="#post-hoc-tests">Post-hoc tests</a>
+<li><a href="#post-hoc-tests" id="toc-post-hoc-tests">Post-hoc tests</a>
 <ul>
-<li><a href="#dunn-test">Dunn test</a></li>
-<li><a href="#pairwise-wilcoxon-test">Pairwise Wilcoxon test</a></li>
+<li><a href="#dunn-test" id="toc-dunn-test">Dunn test</a></li>
 </ul></li>
-<li><a href="#combination-of-statistical-results-and-plot">Combination of statistical results and plot</a></li>
-<li><a href="#summary">Summary</a></li>
-<li><a href="#references">References</a></li>
+<li><a href="#combination-of-statistical-results-and-plot" id="toc-combination-of-statistical-results-and-plot">Combination of statistical results and plot</a></li>
+<li><a href="#summary" id="toc-summary">Summary</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
 </ul>
 </div>
 
@@ -99,7 +98,7 @@ ggplot(dat) +
 <div id="aim-and-hypotheses" class="section level2">
 <h2>Aim and hypotheses</h2>
 <p>As mentioned earlier, the Kruskal-Wallis test allows to compare three or more groups. More precisely, it is used to compare three or more groups in terms of a <a href="/blog/variable-types-and-examples/#quantitative">quantitative variable</a>. It can be seen as the extension to the <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/">Mann-Whitney</a> test which allows to compare 2 groups under the non-normality assumption.</p>
-<p>In the context of our example, we are going to use the Kruskal-Wallis test to help us answer the following question: “Is the length of the flippers different between the 3 species of penguins?”</p>
+<p>In the context of our example, we are going to use the Kruskal-Wallis test to help us answer the following question: “Is the length of the flippers different between the 3 species of penguins?”.</p>
 <p>The null and alternative hypotheses of the Kruskal-Wallis test are:</p>
 <ul>
 <li><span class="math inline">\(H_0\)</span>: The 3 species are equal in terms of flipper length</li>
@@ -137,15 +136,15 @@ ggplot(dat) +
 <div id="post-hoc-tests" class="section level1">
 <h1>Post-hoc tests</h1>
 <p>We have just showed that at least one species is different from the others in terms of flippers length. Nonetheless, here comes the limitations of the Kruskal-Wallis test: it does not say which group(s) is(are) different from the others.</p>
-<p>To know this, we need to use other types of test, referred as post-hoc tests (in Latin, “after this,” so after obtaining statistically significant Kruskal-Wallis results) or multiple pairwise-comparison tests. For the interested reader, a more detailed explanation of post-hoc tests can be found <a href="/blog/anova-in-r/#post-hoc-test">here</a>.</p>
+<p>To know this, we need to use other types of test, referred as post-hoc tests (in Latin, “after this”, so after obtaining statistically significant Kruskal-Wallis results) or multiple pairwise-comparison tests. For the interested reader, a more detailed explanation of post-hoc tests can be found <a href="/blog/anova-in-r/#post-hoc-test">here</a>.</p>
 <p>The most common post-hoc tests after a significant Kruskal-Wallis test are:</p>
 <ul>
 <li>Dunn test</li>
-<li>Pairwise Wilcoxont test</li>
 <li>Conover test</li>
 <li>Nemenyi test</li>
+<li>Pairwise Wilcoxont test</li>
 </ul>
-<p>The Dunn test and pairwise Wilcoxon test being the most common ones among the four, here is how to do them in R.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<p>The Dunn test being the most common one, here is how to do it in R.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 <div id="dunn-test" class="section level2">
 <h2>Dunn test</h2>
 <pre class="r"><code>library(FSA)
@@ -167,23 +166,6 @@ dunnTest(flipper_length_mm ~ species,
 </ul>
 <p>Therefore, based on the Dunn test, we can now conclude that <strong>all 3 species differ in terms of flipper length</strong>.</p>
 </div>
-<div id="pairwise-wilcoxon-test" class="section level2">
-<h2>Pairwise Wilcoxon test</h2>
-<pre class="r"><code>pairwise.wilcox.test(dat$flipper_length_mm, dat$species,
-  p.adjust.method = &quot;holm&quot;
-)</code></pre>
-<pre><code>## 
-##  Pairwise comparisons using Wilcoxon rank sum test with continuity correction 
-## 
-## data:  dat$flipper_length_mm and dat$species 
-## 
-##           Adelie Chinstrap
-## Chinstrap 3e-08  -        
-## Gentoo    &lt;2e-16 &lt;2e-16   
-## 
-## P value adjustment method: holm</code></pre>
-<p>Here again, we conclude that all 3 species are significantly different in terms of flipper length (<em>p</em>-values &lt; 0.001).</p>
-</div>
 </div>
 <div id="combination-of-statistical-results-and-plot" class="section level1">
 <h1>Combination of statistical results and plot</h1>
@@ -201,14 +183,14 @@ ggbetweenstats(
   centrality.plotting = FALSE,
   bf.message = FALSE
 )</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>This method has the advantage that all necessary statistical results are displayed directly on the plot.</p>
 <p>The results of the Kruskal-Wallis test are shown in the subtitle above the plot (the <em>p</em>-value is after <code>p =</code>). Moreover, the results of the post-hoc test are displayed between each group via accolades, and the boxplots allow to visualize the distribution for each species.</p>
 </div>
 <div id="summary" class="section level1">
 <h1>Summary</h1>
 <p>In this post, we reviewed the aim and hypotheses of the Kruskal-Wallis test and its underlying assumptions. We then showed how to do the test in R and how to interpret the results.</p>
-<p>We also showed the most common post-hoc tests after a significant Kruskal-Wallis test—the Dunn and pairwise Wilcoxon tests.</p>
+<p>We also showed the most common post-hoc test after a significant Kruskal-Wallis test—the Dunn test.</p>
 <p>Last but not least, we presented a concise way to present both the data by group and all the statistical results on the same plot.</p>
 <p>Thanks for reading.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
@@ -221,12 +203,12 @@ Stevens, James P. 2013. <em>Intermediate Statistics: A Modern Approach</em>. Rou
 </div>
 </div>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
 <li id="fn1"><p>This is the case for small sample sizes. For large sample sizes, normality is not required (this is a common misconception!). By the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">central limit theorem</a>, sample means of large samples are often well-approximated by a normal distribution even if the data are not normally distributed <span class="citation">(<a href="#ref-stevens2013intermediate" role="doc-biblioref">Stevens 2013</a>)</span>. See more details in this <a href="/blog/anova-in-r/#fn3">note</a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>Note that in theory, Kruskal-Wallis test can also be used for only two groups. However, in practice we use the <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/">Mann-Whitney test</a> for two groups and Kruskal-Wallis for three or more groups.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 <li id="fn3"><p>See more information about the difference in this <a href="https://influentialpoints.com/Training/Kruskal-Wallis_ANOVA_use_and_misuse.htm" target="_blank">article</a>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>Note that there are other <em>p</em>-value adjustment methods. See <code>?dunnTest</code> and <code>?pairwise.wilcox.test</code> for more options.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Note Note that there are other <em>p</em>-value adjustment methods. See <code>?dunnTest</code> for more options.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
