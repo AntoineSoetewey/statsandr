@@ -39,7 +39,9 @@ Throughout this blog, I actually realized that in order to learn and **fully und
 
 So although this blog was first launched to share statistical concepts I am most familiar with (hoping that it would be useful to some people), I now also use it to **learn by writing**. I think that this additional way of learning is actually **as powerful as teaching** because writing allows me to **consolidate my understanding**.
 
-Also, getting valuable feedback from people all over the world makes the whole journey even more interesting and enriching.
+Also, I launched this blog to **make statistics accessible to everyone!** Statistics is often seen as a challenging course and many students struggle with this subject. Via this blog, I hope that the most common statistical concepts will become more clear so that both students and scientists dealing with data can use them appropriately.
+
+Last but not least, getting valuable feedback from people all over the world makes the whole journey even more interesting and enriching.
 
 If you are interested in learning more why I launched this blog, see the article about the main [benefits of maintaining a technical blog](/blog/7-benefits-of-sharing-your-code-in-a-data-science-blog/).
 
