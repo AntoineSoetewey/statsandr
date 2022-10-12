@@ -7,7 +7,7 @@ menu: "main"
 
 Welcome to the blog [Stats and R](/). As the name suggests, this blog is about [statistics](/tags/statistics/) and its applications in [R](/tags/r/) (an open source statistical software program).
 
-Throughout different articles, I (see more [about me](/about/)) share, explain and illustrate statistical concepts, and when appropriate, apply them in R.
+An objective of this blog is to make statistics accessible to everyone! Throughout different articles, I (see more [about me](/about/)) share, explain and illustrate statistical concepts, and when appropriate, apply them in R.
 
 From time to time, I also present some work related to data science & [data visualization](/tags/visualization/) using R, news about my [research](/tags/research/) and, to a smaller extent, my journey in the [blogging](/tags/blogging/) world.
 
