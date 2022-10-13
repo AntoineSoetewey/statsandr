@@ -1,5 +1,5 @@
 ---
-title: "Student's t-test in R and by hand: how to compare two groups under different scenarios"
+title: "Student's t-test in R and by hand: how to compare two groups under different scenarios?"
 author: Antoine Soetewey
 date: '2020-02-28'
 slug: student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios
@@ -27,37 +27,37 @@ bibliography: bibliography.bib
 
 <div id="TOC">
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#null-and-alternative-hypothesis">Null and alternative hypothesis</a></li>
-<li><a href="#hypothesis-testing">Hypothesis testing</a></li>
-<li><a href="#different-versions-of-the-students-t-test">Different versions of the Student’s t-test</a></li>
-<li><a href="#how-to-compute-students-t-test-by-hand">How to compute Student’s t-test by hand?</a>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#null-and-alternative-hypothesis" id="toc-null-and-alternative-hypothesis">Null and alternative hypothesis</a></li>
+<li><a href="#hypothesis-testing" id="toc-hypothesis-testing">Hypothesis testing</a></li>
+<li><a href="#different-versions-of-the-students-t-test" id="toc-different-versions-of-the-students-t-test">Different versions of the Student’s t-test</a></li>
+<li><a href="#how-to-compute-students-t-test-by-hand" id="toc-how-to-compute-students-t-test-by-hand">How to compute Student’s t-test by hand?</a>
 <ul>
-<li><a href="#scenario-1-independent-samples-with-2-known-variances">Scenario 1: Independent samples with 2 known variances</a></li>
-<li><a href="#scenario-2-independent-samples-with-2-equal-but-unknown-variances">Scenario 2: Independent samples with 2 equal but unknown variances</a></li>
-<li><a href="#scenario-3-independent-samples-with-2-unequal-and-unknown-variances">Scenario 3: Independent samples with 2 unequal and unknown variances</a></li>
-<li><a href="#scenario-4-paired-samples-where-the-variance-of-the-differences-is-known">Scenario 4: Paired samples where the variance of the differences is known</a></li>
-<li><a href="#scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown">Scenario 5: Paired samples where the variance of the differences is unknown</a></li>
+<li><a href="#scenario-1-independent-samples-with-2-known-variances" id="toc-scenario-1-independent-samples-with-2-known-variances">Scenario 1: Independent samples with 2 known variances</a></li>
+<li><a href="#scenario-2-independent-samples-with-2-equal-but-unknown-variances" id="toc-scenario-2-independent-samples-with-2-equal-but-unknown-variances">Scenario 2: Independent samples with 2 equal but unknown variances</a></li>
+<li><a href="#scenario-3-independent-samples-with-2-unequal-and-unknown-variances" id="toc-scenario-3-independent-samples-with-2-unequal-and-unknown-variances">Scenario 3: Independent samples with 2 unequal and unknown variances</a></li>
+<li><a href="#scenario-4-paired-samples-where-the-variance-of-the-differences-is-known" id="toc-scenario-4-paired-samples-where-the-variance-of-the-differences-is-known">Scenario 4: Paired samples where the variance of the differences is known</a></li>
+<li><a href="#scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown" id="toc-scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown">Scenario 5: Paired samples where the variance of the differences is unknown</a></li>
 </ul></li>
-<li><a href="#how-to-compute-students-t-test-in-r">How to compute Student’s t-test in R?</a>
+<li><a href="#how-to-compute-students-t-test-in-r" id="toc-how-to-compute-students-t-test-in-r">How to compute Student’s t-test in R?</a>
 <ul>
-<li><a href="#scenario-1-independent-samples-with-2-known-variances-1">Scenario 1: Independent samples with 2 known variances</a>
+<li><a href="#scenario-1-independent-samples-with-2-known-variances-1" id="toc-scenario-1-independent-samples-with-2-known-variances-1">Scenario 1: Independent samples with 2 known variances</a>
 <ul>
-<li><a href="#a-note-on-p-value-and-significance-level-alpha">A note on <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span></a></li>
+<li><a href="#a-note-on-p-value-and-significance-level-alpha" id="toc-a-note-on-p-value-and-significance-level-alpha">A note on <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span></a></li>
 </ul></li>
-<li><a href="#scenario-2-independent-samples-with-2-equal-but-unknown-variances-1">Scenario 2: Independent samples with 2 equal but unknown variances</a></li>
-<li><a href="#scenario-3-independent-samples-with-2-unequal-and-unknown-variances-1">Scenario 3: Independent samples with 2 unequal and unknown variances</a></li>
-<li><a href="#scenario-4-paired-samples-where-the-variance-of-the-differences-is-known-1">Scenario 4: Paired samples where the variance of the differences is known</a></li>
-<li><a href="#scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown-1">Scenario 5: Paired samples where the variance of the differences is unknown</a></li>
-<li><a href="#combination-of-plot-and-statistical-test">Combination of plot and statistical test</a>
+<li><a href="#scenario-2-independent-samples-with-2-equal-but-unknown-variances-1" id="toc-scenario-2-independent-samples-with-2-equal-but-unknown-variances-1">Scenario 2: Independent samples with 2 equal but unknown variances</a></li>
+<li><a href="#scenario-3-independent-samples-with-2-unequal-and-unknown-variances-1" id="toc-scenario-3-independent-samples-with-2-unequal-and-unknown-variances-1">Scenario 3: Independent samples with 2 unequal and unknown variances</a></li>
+<li><a href="#scenario-4-paired-samples-where-the-variance-of-the-differences-is-known-1" id="toc-scenario-4-paired-samples-where-the-variance-of-the-differences-is-known-1">Scenario 4: Paired samples where the variance of the differences is known</a></li>
+<li><a href="#scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown-1" id="toc-scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown-1">Scenario 5: Paired samples where the variance of the differences is unknown</a></li>
+<li><a href="#combination-of-plot-and-statistical-test" id="toc-combination-of-plot-and-statistical-test">Combination of plot and statistical test</a>
 <ul>
-<li><a href="#scenario-2-independent-samples-with-2-equal-but-unknown-variances-2">Scenario 2: Independent samples with 2 equal but unknown variances</a></li>
-<li><a href="#scenario-3-independent-samples-with-2-unequal-and-unknown-variances-2">Scenario 3: Independent samples with 2 unequal and unknown variances</a></li>
-<li><a href="#scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown-2">Scenario 5: Paired samples where the variance of the differences is unknown</a></li>
+<li><a href="#scenario-2-independent-samples-with-2-equal-but-unknown-variances-2" id="toc-scenario-2-independent-samples-with-2-equal-but-unknown-variances-2">Scenario 2: Independent samples with 2 equal but unknown variances</a></li>
+<li><a href="#scenario-3-independent-samples-with-2-unequal-and-unknown-variances-2" id="toc-scenario-3-independent-samples-with-2-unequal-and-unknown-variances-2">Scenario 3: Independent samples with 2 unequal and unknown variances</a></li>
+<li><a href="#scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown-2" id="toc-scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown-2">Scenario 5: Paired samples where the variance of the differences is unknown</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#assumptions">Assumptions</a></li>
-<li><a href="#references">References</a></li>
+<li><a href="#assumptions" id="toc-assumptions">Assumptions</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
 </ul>
 </div>
 
@@ -96,7 +96,7 @@ bibliography: bibliography.bib
 <li><span class="math inline">\(H_1\)</span>: <span class="math inline">\(\mu_1 &lt; \mu_2\)</span></li>
 </ul>
 <p>In the first case, we want to test if the mean of the first population is significantly larger than the mean of the second, while in the latter case, we want to test if the mean of the first population is significantly smaller than the mean of the second. This type of test is referred as a <strong>one-sided</strong> or unilateral test.</p>
-<p>Some authors argue that one-sided tests should not be used in practice for the simple reason that, if a researcher is so sure that the mean of one population is larger (smaller) than the mean of the other and would never be smaller (larger) than the other, why would she needs to test for significance at all? This a rather philosophical question and it is beyond the scope of this article. Interested readers are invited to see part of the discussion in <span class="citation"><a href="#ref-rowntree2000statistics" role="doc-biblioref">Rowntree</a> (<a href="#ref-rowntree2000statistics" role="doc-biblioref">2000</a>)</span>.</p>
+<p>Some authors argue that one-sided tests should not be used in practice for the simple reason that, if a researcher is so sure that the mean of one population is larger (smaller) than the mean of the other and would never be smaller (larger) than the other, why would she needs to test for significance at all? This a rather philosophical question and it is beyond the scope of this article. Interested readers are invited to see part of the discussion in <span class="citation">Rowntree (<a href="#ref-rowntree2000statistics" role="doc-biblioref">2000</a>)</span>.</p>
 </div>
 <div id="hypothesis-testing" class="section level1">
 <h1>Hypothesis testing</h1>
@@ -687,7 +687,7 @@ z.test(dat1$sample1,
 <p>If the observations are not so extreme—not unlikely to occur if the null hypothesis were true—we do not reject this null hypothesis because it is deemed plausible to be true. And if the observations are considered too extreme—too unlikely to happen under the null hypothesis—we reject the null hypothesis because it is deemed too implausible to be true. Note that it does not mean that we are 100% sure that it is too unlikely, it happens sometimes that the null hypothesis is rejected although it is true (see the significance level <span class="math inline">\(\alpha\)</span> later on).</p>
 <p>In our example above, the observations are not really extreme and the difference between the two means is not extreme, so the test statistic is not extreme (since the test statistic is partially based on the difference of the means of the two samples). Having a test statistic which is not extreme is not unlikely and that is the reason why the <em>p</em>-value is quite high. The <em>p</em>-value of 0.95 actually tells us that the probability of having two samples with a difference in means of -0.04 (= 0.02 - 0.06), given that the difference in means in the populations is 0 (the null hypothesis), equals 95%. A probability of 95% is definitely considered as plausible, so we do not reject the null hypothesis of equal means in the populations.</p>
 <p>One may then wonder, “What is too extreme for a test statistic?” Most of the time, we consider that a test statistic is too extreme to happen just by chance when the probability of having such an extreme test statistic given that the null hypothesis is true is below 5%. The threshold of 5% (<span class="math inline">\(\alpha = 0.05\)</span>) that you very often see in statistic courses or textbooks is the threshold used in many fields. With a <em>p</em>-value under that threshold of 5%, we consider that the observations (and thus the test statistic) is <strong>too unlikely</strong> to happen just by chance if the null hypothesis were true, so the null hypothesis is rejected. With a <em>p</em>-value above that threshold of 5%, we consider that it is not really implausible to face the observations we have if the null hypothesis were true, and we therefore do not reject the null hypothesis.</p>
-<p>Note that I wrote “we do not reject the null hypothesis,” and not “we accept the null hypothesis.” This is because it may be the case that the null hypothesis is in fact false, but we failed to prove it with the samples. Suppose the analogy of a suspect accused of murder and we do not know the truth. On the one hand, if we have collected enough evidence that the suspect committed the murder, he is considered guilty: we reject the null hypothesis that he is innocent. On the other hand, if we have <em>not</em> collected enough evidence against the suspect, he is presumed to be innocent although he may in fact have committed the crime: we failed to reject the null hypothesis of him being innocent. We are never sure that he did not commit the crime even if he is released, we just did not find sufficient evidence against the null hypothesis of the suspect being innocent. This is the reason why we do not reject the null hypothesis instead of accepting it, and why you will often read things like “there is no sufficient evidence in the data to reject the null hypothesis” or “based on the samples we fail to reject the null hypothesis.”</p>
+<p>Note that I wrote “we do not reject the null hypothesis”, and not “we accept the null hypothesis”. This is because it may be the case that the null hypothesis is in fact false, but we failed to prove it with the samples. Suppose the analogy of a suspect accused of murder and we do not know the truth. On the one hand, if we have collected enough evidence that the suspect committed the murder, he is considered guilty: we reject the null hypothesis that he is innocent. On the other hand, if we have <em>not</em> collected enough evidence against the suspect, he is presumed to be innocent although he may in fact have committed the crime: we failed to reject the null hypothesis of him being innocent. We are never sure that he did not commit the crime even if he is released, we just did not find sufficient evidence against the null hypothesis of the suspect being innocent. This is the reason why we do not reject the null hypothesis instead of accepting it, and why you will often read things like “there is no sufficient evidence in the data to reject the null hypothesis” or “based on the samples we fail to reject the null hypothesis”.</p>
 <p>The <strong>significance level <span class="math inline">\(\alpha\)</span></strong>, derived from the threshold of 5% mentioned earlier, <strong>is the probability of rejecting the null hypothesis when it is in fact true</strong>. In this sense, it is an error (of 5%) that we accept to deal with, in order to be able to draw conclusions. If we would accept no error (an error of 0%), we would not be able to draw any conclusion about the population(s) since we only have access to a limited portion of the population(s) via the sample(s). As a consequence, we will never be 100% sure when interpreting the result of a hypothesis test unless we have access to the data for the entire population, but then there is no reason to do a hypothesis test anymore since we can simply compare the two populations. We usually allow this error (called Type I error) to be 5%, but in order to be a bit more certain when concluding that we reject the null hypothesis, the alpha level can also be set to 1% (or even to 0.1% in some rare cases).</p>
 <p><strong>To sum up</strong> what you need to remember about <em>p</em>-value and significance level <span class="math inline">\(\alpha\)</span>:</p>
 <ul>
@@ -1115,7 +1115,7 @@ Stevens, James P. 2013. <em>Intermediate Statistics: A Modern Approach</em>. Rou
 </div>
 </div>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
 <li id="fn1"><p>Remind that inferential statistics, as opposed to <a href="/blog/descriptive-statistics-by-hand/">descriptive statistics</a>, is a branch of statistics defined as the science of drawing conclusions about a population from observations made on a representative sample of that population. See the <a href="/blog/what-is-the-difference-between-population-and-sample/">difference between population and sample</a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>

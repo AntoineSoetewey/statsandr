@@ -1,0 +1,121 @@
+---
+title: How do you keep yourself updated with the latest R news?
+author: Antoine Soetewey
+date: '2022-10-14'
+slug: how-to-keep-up-to-date-with-the-latest-R-news
+categories: []
+tags:
+  - Blogging
+  - Professional
+  - R
+  - Tips
+  - Web
+meta_img: blog/how-to-keep-up-to-date-with-the-latest-R-news/images/how-to-keep-up-to-date-with-the-latest-R-news.jpeg
+description: R is evolving rapidly and new codes are implemented everyday. See how to keep up to date with the latest R news through several twitter feeds and newsletters.
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
+)
+
+set.seed(42)
+
+library(DT)
+library(googlesheets4)
+library(dplyr)
+```
+
+![](images/how-to-keep-up-to-date-with-the-latest-R-news.jpeg){width=100%}
+
+# Introduction
+
+At the end of one of the training sessions I gave on R, a student asked me the following question:
+
+> How do you keep yourself updated with the latest R news?
+
+It is true that R, being open source (meaning that everyone can contribute), is evolving rapidly. This means that even if I am using R for several years and on a daily basis, I like to stay informed in order to stay up to date with the program and the latest coding practices.
+
+In fact, I learn about new packages, new functions and new features almost everyday. Most of them are not particularly useful for my research or my teaching tasks, but sometimes I discover such a nice package or function that I replace my code with new one.^[See for example this [article](/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/#update-with-the-ggstatsplot-package). The package I discovered was so useful and interesting (to me), that I added a new section to the post and now use it instead of the older package.]
+
+The training was an advanced one, so the student had a good knowledge of R and was not looking for more tutorials or courses. She was interested in knowing where to look for updates about current and new R packages and functions.
+
+After sharing my sources with all students following the training, I thought it would be useful to others. In this article, I share my sources---from where I get the latest R updates and news. The sources are divided into two main categories: **Twitter and newsletters.**
+
+# How do I keep track?
+
+## Twitter
+
+To be honest, I mostly use Twitter to keep up to date with R news.
+
+Twitter allows me to follow discussions about statistical methods or approaches, and to keep me informed about publications of new blog posts.
+
+What I particularly like with Twitter is that there is a mix between:
+
+- short messages about new functions or packages (most of the time with an illustration or an example), and
+- announcements of new blog posts that cover specific subjects in details.
+
+For this, I follow people (researchers, professors, bloggers, statisticians, data scientists, etc.) that are working in my domains of interest. For instance, I am mostly interested in the application of statistics in R, data science, biostatistics and data visualization. I thus follow accounts which regularly post about these topics. I also avoid following accounts that cover topics I am not interested in, so that my Twitter feed really shows information I am most likely to be interested in.
+
+Below, you will see a list of some of the accounts I follow, classified by themes. Of course, this is a **non-exhaustive list!** There are plenty of very inspiring and intelligent people that are not in the list, simply because I cannot afford to put them all.
+
+If you follow people that post regularly about the themes covered below, feel free to add them in the comments. I am always looking for new inspiring accounts to follow.
+
+*Note that the accounts are displayed in alphabetical order and the table is searchable.*
+
+```{r, echo = FALSE, message = FALSE}
+dat <- read_sheet("https://docs.google.com/spreadsheets/d/1Ev9FwX8xLH1gaPNRaxh_EPCBV6QjMCGINlYvZ7UXnWM/edit?usp=sharing")
+
+# create table
+dat$Username <- substring(dat$URL, first = 21)
+dat$Link <- paste0("<a href='", dat$URL, "' target='_blank'>@", dat$Username, "</a>")
+dat <- dat %>%
+  select(Name,
+         Category,
+         Link)
+
+# display table
+n <- nrow(dat)
+datatable(dat,
+  extensions = "Buttons",
+  rownames = FALSE,
+  filter = "top",
+  options = list(
+    pageLength = n,
+    order = list(0, "asc"),
+    autoWidth = TRUE,
+    dom = "Blfrtip",
+    buttons = c("copy", "csv", "excel", "pdf", "print")
+  ),
+  escape = FALSE
+)
+```
+
+<br>
+
+You will also find many news when exploring [#rstats](https://twitter.com/hashtag/rstats?src=hashtag_click) on Twitter.
+
+## Newsletters
+
+Besides Twitter, I also read new blog posts through these newsletters:
+
+- [R-Bloggers](https://www.r-bloggers.com/) (daily)
+- [R Weekly](https://rweekly.org/) (weekly)
+
+These newsletters are actually blog aggregators, so collections of many many blogs. If you have your own blog, don't hesitate to submit it to make it accessible to more people.
+
+# Conclusion
+
+Thanks for reading. I hope this article will help you to keep track of great blogs, tutorials and other resources about R. Feel free to follow me on Twitter ([@statsandr](https://twitter.com/statsandr)), where I tweet my new articles and retweet everything I find interesting or worth mentioning.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
