@@ -15,22 +15,15 @@ I work on the blog voluntarily in my spare time (when I am not too busy with my 
 
 I love coding, writing and showing what I learned during this continuous process. I love even more to share it for free and I am trying my best to keep it this way. However, costs are getting higher and I would not say no to a little help from you.
 
-So if you found something helpful on the blog and are feeling grateful today, here are the different ways you can support my work:
-
-1. [GitHub sponsor program, Paypal or Buy me a book](#github-sponsor-program-paypal-or-buy-me-a-book)
-1. [Link or share](#link-or-share)
-1. [Follow the blog](#follow-the-blog)
-1. [Recommendations](#recommendations)
+So if you found something helpful on the blog and are feeling grateful today, below are the different ways you can support my work.
 
 ## GitHub sponsor program, PayPal or Buy me a book
 
-If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via the [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey).
+If you would like to financially support this blog so I can continue to provide free content and free Shiny apps on an ad-free blog, you can sponsor me via:
 
-Alternatively, you can also consider making a one time donation via [PayPal](https://paypal.me/AntoineSoetewey), or by [buying me a book](https://www.buymeacoffee.com/statsandr) (it is usually known as "buy me a coffee", but I enjoy books much more than coffee):
-
-<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="statsandr" data-color="#5F7FFF" data-emoji="📖"  data-font="Lato" data-text="Buy me a book" data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
-
-<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="statsandr" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+- [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey)
+- [PayPal](https://www.paypal.com/donate/?hosted_button_id=TUVCTTX838UC2)
+- [Buy me a book](https://www.buymeacoffee.com/statsandr) (it is usually known as "buy me a coffee", but I enjoy books much more than coffee)
 
 ## Link or share
 
