@@ -41,9 +41,9 @@ bibliography: bibliography.bib
 <p><img src="images/EpiLPS.PNG" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>A colleague (and friend) of mine recently published a research paper titled “EpiLPS: A fast and flexible Bayesian tool for estimation of the time-varying reproduction number” in PLoS Computational Biology.</p>
-<p>I am not used to share papers for which I have not contributed to. Nonetheless, I would like to do an exception with this one as I strongly believe that the method developed in the paper deserves to be known, in particular for anyone working in epidemiology.</p>
-<p>Below, the motivation behind the paper, together with an illustration on simulated and real data (US hospitalization data). More information can be found in the <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1010618">paper</a> and in the accompanying <a href="https://epilps.com/">website</a>.</p>
+<p>A colleague (and friend) of mine recently published a research paper entitled “EpiLPS: A fast and flexible Bayesian tool for estimation of the time-varying reproduction number” in PLoS Computational Biology.</p>
+<p>I am not in the habit of sharing research paper to which I did not contribute. Nevertheless, I would like to make an exception with this one because I strongly believe that the method developed in the paper deserves to be known, especially for anyone working in epidemiology.</p>
+<p>Below is the motivation behind the article, as well as an illustration on simulated and real data (US hospitalization data). More information can be found in the <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1010618">paper</a> and on the accompanying <a href="https://epilps.com/">website</a>.</p>
 </div>
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
@@ -54,7 +54,7 @@ bibliography: bibliography.bib
 <img src="images/Infographic_EpiLPS.png" style="width:100.0%" />
 <br></p>
 <p>The EpiLPS model assumes that the observed reported cases (by reporting date or date of symptom onset) are governed by a negative binomial distribution. As such, it allows to take the feature of overdispersion into account, contrary to a Poisson model. The epidemic curve is smoothed with P-splines (where posterior estimates of latent variables are computed via Laplace approximations) in a first step and a renewal equation model is used in a second step as a bridge between the reproduction number and the estimated spline coefficients through a “plug-in” method.</p>
-<p>The authors also explain the main difference between EpiLPS and EpiEstim, a well established approached for estimating <span class="math inline">\(\mathcal{R}_t\)</span> in real-time developed by <span class="citation">(<a href="#ref-cori2013new" role="doc-biblioref">Cori et al. 2013</a>)</span> and make extensive comparisons between the two approaches under different epidemic scenarios.</p>
+<p>The authors also explain the main difference between EpiLPS and EpiEstim, a well established approached for estimating <span class="math inline">\(\mathcal{R}_t\)</span> in real-time developed by <span class="citation">Cori et al. (<a href="#ref-cori2013new" role="doc-biblioref">2013</a>)</span> and make extensive comparisons between the two approaches under different epidemic scenarios.</p>
 <p>An interesting feature of EpiLPS is that the user can choose between a fully “sampling-free” path, where model hyperparameters are fixed at their <em>maximum a posteriori</em> (LPSMAP) or a fully stochastic path (LPSMALA) based on a Metropolis-adjusted Langevin algorithm (LPSMALA). Talking about efficiency, routines for Laplace approximations and B-splines evaluations have been coded in C++ and integrated in R via the <a href="https://www.rcpp.org/">Rcpp package</a>, so that the underlying algorithm can be executed in negligible time.</p>
 <p>Below, we provide a short example of how to use the EpiLPS routines to estimate <span class="math inline">\(\mathcal{R}_t\)</span>.</p>
 </div>
@@ -107,7 +107,7 @@ simepidemic &lt;- episim(
 ## CI for LPSMAP computed via lognormal posterior approx. of Rt.Total number of days: 40. 
 ## Mean Rt discarding first 7 days: 1.327.
 ## Mean 95% CI of Rt discarding first 7 days: (1.164,1.527) 
-## Elapsed real time (wall clock time): 0.34 seconds.</code></pre>
+## Elapsed real time (wall clock time): 0.214 seconds.</code></pre>
 <pre class="r"><code>LPSMALA_fit &lt;- epilps(
   incidence = simepidemic$y, serial_interval = SI,
   method = &quot;LPSMALA&quot;, chain_length = 10000, burn = 4000
@@ -143,7 +143,7 @@ gridExtra::grid.arrange(
 <p>The figure can be customized in various ways:</p>
 <ul>
 <li>Users can specify the theme under <code>themetype</code>. Available options are <code>gray</code> (the default), <code>classic</code>, <code>light</code> and <code>dark</code>.</li>
-<li>Other choices, such as whether or not to show the incidence bars, the color of the credible interval envelope and the color of the smoothed epidemic curve and the estimated reproduction number are also available.</li>
+<li>Other choices, such as whether or not to show the incidence bars, the color of the credible interval envelope, the color of the smoothed epidemic curve and the estimated reproduction number are also available.</li>
 </ul>
 <p>The figure above was generated within the <a href="/blog/graphics-in-r-with-ggplot2/"><code>ggplot2</code> package</a>, but there is also another way of extracting information directly from the <code>LPSMAP_fit</code> and <code>LPSMALA_fit</code> objects. In fact, the estimated reproduction number values and their associated credible interval for each day can be extracted and plotted.</p>
 <p>Below, we make the exercise and plot the estimated <span class="math inline">\(\mathcal{R}_t\)</span> obtained with LPSMAP and LPSMALA, respectively and compare it with the true underlying reproduction number curve. The fit is quite good.</p>

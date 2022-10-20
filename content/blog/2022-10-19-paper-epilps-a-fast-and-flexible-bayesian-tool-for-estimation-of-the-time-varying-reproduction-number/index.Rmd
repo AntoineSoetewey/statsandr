@@ -36,11 +36,11 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-A colleague (and friend) of mine recently published a research paper titled "EpiLPS: A fast and flexible Bayesian tool for estimation of the time-varying reproduction number" in PLoS Computational Biology.
+A colleague (and friend) of mine recently published a research paper entitled "EpiLPS: A fast and flexible Bayesian tool for estimation of the time-varying reproduction number" in PLoS Computational Biology.
 
-I am not used to share papers for which I have not contributed to. Nonetheless, I would like to do an exception with this one as I strongly believe that the method developed in the paper deserves to be known, in particular for anyone working in epidemiology.
+I am not in the habit of sharing research paper to which I did not contribute. Nevertheless, I would like to make an exception with this one because I strongly believe that the method developed in the paper deserves to be known, especially for anyone working in epidemiology.
 
-Below, the motivation behind the paper, together with an illustration on simulated and real data (US hospitalization data). More information can be found in the [paper](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1010618) and in the accompanying [website](https://epilps.com/).
+Below is the motivation behind the article, as well as an illustration on simulated and real data (US hospitalization data). More information can be found in the [paper](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1010618) and on the accompanying [website](https://epilps.com/).
 
 # Motivation
 
@@ -56,7 +56,7 @@ A group of researchers in the EpiPose team from Hasselt University (Belgium), Le
 
 The EpiLPS model assumes that the observed reported cases (by reporting date or date of symptom onset) are governed by a negative binomial distribution. As such, it allows to take the feature of overdispersion into account, contrary to a Poisson model. The epidemic curve is smoothed with P-splines (where posterior estimates of latent variables are computed via Laplace approximations) in a first step and a renewal equation model is used in a second step as a bridge between the reproduction number and the estimated spline coefficients through a "plug-in" method.
 
-The authors also explain the main difference between EpiLPS and EpiEstim, a well established approached for estimating $\mathcal{R}_t$ in real-time developed by [@cori2013new] and make extensive comparisons between the two approaches under different epidemic scenarios.
+The authors also explain the main difference between EpiLPS and EpiEstim, a well established approached for estimating $\mathcal{R}_t$ in real-time developed by @cori2013new and make extensive comparisons between the two approaches under different epidemic scenarios.
 
 An interesting feature of EpiLPS is that the user can choose between a fully "sampling-free" path, where model hyperparameters are fixed at their *maximum a posteriori* (LPSMAP) or a fully stochastic path (LPSMALA) based on a Metropolis-adjusted Langevin algorithm (LPSMALA). Talking about efficiency, routines for Laplace approximations and B-splines evaluations have been coded in C++ and integrated in R via the [Rcpp package](https://www.rcpp.org/), so that the underlying algorithm can be executed in negligible time.
 
@@ -143,7 +143,7 @@ plot(LPSMALA_fit, plotout = "rt", theme = "light", rtcol = "black",
 The figure can be customized in various ways:
 
 - Users can specify the theme under `themetype`. Available options are `gray` (the default), `classic`, `light` and `dark`.
-- Other choices, such as whether or not to show the incidence bars, the color of the credible interval envelope and the color of the smoothed epidemic curve and the estimated reproduction number are also available.
+- Other choices, such as whether or not to show the incidence bars, the color of the credible interval envelope, the color of the smoothed epidemic curve and the estimated reproduction number are also available.
 
 The figure above was generated within the [`ggplot2` package](/blog/graphics-in-r-with-ggplot2/), but there is also another way of extracting information directly from the `LPSMAP_fit` and `LPSMALA_fit` objects. In fact, the estimated reproduction number values and their associated credible interval for each day can be extracted and plotted.
 
