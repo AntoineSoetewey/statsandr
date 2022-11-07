@@ -24,6 +24,7 @@ If you would like to financially support this blog so I can continue to provide 
 - [GitHub sponsor program](https://github.com/sponsors/AntoineSoetewey)
 - [PayPal](https://www.paypal.com/donate/?hosted_button_id=TUVCTTX838UC2)
 - [Buy me a book](https://www.buymeacoffee.com/statsandr) (it is usually known as "buy me a coffee", but I enjoy books much more than coffee)
+- [Buy one of my article on Gumroad](https://statsandr.gumroad.com/)
 
 ## Link or share
 
