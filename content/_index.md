@@ -21,5 +21,5 @@ From time to time, I also present some work related to data science & [data visu
 * [Support my work](/support/) so I can keep providing free content on an ad-free blog
 * [Contact me](/contact/) if you have any questions
 
-If you need help in performing statistical data analyses for your thesis or work related projects, or if you need a private lesson in statistics or R, see more information at [datanalyze.be](https://datanalyze.be/)
+If you need help in performing statistical data analyses for your thesis or work related projects, or if you need a private lesson in statistics or R, see more information at [datanalyze.be](https://datanalyze.be/).
 <br>
