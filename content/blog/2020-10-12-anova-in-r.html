@@ -20,42 +20,41 @@ output:
 bibliography: bibliography.bib
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#data">Data</a></li>
-<li><a href="#aim-and-hypotheses-of-anova">Aim and hypotheses of ANOVA</a></li>
-<li><a href="#underlying-assumptions-of-anova">Underlying assumptions of ANOVA</a>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#data" id="toc-data">Data</a></li>
+<li><a href="#aim-and-hypotheses-of-anova" id="toc-aim-and-hypotheses-of-anova">Aim and hypotheses of ANOVA</a></li>
+<li><a href="#underlying-assumptions-of-anova" id="toc-underlying-assumptions-of-anova">Underlying assumptions of ANOVA</a>
 <ul>
-<li><a href="#variable-type">Variable type</a></li>
-<li><a href="#independence">Independence</a></li>
-<li><a href="#normality">Normality</a></li>
-<li><a href="#equality-of-variances---homogeneity">Equality of variances - homogeneity</a></li>
-<li><a href="#another-method-to-test-normality-and-homogeneity">Another method to test normality and homogeneity</a></li>
-<li><a href="#outliers">Outliers</a></li>
+<li><a href="#variable-type" id="toc-variable-type">Variable type</a></li>
+<li><a href="#independence" id="toc-independence">Independence</a></li>
+<li><a href="#normality" id="toc-normality">Normality</a></li>
+<li><a href="#equality-of-variances---homogeneity" id="toc-equality-of-variances---homogeneity">Equality of variances - homogeneity</a></li>
+<li><a href="#another-method-to-test-normality-and-homogeneity" id="toc-another-method-to-test-normality-and-homogeneity">Another method to test normality and homogeneity</a></li>
+<li><a href="#outliers" id="toc-outliers">Outliers</a></li>
 </ul></li>
-<li><a href="#anova">ANOVA</a>
+<li><a href="#anova" id="toc-anova">ANOVA</a>
 <ul>
-<li><a href="#preliminary-analyses">Preliminary analyses</a></li>
-<li><a href="#anova-in-r">ANOVA in R</a></li>
-<li><a href="#interpretations-of-anova-results">Interpretations of ANOVA results</a></li>
-<li><a href="#whats-next">What’s next?</a></li>
+<li><a href="#preliminary-analyses" id="toc-preliminary-analyses">Preliminary analyses</a></li>
+<li><a href="#anova-in-r" id="toc-anova-in-r">ANOVA in R</a></li>
+<li><a href="#interpretations-of-anova-results" id="toc-interpretations-of-anova-results">Interpretations of ANOVA results</a></li>
+<li><a href="#whats-next" id="toc-whats-next">What’s next?</a></li>
 </ul></li>
-<li><a href="#post-hoc-test">Post-hoc test</a>
+<li><a href="#post-hoc-test" id="toc-post-hoc-test">Post-hoc test</a>
 <ul>
-<li><a href="#issue-of-multiple-testing">Issue of multiple testing</a></li>
-<li><a href="#post-hoc-tests-in-r-and-their-interpretation">Post-hoc tests in R and their interpretation</a>
+<li><a href="#issue-of-multiple-testing" id="toc-issue-of-multiple-testing">Issue of multiple testing</a></li>
+<li><a href="#post-hoc-tests-in-r-and-their-interpretation" id="toc-post-hoc-tests-in-r-and-their-interpretation">Post-hoc tests in R and their interpretation</a>
 <ul>
-<li><a href="#tukey-hsd-test">Tukey HSD test</a></li>
-<li><a href="#dunnetts-test">Dunnett’s test</a></li>
+<li><a href="#tukey-hsd-test" id="toc-tukey-hsd-test">Tukey HSD test</a></li>
+<li><a href="#dunnetts-test" id="toc-dunnetts-test">Dunnett’s test</a></li>
 </ul></li>
-<li><a href="#other-p-values-adjustment-methods">Other <em>p</em>-values adjustment methods</a></li>
+<li><a href="#other-p-values-adjustment-methods" id="toc-other-p-values-adjustment-methods">Other <em>p</em>-values adjustment methods</a></li>
 </ul></li>
-<li><a href="#visualization-of-anova-and-post-hoc-tests-on-the-same-plot">Visualization of ANOVA and post-hoc tests on the same plot</a></li>
-<li><a href="#summary">Summary</a></li>
-<li><a href="#references">References</a></li>
+<li><a href="#visualization-of-anova-and-post-hoc-tests-on-the-same-plot" id="toc-visualization-of-anova-and-post-hoc-tests-on-the-same-plot">Visualization of ANOVA and post-hoc tests on the same plot</a></li>
+<li><a href="#summary" id="toc-summary">Summary</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
 </ul>
 </div>
 
@@ -69,7 +68,7 @@ bibliography: bibliography.bib
 <li><strong>ANOVA</strong> generalizes the t-test beyond 2 groups, so it is used to compare <strong>3 or more groups</strong>.</li>
 </ul>
 <p>Note that there are several versions of the ANOVA (e.g., one-way ANOVA, two-way ANOVA, mixed ANOVA, repeated measures ANOVA, etc.). In this article, we present the simplest form only—the <strong>one-way ANOVA</strong><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>—and we refer to it as ANOVA in the remaining of the article.</p>
-<p>Although ANOVA is used to make inference about <a href="/blog/descriptive-statistics-by-hand/#mean">means</a> of different groups, the method is called “analysis of <em><a href="/blog/descriptive-statistics-by-hand/#variance">variance</a></em>.” It is called like this because it compares the “between” variance (the variance between the different groups) and the variance “within” (the variance within each group). If the between variance is significantly larger than the within variance, the group means are declared to be different. Otherwise, we cannot conclude one way or the other. The two variances are compared to each other by taking the ratio (<span class="math inline">\(\frac{variance_{between}}{variance_{within}}\)</span>) and then by comparing this ratio to a threshold from the Fisher <a href="/blog/a-guide-on-how-to-read-statistical-tables/">probability distribution</a> (a threshold based on a specific significance level, usually 5%).</p>
+<p>Although ANOVA is used to make inference about <a href="/blog/descriptive-statistics-by-hand/#mean">means</a> of different groups, the method is called “analysis of <em><a href="/blog/descriptive-statistics-by-hand/#variance">variance</a></em>”. It is called like this because it compares the “between” variance (the variance between the different groups) and the variance “within” (the variance within each group). If the between variance is significantly larger than the within variance, the group means are declared to be different. Otherwise, we cannot conclude one way or the other. The two variances are compared to each other by taking the ratio (<span class="math inline">\(\frac{variance_{between}}{variance_{within}}\)</span>) and then by comparing this ratio to a threshold from the Fisher <a href="/blog/a-guide-on-how-to-read-statistical-tables/">probability distribution</a> (a threshold based on a specific significance level, usually 5%).</p>
 <p>This is enough theory regarding the ANOVA method for now. In the remaining of this article, we discuss about it from a more practical point of view, and in particular we will cover the following points:</p>
 <ul>
 <li>the aim of the ANOVA, when it should be used and the null/alternative hypothesis</li>
@@ -79,6 +78,7 @@ bibliography: bibliography.bib
 <li>understand the notion of post-hoc test and interpret the results</li>
 <li>how to visualize results of ANOVA and post-hoc tests</li>
 </ul>
+<p><em>(Note that this article is available for download on my <a href="https://statsandr.gumroad.com/">Gumroad page</a>.)</em></p>
 </div>
 <div id="data" class="section level1">
 <h1>Data</h1>
@@ -119,7 +119,7 @@ ggplot(dat) +
 <li>compare the impact of the different levels of a categorical variable on a <a href="/blog/variable-types-and-examples/#quantitative">quantitative</a> variable</li>
 <li>explain a quantitative variable based on a qualitative variable</li>
 </ul>
-<p>In this context and as an example, we are going to use an ANOVA to help us answer the question: “<strong>Is the length of the flippers different between the 3 species of penguins?</strong>”</p>
+<p>In this context and as an example, we are going to use an ANOVA to help us answer the question: “<strong>Is the length of the flippers different between the 3 species of penguins?</strong>”.</p>
 <p>The null and alternative hypothesis of an ANOVA are:</p>
 <ul>
 <li><span class="math inline">\(H_0\)</span>: <span class="math inline">\(\mu_{Adelie} = \mu_{Chinstrap} = \mu_{Gentoo}\)</span> (<span class="math inline">\(\Rightarrow\)</span> the 3 species are equal in terms of flipper length)</li>
@@ -222,7 +222,7 @@ qqPlot(res_aov$residuals,
 <p><em>Side note: Remind that the p-value is the <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/">probability</a> of having observations as extreme as the ones we have observed in the sample(s) given that the null hypothesis is true. If the p-value <span class="math inline">\(&lt; \alpha\)</span> (indicating that it is not likely to observe the data we have in the sample given that the null hypothesis is true), the null hypothesis is rejected, otherwise the null hypothesis is not rejected. See more about <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha">p-value and significance level</a> if you are unfamiliar with those important statistical concepts.</em></p>
 <p>Remember that if the normality assumption was not reached, some transformation(s) would need to be applied on the raw data in the hope that residuals would better fit a normal distribution, or you would need to use the non-parametric version of the ANOVA—the <a href="/blog/kruskal-wallis-test-nonparametric-version-anova/">Kruskal-Wallis test</a>.</p>
 <p>As pointed out by a reader (see comments at the very end of the article), the normality assumption can also be tested on the “raw” data (i.e., the observations) instead of the residuals. However, if you test the normality assumption on the raw data, it must be tested for <em>each group separately</em> as the ANOVA requires normality in <em>each group</em>.</p>
-<p>Testing normality on all residuals or on the observations per group is equivalent, and will give similar results. Indeed, saying “The distribution of Y within each group is normally distributed” is the same as saying “The residuals are normally distributed.”</p>
+<p>Testing normality on all residuals or on the observations per group is equivalent, and will give similar results. Indeed, saying “The distribution of Y within each group is normally distributed” is the same as saying “The residuals are normally distributed”.</p>
 <p>Remember that residuals are the distance between the actual value of Y and the mean value of Y for a specific value of X, so the grouping variable is induced in the computation of the residuals.</p>
 <p>So in summary, in ANOVA you actually have two options for testing normality:</p>
 <ol style="list-style-type: decimal">
@@ -341,7 +341,7 @@ group_by(dat, species) %&gt;%
 </div>
 <div id="anova-in-r" class="section level2">
 <h2>ANOVA in R</h2>
-<p>As you guessed by now, only the ANOVA can help us to make inference about the population given the sample at hand, and help us to answer the initial research question “Is the length of the flippers different between the 3 species of penguins?”</p>
+<p>As you guessed by now, only the ANOVA can help us to make inference about the population given the sample at hand, and help us to answer the initial research question “Is the length of the flippers different between the 3 species of penguins?”.</p>
 <p>ANOVA in R can be done in several ways, of which two are presented below:</p>
 <ol style="list-style-type: decimal">
 <li>With the <code>oneway.test()</code> function:</li>
@@ -400,7 +400,8 @@ library(&quot;report&quot;) # Load the package every time you start R
 report(res_aov)</code></pre>
 <pre><code>## The ANOVA (formula: flipper_length_mm ~ species) suggests that:
 ## 
-##   - The main effect of species is statistically significant and large (F(2, 339) = 594.80, p &lt; .001; Eta2 = 0.78, 95% CI [0.75, 1.00])
+##   - The main effect of species is statistically significant and large (F(2, 339)
+## = 594.80, p &lt; .001; Eta2 = 0.78, 95% CI [0.75, 1.00])
 ## 
 ## Effect sizes were labelled following Field&#39;s (2013) recommendations.</code></pre>
 <p>As you can see, the function interprets the results for you and indicates a large and significant main effect of the species on the flipper length (<em>p</em>-value &lt; .001).</p>
@@ -411,7 +412,7 @@ report(res_aov)</code></pre>
 <p>If the <strong>null hypothesis is not rejected</strong> (<em>p</em>-value <span class="math inline">\(\ge\)</span> 0.05), it means that we do not reject the hypothesis that all groups are equal. The ANOVA more or less stops here. Other types of analyses can be performed of course, but—given the data at hand—we could not prove that at least one group was different so we usually do not go further with the ANOVA.</p>
 <p>On the contrary, if the <strong>null hypothesis is rejected</strong> (as it is our case since the <em>p</em>-value &lt; 0.05), we proved that at least one group is different. We can decide to stop here if we are only interested to test whether all species are equal in terms of flippers length.</p>
 <p>But most of the time, when we showed thanks to an ANOVA that at least one group is different, we are also interested in knowing <strong>which</strong> one(s) is(are) different. Results of an ANOVA, however, do <strong><em>NOT</em></strong> tell us which group(s) is(are) different from the others.</p>
-<p>To test this, we need to use other types of test, referred as post-hoc tests (in Latin, “after this,” so after obtaining statistically significant ANOVA results) or multiple pairwise-comparison tests.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> This family of statistical tests is the topic of the following sections.</p>
+<p>To test this, we need to use other types of test, referred as post-hoc tests (in Latin, “after this”, so after obtaining statistically significant ANOVA results) or multiple pairwise-comparison tests.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> This family of statistical tests is the topic of the following sections.</p>
 </div>
 </div>
 <div id="post-hoc-test" class="section level1">
@@ -430,8 +431,8 @@ report(res_aov)</code></pre>
 <p><span class="math display">\[\begin{equation}
 \begin{split}
 P(\text{at least 1 sig. result}) &amp; = 1 - P(\text{no sig. results}) \\
- &amp; = 1 - (1 - 0.05)^3 \\
- &amp; = 0.142625
+&amp; = 1 - (1 - 0.05)^3 \\
+&amp; = 0.142625
 \end{split}
 \end{equation}\]</span></p>
 <p>So, with as few as 3 tests being considered, we already have a 14.26% chance of observing at least one significant result, even if all of the tests are actually not significant.</p>
@@ -471,7 +472,7 @@ summary(post_test)</code></pre>
 ## 
 ## Linear Hypotheses:
 ##                         Estimate Std. Error t value Pr(&gt;|t|)    
-## Chinstrap - Adelie == 0   5.8699     0.9699   6.052 6.51e-09 ***
+## Chinstrap - Adelie == 0   5.8699     0.9699   6.052  7.1e-09 ***
 ## Gentoo - Adelie == 0     27.2333     0.8067  33.760  &lt; 1e-09 ***
 ## Gentoo - Chinstrap == 0  21.3635     1.0036  21.286  &lt; 1e-09 ***
 ## ---
@@ -649,6 +650,7 @@ for (i in y) {
     )
   }
 }</code></pre>
+<pre><code>## [1] FALSE</code></pre>
 <p><img src="/blog/2020-10-12-anova-in-r_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>And the second method is from the <code>{ggstatsplot}</code> package:</p>
 <pre class="r"><code>library(ggstatsplot)
@@ -688,14 +690,14 @@ Stevens, James P. 2013. <em>Intermediate Statistics: A Modern Approach</em>. Rou
 </div>
 </div>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
 <li id="fn1"><p>Note that it is called <em>one-way</em> or <em>one-factor</em> ANOVA because the means relate to the different modalities of a single independent variable, or factor.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>Residuals (denoted <span class="math inline">\(\epsilon\)</span>) are the differences between the observed values of the dependent variable (<span class="math inline">\(y\)</span>) and the predicted values (<span class="math inline">\(\hat{y}\)</span>). In the context of ANOVA, residuals correspond to the differences between the observed values and the mean of all values for that group.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p><span class="citation"><a href="#ref-stevens2013intermediate" role="doc-biblioref">Stevens</a> (<a href="#ref-stevens2013intermediate" role="doc-biblioref">2013</a>)</span> wrote, in p. 57, “Numerous studies have examined the effect of violations of assumptions in ANOVA, and an excellent summary of this literature has been provided by Glass, Peckham, and Sanders (1972). Their review indicates that non normality has only a slight effect on the type I error rate, even for very skewed or kurtotic distributions. For example, the actual <span class="math inline">\(\alpha\)</span>s for some very non-normal populations were only .055 or .06: very minor deviations from the nominal level of .05. […] The basic reason is the <em>Central Limit Theorem</em>, which states that the sum of independent observations having any distribution whatsoever approaches a normal distribution as the number of observations increases. To be somewhat more specific, Bock (1975) notes,”even for distributions which depart markedly from normality, sums of 50 or more observations approximate to normality. For moderately non-normal distributions the approximation is good with as few as 10 to 20 observations" (p. 111). Now since the sums of independent observations approach normality rapidly, so do the means, and the sampling distribution of <em>F</em> is based on means. Thus the sampling distribution of <em>F</em> is only slightly affected, and therefore the critical values when sampling from normal and non-normal distributions will not differ by much. Lack of normality due to skewness also has only a slight effect on power (a few hundredths)."<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p><span class="citation">Stevens (<a href="#ref-stevens2013intermediate" role="doc-biblioref">2013</a>)</span> wrote, in p. 57, “Numerous studies have examined the effect of violations of assumptions in ANOVA, and an excellent summary of this literature has been provided by Glass, Peckham, and Sanders (1972). Their review indicates that non normality has only a slight effect on the type I error rate, even for very skewed or kurtotic distributions. For example, the actual <span class="math inline">\(\alpha\)</span>s for some very non-normal populations were only .055 or .06: very minor deviations from the nominal level of .05. […] The basic reason is the <em>Central Limit Theorem</em>, which states that the sum of independent observations having any distribution whatsoever approaches a normal distribution as the number of observations increases. To be somewhat more specific, Bock (1975) notes,”even for distributions which depart markedly from normality, sums of 50 or more observations approximate to normality. For moderately non-normal distributions the approximation is good with as few as 10 to 20 observations” (p. 111). Now since the sums of independent observations approach normality rapidly, so do the means, and the sampling distribution of <em>F</em> is based on means. Thus the sampling distribution of <em>F</em> is only slightly affected, and therefore the critical values when sampling from normal and non-normal distributions will not differ by much. Lack of normality due to skewness also has only a slight effect on power (a few hundredths).”<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
 <li id="fn4"><p>As long as you use the Kruskal-Wallis test to, <em>in fine</em>, compare groups, homoscedasticity is not required. If you wish to compare medians, the Kruskal-Wallis test requires homoscedasticity. See more information about the difference in this <a href="https://influentialpoints.com/Training/Kruskal-Wallis_ANOVA_use_and_misuse.htm" target="_blank">article</a>.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>Note that, as discussed in the comments at the end of the article, post-hoc tests can under some circumstances be done directly (without an ANOVA). See the comments or <span class="citation"><a href="#ref-hsu1996multiple" role="doc-biblioref">Hsu</a> (<a href="#ref-hsu1996multiple" role="doc-biblioref">1996</a>)</span> for more details.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Note that, as discussed in the comments at the end of the article, post-hoc tests can under some circumstances be done directly (without an ANOVA). See the comments or <span class="citation">Hsu (<a href="#ref-hsu1996multiple" role="doc-biblioref">1996</a>)</span> for more details.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
 <li id="fn6"><p>Note that you could in principle apply the Bonferroni correction to all tests. For example, in the example above, with 3 tests and a global desired significance level of <span class="math inline">\(\alpha\)</span> = 0.05, we would only reject a null hypothesis if the <em>p</em>-value is less than <span class="math inline">\(\frac{0.05}{3}\)</span> = 0.0167. This method is, however, known to be quite conservative, leading to a potentially high rate of false negatives.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
 <li id="fn7"><p>The <em>p</em>-values are adjusted to keep the global significance level to the desired level.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
 <li id="fn8"><p>Thanks Michael Friendly for this suggestion.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
