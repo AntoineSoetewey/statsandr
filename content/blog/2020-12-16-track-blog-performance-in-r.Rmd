@@ -118,7 +118,7 @@ gadata <- google_analytics(view_id,
 gadata
 ```
 
-In its first year, Stats and R has attracted **`r format(gadata$users, big.mark = ",")` users**, who generated a total of **`r format(gadata$sessions, big.mark = ",")` sessions** and **`r format(gadata$pageviews, big.mark = ",")` page views** (that is an average of `r format(gadata$pageviews / (as.numeric(end_date - start_date) + 1), big.mark = ",", digits = 0)` page views per day).
+In its first year, Stats and R has attracted **`r format(gadata$users, big.mark = ",")` users**, who generated a total of **`r format(gadata$sessions, big.mark = ",")` sessions** and **`r format(gadata$pageviews, big.mark = ",")` page views** (that is an average of `r pander(gadata$pageviews / (as.numeric(end_date - start_date) + 1))` page views per day).
 
 For those unfamiliar with Google Analytics data and the difference between these metrics, remember that:
 
@@ -870,7 +870,7 @@ ggplot(gadata) +
     linetype = "dashed"
   ) +
   geom_text(aes(
-    x = med, y = 90,
+    x = med, y = 25,
     label = paste0("Median = ", round(med), " seconds")
   ),
   angle = 90,
@@ -882,8 +882,8 @@ ggplot(gadata) +
 
 From the above plot, we see that:
 
-* for readers with a low average time spent on each page, most of them were on tablet (see the peak around 0 second in the tablet facet)
-* besides some [outliers](/blog/outliers-detection-in-r/) at around 750 seconds (= 12 minutes 30 seconds) on mobile, distributions of the average time on page for readers on desktop and mobile were quite similar, with an average time on page mostly between 100 seconds (= 1 minute 40 seconds) and 350 seconds (= 5 minutes 50 seconds)
+* some readers on tablet have a very low average time spent on each page (see the peak around 0 second in the tablet facet)
+* distributions of the average time on page for readers on desktop and mobile were quite similar, with an average time on page mostly between 100 seconds (= 1 minute 40 seconds) and 400 seconds (= 6 minutes 40 seconds)
 * quite surprisingly, the median of the average time spent on page is slightly higher for visitors on mobile than on desktop (see the dashed vertical lines representing the medians in the desktop and mobile facets). This indicates that, although more people visit the blog from desktop, it seems that **people on mobile spend more time per page**. I find this result quite surprising given that most of my articles include R code and require a computer to run the code. Therefore, I expected that people would spend more time on desktop than on mobile because on mobile they would quickly scan the article, while on desktop they would read the article carefully and try to reproduce the code on their computer.^[At least that is what I do when I read blogs on mobile versus reading them on desktop.]
 
 Given this result, it would be interesting to also illustrate the **number of page views during a session**, represented by device type.
