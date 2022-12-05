@@ -53,6 +53,8 @@ The dataset `mpg` from the `{ggplot2}` package will be used to illustrate the di
 
 # Descriptive statistics
 
+Several methods using descriptive statistics exist. We present the most common ones below.
+
 ## Minimum and maximum
 
 The first step to detect outliers in R is to start with some [descriptive statistics](/blog/descriptive-statistics-in-r/), and in particular with the [minimum and maximum](/blog/descriptive-statistics-in-r/#minimum-and-maximum).
@@ -206,6 +208,42 @@ dat[outlier_ind, ]
 ```
 
 Setting the percentiles to 1 and 99 gives the same potential outliers as with the IQR criterion.
+
+## Z-scores
+
+If your data come from a [normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/), you can use the z-scores, defined as
+
+$$z_i = \frac{x_i - \overline{X}}{s_X}$$
+
+where $\overline{X}$ is the mean of $X$ and $s_X$ is the standard deviation.
+
+This is referred as scaling, which can be done with the `scale()` function in R.
+
+According to this method, any z-score:
+
+- below -2 or above 2 is considered as rare
+- below -3 or above 3 is considered as extremely rare
+
+Others also use a z-score below -3.29 or above 3.29 to detect outliers. This value of 3.29 comes from the fact that 1 observation out of 1000 is out of this interval if the data follow a normal distribution.
+
+In our case:
+
+```{r}
+dat$z_hwy <- scale(dat$hwy)
+
+hist(dat$z_hwy)
+summary(dat$z_hwy)
+```
+
+We see that there are some observations above 3.29, but none below 3.29.
+
+To identify these observations:
+
+```{r}
+which(dat$z_hwy > 3.29)
+```
+
+We see that bservations 213 and 222 can be considered as outliers according to this method.
 
 # Hampel filter
 

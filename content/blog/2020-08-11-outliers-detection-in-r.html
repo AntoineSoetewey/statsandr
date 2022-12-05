@@ -27,6 +27,7 @@ bibliography: bibliography.bib
 <li><a href="#histogram" id="toc-histogram">Histogram</a></li>
 <li><a href="#boxplot" id="toc-boxplot">Boxplot</a></li>
 <li><a href="#percentiles" id="toc-percentiles">Percentiles</a></li>
+<li><a href="#z-scores" id="toc-z-scores">Z-scores</a></li>
 </ul></li>
 <li><a href="#hampel-filter" id="toc-hampel-filter">Hampel filter</a></li>
 <li><a href="#statistical-tests" id="toc-statistical-tests">Statistical tests</a>
@@ -59,6 +60,7 @@ bibliography: bibliography.bib
 </div>
 <div id="descriptive-statistics" class="section level1">
 <h1>Descriptive statistics</h1>
+<p>Several methods using descriptive statistics exist. We present the most common ones below.</p>
 <div id="minimum-and-maximum" class="section level2">
 <h2>Minimum and maximum</h2>
 <p>The first step to detect outliers in R is to start with some <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a>, and in particular with the <a href="/blog/descriptive-statistics-in-r/#minimum-and-maximum">minimum and maximum</a>.</p>
@@ -203,6 +205,37 @@ dat[outlier_ind, ]</code></pre>
 ## 3 volkswagen   new beetle   1.9  1999     4 auto(… f        29    41 d     subc…</code></pre>
 <p>Setting the percentiles to 1 and 99 gives the same potential outliers as with the IQR criterion.</p>
 </div>
+<div id="z-scores" class="section level2">
+<h2>Z-scores</h2>
+<p>If your data come from a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normal distribution</a>, you can use the z-scores, defined as</p>
+<p><span class="math display">\[z_i = \frac{x_i - \overline{X}}{s_X}\]</span></p>
+<p>where <span class="math inline">\(\overline{X}\)</span> is the mean of <span class="math inline">\(X\)</span> and <span class="math inline">\(s_X\)</span> is the standard deviation.</p>
+<p>This is referred as scaling, which can be done with the <code>scale()</code> function in R.</p>
+<p>According to this method, any z-score:</p>
+<ul>
+<li>below -2 or above 2 is considered as rare</li>
+<li>below -3 or above 3 is considered as extremely rare</li>
+</ul>
+<p>Others also use a z-score below -3.29 or above 3.29 to detect outliers. This value of 3.29 comes from the fact that 1 observation out of 1000 is out of this interval if the data follow a normal distribution.</p>
+<p>In our case:</p>
+<pre class="r"><code>dat$z_hwy &lt;- scale(dat$hwy)
+
+hist(dat$z_hwy)</code></pre>
+<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>summary(dat$z_hwy)</code></pre>
+<pre><code>##        V1          
+##  Min.   :-1.92122  
+##  1st Qu.:-0.91360  
+##  Median : 0.09402  
+##  Mean   : 0.00000  
+##  3rd Qu.: 0.59782  
+##  Max.   : 3.45274</code></pre>
+<p>We see that there are some observations above 3.29, but none below 3.29.</p>
+<p>To identify these observations:</p>
+<pre class="r"><code>which(dat$z_hwy &gt; 3.29)</code></pre>
+<pre><code>## [1] 213 222</code></pre>
+<p>We see that bservations 213 and 222 can be considered as outliers according to this method.</p>
+</div>
 </div>
 <div id="hampel-filter" class="section level1">
 <h1>Hampel filter</h1>
@@ -318,7 +351,7 @@ boxplot(subdat$hwy,
   ylab = &quot;hwy&quot;
 )
 mtext(paste(&quot;Outliers: &quot;, paste(out, collapse = &quot;, &quot;)))</code></pre>
-<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-24-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>From the boxplot, we see that we could also apply the Dixon test on the value 20 in addition to the value 15 done previously. This can be done by finding the row number of the minimum value, excluding this row number from the dataset and then finally apply the Dixon test on this new dataset:</p>
 <pre class="r"><code># find and exclude lowest value
 remove_ind &lt;- which.min(subdat$hwy)
@@ -432,7 +465,7 @@ test</code></pre>
 
 Y &lt;- as.matrix(ggplot2::mpg[, c(&quot;cyl&quot;, &quot;hwy&quot;)])
 res &lt;- aq.plot(Y)</code></pre>
-<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Note also that some transformations may “naturally” eliminate outliers. The natural log or square root of a value reduces the variation caused by extreme values, so in some cases applying these transformations will eliminate the outliers.</p>
 <p>Thanks for reading. I hope this article helped you to detect outliers in R via several <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> (including minimum, maximum, histogram, boxplot and percentiles) or thanks to more formal techniques of outliers detection (including Hampel filter, Grubbs, Dixon and Rosner test). It is now your turn to verify them, and if they are correct, decide how to treat them (i.e., keeping, removing or imputing them) before conducting your analyses.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
