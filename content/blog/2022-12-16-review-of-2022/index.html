@@ -1,0 +1,368 @@
+---
+title: "Google Analytics in R: Review of 2022"
+author: Antoine Soetewey
+date: '2022-12-16'
+slug: review-of-2022
+categories: []
+tags:
+  - Blogging
+  - Package
+  - Professional
+  - R
+  - Review
+  - Visualization
+  - Web
+meta_img: blog/review-of-2022/images/review-of-2022.jpeg
+description: Learn how to analyze and visualize Universal Analytics (UA) and Google Analytics 4 (GA4) data for your blog or website via the googleAnalyticsR package in R
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#prerequesites" id="toc-prerequesites">Prerequesites</a></li>
+<li><a href="#analytics" id="toc-analytics">Analytics</a>
+<ul>
+<li><a href="#page-views-over-time" id="toc-page-views-over-time">Page views over time</a></li>
+<li><a href="#page-views-per-month-and-year" id="toc-page-views-per-month-and-year">Page views per month and year</a></li>
+<li><a href="#top-performing-pages" id="toc-top-performing-pages">Top performing pages</a></li>
+<li><a href="#page-views-by-country" id="toc-page-views-by-country">Page views by country</a></li>
+<li><a href="#page-views-per-day-of-week" id="toc-page-views-per-day-of-week">Page views per day of week</a></li>
+</ul></li>
+<li><a href="#thank-you-note" id="toc-thank-you-note">Thank you note</a></li>
+</ul>
+</div>
+
+<p><img src="images/review-of-2022.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>End of year means it is time to do a review of Stats and R.</p>
+<p>This year’s review will be much shorter compared to previous years because there are already a lot of examples in those <a href="/tags/review/">previous reviews</a>.</p>
+<p>Note that beginning of September 2022, I moved from Universal Analytics (known as UA) to Google Analytics 4 (known as GA4). As you may know if you often use Google Analytics; on July 1, 2023, standard Universal Analytics properties will stop processing new hits. This means that you will need to move to GA4 if you want to continue using it after this date.</p>
+<p>This year, I will be brief about the different metrics and how to analyze your Google Analytics (GA) data. However, this post will perhaps be helpful for people who also moved (or will move) to GA4 and still want to analyze their GA data from both UA and GA4.</p>
+<p>I have to admit that it is quite time consuming to combine data from both, in particular since metrics and dimensions are not the same between UA and GA4. So if you have not moved yet, I recommend doing it at the end or beginning of a year. This will prevent you from having to fetch data from two GA IDs, and then having to combine both data in R.</p>
+<p>As usual, I analyze my GA data in R thanks to the amazing <code>{googleAnalyticsR}</code> package from <a href="https://code.markedmondson.me/googleAnalyticsR/">Mark Edmondson</a>.</p>
+<p>Note that the actual number presented below will not be very useful for you. Every blog and website is different, so every audience is different. This post is more about illustrating the process of analyzing GA data in R (and this year, also to illustrate the process of combining GA data from two GA IDs), rather than about showing my numbers.</p>
+</div>
+<div id="prerequesites" class="section level1">
+<h1>Prerequesites</h1>
+<p>Before anything else, you have to specify the GA ID for which you want to analyze data. Mine are as follows:</p>
+<pre class="r"><code>ga_id &lt;- c(&quot;208126346&quot;, &quot;250795226&quot;)</code></pre>
+<p>You will find your(s) in the admin section of your GA account.</p>
+</div>
+<div id="analytics" class="section level1">
+<h1>Analytics</h1>
+<p>In this section, I present some visualizations that might be useful when analyzing your GA data. Feel free to comment at the end of the post if you use other interesting visualizations.</p>
+<p>Note that I focus on the page views metrics in this post, but you can edit my code to show other metrics as well. See the metrics available <a href="https://ga-dev-tools.web.app/dimensions-metrics-explorer/">for UA</a> and the ones <a href="https://developers.google.com/analytics/devguides/reporting/data/v1/api-schema">for GA4</a>.</p>
+<div id="page-views-over-time" class="section level2">
+<h2>Page views over time</h2>
+<p>Let’s start with the evolution of the number of page views over the past year, so from December 16, 2021 to December 15, 2022.</p>
+<pre class="r"><code>library(googleAnalyticsR)
+
+# set date range
+start_date &lt;- as.Date(&quot;2021-12-16&quot;)
+end_date &lt;- as.Date(&quot;2022-12-15&quot;)
+
+# extract data from both IDs
+dat1 &lt;- google_analytics(ga_id[1],
+  date_range = c(start_date, end_date),
+  metrics = &quot;pageviews&quot;,
+  dimensions = &quot;date&quot;,
+  anti_sample = TRUE # avoid sampling
+)
+
+dat2 &lt;- ga_data(ga_id[2],
+  date_range = c(start_date, end_date),
+  metrics = &quot;screenPageViews&quot;,
+  dimensions = &quot;date&quot;,
+  limit = -1 # return all data (no limit)
+)
+
+# combine data from both IDs
+library(dplyr)
+dat &lt;- full_join(dat1, dat2, by = &quot;date&quot;)
+dat$page_views &lt;- rowSums(select(dat, pageviews, screenPageViews),
+  na.rm = TRUE
+)
+
+
+# scatter plot with a trend line
+library(ggplot2)
+dat %&gt;%
+  ggplot(aes(x = date, y = page_views)) +
+  geom_point(size = 1L, color = &quot;gray&quot;) + # change size and color of points
+  geom_smooth(color = &quot;steelblue&quot;, alpha = 0.25) + # change color of smoothed line and transparency of confidence interval
+  theme_minimal() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;&quot;,
+    title = &quot;Evolution of daily page views&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  theme(plot.margin = unit(c(5.5, 17.5, 5.5, 5.5), &quot;pt&quot;)) + # to avoid the plot being cut on the right edge
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="images/page_views.jpeg" style="width:100.0%" /></p>
+<p>As you can see in the code above, we need to:</p>
+<ul>
+<li>extract data from two different IDs: this is done with <code>google_analytics()</code> for UA and <code>ga_data()</code> for GA4 (with each function having its own arguments)</li>
+<li>join data from the two IDs (with a <code>full_join()</code> because even after moving to GA4, there were still some hits on UA, so I need to keep data from the 2 IDs for the entire year)</li>
+<li>sum up the metric for both IDs (with <code>rowSums()</code>)</li>
+</ul>
+<p>This process will be done repeatedly for each visualization.</p>
+<p>From the plot above, we see that the number of page views follows a cyclical evolution (with a decrease during summer). This trend follows the same pattern than last year, but the increase in the last quarter of the year is larger in 2022.</p>
+<p>Note that there seems to be consistently some days with a lower number of page views than the rest. This is actually the weekends. See more on that in this <a href="/blog/review-of-2022/#page-views-per-day-of-week">section</a>. Note also the presence of an <a href="/blog/outliers-detection-in-r/">outlier</a> with a number of page views above 5,000. No post has been published on that day, so it probably comes from an old post that was shared to a large audience.</p>
+<p>Finally, summing all days give a total page views of 938,630. Last year, it was 876,280, so 2022 saw an increase of 7.12%.</p>
+</div>
+<div id="page-views-per-month-and-year" class="section level2">
+<h2>Page views per month and year</h2>
+<p>Comparison of the number of page views per month for all previous years can also be useful. Below two different types of visualizations.</p>
+<pre class="r"><code># set new date range to include previous years
+start_date_launch &lt;- as.Date(&quot;2019-12-16&quot;)
+
+# extract data from both IDs
+dat1 &lt;- google_analytics(ga_id[1],
+  date_range = c(start_date_launch, end_date),
+  metrics = &quot;pageviews&quot;,
+  dimensions = &quot;date&quot;,
+  anti_sample = TRUE # avoid sampling
+)
+
+dat2 &lt;- ga_data(ga_id[2],
+  date_range = c(start_date_launch, end_date),
+  metrics = &quot;screenPageViews&quot;,
+  dimensions = &quot;date&quot;,
+  limit = -1 # return all data (no limit)
+)
+
+# combine data from both IDs
+dat &lt;- full_join(dat1, dat2, by = &quot;date&quot;)
+dat$page_views &lt;- rowSums(select(dat, pageviews, screenPageViews),
+  na.rm = TRUE
+)
+
+
+# add year and month columns to dataframe
+dat$month &lt;- format(dat$date, &quot;%m&quot;)
+dat$year &lt;- format(dat$date, &quot;%Y&quot;)
+
+# page views by month by year using dplyr then graph using ggplot2 barplot
+dat %&gt;%
+  filter(year != 2019) %&gt;% # remove 2019 because there are data for December only
+  group_by(year, month) %&gt;%
+  summarize(page_views = sum(page_views)) %&gt;%
+  ggplot(aes(x = month, y = page_views, fill = year)) +
+  geom_bar(position = &quot;dodge&quot;, stat = &quot;identity&quot;) +
+  theme_minimal() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;Month&quot;,
+    title = &quot;Page views per month and year&quot;,
+    subtitle = paste0(format(start_date_launch, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;,
+    fill = &quot;&quot; # remove legend title
+  ) +
+  theme(legend.position = &quot;top&quot;) + # change legend position
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="images/page_views_month.jpeg" style="width:100.0%" /></p>
+<p>Another possibility is as follows:</p>
+<pre class="r"><code>dat2 &lt;- dat
+dat2$day &lt;- day(dat2$date)
+dat2$day_month &lt;- as.Date(paste0(dat2$month, &quot;-&quot;, dat2$day), format = &quot;%m-%d&quot;)
+
+dat2 %&gt;%
+  filter(year != 2019 &amp; page_views &lt; 7500) %&gt;% # remove 2019 and outliers
+  ggplot(aes(x = day_month, y = page_views, color = year)) +
+  geom_point(size = 1L, alpha = 0.25) + # change size and alpha of points
+  geom_smooth(se = FALSE) + # remove confidence interval
+  theme_minimal() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;&quot;,
+    title = &quot;Evolution of daily page views&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;,
+    color = &quot;&quot; # remove legend title
+  ) +
+  theme(legend.position = &quot;top&quot;) + # change legend position
+  scale_y_continuous(labels = scales::comma) + # better y labels
+  scale_x_date(date_labels = &quot;%b&quot;) # show only months</code></pre>
+<p><img src="images/page_views_month_evolution.jpeg" style="width:100.0%" /></p>
+<p>From the 2 plots above, we see that the blog globally performed better in terms of page views compared to 2020-2021 (with an exception in the first quarter for which it performed better in 2021).</p>
+<p>Note that a comparison between 3 years is fine, but with more years to compare the plots would quickly become unreadable!</p>
+</div>
+<div id="top-performing-pages" class="section level2">
+<h2>Top performing pages</h2>
+<p>In case you are interested to know the top performing pages (still in terms of page views):</p>
+<pre class="r"><code># extract data from both IDs
+dat1 &lt;- google_analytics(ga_id[1],
+  date_range = c(start_date, end_date),
+  metrics = &quot;pageviews&quot;,
+  dimensions = &quot;pageTitle&quot;,
+  anti_sample = TRUE # avoid sampling
+)
+
+dat2 &lt;- ga_data(ga_id[2],
+  date_range = c(start_date, end_date),
+  metrics = &quot;screenPageViews&quot;,
+  dimensions = &quot;pageTitle&quot;,
+  limit = -1 # return all data (no limit)
+)
+
+# combine data from both IDs
+dat &lt;- full_join(dat1, dat2, by = &quot;pageTitle&quot;)
+dat$page_views &lt;- rowSums(select(dat, pageviews, screenPageViews),
+  na.rm = TRUE
+)
+
+## Create a table of the most viewed posts
+library(lubridate)
+library(reactable)
+library(stringr)
+
+
+most_viewed_posts &lt;- dat %&gt;%
+  mutate(Title = str_sub(pageTitle, start = 1, end = -nchar(&quot; - Stats and R&quot;))) %&gt;% # remove blog site in pageTitle
+  count(Title, wt = page_views, sort = TRUE) %&gt;%
+  mutate(Title = str_trunc(Title, width = 30)) # keep maximum 30 characters
+
+# plot
+top_n(most_viewed_posts, n = 7, n) %&gt;% # edit n for more or less pages to display
+  ggplot(., aes(x = reorder(Title, n), y = n)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;steelblue&quot;) +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;Page title&quot;,
+    title = &quot;Top performing pages&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="images/top_pages.jpeg" style="width:100.0%" /></p>
+<p>Top performing posts are quite similar than last year, that is:</p>
+<ol style="list-style-type: decimal">
+<li><a href="/blog/descriptive-statistics-in-r/">Descriptive statistics in R</a></li>
+<li><a href="/blog/outliers-detection-in-r/">Outliers detection in R</a></li>
+<li><a href="/blog/correlation-coefficient-and-correlation-test-in-r/">Correlation coefficient and correlation test in R</a></li>
+<li><a href="/blog/anova-in-r/">ANOVA in R</a></li>
+<li><a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence in R</a></li>
+</ol>
+<p>Since they are the most read posts for several years, I have made them available to download via <a href="https://statsandr.gumroad.com/">Gumroad</a>.</p>
+</div>
+<div id="page-views-by-country" class="section level2">
+<h2>Page views by country</h2>
+<p>Knowing from which country your readers come from can also be useful, in particular for e-commerce or blogs that sell physical products in addition to writing posts.</p>
+<pre class="r"><code># extract data from both IDs
+dat1 &lt;- google_analytics(ga_id[1],
+  date_range = c(start_date, end_date),
+  metrics = &quot;pageviews&quot;,
+  dimensions = &quot;country&quot;,
+  anti_sample = TRUE # avoid sampling
+)
+
+dat2 &lt;- ga_data(ga_id[2],
+  date_range = c(start_date, end_date),
+  metrics = &quot;screenPageViews&quot;,
+  dimensions = &quot;country&quot;,
+  limit = -1 # return all data (no limit)
+)
+
+# combine data from both IDs
+dat &lt;- full_join(dat1, dat2, by = &quot;country&quot;)
+dat$page_views &lt;- rowSums(select(dat, pageviews, screenPageViews),
+  na.rm = TRUE
+)
+
+# table
+countries &lt;- dat %&gt;%
+  mutate(Country = str_trunc(country, width = 30)) %&gt;% # keep maximum 30 characters
+  count(Country, wt = pageviews, sort = TRUE)
+
+# plot
+top_n(countries, n = 10, n) %&gt;% # edit n for more or less countries to display
+  ggplot(., aes(x = reorder(Country, n), y = n)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;steelblue&quot;) +
+  theme_minimal() +
+  coord_flip() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;Country&quot;,
+    title = &quot;Top performing countries&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) + # better y labels
+  theme(plot.margin = unit(c(5.5, 7.5, 5.5, 5.5), &quot;pt&quot;)) # to avoid the plot being cut on the right edge</code></pre>
+<p><img src="images/countries.jpeg" style="width:100.0%" /></p>
+<p>For Stats and R, most readers are from the US, and to a large extent since the second top country (UK) is quite far in terms of page views.</p>
+<p>This trend is the same than last years, except that:</p>
+<ul>
+<li>UK has surpassed India, and</li>
+<li>Belgium (which used to rank 3rd and 6th in 2020 and 2021, respectively) is now only 8th. Since I am from Belgium, this indicates that the blog is attracting more and more international readers through the years (and proportionally less and less from my country).</li>
+</ul>
+</div>
+<div id="page-views-per-day-of-week" class="section level2">
+<h2>Page views per day of week</h2>
+<p>As discussed in the section about the evolution of daily page views (view this <a href="/blog/review-of-2022/#page-views-over-time">section</a>), there seem to be some days which consistently perform worse than other days.</p>
+<p>The following plot will show what are these days:</p>
+<pre class="r"><code># extract data from both IDs
+dat1 &lt;- google_analytics(ga_id[1],
+  date_range = c(start_date, end_date),
+  metrics = &quot;pageviews&quot;,
+  dimensions = c(&quot;date&quot;),
+  anti_sample = TRUE # avoid sampling
+)
+
+dat2 &lt;- ga_data(ga_id[2],
+  date_range = c(start_date, end_date),
+  metrics = &quot;screenPageViews&quot;,
+  dimensions = c(&quot;date&quot;),
+  limit = -1 # return all data (no limit)
+)
+
+# combine data from both IDs
+dat &lt;- full_join(dat1, dat2, by = &quot;date&quot;)
+dat$page_views &lt;- rowSums(select(dat, pageviews, screenPageViews),
+  na.rm = TRUE
+)
+# find day of week
+dat$weekday &lt;- wday(dat$date, label = TRUE, abbr = TRUE)
+
+## Reordering dat$weekday so Monday is first
+dat$weekday &lt;- factor(dat$weekday,
+  levels = c(&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;, &quot;Sat&quot;, &quot;Sun&quot;)
+)
+
+# boxplot
+library(scales)
+dat %&gt;%
+  ggplot(aes(x = weekday, y = page_views)) +
+  geom_boxplot(fill = &quot;steelblue&quot;, outlier.colour = alpha(0.25)) +
+  geom_jitter(alpha = 0.25) + # adds transparency
+  theme_minimal() +
+  labs(
+    y = &quot;Page views&quot;,
+    x = &quot;&quot;,
+    title = &quot;Page views per day of week&quot;,
+    subtitle = paste0(format(start_date, &quot;%b %d, %Y&quot;), &quot; to &quot;, format(end_date, &quot;%b %d, %Y&quot;)),
+    caption = &quot;Data: Google Analytics data of statsandr.com&quot;
+  ) +
+  scale_y_continuous(labels = scales::comma) # better y labels</code></pre>
+<p><img src="images/weekday.jpeg" style="width:100.0%" /></p>
+<p>As expected for a technical blog, there are much more readers during the week than during the weekend.</p>
+</div>
+</div>
+<div id="thank-you-note" class="section level1">
+<h1>Thank you note</h1>
+<p>Thank you to all readers who came to Stats and R this year. You made this journey incredibly more enriching. For next year and the many more to come, I will keep writing about topics for which I am familiar and interested in. So stay tuned!</p>
+<p>Thanks for reading. I hope this article helped you to analyze your Google Analytics data in R, or helped you to combine your Universal Analytics and Google Analytics 4 data. For more examples of visualizations or summaries of your GA data in R, see also previous years’ <a href="/tags/review/">reviews</a>.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
