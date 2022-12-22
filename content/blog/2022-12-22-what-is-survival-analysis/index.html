@@ -1,0 +1,1058 @@
+---
+title: What is survival analysis? Examples by hand and in R
+author: Antoine Soetewey
+date: '2022-12-22'
+slug: what-is-survival-analysis
+categories: []
+tags:
+  - Descriptive statistics
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+  - Survival analysis
+meta_img: blog/what-is-survival-analysis/images/what-is-survival-analysis.jpeg
+description: Learn more about survival analysis (also called time-to-event analysis), in which context and how it is used. Also learn how to apply it by hand and in R
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+    # df_print: paged
+draft: true
+bibliography: bibliography.bib
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#what-is-survival-analysis" id="toc-what-is-survival-analysis">What is survival analysis?</a></li>
+<li><a href="#why-do-we-need-special-methods-for-survival-analysis" id="toc-why-do-we-need-special-methods-for-survival-analysis">Why do we need special methods for survival analysis?</a></li>
+<li><a href="#common-functions-in-survival-analysis" id="toc-common-functions-in-survival-analysis">Common functions in survival analysis</a>
+<ul>
+<li><a href="#survival-function" id="toc-survival-function">Survival function</a></li>
+<li><a href="#cumulative-hazard-function" id="toc-cumulative-hazard-function">Cumulative hazard function</a></li>
+<li><a href="#hazard-function" id="toc-hazard-function">Hazard function</a></li>
+</ul></li>
+<li><a href="#estimation" id="toc-estimation">Estimation</a>
+<ul>
+<li><a href="#by-hand" id="toc-by-hand">By hand</a></li>
+<li><a href="#in-r" id="toc-in-r">In R</a></li>
+</ul></li>
+<li><a href="#hypothesis-testing" id="toc-hypothesis-testing">Hypothesis testing</a>
+<ul>
+<li><a href="#log-rank-test" id="toc-log-rank-test">Log-rank test</a>
+<ul>
+<li><a href="#by-hand-1" id="toc-by-hand-1">By hand</a></li>
+<li><a href="#in-r-1" id="toc-in-r-1">In R</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#to-go-further" id="toc-to-go-further">To go further</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+</ul>
+</div>
+
+<p><img src="images/what-is-survival-analysis.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>For the last post of the year, I would like to present a rather unknown (yet important) statistical method–<strong>survival analysis</strong>.</p>
+<p>Although survival analysis is a branch of statistics, it is usually not covered in introductory statistics courses and it is rather unknown to the general public. It is mostly taught in biostatistics courses or advanced statistics study programs.</p>
+<p>In this article, I will explain what is survival analysis, in which context and how it is used. I will explain the main tools and methods used by biostatisticians to analyze survival data and how to estimate and interpret survival curves.</p>
+<p>I will show in detail how to apply these techniques in R with concrete examples. In practice, survival analysis is almost always done via a statistical program and never done by hand. However, as for any statistical concept, I believe that doing it by hand allows to really understand the concepts and what these programs actually do. For this reason, I will also show a brief example on how to perform a basic survival analysis by hand.</p>
+<p><em>Note that this article is inspired from:</em></p>
+<ul>
+<li><em>the lecture notes of Prof. Van Keilegom and my personal notes as teaching assistant for her course entitled “Analysis of Survival and Duration Data” given at UCLouvain</em></li>
+<li><em>the lecture notes of Prof. Legrand for her course entitled “Statistics in clinical trials” given at UCLouvain</em></li>
+</ul>
+</div>
+<div id="what-is-survival-analysis" class="section level1">
+<h1>What is survival analysis?</h1>
+<p><strong>Survival analysis</strong> (also called time-to-event analysis or duration analysis) is a branch of statistics aimed at <strong>analyzing the expected duration of time until one or more events happen</strong>, called survival times or duration times.</p>
+<p>In survival analysis, we are interested in a certain event and want to <strong>analyze the time until the event happens</strong>.</p>
+<p>While the event of interest is often death (in this case we study the time to death for patients having a specific disease) or recurrence (in this case we study the time to relapse of a certain disease), it is not limited to the fields of medicine and epidemiology.</p>
+<p>In fact, it can be used in many domains. For example, we may also analyze the time until:</p>
+<ul>
+<li>getting cured from a certain disease</li>
+<li>finding a new job after a period of unemployment</li>
+<li>being arrested again after being released from jail</li>
+<li>the first pregnancy</li>
+<li>the failure of a mechanical system or a machine</li>
+<li>a bank or a company goes bankrupt</li>
+<li>a customer buys a new product or stops its current subscription</li>
+<li>a letter is delivered</li>
+<li>a taxi picks you up after having called the taxi company</li>
+<li>an employee leaves the company</li>
+<li>etc.</li>
+</ul>
+<p>As you can see, the event of interest does not necessarily have to be the death or a disease, but in all situations <strong>we are interested in the time until a specific event occurs</strong>.</p>
+</div>
+<div id="why-do-we-need-special-methods-for-survival-analysis" class="section level1">
+<h1>Why do we need special methods for survival analysis?</h1>
+<p>Survival data, also referred as time-to-event data, requires a special set of statistical methods for three main reasons:</p>
+<ul>
+<li><strong>Duration times</strong> are <strong>always positive</strong>: the time until an event of interest takes place cannot be less than 0.</li>
+<li><strong>Different measures</strong> are of interest depending on the research question, context, etc. For instance, we could be interested in:
+<ul>
+<li>The <strong>probability</strong> that a cancer patient survives longer than 5 years?</li>
+<li>The typical <strong>waiting time</strong> for a cab to arrive after having called the taxi company?</li>
+<li><strong>How many</strong>, out of 100 unemployed people, are expected to have a job again after 2 months?</li>
+</ul></li>
+<li><strong>Censoring</strong> is almost always an issue:
+<ul>
+<li>Most of the time, the event occurred before the end of the study and the survival duration is known.</li>
+<li>However, sometimes, the event is not yet observed at the end of the study. Suppose that we study the time until death of patients with breast cancer. Luckily, some patients will not die before the end of the study.</li>
+<li>Other times, another event takes place before the event of interest. For example, a cancer patient may die from a car accident.</li>
+<li>And even sometimes the patient withdraws from the study or moves to another country so we cannot observe her survival time (this is known as lost to follow up or drop out).</li>
+<li>Censoring can be seen, in some sense, as a type of missing data.</li>
+<li>For these reasons, many “standard” <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a>, <a href="/blog/hypothesis-test-by-hand/">hypothesis tests</a> and <a href="/blog/multiple-linear-regression-made-simple/">regression models</a> are not appropriate for this kind of data. Specific statistical methods are required to take into account the fact that we miss the <em>exact</em> survival duration for some patients. We know that they survived a certain amount of time (until the end of the study or until the time of withdrawal), but we do not know their exact survival time.</li>
+</ul></li>
+</ul>
+<p>For your information, when the event is not yet observed at the end of the study (i.e., the survival duration is greater than the observed duration), this is referred as right-censoring. On the other hand, left-censoring occurs if a participant is entered into the study when the event of interest occurred prior to study entry but we do not know exactly when. Of course, we would like to analyze all available data, including information about censored patients.</p>
+<p>The goal of survival analysis is thus to model and describe time-to-event data in an appropriate way, taking the particularities of this type of data into account.</p>
+</div>
+<div id="common-functions-in-survival-analysis" class="section level1">
+<h1>Common functions in survival analysis</h1>
+<p>We are not going to go to much into the details, but it is important to lay the foundation with the most common functions in survival analysis.</p>
+<p>Let <em>T</em> be a non-negative continuous random variable, representing the time until the event of interest. We consider the following functions:</p>
+<ol style="list-style-type: decimal">
+<li>Survival function</li>
+<li>Cumulative hazard function</li>
+<li>Hazard function</li>
+</ol>
+<div id="survival-function" class="section level2">
+<h2>Survival function</h2>
+<p>The most common one is the survival function. For each <span class="math inline">\(t\)</span>:</p>
+<p><span class="math display">\[S(t) = P(T &gt; t) = 1 - F(t)\]</span></p>
+<p><span class="math inline">\(S(t)\)</span> represents, for each time <span class="math inline">\(t\)</span>, the probability that the time until the event is greater than this time <span class="math inline">\(t\)</span>. In other words, it models the probability that the event of interest happens <strong>after</strong> <span class="math inline">\(t\)</span>.</p>
+<p>In the context of our examples mentioned above, it gives the probability that:</p>
+<ul>
+<li>a randomly selected patient will survive beyond time <span class="math inline">\(t\)</span>,</li>
+<li>the cab takes more than <span class="math inline">\(t\)</span> minutes to arrive, or</li>
+<li>an unemployed person take more than <span class="math inline">\(t\)</span> months to find a new job.</li>
+</ul>
+<p>The survival function <span class="math inline">\(S(t)\)</span> is:</p>
+<ul>
+<li>a decreasing function,</li>
+<li>taking values in <span class="math inline">\([0, 1]\)</span> (since it is a probability), and</li>
+<li>equal to 1 at <span class="math inline">\(t = 0\)</span> and 0 at <span class="math inline">\(t = \infty\)</span>.</li>
+</ul>
+<p>Visually we have:</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The curve shows the proportion of individuals (or experimental units) who, as time goes on, have not experienced an event. As time progresses, events occur, so the proportion who have not experienced the event decreases.</p>
+</div>
+<div id="cumulative-hazard-function" class="section level2">
+<h2>Cumulative hazard function</h2>
+<p>The cumulative hazard function is defined as:</p>
+<p><span class="math display">\[H(t) = -log S(t)\]</span></p>
+<p>and has the following properties:</p>
+<ul>
+<li>increasing function,</li>
+<li>taking value in <span class="math inline">\([0, +\infty]\)</span>, and</li>
+<li><span class="math inline">\(S(t) = exp(-H(t))\)</span></li>
+</ul>
+<p>The cumulative hazard is the total hazard experienced up to time <span class="math inline">\(t\)</span>.</p>
+</div>
+<div id="hazard-function" class="section level2">
+<h2>Hazard function</h2>
+<p>The hazard function, or hazard rate, is defined as:</p>
+<p><span class="math display">\[
+\begin{aligned}
+h(t) &amp;= \lim_{\Delta t \rightarrow 0} \frac{P(t \le T &lt; t + \Delta t | T \ge t)}{\Delta t}\\
+&amp;= \frac{d}{dt} H(t)
+\end{aligned}
+\]</span></p>
+<p>and has the following properties:</p>
+<ul>
+<li>positive function (not necessarily increasing or decreasing)</li>
+<li>the hazard function <span class="math inline">\(h(t)\)</span> can have many different shapes and is therefore a useful tool to summarize survival data</li>
+</ul>
+<p>In the example of cancer patients, <span class="math inline">\(h(t)\)</span> measures the instantaneous risk of dying right after time <span class="math inline">\(t\)</span> given the individual is alive at time <span class="math inline">\(t\)</span>.</p>
+<p>To link the hazard rate with the survival function; the survival curve represents the hazard rates. A steeper slope indicates a higher hazard rate because events happen more frequently, reducing the proportion of individuals who have not experienced the event at a faster rate. On the contrary, a gradual and flatter slope indicates a lower hazard rate because events occur less frequently, reducing the proportion of individuals who have not experiences the event at a slower rate.</p>
+<p>Note that, in contrast to the survival function which focuses on not having an event, the hazard function focuses on the event occurring.</p>
+</div>
+</div>
+<div id="estimation" class="section level1">
+<h1>Estimation</h1>
+<p>To estimate the survival function, we need to use an estimator which is able to deal with censoring. The most common one is the nonparametric <strong><span class="citation">Kaplan and Meier (<a href="#ref-kaplan1958nonparametric" role="doc-biblioref">1958</a>)</span> estimator</strong> (also sometimes referred as the product-limit estimator, or more simply, the K-M estimator).</p>
+<p>The advantages of the Kaplan-Meier estimator are that:</p>
+<ul>
+<li>it is simple and straightforward to use and interpret</li>
+<li>it is a nonparametric estimator, so it constructs a survival curve from the data and no assumptions is made about the shape of the underlying distribution</li>
+<li>it gives a graphical representation of the survival function(s), useful for illustrative purposes</li>
+</ul>
+<p>Note that an important assumption for the estimation to hold is that censoring is independent of the occurrence of events. We say that censoring is non-informative, that is, censored subjects have the same survival prospects as subjects that are not censored and continue to be followed.</p>
+<div id="by-hand" class="section level2">
+<h2>By hand</h2>
+<p>To understand how it works, let’s first estimate it by hand on the following dataset:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<pre><code>##    subject time event
+## 1        1    3     0
+## 2        2    5     1
+## 3        3    7     1
+## 4        4    2     1
+## 5        5   18     0
+## 6        6   16     1
+## 7        7    2     1
+## 8        8    9     1
+## 9        9   16     1
+## 10      10    5     0</code></pre>
+<p>where:</p>
+<ul>
+<li><code>subject</code> is the individual’s identifier</li>
+<li><code>time</code> is the time to event (in years)<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></li>
+<li><code>event</code> is the event status (0 = censored, 1 = event happened)</li>
+</ul>
+<p>Remember that for each subject, we need to know at least 2 pieces of information:</p>
+<ol style="list-style-type: decimal">
+<li>the time until the event of interest or the time until the censoring, and</li>
+<li>whether we have observed the event of interest or if we have observed censoring.</li>
+</ol>
+<p>We first need to count the number of distinct event times. Ignoring censored observations, we have 5 distinct event times:</p>
+<p><em>2</em>, <em>5</em>, <em>7</em>, <em>9</em> and <em>16</em></p>
+<p>The easiest way to do the calculation by hand is by filling the following table (a table with 5 rows since there are 5 distinct event times):</p>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="43%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"><span class="math inline">\(j\)</span></th>
+<th align="center"><span class="math inline">\(y_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(d_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(R_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(1 - \frac{d_{(j)}}{R_{(j)}}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>We fill columns one by one:</p>
+<ul>
+<li><span class="math inline">\(y_{(j)}\)</span> = the ordered distinct event times:</li>
+</ul>
+<p><em>2</em>, <em>5</em>, <em>7</em>, <em>9</em> and <em>16</em></p>
+<p>So the table becomes:</p>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="43%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"><span class="math inline">\(j\)</span></th>
+<th align="center"><span class="math inline">\(y_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(d_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(R_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(1 - \frac{d_{(j)}}{R_{(j)}}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">5</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">7</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">9</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">16</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(d_{(j)}\)</span> = the number of observations for each distinct event time. For this, the frequency for each distinct event time is useful:</li>
+</ul>
+<pre><code>## time
+##  2  5  7  9 16 
+##  2  1  1  1  2</code></pre>
+<p>The table becomes:</p>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="43%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"><span class="math inline">\(j\)</span></th>
+<th align="center"><span class="math inline">\(y_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(d_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(R_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(1 - \frac{d_{(j)}}{R_{(j)}}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">5</td>
+<td align="center">1</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">7</td>
+<td align="center">1</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">9</td>
+<td align="center">1</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">16</td>
+<td align="center">2</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(R_{(j)}\)</span> = the remaining number of individuals at risk. For this, the distribution of time (censored and not censored) is useful:</li>
+</ul>
+<pre><code>## time
+##  2  3  5  7  9 16 18 
+##  2  1  2  1  1  2  1</code></pre>
+<p>We see that:</p>
+<ul>
+<li>At the beginning there are 10 subjects</li>
+<li>Just before time <span class="math inline">\(t = 5\)</span>, there are 7 subjects left (10 subjects - 2 who had the event - 1 who is censored)</li>
+<li>Just before time <span class="math inline">\(t = 7\)</span>, there are 5 subjects left (= 10 - 2 - 1 - 2)</li>
+<li>Just before time <span class="math inline">\(t = 9\)</span>, there are 4 subjects left (= 10 - 2 - 1 - 2 - 1)</li>
+<li>Just before time <span class="math inline">\(t = 16\)</span>, there are 3 subjects left (= 10 - 2 - 1 - 2 - 1 - 1)</li>
+</ul>
+<p>The table becomes:</p>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="43%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"><span class="math inline">\(j\)</span></th>
+<th align="center"><span class="math inline">\(y_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(d_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(R_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(1 - \frac{d_{(j)}}{R_{(j)}}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">10</td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">5</td>
+<td align="center">1</td>
+<td align="center">7</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">7</td>
+<td align="center">1</td>
+<td align="center">5</td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">9</td>
+<td align="center">1</td>
+<td align="center">4</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">16</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(1 - \frac{d_{(j)}}{R_{(j)}}\)</span> is straightforward, so the table becomes:</li>
+</ul>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="43%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"><span class="math inline">\(j\)</span></th>
+<th align="center"><span class="math inline">\(y_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(d_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(R_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(1 - \frac{d_{(j)}}{R_{(j)}}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">10</td>
+<td align="center">0.8</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">5</td>
+<td align="center">1</td>
+<td align="center">7</td>
+<td align="center">0.857</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">7</td>
+<td align="center">1</td>
+<td align="center">5</td>
+<td align="center">0.8</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">9</td>
+<td align="center">1</td>
+<td align="center">4</td>
+<td align="center">0.75</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">16</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">0.333</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>The Kaplan-Meier estimator is:</p>
+<p><span class="math display">\[\hat{S}_{KM}(t) = \prod_{j:y_{(j)} \le t} \left(1 - \frac{d_{(j)}}{R_{(j)}} \right)\]</span></p>
+<p>For each <span class="math inline">\(j\)</span>, we thus take the cumulative product:</p>
+<ul>
+<li><span class="math inline">\(j_1 = 0.8\)</span></li>
+<li><span class="math inline">\(j_2 = 0.8 \cdot 0.857 = 0.6856\)</span></li>
+<li><span class="math inline">\(j_3 = 0.6856 \cdot 0.8 = 0.54848\)</span></li>
+<li><span class="math inline">\(j_4 = 0.54848 \cdot 0.75 = 0.41136\)</span></li>
+<li><span class="math inline">\(j_5 = 0.41136 \cdot 0.333 = 0.1369829\)</span></li>
+</ul>
+<p>So finally, we have the survival probabilities (rounded to 3 digits):</p>
+<table style="width:81%;">
+<colgroup>
+<col width="8%" />
+<col width="44%" />
+<col width="27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"><span class="math inline">\(j\)</span></th>
+<th align="center"><span class="math inline">\(1 - \frac{d_{(j)}}{R_{(j)}}\)</span></th>
+<th align="center"><span class="math inline">\(\hat{S}_{KM}(t)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">0.8</td>
+<td align="center">0.8</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">0.857</td>
+<td align="center">0.686</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">0.8</td>
+<td align="center">0.548</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">0.75</td>
+<td align="center">0.411</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">0.333</td>
+<td align="center">0.137</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>We can now represent graphically the Kaplan-Meier estimator:</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>To draw this survival curve, remember that:</p>
+<ul>
+<li>the x-axis corresponds to the <code>time</code> variable in the initial dataset, and</li>
+<li>the y-axis corresponds to the survival probabilities found above.</li>
+</ul>
+</div>
+<div id="in-r" class="section level2">
+<h2>In R</h2>
+<p>We now compare our results with the results found in R.</p>
+<p>We first create the dataset with the time and event variables:</p>
+<pre class="r"><code># create dataset
+dat &lt;- data.frame(
+  time = c(3, 5, 7, 2, 18, 16, 2, 9, 16, 5),
+  event = c(0, 1, 1, 1, 0, 1, 1, 1, 1, 0)
+)</code></pre>
+<p>We then run the Kaplan-Meier estimator with the <code>survfit()</code> and <code>Surv()</code> functions:</p>
+<pre class="r"><code># KM
+library(survival)
+
+km &lt;- survfit(Surv(time, event) ~ 1,
+  data = dat
+)</code></pre>
+<p>Notice that the <code>Surv()</code> function accepts two arguments:</p>
+<ol style="list-style-type: decimal">
+<li>the <code>time</code> variable, and</li>
+<li>the <code>event</code> variable.</li>
+</ol>
+<p>The <code>~ 1</code> in the <code>survfit()</code> function indicates that we estimate the Kaplan-Meier without any grouping. See more on this later in the post.</p>
+<p>Finally, we display the results and draw the Kaplan-Meier plot:</p>
+<pre class="r"><code># results
+summary(km)</code></pre>
+<pre><code>## Call: survfit(formula = Surv(time, event) ~ 1, data = dat)
+## 
+##  time n.risk n.event survival std.err lower 95% CI upper 95% CI
+##     2     10       2    0.800   0.126       0.5868        1.000
+##     5      7       1    0.686   0.151       0.4447        1.000
+##     7      5       1    0.549   0.172       0.2963        1.000
+##     9      4       1    0.411   0.176       0.1782        0.950
+##    16      3       2    0.137   0.126       0.0225        0.834</code></pre>
+<pre class="r"><code># plot
+plot(km,
+  xlab = &quot;Time&quot;,
+  ylab = &quot;Survival probability&quot;,
+  conf.int = FALSE
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The survival probabilities can be found in the <code>survival</code> column. Remark that results by hand and in R are similar (any difference with the results by hand is due to rounding).</p>
+<p>Alternatively, we can use the <code>ggsurvplot()</code> function within the <code>{survminer}</code> package:</p>
+<pre class="r"><code>library(survminer)
+
+# plot
+ggsurvplot(km,
+  conf.int = FALSE,
+  legend = &quot;none&quot;
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><em>Note that the crosses on the survival curve denote the censored observations.</em></p>
+<p>The advantage with the <code>ggsurvplot()</code> function is that it is easy to draw the <a href="/blog/descriptive-statistics-in-r/#median">median</a> directly on the plot:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<pre class="r"><code>ggsurvplot(km,
+  conf.int = FALSE,
+  surv.median.line = &quot;hv&quot;,
+  legend = &quot;none&quot;
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>To find the median duration:<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<pre class="r"><code>summary(km)$table[&quot;median&quot;]</code></pre>
+<pre><code>## median 
+##      9</code></pre>
+<pre class="r"><code># or more simply
+km</code></pre>
+<pre><code>## Call: survfit(formula = Surv(time, event) ~ 1, data = dat)
+## 
+##       n events median 0.95LCL 0.95UCL
+## [1,] 10      7      9       5      NA</code></pre>
+<p>Suppose that the event of interest is death:</p>
+<ul>
+<li>At time zero, the survival probability is 1 (100% of the subjects are alive).</li>
+<li>The median indicates that the median survival time is 9 years.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> This is the time at which the survival <span class="math inline">\(S(t)\)</span> is 50%. In other words, is the time after which half of the subjects are expected to have died.</li>
+<li>From the plot, we also see that <span class="math inline">\(S(5) = P(T &gt; 5 \text{ years}) =\)</span> Probability of survival of more than 5 years for these subjects = 75%. This means that 75% of all subjects survive longer than 5 years, and that 25% of all subjects die within the first 5 years.</li>
+</ul>
+<p>For the sake of completeness, let’s do another example with a much larger dataset; the <code>tongue</code> dataset within the <code>{KMsurv}</code> package.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
+<pre class="r"><code># load data
+library(KMsurv)
+data(tongue)
+
+# preview data
+head(tongue)</code></pre>
+<pre><code>##   type time delta
+## 1    1    1     1
+## 2    1    3     1
+## 3    1    3     1
+## 4    1    4     1
+## 5    1   10     1
+## 6    1   13     1</code></pre>
+<ul>
+<li><code>type</code> is the tumor DNA profile (1 = aneuploid tumor, 2 = diploid tumor)</li>
+<li><code>time</code> is the time to death or on-study time (in weeks)</li>
+<li><code>delta</code> is the death indicator (0 = alive, 1 = dead)</li>
+</ul>
+<p>For this example, we focus on the aneuploid type:</p>
+<pre class="r"><code>anaploid &lt;- subset(tongue, type == 1)</code></pre>
+<p>We can now plot the estimated survival function and estimate the median time to death. Since it is an estimator, we can also construct a confidence interval for the estimated survival at each time <span class="math inline">\(t\)</span> and for the estimated median survival time.<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
+<pre class="r"><code># results
+fit &lt;- survfit(Surv(time, delta) ~ 1,
+  data = anaploid,
+  conf.type = &quot;log-log&quot;
+)
+
+fit</code></pre>
+<pre><code>## Call: survfit(formula = Surv(time, delta) ~ 1, data = anaploid, conf.type = &quot;log-log&quot;)
+## 
+##       n events median 0.95LCL 0.95UCL
+## [1,] 52     31     93      65     157</code></pre>
+<pre class="r"><code># plot
+ggsurvplot(fit,
+  surv.median.line = &quot;hv&quot;,
+  legend = &quot;none&quot;
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The median survival time is estimated to be 93 weeks, with a 95% confidence interval [65; 157].</p>
+<p>Kaplan-Meier curves can be seen as <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> for survival data. We now focus on the second branch of statistics, <a href="/blog/hypothesis-test-by-hand/">hypothesis testing</a> which allows to draw conclusions on the population based on a sample (see a quick reminder about the <a href="/blog/what-is-the-difference-between-population-and-sample/">difference between population and sample</a> if you need).</p>
+</div>
+</div>
+<div id="hypothesis-testing" class="section level1">
+<h1>Hypothesis testing</h1>
+<p>Hypothesis testing in the field of survival analysis mostly concerns:</p>
+<ul>
+<li>The hazard function of <strong>one population</strong>: in this case we test whether a censored sample comes from a population with a known hazard function <span class="math inline">\(h_0(t)\)</span>. For example, we may be interested to compare survival in a sample of patients to the survival in the overall population (derived from the life tables).</li>
+<li>The comparison of the hazard function of <strong>two or more populations</strong>: in this case we are interested in assessing whether there are differences in survival among different groups of subjects. For example:
+<ul>
+<li>2 groups: we are interested in comparing survival for female and male colon cancer patients</li>
+<li>3 groups or more: we are interested in comparing survival for melanoma cancer patients according to their treatments (with treatments A, B and C for example)<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></li>
+</ul></li>
+</ul>
+<div id="log-rank-test" class="section level2">
+<h2>Log-rank test</h2>
+<p>In this article, we focus on comparing survival between two groups using the <strong>log-rank test</strong> (also known as Mantel-Cox test).</p>
+<p>The intuition behind the test is that if the two groups have different hazard rates, the two survival curves (so their slopes) will differ. More precisely, the log-rank test compares the observed number of events in each group to what would be expected if the survival curves were identical (i.e., if the null hypothesis were true).</p>
+<p>Note that, as for the Kaplan-Meier estimator, the log-rank test is a nonparametric test, which makes no assumptions about the survival distributions.</p>
+<p>For this example, consider the following dataset:</p>
+<pre><code>##    patient group time event
+## 1        1     1  4.1     1
+## 2        2     1  7.8     0
+## 3        3     1 10.0     1
+## 4        4     1 10.0     1
+## 5        5     1 12.3     0
+## 6        6     1 17.2     1
+## 7        7     2  9.7     1
+## 8        8     2 10.0     1
+## 9        9     2 11.1     0
+## 10      10     2 13.1     0
+## 11      11     2 19.7     1
+## 12      12     2 24.1     0</code></pre>
+<p>where:</p>
+<ul>
+<li><code>patient</code> is the patient’s identifier</li>
+<li><code>group</code> is the group (group 1 or 2)</li>
+<li><code>time</code> is the time to death (in years)<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a></li>
+<li><code>event</code> is the event status (0 = censored, 1 = death)</li>
+</ul>
+<p>Suppose we are interested in comparing group 1 and 2 in terms of survival, that is, we compare survival curves between the 2 groups:</p>
+<ul>
+<li><span class="math inline">\(H_0 : S_1(t) = S_2(t)\)</span> for all <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(H_1 : S_1(t) \ne S_2(t)\)</span> for some <span class="math inline">\(t\)</span></li>
+</ul>
+<p>It is a statistical test, so if the <span class="math inline">\(p\)</span>-value &lt; <span class="math inline">\(\alpha\)</span> (usually 0.05), we reject the null hypothesis and we conclude that survival (or the time to event) is significantly different between the two groups considered.</p>
+<p>To perform the log-rank test, the following test statistic will be useful:</p>
+<p><span class="math display">\[\begin{eqnarray}
+U &amp;=&amp; \sum_{j=1}^r w(y_{(j)})\left(O_j - E_j\right) \\
+&amp;=&amp; \sum_{j=1}^r w(y_{(j)})\left( d_{(j)1} - \frac{d_{(j)}R_{(j)1}}{R_{(j)}}\right)
+\end{eqnarray}\]</span></p>
+<p>with <span class="math inline">\(U^{obs} = \frac{U}{\sqrt{Var(U)}} \sim N(0,1)\)</span> and<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></p>
+<p><span class="math display">\[\begin{eqnarray}
+Var(U) &amp;=&amp; \sum_{j=1}^r w^2(y_{(j)}) \frac{N_{(j)}}{ D_{(j)}  }\\
+&amp;=&amp; \sum_{j=1}^r w^2(y_{(j)}) \frac{ d_{(j)} \frac{R_{(j)1}}{R_{(j)} } \left( 1 - \frac{R_{(j)1}}{R_{(j)} } \right) \left( R_{(j)} - d_{(j)}\right) }{ R_{(j)} - 1  }
+\end{eqnarray}\]</span></p>
+<div id="by-hand-1" class="section level3">
+<h3>By hand</h3>
+<p>As for the Kaplan-Meier estimator by hand, it is best to also fill in a table for the log-rank test by hand.</p>
+<p>Let’s present the final table and comment below on how to fill it, column by column:</p>
+<table style="width:100%;">
+<colgroup>
+<col width="5%" />
+<col width="6%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="6%" />
+<col width="6%" />
+<col width="5%" />
+<col width="5%" />
+<col width="10%" />
+<col width="6%" />
+<col width="6%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"><span class="math inline">\(j\)</span></th>
+<th align="center"><span class="math inline">\(y_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(d_{(j)1}\)</span></th>
+<th align="center"><span class="math inline">\(R_{(j)1}\)</span></th>
+<th align="center"><span class="math inline">\(d_{(j)2}\)</span></th>
+<th align="center"><span class="math inline">\(R_{(j)2}\)</span></th>
+<th align="center"><span class="math inline">\(d_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(R_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(E_{j}\)</span></th>
+<th align="center"><span class="math inline">\(O_{j}\)</span></th>
+<th align="center"><span class="math inline">\(O_{j} - E_{j}\)</span></th>
+<th align="center"><span class="math inline">\(N_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(D_{(j)}\)</span></th>
+<th align="center"><span class="math inline">\(N_{(j)}/D_{(j)}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">4.1</td>
+<td align="center">1</td>
+<td align="center">6</td>
+<td align="center">0</td>
+<td align="center">6</td>
+<td align="center">1</td>
+<td align="center">12</td>
+<td align="center">0.5</td>
+<td align="center">1</td>
+<td align="center">0.5</td>
+<td align="center">2.75</td>
+<td align="center">11</td>
+<td align="center">0.25</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">9.7</td>
+<td align="center">0</td>
+<td align="center">4</td>
+<td align="center">1</td>
+<td align="center">6</td>
+<td align="center">1</td>
+<td align="center">10</td>
+<td align="center">0.4</td>
+<td align="center">0</td>
+<td align="center">-0.4</td>
+<td align="center">2.16</td>
+<td align="center">9</td>
+<td align="center">0.24</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">10</td>
+<td align="center">2</td>
+<td align="center">4</td>
+<td align="center">1</td>
+<td align="center">5</td>
+<td align="center">3</td>
+<td align="center">9</td>
+<td align="center">1.333</td>
+<td align="center">2</td>
+<td align="center">0.667</td>
+<td align="center">4.44</td>
+<td align="center">8</td>
+<td align="center">0.555</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">17.2</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">3</td>
+<td align="center">0.333</td>
+<td align="center">1</td>
+<td align="center">0.667</td>
+<td align="center">0.44</td>
+<td align="center">2</td>
+<td align="center">0.22</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">19.7</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0.00</td>
+<td align="center">1</td>
+<td align="center">0.00</td>
+</tr>
+<tr class="even">
+<td align="center"><span class="math inline">\(Total\)</span></td>
+<td align="center"></td>
+<td align="center">4</td>
+<td align="center"></td>
+<td align="center">3</td>
+<td align="center"></td>
+<td align="center">7</td>
+<td align="center"></td>
+<td align="center">2.566</td>
+<td align="center"></td>
+<td align="center">1.433</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">1.265</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Column <span class="math inline">\(j\)</span></strong> is the number of distinct event times. We see that there are 5 (ignoring censored observations), so we write 1 to 5 in the table.</p>
+<p><strong>Column <span class="math inline">\(y_{(j)}\)</span></strong> is the ordered distinct event times:</p>
+<p><em>4.1</em>, <em>9.7</em>, <em>10</em>, <em>17.2</em> and <em>19.7</em></p>
+<p><strong>Column <span class="math inline">\(d_{(j)1}\)</span></strong> is the number of observations for each distinct event time, for group 1:</p>
+<pre><code>## time
+##  4.1   10 17.2 
+##    1    2    1</code></pre>
+<p>When there is no event, we simply write 0 in the table.</p>
+<p><strong>Column <span class="math inline">\(R_{(j)1}\)</span></strong> is the remaining number of patients at risk, for group 1. For this, the distribution of time (censored and not censored, for group 1) is useful:</p>
+<pre><code>## time
+##  4.1  7.8   10 12.3 17.2 
+##    1    1    2    1    1</code></pre>
+<p>We see that:</p>
+<ul>
+<li>At the beginning, there are 6 patients</li>
+<li>Before time 9.7, there are 4 patients left (6 - 1 who had the event at time 4.1 - 1 who was censored at time 7.8)</li>
+<li>Before time 10, there are 4 patients left (6 - 2)</li>
+<li>Before time 17.2, there are 1 patient left (6 - 5)</li>
+<li>Before time 19.7, there are 0 patient left (6 - 6)</li>
+</ul>
+<p><strong>Columns <span class="math inline">\(d_{(j)2}\)</span> and <span class="math inline">\(R_{(j)2}\)</span></strong> follow the same principle, but for group 2 this time. So we have, respectively for <span class="math inline">\(d_{(j)2}\)</span> and <span class="math inline">\(R_{(j)2}\)</span>:</p>
+<pre><code>## time
+##  9.7   10 19.7 
+##    1    1    1</code></pre>
+<pre><code>## time
+##  9.7   10 11.1 13.1 19.7 24.1 
+##    1    1    1    1    1    1</code></pre>
+<p><strong>Columns <span class="math inline">\(d_{(j)}\)</span> and <span class="math inline">\(R_{(j)}\)</span></strong> also follow the same principle, but this time considering both groups. So we have, respectively for <span class="math inline">\(d_{(j)}\)</span> and <span class="math inline">\(R_{(j)}\)</span>:</p>
+<pre><code>## time
+##  4.1  9.7   10 17.2 19.7 
+##    1    1    3    1    1</code></pre>
+<pre><code>## time
+##  4.1  7.8  9.7   10 11.1 12.3 13.1 17.2 19.7 24.1 
+##    1    1    1    3    1    1    1    1    1    1</code></pre>
+<p><strong>Column <span class="math inline">\(E_{j}\)</span></strong> is the expected number of events in the first group assuming that <span class="math inline">\(h_1 \equiv h_2\)</span>. It is obtained as follows</p>
+<p><span class="math display">\[ E_{j} = \frac{d_{(j)}R_{(j)1}}{R_{(j)}}\]</span></p>
+<p><strong>Column <span class="math inline">\(O_{j}\)</span></strong> is the observed number of events in the first group, so it is equal to the <span class="math inline">\(d_{(j)1}\)</span> column.</p>
+<p><strong>Column <span class="math inline">\(O_{j} - E_{j}\)</span></strong> is straightforward.</p>
+<p><strong>Column <span class="math inline">\(N_{(j)}\)</span></strong> is defined as follows</p>
+<p><span class="math display">\[N_{(j)} = d_{(j)} \frac{R_{(j)1}}{R_{(j)} } \left( 1 - \frac{R_{(j)1}}{R_{(j)} } \right) \left( R_{(j)} - d_{(j)}\right)\]</span></p>
+<p><strong>Column <span class="math inline">\(D_{(j)}\)</span></strong> is <span class="math inline">\(R_{(j)} - 1\)</span>.</p>
+<p><strong>Column <span class="math inline">\(N_{(j)}/D_{(j)}\)</span></strong> is straightforward.</p>
+<p>Since <span class="math inline">\(w(y_{(j)}) = w^2(y_{(j)}) = 1\)</span> for a log-rank test, we have<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a></p>
+<p><span class="math display">\[ U^{obs} = \frac{U}{\sqrt{Var(U)}} = \frac{1.434}{\sqrt{1.265}} = 1.275.\]</span></p>
+<p>We reject <span class="math inline">\(H_0\)</span> if <span class="math inline">\(|U^{obs}|&gt;z_{1-\alpha/2}\)</span>, so at the 5% significance level we reject <span class="math inline">\(H_0\)</span> if <span class="math inline">\(|U^{obs}|&gt;z_{0.975}=1.96\)</span>.</p>
+<p>We have <span class="math inline">\(|U^{obs}| = 1.275 &lt; z_{0.975}=1.96\)</span>. Hence, at the 5% significance level we do not reject <span class="math inline">\(H_0\)</span>. This means that, based on the data, we are not able to conclude that survival is different between the two groups (which is equivalent than saying that we do not reject the hypothesis that survival is equal between the two groups).</p>
+<p>If you are interested in computing the <span class="math inline">\(p\)</span>-value:</p>
+<p><span class="math inline">\(p\)</span>-value <span class="math inline">\(= 2\times P(Z&gt;1.275) = 2 \times 0.101 = 0.202 &gt; 0.05\)</span>.</p>
+</div>
+<div id="in-r-1" class="section level3">
+<h3>In R</h3>
+<p>We now compare our results in R with the <code>survdiff()</code> function:</p>
+<pre class="r"><code>dat &lt;- data.frame(
+  group = c(rep(1, 6), rep(2, 6)),
+  time = c(4.1, 7.8, 10, 10, 12.3, 17.2, 9.7, 10, 11.1, 13.1, 19.7, 24.1),
+  event = c(1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0)
+)
+
+dat</code></pre>
+<pre><code>##    group time event
+## 1      1  4.1     1
+## 2      1  7.8     0
+## 3      1 10.0     1
+## 4      1 10.0     1
+## 5      1 12.3     0
+## 6      1 17.2     1
+## 7      2  9.7     1
+## 8      2 10.0     1
+## 9      2 11.1     0
+## 10     2 13.1     0
+## 11     2 19.7     1
+## 12     2 24.1     0</code></pre>
+<pre class="r"><code>survdiff(Surv(time, event) ~ group,
+  data = dat
+)</code></pre>
+<pre><code>## Call:
+## survdiff(formula = Surv(time, event) ~ group, data = dat)
+## 
+##         N Observed Expected (O-E)^2/E (O-E)^2/V
+## group=1 6        4     2.57     0.800      1.62
+## group=2 6        3     4.43     0.463      1.62
+## 
+##  Chisq= 1.6  on 1 degrees of freedom, p= 0.2</code></pre>
+<p>Alternatively, we can use the <code>ggsurvplot()</code> function to draw the survival curves and perform the log-rank test at the same time:</p>
+<pre class="r"><code>fit &lt;- survfit(Surv(time, event) ~ group, data = dat)
+
+ggsurvplot(fit,
+  pval = TRUE,
+  pval.method = TRUE
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>As we can see, the <span class="math inline">\(p\)</span>-values and the conclusions are the same (any difference with the results by hand is due to rounding).</p>
+<p>As for the Kaplan-Meier estimation, we do another example on a larger dataset. Consider the data on the times until staphylococcus infection of burn patients, also available in the <code>{KMsurv}</code>:<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a></p>
+<pre class="r"><code># load data
+data(burn)
+
+# preview data
+head(burn)</code></pre>
+<pre><code>##   Obs Z1 Z2 Z3 Z4 Z5 Z6 Z7 Z8 Z9 Z10 Z11 T1 D1 T2 D2 T3 D3
+## 1   1  0  0  0 15  0  0  1  1  0   0   2 12  0 12  0 12  0
+## 2   2  0  0  1 20  0  0  1  0  0   0   4  9  0  9  0  9  0
+## 3   3  0  0  1 15  0  0  0  1  1   0   2 13  0 13  0  7  1
+## 4   4  0  0  0 20  1  0  1  0  0   0   2 11  1 29  0 29  0
+## 5   5  0  0  1 70  1  1  1  1  0   0   2 28  1 31  0  4  1
+## 6   6  0  0  1 20  1  0  1  0  0   0   4 11  0 11  0  8  1</code></pre>
+<p>Using the log-rank test, we want to test the hypothesis of difference in the time to staphylococcus infection (<code>T3</code> variable) between patients whose burns were cared for with a routine bathing care method (<code>Z1 = 0</code>) versus those whose body cleansing was initially performed using 4% chlorhexidine gluconate (<code>Z1 = 1</code>). The event indicator is in variable <code>D3</code>.</p>
+<p>For this test, we use a two-sided alternative and a 5% significance level.</p>
+<pre class="r"><code># fit
+fit &lt;- survfit(Surv(T3, D3) ~ Z1, data = burn)
+
+# plot with log-rank test
+ggsurvplot(fit,
+  pval = TRUE,
+  pval.method = TRUE
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-32-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><em>In the sample</em>, it seems that the time to infection for patients with routine bathing (<code>Z1 = 0</code>) is smaller than for patients with body cleansing (<code>Z1 = 1</code>). This is the case because the percentage of patients who have not experienced the infection decreases more quickly, so the hazard rate is greater.</p>
+<p>However, this conclusion cannot be generalized to the <em>population</em> without performing a sound statistical test. And based on the result of the log-rank test, we do not reject the hypothesis that time to infection is the same between the two groups of patients (<span class="math inline">\(p\)</span>-value = 0.051).</p>
+</div>
+</div>
+</div>
+<div id="to-go-further" class="section level1">
+<h1>To go further</h1>
+<p>In this article, we have presented what is survival analysis, when, why and how to use it. We discussed about censoring and survival curves. We showed how to estimate the survival function via the Kaplan-Meier estimator and how to test survival between two groups via the log-rank test. We illustrated these approaches both by hand and in R.</p>
+<p>As you noticed, we did not show how to <em>model</em> survival data. There are several regression models that can be applied to survival data, the most common one being the semiparametric Cox Proportional Hazards model <span class="citation">(<a href="#ref-cox1972regression" role="doc-biblioref">1972</a>)</span>. It originated from the medical area to investigate and assess the relationship between the survival times of patients and their corresponding predictor variables.</p>
+<p>We have seen that the Kaplan-Meier estimator is useful to visualize survival between groups and the log-rank test to test whether survival significantly differs between groups (so both approaches use a <a href="/blog/variable-types-and-examples/#qualitative">categorical variable</a> as predictor). However, it does not work well for assessing the effect of <a href="/blog/variable-types-and-examples/#quantitative">quantitative predictor</a>. The Cox model has the advantage that it works for both quantitative as well as for categorical predictors, and for several risk factors at the same time (so it can model the effect of multiple variables at once).</p>
+<p>With the Cox model, we model the impact of different factors <span class="math inline">\(X_1, X_2, \ldots, X_q\)</span> on survival via their impact on the hazard function:</p>
+<p><span class="math display">\[h(t|\textbf{X}) = h_0 (t) exp(\beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_q X_q),\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(h(t|\textbf{X})\)</span> is the instantaneous death rate conditional on having survived up to time <span class="math inline">\(t\)</span>.</li>
+<li><span class="math inline">\(h_0 (t)\)</span> is the population-level baseline hazard – the underlying hazard function. It describes how the average person’s risk evolves over time.</li>
+<li><span class="math inline">\(exp(\beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_q X_q)\)</span> describes how covariates affect the hazard. In particular, a unit increase in <span class="math inline">\(x_i\)</span> leads to an increase of the hazard by a factor of <span class="math inline">\(\exp(\beta_i)\)</span>.</li>
+</ul>
+<p>This post aimed at presenting the introductory concepts in survival analysis, so this model will be developed in another post. In the meantime, if you would like to learn more about modeling survival data (thanks to the Cox model and other models), see this <a href="https://rviews.rstudio.com/2022/09/06/deep-survival/">post</a> from Joseph Rickert.</p>
+<p>Thanks for reading.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-cox1972regression" class="csl-entry">
+Cox, David R. 1972. <span>“Regression Models and Life-Tables.”</span> <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 34 (2): 187–202.
+</div>
+<div id="ref-kaplan1958nonparametric" class="csl-entry">
+Kaplan, Edward L, and Paul Meier. 1958. <span>“Nonparametric Estimation from Incomplete Observations.”</span> <em>Journal of the American Statistical Association</em> 53 (282): 457–81.
+</div>
+</div>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>Note that in survival analysis, the precision of the estimators (and the power of the tests) does not depend on the number of patients but on the number of events. So it is best to have many observations where the event does occur for the analyses to be effective. Here we work on a small sample for the sake of illustration.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Note that the <code>time</code> variable can be expressed in other units, such as seconds, days, weeks, months, etc.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Median is preferred over mean in survival analysis because survival functions are often skewed to the right. The mean is often influenced by <a href="/blog/outliers-detection-in-r/">outliers</a>, whereas the median is not. See a discussion comparing the two in this <a href="/blog/descriptive-statistics-by-hand/#mean-vs.-median">section</a>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Note that if 50% or more of the subjects are censored, the median cannot be computed.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Note that the median duration is expressed in the same unit than the unit of the <code>time</code> variable in the initial dataset. So if the time unit was months, the median survival time would be 9 months.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>More information about the dataset can be found on <a href="https://cran.r-project.org/web/packages/KMsurv/">CRAN</a> or with <code>?tongue</code>.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>See the reason we use <code>log-log</code> for the confidence interval in this <a href="https://stats.stackexchange.com/questions/361354/choosing-conf-type-for-survfit-in-r">thread</a>.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>Note that if the groups to compare have a natural ordering (such as the educational level; none, low, medium, high), tests that take it into consideration have more power to detect significant effects. These tests are referred as tests for trend.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>Remember that the time unit can be different than years.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p>This is the case for large samples. The example described here does not meet this condition, but we still show it as an illustration.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
+<li id="fn11"><p>Note that other weights can be considered, but this is beyond the scope of this article.<a href="#fnref11" class="footnote-back">↩︎</a></p></li>
+<li id="fn12"><p>More information about the dataset can be found on <a href="https://cran.r-project.org/web/packages/KMsurv/">CRAN</a> or with <code>?burn</code>.<a href="#fnref12" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

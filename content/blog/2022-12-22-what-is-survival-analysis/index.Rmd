@@ -1,0 +1,725 @@
+---
+title: What is survival analysis? Examples by hand and in R
+author: Antoine Soetewey
+date: '2022-12-22'
+slug: what-is-survival-analysis
+categories: []
+tags:
+  - Descriptive statistics
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+  - Survival analysis
+meta_img: blog/what-is-survival-analysis/images/what-is-survival-analysis.jpeg
+description: Learn more about survival analysis (also called time-to-event analysis), in which context and how it is used. Also learn how to apply it by hand and in R
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+    # df_print: paged
+draft: true
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
+)
+
+set.seed(42)
+
+library(pander)
+library(knitr)
+library(rmarkdown)
+```
+
+![](images/what-is-survival-analysis.jpeg){width=100%}
+
+# Introduction
+
+For the last post of the year, I would like to present a rather unknown (yet important) statistical method--**survival analysis**.
+
+Although survival analysis is a branch of statistics, it is usually not covered in introductory statistics courses and it is rather unknown to the general public. It is mostly taught in biostatistics courses or advanced statistics study programs.
+
+In this article, I will explain what is survival analysis, in which context and how it is used. I will explain the main tools and methods used by biostatisticians to analyze survival data and how to estimate and interpret survival curves.
+
+I will show in detail how to apply these techniques in R with concrete examples. In practice, survival analysis is almost always done via a statistical program and never done by hand. However, as for any statistical concept, I believe that doing it by hand allows to really understand the concepts and what these programs actually do. For this reason, I will also show a brief example on how to perform a basic survival analysis by hand.
+
+*Note that this article is inspired from:*
+
+- *the lecture notes of Prof. Van Keilegom and my personal notes as teaching assistant for her course entitled "Analysis of Survival and Duration Data" given at UCLouvain*
+- *the lecture notes of Prof. Legrand for her course entitled "Statistics in clinical trials" given at UCLouvain*
+
+# What is survival analysis?
+
+**Survival analysis** (also called time-to-event analysis or duration analysis) is a branch of statistics aimed at **analyzing the expected duration of time until one or more events happen**, called survival times or duration times.
+
+In survival analysis, we are interested in a certain event and want to **analyze the time until the event happens**.
+
+While the event of interest is often death (in this case we study the time to death for patients having a specific disease) or recurrence (in this case we study the time to relapse of a certain disease), it is not limited to the fields of medicine and epidemiology.
+
+In fact, it can be used in many domains. For example, we may also analyze the time until:
+
+* getting cured from a certain disease
+* finding a new job after a period of unemployment
+* being arrested again after being released from jail
+* the first pregnancy
+* the failure of a mechanical system or a machine
+* a bank or a company goes bankrupt
+* a customer buys a new product or stops its current subscription
+* a letter is delivered
+* a taxi picks you up after having called the taxi company
+* an employee leaves the company
+* etc.
+
+As you can see, the event of interest does not necessarily have to be the death or a disease, but in all situations **we are interested in the time until a specific event occurs**.
+
+# Why do we need special methods for survival analysis?
+
+Survival data, also referred as time-to-event data, requires a special set of statistical methods for three main reasons:
+
+* **Duration times** are **always positive**: the time until an event of interest takes place cannot be less than 0.
+* **Different measures** are of interest depending on the research question, context, etc. For instance, we could be interested in:
+  + The **probability** that a cancer patient survives longer than 5 years?
+  + The typical **waiting time** for a cab to arrive after having called the taxi company?
+  + **How many**, out of 100 unemployed people, are expected to have a job again after 2 months?
+* **Censoring** is almost always an issue:
+  + Most of the time, the event occurred before the end of the study and the survival duration is known.
+  + However, sometimes, the event is not yet observed at the end of the study. Suppose that we study the time until death of patients with breast cancer. Luckily, some patients will not die before the end of the study.
+  + Other times, another event takes place before the event of interest. For example, a cancer patient may die from a car accident.
+  + And even sometimes the patient withdraws from the study or moves to another country so we cannot observe her survival time (this is known as lost to follow up or drop out).
+  + Censoring can be seen, in some sense, as a type of missing data.
+  + For these reasons, many "standard" [descriptive statistics](/blog/descriptive-statistics-in-r/), [hypothesis tests](/blog/hypothesis-test-by-hand/) and [regression models](/blog/multiple-linear-regression-made-simple/) are not appropriate for this kind of data. Specific statistical methods are required to take into account the fact that we miss the *exact* survival duration for some patients. We know that they survived a certain amount of time (until the end of the study or until the time of withdrawal), but we do not know their exact survival time.
+  
+For your information, when the event is not yet observed at the end of the study (i.e., the survival duration is greater than the observed duration), this is referred as right-censoring. On the other hand, left-censoring occurs if a participant is entered into the study when the event of interest occurred prior to study entry but we do not know exactly when. Of course, we would like to analyze all available data, including information about censored patients.
+
+The goal of survival analysis is thus to model and describe time-to-event data in an appropriate way, taking the particularities of this type of data into account.
+
+# Common functions in survival analysis
+
+We are not going to go to much into the details, but it is important to lay the foundation with the most common functions in survival analysis.
+
+Let *T* be a non-negative continuous random variable, representing the time until the event of interest. We consider the following functions:
+
+1. Survival function
+1. Cumulative hazard function
+1. Hazard function
+
+## Survival function
+
+The most common one is the survival function. For each $t$:
+
+$$S(t) = P(T > t) = 1 - F(t)$$
+
+$S(t)$ represents, for each time $t$, the probability that the time until the event is greater than this time $t$. In other words, it models the probability that the event of interest happens **after** $t$.
+
+In the context of our examples mentioned above, it gives the probability that:
+
+- a randomly selected patient will survive beyond time $t$,
+- the cab takes more than $t$ minutes to arrive, or
+- an unemployed person take more than $t$ months to find a new job.
+
+The survival function $S(t)$ is:
+
+- a decreasing function,
+- taking values in $[0, 1]$ (since it is a probability), and
+- equal to 1 at $t = 0$ and 0 at $t = \infty$.
+
+Visually we have:
+
+```{r, echo = FALSE}
+inverse = function(fn, min_x, max_x){
+   # Returns the inverse of a function for a given range.
+   # E.g. inverse(sin, 0, pi/2)(sin(pi/4)) equals pi/4 because 0 <= pi/4 <= pi/2
+   fn_inv = function(y){
+      uniroot((function(x){fn(x) - y}), lower=min_x, upper=max_x)[1]$root
+   }
+   return(Vectorize(fn_inv))
+}
+
+integrate_from_0 = function(fn, t){
+   int_fn = function(t) integrate(fn, 0, t)
+   result = sapply(t, int_fn)
+   value  = unlist(result["value",])
+   msg    = unlist(result["message",])
+   value[which(msg != "OK")] = NA
+   return(value)
+}
+
+random_survival_times = function(hazard_fn, n, max_time=10000){
+   # Given a hazard function, returns n random time-to-event observations.
+   cumulative_density_fn = function(t) 1 - exp(-integrate_from_0(hazard_fn, t))
+   inverse_cumulative_density_fn = inverse(cumulative_density_fn, 0, max_time)
+   return(inverse_cumulative_density_fn(runif(n)))
+}
+
+hazard_fn = function(t) 0.001 + t * 0.0001
+survival_times = random_survival_times(hazard_fn, 10000)
+require("survival")
+plot(survfit(Surv(survival_times, rep(1, length(survival_times)))~1), xlab="Time", ylab="Survival probability", conf.int = FALSE)
+```
+
+The curve shows the proportion of individuals (or experimental units) who, as time goes on, have not experienced an event. As time progresses, events occur, so the proportion who have not experienced the event decreases.
+
+## Cumulative hazard function
+
+The cumulative hazard function is defined as:
+
+$$H(t) = -log S(t)$$
+
+and has the following properties:
+
+- increasing function,
+- taking value in $[0, +\infty]$, and
+- $S(t) = exp(-H(t))$
+
+The cumulative hazard is the total hazard experienced up to time $t$.
+
+## Hazard function
+
+The hazard function, or hazard rate, is defined as:
+
+$$
+\begin{aligned}
+h(t) &= \lim_{\Delta t \rightarrow 0} \frac{P(t \le T < t + \Delta t | T \ge t)}{\Delta t}\\
+&= \frac{d}{dt} H(t)
+\end{aligned}
+$$
+
+and has the following properties:
+
+- positive function (not necessarily increasing or decreasing)
+- the hazard function $h(t)$ can have many different shapes and is therefore a useful tool to summarize survival data
+
+In the example of cancer patients, $h(t)$ measures the instantaneous risk of dying right after time $t$ given the individual is alive at time $t$.
+
+To link the hazard rate with the survival function; the survival curve represents the hazard rates. A steeper slope indicates a higher hazard rate because events happen more frequently, reducing the proportion of individuals who have not experienced the event at a faster rate. On the contrary, a gradual and flatter slope indicates a lower hazard rate because events occur less frequently, reducing the proportion of individuals who have not experiences the event at a slower rate.
+
+Note that, in contrast to the survival function which focuses on not having an event, the hazard function focuses on the event occurring.
+
+# Estimation
+
+To estimate the survival function, we need to use an estimator which is able to deal with censoring. The most common one is the nonparametric **@kaplan1958nonparametric estimator** (also sometimes referred as the product-limit estimator, or more simply, the K-M estimator).
+
+The advantages of the Kaplan-Meier estimator are that:
+
+- it is simple and straightforward to use and interpret
+- it is a nonparametric estimator, so it constructs a survival curve from the data and no assumptions is made about the shape of the underlying distribution
+- it gives a graphical representation of the survival function(s), useful for illustrative purposes
+
+Note that an important assumption for the estimation to hold is that censoring is independent of the occurrence of events. We say that censoring is non-informative, that is, censored subjects have the same survival prospects as subjects that are not censored and continue to be followed.
+
+## By hand
+
+To understand how it works, let's first estimate it by hand on the following dataset:^[Note that in survival analysis, the precision of the estimators (and the power of the tests) does not depend on the number of patients but on the number of events. So it is best to have many observations where the event does occur for the analyses to be effective. Here we work on a small sample for the sake of illustration.]
+
+```{r, echo = FALSE}
+dat <- data.frame(
+  subject = 1:10,
+  time = c(3, 5, 7, 2, 18, 16, 2, 9, 16, 5),
+  event = c(0, 1, 1, 1, 0, 1, 1, 1, 1, 0)
+)
+
+dat
+```
+
+where:
+
+- `subject` is the individual's identifier
+- `time` is the time to event (in years)^[Note that the `time` variable can be expressed in other units, such as seconds, days, weeks, months, etc.]
+- `event` is the event status (0 = censored, 1 = event happened)
+
+Remember that for each subject, we need to know at least 2 pieces of information:
+
+1. the time until the event of interest or the time until the censoring, and
+1. whether we have observed the event of interest or if we have observed censoring.
+
+We first need to count the number of distinct event times. Ignoring censored observations, we have 5 distinct event times:
+
+```{r, echo = FALSE}
+pander(sort(unique(subset(dat, event == 1)$time)))
+```
+
+The easiest way to do the calculation by hand is by filling the following table (a table with 5 rows since there are 5 distinct event times):
+
+```{r, echo = FALSE}
+tab <- data.frame(
+  j = 1:5,
+  y_j = rep("", 5),
+  d_j = rep("", 5),
+  R_j = rep("", 5),
+  djRj = rep("", 5)
+)
+
+names(tab) <- c("$j$", "$y_{(j)}$", "$d_{(j)}$", "$R_{(j)}$", "$1 - \\frac{d_{(j)}}{R_{(j)}}$")
+pander(tab)
+```
+
+<br>
+
+We fill columns one by one:
+
+- $y_{(j)}$ = the ordered distinct event times:
+
+```{r, echo = FALSE}
+pander(sort(unique(subset(dat, event == 1)$time)))
+```
+
+So the table becomes:
+
+```{r, echo = FALSE}
+tab[, 2] <- sort(unique(subset(dat, event == 1)$time))
+
+pander(tab)
+```
+
+<br>
+
+- $d_{(j)}$ = the number of observations for each distinct event time. For this, the frequency for each distinct event time is useful:
+
+```{r, echo = FALSE}
+xtabs(~ time, data = subset(dat, event == 1))
+```
+
+The table becomes:
+
+```{r, echo = FALSE}
+tab[, 3] <- table(subset(dat, event == 1)$time)
+
+pander(tab)
+```
+
+<br>
+
+- $R_{(j)}$ = the remaining number of individuals at risk. For this, the distribution of time (censored and not censored) is useful:
+
+```{r, echo = FALSE}
+xtabs(~ time, data = dat)
+```
+
+We see that:
+
+- At the beginning there are 10 subjects
+- Just before time $t = 5$, there are 7 subjects left (10 subjects - 2 who had the event - 1 who is censored)
+- Just before time $t = 7$, there are 5 subjects left (= 10 - 2 - 1 - 2)
+- Just before time $t = 9$, there are 4 subjects left (= 10 - 2 - 1 - 2 - 1)
+- Just before time $t = 16$, there are 3 subjects left (= 10 - 2 - 1 - 2 - 1 - 1)
+  
+The table becomes:
+
+```{r, echo = FALSE}
+tab[, 4] <- c(10, 7, 5, 4, 3)
+
+pander(tab)
+```
+
+<br>
+
+- $1 - \frac{d_{(j)}}{R_{(j)}}$ is straightforward, so the table becomes:
+
+```{r, echo = FALSE}
+tab[, 5] <- round((1 - (tab[, 3] / tab[, 4])), 3)
+
+pander(tab)
+```
+
+<br>
+
+The Kaplan-Meier estimator is:
+
+$$\hat{S}_{KM}(t) = \prod_{j:y_{(j)} \le t} \left(1 - \frac{d_{(j)}}{R_{(j)}} \right)$$
+
+For each $j$, we thus take the cumulative product:
+
+- $j_1 = 0.8$ 
+- $j_2 = 0.8 \cdot 0.857 = 0.6856$
+- $j_3 = 0.6856 \cdot 0.8 = 0.54848$
+- $j_4 = 0.54848 \cdot 0.75 = 0.41136$
+- $j_5 = 0.41136 \cdot 0.333 = 0.1369829$
+
+So finally, we have the survival probabilities (rounded to 3 digits):
+
+```{r, echo = FALSE}
+tab[, 6] <- round(cumprod(tab[, 5]), 3)
+
+names(tab)[6] <- "$\\hat{S}_{KM}(t)$"
+pander(tab[, c(1, 5, 6)])
+```
+
+<br>
+
+We can now represent graphically the Kaplan-Meier estimator:
+
+```{r, echo = FALSE}
+km <- survfit(Surv(time, event) ~ 1,
+              data = dat)
+
+plot(km, xlab = "Time", ylab = "Survival probability", conf.int = FALSE)
+```
+
+To draw this survival curve, remember that:
+
+- the x-axis corresponds to the `time` variable in the initial dataset, and
+- the y-axis corresponds to the survival probabilities found above.
+
+## In R
+
+We now compare our results with the results found in R.
+
+We first create the dataset with the time and event variables:
+
+```{r}
+# create dataset
+dat <- data.frame(
+  time = c(3, 5, 7, 2, 18, 16, 2, 9, 16, 5),
+  event = c(0, 1, 1, 1, 0, 1, 1, 1, 1, 0)
+)
+```
+
+We then run the Kaplan-Meier estimator with the `survfit()` and `Surv()` functions:
+
+```{r}
+# KM
+library(survival)
+
+km <- survfit(Surv(time, event) ~ 1,
+              data = dat)
+```
+
+Notice that the `Surv()` function accepts two arguments:
+
+1. the `time` variable, and
+1. the `event` variable.
+
+The `~ 1` in the `survfit()` function indicates that we estimate the Kaplan-Meier without any grouping. See more on this later in the post.
+
+Finally, we display the results and draw the Kaplan-Meier plot: 
+
+```{r}
+# results
+summary(km)
+
+# plot
+plot(km,
+     xlab = "Time",
+     ylab = "Survival probability",
+     conf.int = FALSE)
+```
+
+The survival probabilities can be found in the `survival` column. Remark that results by hand and in R are similar (any difference with the results by hand is due to rounding).
+
+Alternatively, we can use the `ggsurvplot()` function within the `{survminer}` package:
+
+```{r}
+library(survminer)
+
+# plot
+ggsurvplot(km,
+           conf.int = FALSE,
+           legend = "none")
+```
+
+*Note that the crosses on the survival curve denote the censored observations.*
+
+The advantage with the `ggsurvplot()` function is that it is easy to draw the [median](/blog/descriptive-statistics-in-r/#median) directly on the plot:^[Median is preferred over mean in survival analysis because survival functions are often skewed to the right. The mean is often influenced by [outliers](/blog/outliers-detection-in-r/), whereas the median is not. See a discussion comparing the two in this [section](/blog/descriptive-statistics-by-hand/#mean-vs.-median).]
+
+```{r}
+ggsurvplot(km,
+           conf.int = FALSE,
+           surv.median.line = "hv",
+           legend = "none")
+```
+
+To find the median duration:^[Note that if 50% or more of the subjects are censored, the median cannot be computed.]
+
+```{r}
+summary(km)$table["median"]
+
+# or more simply
+km
+```
+
+Suppose that the event of interest is death:
+
+- At time zero, the survival probability is 1 (100% of the subjects are alive).
+- The median indicates that the median survival time is 9 years.^[Note that the median duration is expressed in the same unit than the unit of the `time` variable in the initial dataset. So if the time unit was months, the median survival time would be 9 months.] This is the time at which the survival $S(t)$ is 50%. In other words, is the time after which half of the subjects are expected to have died.
+- From the plot, we also see that $S(5) = P(T > 5 \text{ years}) =$ Probability of survival of more than 5 years for these subjects = 75%. This means that 75% of all subjects survive longer than 5 years, and that 25% of all subjects die within the first 5 years.
+
+For the sake of completeness, let's do another example with a much larger dataset; the `tongue` dataset within the `{KMsurv}` package.^[More information about the dataset can be found on [CRAN](https://cran.r-project.org/web/packages/KMsurv/) or with `?tongue`.]
+
+```{r}
+# load data
+library(KMsurv)
+data(tongue)
+
+# preview data
+head(tongue)
+```
+
+- `type` is the tumor DNA profile (1 = aneuploid tumor, 2 = diploid tumor)
+- `time` is the time to death or on-study time (in weeks)
+- `delta` is the death indicator (0 = alive, 1 = dead)
+
+For this example, we focus on the aneuploid type:
+
+```{r}
+anaploid <- subset(tongue, type == 1)
+```
+
+We can now plot the estimated survival function and estimate the median time to death. Since it is an estimator, we can also construct a confidence interval for the estimated survival at each time $t$ and for the estimated median survival time.^[See the reason we use `log-log` for the confidence interval in this [thread](https://stats.stackexchange.com/questions/361354/choosing-conf-type-for-survfit-in-r).]
+
+```{r}
+# results
+fit <- survfit(Surv(time, delta) ~ 1,
+               data = anaploid,
+               conf.type = "log-log")
+
+fit
+
+# plot
+ggsurvplot(fit,
+           surv.median.line = "hv",
+           legend = "none")
+```
+
+The median survival time is estimated to be 93 weeks, with a 95% confidence interval [65; 157].
+
+Kaplan-Meier curves can be seen as [descriptive statistics](/blog/descriptive-statistics-in-r/) for survival data. We now focus on the second branch of statistics, [hypothesis testing](/blog/hypothesis-test-by-hand/) which allows to draw conclusions on the population based on a sample (see a quick reminder about the [difference between population and sample](/blog/what-is-the-difference-between-population-and-sample/) if you need).
+
+# Hypothesis testing
+
+Hypothesis testing in the field of survival analysis mostly concerns:
+
+- The hazard function of **one population**: in this case we test whether a censored sample comes from a population with a known hazard function $h_0(t)$. For example, we may be interested to compare survival in a sample of patients to the survival in the overall population (derived from the life tables).
+- The comparison of the hazard function of **two or more populations**: in this case we are interested in assessing whether there are differences in survival among different groups of subjects. For example:
+  + 2 groups: we are interested in comparing survival for female and male colon cancer patients
+  + 3 groups or more: we are interested in comparing survival for melanoma cancer patients according to their treatments (with treatments A, B and C for example)^[Note that if the groups to compare have a natural ordering (such as the educational level; none, low, medium, high), tests that take it into consideration have more power to detect significant effects. These tests are referred as tests for trend.]
+
+## Log-rank test
+
+In this article, we focus on comparing survival between two groups using the **log-rank test** (also known as Mantel-Cox test).
+
+The intuition behind the test is that if the two groups have different hazard rates, the two survival curves (so their slopes) will differ. More precisely, the log-rank test compares the observed number of events in each group to what would be expected if the survival curves were identical (i.e., if the null hypothesis were true).
+
+Note that, as for the Kaplan-Meier estimator, the log-rank test is a nonparametric test, which makes no assumptions about the survival distributions.
+
+For this example, consider the following dataset:
+
+```{r, echo = FALSE}
+dat <- data.frame(
+  patient = 1:12,
+  group = c(rep(1, 6), rep(2, 6)),
+  time = c(4.1,7.8,10,10,12.3,17.2,9.7,10,11.1,13.1,19.7,24.1),
+  event = c(1,0,1,1,0,1,1,1,0,0,1,0)
+)
+
+dat
+```
+
+where:
+
+- `patient` is the patient's identifier
+- `group` is the group (group 1 or 2)
+- `time` is the time to death (in years)^[Remember that the time unit can be different than years.]
+- `event` is the event status (0 = censored, 1 = death)
+
+Suppose we are interested in comparing group 1 and 2 in terms of survival, that is, we compare survival curves between the 2 groups:
+
+- $H_0 : S_1(t) = S_2(t)$ for all $t$
+- $H_1 : S_1(t) \ne S_2(t)$ for some $t$
+
+It is a statistical test, so if the $p$-value < $\alpha$ (usually 0.05), we reject the null hypothesis and we conclude that survival (or the time to event) is significantly different between the two groups considered.
+
+To perform the log-rank test, the following test statistic will be useful: 
+
+\begin{eqnarray}
+U &=& \sum_{j=1}^r w(y_{(j)})\left(O_j - E_j\right) \\
+&=& \sum_{j=1}^r w(y_{(j)})\left( d_{(j)1} - \frac{d_{(j)}R_{(j)1}}{R_{(j)}}\right)
+\end{eqnarray}
+
+with $U^{obs} = \frac{U}{\sqrt{Var(U)}} \sim N(0,1)$ and^[This is the case for large samples. The example described here does not meet this condition, but we still show it as an illustration.]
+
+\begin{eqnarray}
+Var(U) &=& \sum_{j=1}^r w^2(y_{(j)}) \frac{N_{(j)}}{ D_{(j)}  }\\
+&=& \sum_{j=1}^r w^2(y_{(j)}) \frac{ d_{(j)} \frac{R_{(j)1}}{R_{(j)} } \left( 1 - \frac{R_{(j)1}}{R_{(j)} } \right) \left( R_{(j)} - d_{(j)}\right) }{ R_{(j)} - 1  }
+\end{eqnarray}
+
+### By hand
+
+As for the Kaplan-Meier estimator by hand, it is best to also fill in a table for the log-rank test by hand.
+
+Let's present the final table and comment below on how to fill it, column by column:
+
+|   $j$   | $y_{(j)}$ | $d_{(j)1}$ | $R_{(j)1}$ | $d_{(j)2}$ | $R_{(j)2}$ | $d_{(j)}$ | $R_{(j)}$ | $E_{j}$ | $O_{j}$ | $O_{j} - E_{j}$ | $N_{(j)}$ | $D_{(j)}$ | $N_{(j)}/D_{(j)}$ |
+|:-------:|:---------:|:----------:|:----------:|:----------:|:----------:|:---------:|:---------:|:-------:|:-------:|:---------------:|:---------:|:---------:|:-----------------:|
+|    1    |    4.1    |      1     |      6     |      0     |      6     |     1     |     12    |   0.5   |    1    |       0.5       |    2.75   |     11    |        0.25       |
+|    2    |    9.7    |      0     |      4     |      1     |      6     |     1     |     10    |   0.4   |    0    |       -0.4      |    2.16   |     9     |        0.24       |
+|    3    |     10    |      2     |      4     |      1     |      5     |     3     |     9     |  1.333  |    2    |      0.667      |    4.44   |     8     |       0.555       |
+|    4    |    17.2   |      1     |      1     |      0     |      2     |     1     |     3     |  0.333  |    1    |      0.667      |    0.44   |     2     |        0.22       |
+|    5    |    19.7   |      0     |      0     |      1     |      2     |     1     |     2     |    0    |    0    |        0        |    0.00   |     1     |        0.00       |
+| $Total$ |           |      4     |            |      3     |            |     7     |           |  2.566  |         |      1.433      |           |           |       1.265       |
+
+<br>
+
+**Column $j$** is the number of distinct event times. We see that there are 5 (ignoring censored observations), so we write 1 to 5 in the table.
+
+**Column $y_{(j)}$** is the ordered distinct event times:
+
+```{r, echo = FALSE}
+pander(sort(unique(subset(dat, event == 1)$time)))
+```
+
+**Column $d_{(j)1}$** is the number of observations for each distinct event time, for group 1:
+
+```{r, echo = FALSE}
+xtabs(~ time, data = subset(dat, event == 1 & group == 1))
+```
+
+When there is no event, we simply write 0 in the table.
+
+**Column $R_{(j)1}$** is the remaining number of patients at risk, for group 1. For this, the distribution of time (censored and not censored, for group 1) is useful:
+
+```{r, echo = FALSE}
+xtabs(~ time, data = subset(dat, group == 1))
+```
+
+We see that:
+
+- At the beginning, there are 6 patients
+- Before time 9.7, there are 4 patients left (6 - 1 who had the event at time 4.1 - 1 who was censored at time 7.8)
+- Before time 10, there are 4 patients left (6 - 2)
+- Before time 17.2, there are 1 patient left (6 - 5)
+- Before time 19.7, there are 0 patient left (6 - 6)
+
+**Columns $d_{(j)2}$ and $R_{(j)2}$** follow the same principle, but for group 2 this time. So we have, respectively for $d_{(j)2}$ and $R_{(j)2}$:
+
+```{r, echo = FALSE}
+xtabs(~ time, data = subset(dat, event == 1 & group == 2))
+
+xtabs(~ time, data = subset(dat, group == 2))
+```
+
+**Columns $d_{(j)}$ and $R_{(j)}$** also follow the same principle, but this time considering both groups. So we have, respectively for $d_{(j)}$ and $R_{(j)}$:
+
+```{r, echo = FALSE}
+xtabs(~ time, data = subset(dat, event == 1))
+
+xtabs(~ time, data = subset(dat))
+```
+
+**Column $E_{j}$** is the expected number of events in the first group assuming that $h_1 \equiv h_2$. It is obtained as follows
+
+$$ E_{j} = \frac{d_{(j)}R_{(j)1}}{R_{(j)}}$$
+
+**Column $O_{j}$** is the observed number of events in the first group, so it is equal to the $d_{(j)1}$ column.
+
+**Column $O_{j} - E_{j}$** is straightforward.
+
+**Column $N_{(j)}$** is defined as follows
+
+$$N_{(j)} = d_{(j)} \frac{R_{(j)1}}{R_{(j)} } \left( 1 - \frac{R_{(j)1}}{R_{(j)} } \right) \left( R_{(j)} - d_{(j)}\right)$$
+
+**Column $D_{(j)}$** is $R_{(j)} - 1$.
+
+**Column $N_{(j)}/D_{(j)}$** is straightforward.
+
+Since $w(y_{(j)}) = w^2(y_{(j)}) = 1$ for a log-rank test, we have^[Note that other weights can be considered, but this is beyond the scope of this article.]
+
+$$ U^{obs} = \frac{U}{\sqrt{Var(U)}} = \frac{1.434}{\sqrt{1.265}} = 1.275.$$
+
+We reject $H_0$ if $|U^{obs}|>z_{1-\alpha/2}$, so at the 5% significance level we reject $H_0$ if $|U^{obs}|>z_{0.975}=1.96$.
+
+We have $|U^{obs}| = 1.275 < z_{0.975}=1.96$. Hence, at the 5% significance level we do not reject $H_0$. This means that, based on the data, we are not able to conclude that survival is different between the two groups (which is equivalent than saying that we do not reject the hypothesis that survival is equal between the two groups).
+
+If you are interested in computing the $p$-value:
+
+$p$-value $= 2\times P(Z>1.275) = 2 \times 0.101 = 0.202 > 0.05$.
+ 
+### In R
+
+We now compare our results in R with the `survdiff()` function:
+
+```{r}
+dat <- data.frame(
+  group = c(rep(1, 6), rep(2, 6)),
+  time = c(4.1,7.8,10,10,12.3,17.2,9.7,10,11.1,13.1,19.7,24.1),
+  event = c(1,0,1,1,0,1,1,1,0,0,1,0)
+)
+
+dat
+
+survdiff(Surv(time, event) ~ group,
+               data = dat)
+```
+
+Alternatively, we can use the `ggsurvplot()` function to draw the survival curves and perform the log-rank test at the same time:
+
+```{r}
+fit <- survfit(Surv(time, event) ~ group, data = dat)
+
+ggsurvplot(fit,
+           pval = TRUE,
+           pval.method = TRUE)
+```
+
+As we can see, the $p$-values and the conclusions are the same (any difference with the results by hand is due to rounding).
+
+As for the Kaplan-Meier estimation, we do another example on a larger dataset. Consider the data on the times until staphylococcus infection of burn patients, also available in the `{KMsurv}`:^[More information about the dataset can be found on [CRAN](https://cran.r-project.org/web/packages/KMsurv/) or with `?burn`.]
+
+```{r}
+# load data
+data(burn)
+
+# preview data
+head(burn)
+```
+
+Using the log-rank test, we want to test the hypothesis of difference in the time to staphylococcus infection (`T3` variable) between patients whose burns were cared for with a routine bathing care method (`Z1 = 0`) versus those whose body cleansing was initially performed using 4% chlorhexidine gluconate (`Z1 = 1`). The event indicator is in variable `D3`.
+
+For this test, we use a two-sided alternative and a 5% significance level.
+
+```{r}
+# fit
+fit <- survfit(Surv(T3, D3) ~ Z1, data = burn)
+
+# plot with log-rank test
+ggsurvplot(fit,
+           pval = TRUE,
+           pval.method = TRUE)
+```
+
+*In the sample*, it seems that the time to infection for patients with routine bathing (`Z1 = 0`) is smaller than for patients with body cleansing (`Z1 = 1`). This is the case because the percentage of patients who have not experienced the infection decreases more quickly, so the hazard rate is greater.
+
+However, this conclusion cannot be generalized to the *population* without performing a sound statistical test. And based on the result of the log-rank test, we do not reject the hypothesis that time to infection is the same between the two groups of patients ($p$-value = 0.051).
+
+# To go further
+
+In this article, we have presented what is survival analysis, when, why and how to use it. We discussed about censoring and survival curves. We showed how to estimate the survival function via the Kaplan-Meier estimator and how to test survival between two groups via the log-rank test. We illustrated these approaches both by hand and in R.
+
+As you noticed, we did not show how to *model* survival data. There are several regression models that can be applied to survival data, the most common one being the semiparametric Cox Proportional Hazards model [-@cox1972regression]. It originated from the medical area to investigate and assess the relationship between the survival times of patients and their corresponding predictor variables.
+
+We have seen that the Kaplan-Meier estimator is useful to visualize survival between groups and the log-rank test to test whether survival significantly differs between groups (so both approaches use a [categorical variable](/blog/variable-types-and-examples/#qualitative) as predictor). However, it does not work well for assessing the effect of [quantitative predictor](/blog/variable-types-and-examples/#quantitative). The Cox model has the advantage that it works for both quantitative as well as for categorical predictors, and for several risk factors at the same time (so it can model the effect of multiple variables at once).
+
+With the Cox model, we model the impact of different factors $X_1, X_2, \ldots, X_q$ on survival via their impact on the hazard function:
+
+$$h(t|\textbf{X}) = h_0 (t) exp(\beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_q X_q),$$
+
+where:
+
+- $h(t|\textbf{X})$ is the instantaneous death rate conditional on having survived up to time $t$.
+- $h_0 (t)$ is the population-level baseline hazard -- the underlying hazard function. It describes how the average person's risk evolves over time.
+- $exp(\beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_q X_q)$ describes how covariates affect the hazard. In particular, a unit increase in $x_i$ leads to an increase of the hazard by a factor of $\exp(\beta_i)$.
+
+This post aimed at presenting the introductory concepts in survival analysis, so this model will be developed in another post. In the meantime, if you would like to learn more about modeling survival data (thanks to the Cox model and other models), see this [post](https://rviews.rstudio.com/2022/09/06/deep-survival/) from Joseph Rickert.
+
+Thanks for reading.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
+
+# References
+
