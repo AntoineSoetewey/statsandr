@@ -426,7 +426,7 @@ ggsurvplot(km,
 
 *Note that the crosses on the survival curve denote the censored observations.*
 
-The advantage with the `ggsurvplot()` function is that it is easy to draw the [median](/blog/descriptive-statistics-in-r/#median) directly on the plot:^[Median is preferred over mean in survival analysis because survival functions are often skewed to the right. The mean is often influenced by [outliers](/blog/outliers-detection-in-r/), whereas the median is not. See a discussion comparing the two in this [section](/blog/descriptive-statistics-by-hand/#mean-vs.-median).]
+The advantage with the `ggsurvplot()` function is that it is easy to draw the [median](/blog/descriptive-statistics-in-r/#median) survival directly on the plot:^[Median is preferred over mean in survival analysis because survival functions are often skewed to the right. The mean is often influenced by [outliers](/blog/outliers-detection-in-r/), whereas the median is not. See a discussion comparing the two in this [section](/blog/descriptive-statistics-by-hand/#mean-vs.-median).]
 
 ```{r}
 ggsurvplot(km,
@@ -435,7 +435,7 @@ ggsurvplot(km,
            legend = "none")
 ```
 
-To find the median duration:^[Note that if 50% or more of the subjects are censored, the median cannot be computed.]
+To find the median survival:^[Note that if the survival curve does not cross 50% (because survival is greater than 50% at the last time point), then the median survival cannot be computed and is simply undefined.]
 
 ```{r}
 summary(km)$table["median"]
@@ -447,7 +447,7 @@ km
 Suppose that the event of interest is death:
 
 - At time zero, the survival probability is 1 (100% of the subjects are alive).
-- The median indicates that the median survival time is 9 years.^[Note that the median duration is expressed in the same unit than the unit of the `time` variable in the initial dataset. So if the time unit was months, the median survival time would be 9 months.] This is the time at which the survival $S(t)$ is 50%. In other words, is the time after which half of the subjects are expected to have died.
+- The median indicates that the median survival time is 9 years.^[Note that the median survival is expressed in the same unit than the unit of the `time` variable in the initial dataset. So if the time unit was months, the median survival time would be 9 months.] This is the time at which the survival $S(t)$ is 50%. In other words, is the time after which half of the subjects are expected to have died.
 - From the plot, we also see that $S(5) = P(T > 5 \text{ years}) =$ Probability of survival of more than 5 years for these subjects = 75%. This means that 75% of all subjects survive longer than 5 years, and that 25% of all subjects die within the first 5 years.
 
 For the sake of completeness, let's do another example with a much larger dataset; the `tongue` dataset within the `{KMsurv}` package.^[More information about the dataset can be found on [CRAN](https://cran.r-project.org/web/packages/KMsurv/) or with `?tongue`.]
@@ -487,7 +487,7 @@ ggsurvplot(fit,
            legend = "none")
 ```
 
-The median survival time is estimated to be 93 weeks, with a 95% confidence interval [65; 157].
+The median survival time is estimated to be 93 weeks, with a 95% confidence interval between 65 and 157 weeks.
 
 Kaplan-Meier curves can be seen as [descriptive statistics](/blog/descriptive-statistics-in-r/) for survival data. We now focus on the second branch of statistics, [hypothesis testing](/blog/hypothesis-test-by-hand/) which allows to draw conclusions on the population based on a sample (see a quick reminder about the [difference between population and sample](/blog/what-is-the-difference-between-population-and-sample/) if you need).
 

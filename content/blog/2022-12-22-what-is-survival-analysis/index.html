@@ -632,14 +632,14 @@ ggsurvplot(km,
 )</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p><em>Note that the crosses on the survival curve denote the censored observations.</em></p>
-<p>The advantage with the <code>ggsurvplot()</code> function is that it is easy to draw the <a href="/blog/descriptive-statistics-in-r/#median">median</a> directly on the plot:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<p>The advantage with the <code>ggsurvplot()</code> function is that it is easy to draw the <a href="/blog/descriptive-statistics-in-r/#median">median</a> survival directly on the plot:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <pre class="r"><code>ggsurvplot(km,
   conf.int = FALSE,
   surv.median.line = &quot;hv&quot;,
   legend = &quot;none&quot;
 )</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<p>To find the median duration:<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<p>To find the median survival:<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 <pre class="r"><code>summary(km)$table[&quot;median&quot;]</code></pre>
 <pre><code>## median 
 ##      9</code></pre>
@@ -694,7 +694,7 @@ ggsurvplot(fit,
   legend = &quot;none&quot;
 )</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<p>The median survival time is estimated to be 93 weeks, with a 95% confidence interval [65; 157].</p>
+<p>The median survival time is estimated to be 93 weeks, with a 95% confidence interval between 65 and 157 weeks.</p>
 <p>Kaplan-Meier curves can be seen as <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> for survival data. We now focus on the second branch of statistics, <a href="/blog/hypothesis-test-by-hand/">hypothesis testing</a> which allows to draw conclusions on the population based on a sample (see a quick reminder about the <a href="/blog/what-is-the-difference-between-population-and-sample/">difference between population and sample</a> if you need).</p>
 </div>
 </div>
@@ -1045,8 +1045,8 @@ Kaplan, Edward L, and Paul Meier. 1958. <span>“Nonparametric Estimation from I
 <li id="fn1"><p>Note that in survival analysis, the precision of the estimators (and the power of the tests) does not depend on the number of patients but on the number of events. So it is best to have many observations where the event does occur for the analyses to be effective. Here we work on a small sample for the sake of illustration.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>Note that the <code>time</code> variable can be expressed in other units, such as seconds, days, weeks, months, etc.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 <li id="fn3"><p>Median is preferred over mean in survival analysis because survival functions are often skewed to the right. The mean is often influenced by <a href="/blog/outliers-detection-in-r/">outliers</a>, whereas the median is not. See a discussion comparing the two in this <a href="/blog/descriptive-statistics-by-hand/#mean-vs.-median">section</a>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>Note that if 50% or more of the subjects are censored, the median cannot be computed.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>Note that the median duration is expressed in the same unit than the unit of the <code>time</code> variable in the initial dataset. So if the time unit was months, the median survival time would be 9 months.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Note that if the survival curve does not cross 50% (because survival is greater than 50% at the last time point), then the median survival cannot be computed and is simply undefined.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Note that the median survival is expressed in the same unit than the unit of the <code>time</code> variable in the initial dataset. So if the time unit was months, the median survival time would be 9 months.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
 <li id="fn6"><p>More information about the dataset can be found on <a href="https://cran.r-project.org/web/packages/KMsurv/">CRAN</a> or with <code>?tongue</code>.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
 <li id="fn7"><p>See the reason we use <code>log-log</code> for the confidence interval in this <a href="https://stats.stackexchange.com/questions/361354/choosing-conf-type-for-survfit-in-r">thread</a>.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
 <li id="fn8"><p>Note that if the groups to compare have a natural ordering (such as the educational level; none, low, medium, high), tests that take it into consideration have more power to detect significant effects. These tests are referred as tests for trend.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
