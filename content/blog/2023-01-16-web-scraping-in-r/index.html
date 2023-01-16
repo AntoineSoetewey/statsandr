@@ -1,0 +1,371 @@
+---
+title: Web scraping in R
+author: Antoine Soetewey
+date: '2023-01-16'
+slug: web-scraping-in-r
+categories: []
+tags:
+  - Collaboration
+  - R
+  - Web
+meta_img: blog/web-scraping-in-r/images/web-scraping-in-r.jpeg
+description: Learn more web scraping in R
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+    # df_print: paged
+# draft: true
+# bibliography: bibliography.bib
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a>
+<ul>
+<li><a href="#html-and-css" id="toc-html-and-css">HTML and CSS</a></li>
+<li><a href="#web-scraping-vs.-apis" id="toc-web-scraping-vs.-apis">Web scraping vs. APIs</a>
+<ul>
+<li><a href="#why-does-web-scraping-exist-if-apis-are-so-powerful-and-do-exactly-the-same-work" id="toc-why-does-web-scraping-exist-if-apis-are-so-powerful-and-do-exactly-the-same-work">Why does web scraping exist if APIs are so powerful and do exactly the same work?</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#web-scraping-in-r" id="toc-web-scraping-in-r">Web scraping in R</a>
+<ul>
+<li><a href="#rvest" id="toc-rvest">rvest</a></li>
+<li><a href="#http-get-request" id="toc-http-get-request">HTTP GET request</a></li>
+<li><a href="#parsing-html-content" id="toc-parsing-html-content">Parsing HTML content</a>
+<ul>
+<li><a href="#css-selector" id="toc-css-selector">CSS selector</a></li>
+<li><a href="#xpath" id="toc-xpath">XPath</a></li>
+</ul></li>
+<li><a href="#getting-attributes" id="toc-getting-attributes">Getting attributes</a></li>
+</ul></li>
+<li><a href="#a-real-application-of-web-scraping-in-r" id="toc-a-real-application-of-web-scraping-in-r">A real application of web scraping in R</a>
+<ul>
+<li><a href="#http-get-request-1" id="toc-http-get-request-1">HTTP GET request</a></li>
+<li><a href="#parsing-html-content-and-getting-attributes" id="toc-parsing-html-content-and-getting-attributes">Parsing HTML content and getting attributes</a></li>
+<li><a href="#analysis-on-the-database" id="toc-analysis-on-the-database">Analysis on the database</a></li>
+</ul></li>
+<li><a href="#to-go-further" id="toc-to-go-further">To go further</a></li>
+</ul>
+</div>
+
+<p><img src="images/web-scraping-in-r.jpeg" style="width:100.0%" /></p>
+<p><em>This post has been written in collaboration with <a href="mailto:pcs.parmigiano@gmail.com">Pietro Zanotta</a>.</em></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Almost anyone is familiar with web pages (otherwise you would not be here), but what if we tell you that how you see a site is different from how Google or your browser does? In fact, when you type any site address in your browser, your browser will download and render the page for you, but for rendering the page it needs some instructions.</p>
+<p>There are 3 types of instructions:</p>
+<ul>
+<li><strong>HTML</strong>: describes a web page’s infrastructure;</li>
+<li><strong>CSS</strong>: defines the appearance of a site;</li>
+<li><strong>JavaScript</strong>: decides the behavior of the page.</li>
+</ul>
+<p><strong>Web scraping</strong> is the art of extracting information from the HTML, CSS and Javascript lines of code. The term usually refers to an automated process, which is less error-prone and faster than gathering data by hand.</p>
+<p>It is important to note that web scraping can raise <strong>ethical concerns</strong>, as it involves accessing and using data from websites without the explicit permission of the website owner. It is a good practice to respect the terms of use for a website, and to seek written permission before scraping large amounts of data.</p>
+<p>This article aims to cover the basics of how to do web scraping in R. We will conclude by creating a database on Formula 1 drivers from <a href="https://en.wikipedia.org/wiki/List_of_Formula_One_drivers">Wikipedia</a>.</p>
+<p>Note that this article doesn’t want to be exhaustive on topic. To learn more, see <a href="/blog/web-scraping-in-r/#to-go-further">this section</a>.</p>
+<div id="html-and-css" class="section level3">
+<h3>HTML and CSS</h3>
+<p>Before starting it is important to have a basic knowledge of HTML and CSS. This section aims to briefly explain how HTML and CSS work, to learn more we leave you some resources at the bottom of this article.</p>
+<p>Feel free to skip this section if you already are knowledgeable in this topic.</p>
+<p>Starting from <strong>HTML</strong>, an HTML file looks like the following piece of code.</p>
+<pre class="html"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;body&gt;
+
+&lt;h1 href=&quot;https://en.wikipedia.org/wiki/Carl_Friedrich_Gauss&quot;&gt; Carl Friedrich Gauss&lt;/h1&gt;
+&lt;h2&gt; Biography &lt;/h2&gt;
+&lt;p&gt; Johann Carl Friedrich Gauss was born on 30 April 1777 in Brunswick. &lt;/p&gt;
+&lt;h2&gt; Profession &lt;/h2&gt;
+&lt;p&gt; Gauss is considered as one of the greatest metematician, statistician and physicist of all time. &lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<p>Those instructions produce the following:</p>
+<p><img src="images/gauss.png" style="width:100.0%" /></p>
+<p>As you read above, <strong>HTML</strong> is used to describe the infrastructure of a web page, for example we may want to define the headings, the paragraphs, etc.</p>
+<p>This infrastructure is represented by what are called <em>tags</em> (for example <code>&lt;h1&gt;...&lt;\h1&gt;</code> or <code>&lt;p&gt;...&lt;\p&gt;</code> are tags). Tags are the core of an HTML document as they represent the nature of what is inside the tag (for example <code>h1</code> stands for heading 1). It is important to observe that there are two types of tags:</p>
+<ul>
+<li>starting tags (e.g. <code>&lt;h1&gt;</code>)</li>
+<li>ending tags (e.g. <code>&lt;\h1&gt;</code>)</li>
+</ul>
+<p>This is what allows to nest different tags.</p>
+<p>Tags can also have attributes, for example in <code>&lt;h1 href="https://en.wikipedia.org/wiki/Carl_Friedrich_Gauss"Carl Friedrich Gauss&lt;/h1&gt;</code>, <code>href</code> is an attribute of the tag <code>h1</code> that specifies an URL.</p>
+<p>As the output of the above HTML code is not super elegant, <strong>CSS</strong> is used to style the final website. For example CSS is used to define the font, the color, the size, the spacing and many more features of a website.</p>
+<p>What is important for this article are <em>CSS selectors</em>, which are patterns used to select elements. The most important is the <code>.class</code> selector, which selects all elements with the same class. For example the <code>.xyz</code> selector selects all elements with <code>class="xyz"</code>.</p>
+</div>
+<div id="web-scraping-vs.-apis" class="section level2">
+<h2>Web scraping vs. APIs</h2>
+<p>Going back to web scraping, you may know that APIs are another way to access data from websites and online services.</p>
+<p>In fact an API is a set of rules and protocols that allows two different software systems to communicate with each other. When a website or online service provides an API, it means that they have made it possible for developers to access their data in a structured and controlled way.</p>
+<div id="why-does-web-scraping-exist-if-apis-are-so-powerful-and-do-exactly-the-same-work" class="section level3">
+<h3>Why does web scraping exist if APIs are so powerful and do exactly the same work?</h3>
+<p>The main difference between web scraping and using APIs is that APIs are typically provided by the website or service to allow access to their data, while web scraping involves accessing data without the explicit permission of the website owner.</p>
+<p>This means that using APIs is generally considered more ethical than web scraping, as it is done with the explicit permission of the website or service.</p>
+<p>However, there are also some limitations to using APIs:</p>
+<ul>
+<li>many APIs have rate limits, which means that they will only allow a certain number of requests to be made within a certain time period, i.e. you may not access large amounts of data;</li>
+<li>not all websites or online services provide APIs, which means the only way to access their data is via web scraping.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="web-scraping-in-r" class="section level1">
+<h1>Web scraping in R</h1>
+<p>There are several packages for web scraping in R, every package has its strengths and limitations. We will cover only the <code>rvest</code> package since it is the most used.</p>
+<p>To get started with web scraping in R you will first need R and RStudio installed (if needed, see <a href="/blog/how-to-install-r-and-rstudio/">here</a>). Once you have R and RStudio installed, you need to install the <code>rvest</code> package:</p>
+<pre class="r"><code>install.packages(&quot;rvest&quot;)</code></pre>
+<div id="rvest" class="section level2">
+<h2>rvest</h2>
+<p>Inspired by <code>beautiful soup</code> and <code>RoboBrowser</code> (two Python libraries for web scraping), <code>rvest</code> has a similar syntax, which makes it the most eligible package for those who come from Python.</p>
+<p><code>rvest</code> provides functions to access a web page and specific elements using CSS selectors and XPath. The library is a part of the <a href="https://www.tidyverse.org/">Tidyverse</a> collection of packages, i.e. it shares some coding conventions (e.g. the pipes) with other libraries as <code>tybble</code> and <code>ggplot2</code>.</p>
+<p>Before the real scraping it is necessary to load the <code>rvest</code> package:</p>
+<pre class="r"><code>library(rvest)</code></pre>
+<p>Now that everything is settled down, we can start the web scraping operation, which is usually made in 3 steps:</p>
+<ol style="list-style-type: decimal">
+<li><strong>HTTP GET request</strong></li>
+<li><strong>Parsing HTML content</strong></li>
+<li><strong>Getting HTML element attributes</strong></li>
+</ol>
+<p>These steps are detailed in the following sections.</p>
+</div>
+<div id="http-get-request" class="section level2">
+<h2>HTTP GET request</h2>
+<p>The HTTP GET method is a method used to send a server a question to get certain data and information. It is important to notice that this method does not change the state of the server.</p>
+<p>To send a GET request we need the link (as a character) to the page we want to scrape:</p>
+<pre class="r"><code>link &lt;- &quot;https://www.nytimes.com/&quot;</code></pre>
+<p>Sending the request to the page is simple, <code>rvest</code> provides the <code>read_html</code> function, which returns an object of <code>html_document</code> type:</p>
+<pre class="r"><code>NYT_page &lt;- read_html(link)
+
+NYT_page</code></pre>
+<pre><code>## {html_document}
+## &lt;html lang=&quot;en&quot; class=&quot; nytapp-vi-homepage&quot; xmlns:og=&quot;http://opengraphprotocol.org/schema/&quot;&gt;
+## [1] &lt;head&gt;\n&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8 ...
+## [2] &lt;body&gt;\n    &lt;div id=&quot;app&quot;&gt;\n&lt;a class=&quot;css-kgn7zc&quot; href=&quot;#site-index&quot;&gt;Skip ...</code></pre>
+</div>
+<div id="parsing-html-content" class="section level2">
+<h2>Parsing HTML content</h2>
+<p>As we saw in the last chunk of code, <code>NYT_page</code> contains the raw HTML code, which is not so easily readable.</p>
+<p>In order to make it readable from R it has to be parsed, which means generating a Document Object Model (DOM) from the raw HTML. DOM is what connects scripts and web pages by representing the structure of a document in memory.</p>
+<p><code>rvest</code> provides 2 ways to select HTML elements:</p>
+<ol style="list-style-type: decimal">
+<li><strong>XPath</strong></li>
+<li><strong>CSS selectors</strong></li>
+</ol>
+<p>Selecting elements with <code>rvest</code> is simple, for XPath we use the following syntax:</p>
+<pre class="r"><code>NYT_page %&gt;%
+  html_elements(xpath = &quot;&quot;)</code></pre>
+<p>while for CSS elector we need:</p>
+<pre class="r"><code>NYT_page %&gt;%
+  html_elements(css = &quot;&quot;)</code></pre>
+<div id="css-selector" class="section level3">
+<h3>CSS selector</h3>
+<p>Suppose that for a project you need the summaries of the articles of the NYT (note that what is in the following picture is not what you see in the <a href="https://www.nytimes.com/">New York Times web page</a>).</p>
+<p><img src="images/NYT_screenshot.png" style="width:100.0%" /></p>
+<p>Searching in the HTML code, it is not that complex to find <code>&lt;p class="summary-class"&gt;</code>, which is the markup of what we are looking for. To parse the HTML using this selector we use the <code>html_element</code> function:</p>
+<pre class="r"><code>summaries_css &lt;- NYT_page %&gt;%
+  html_elements(css = &quot;.summary-class&quot;)
+
+head(summaries_css)</code></pre>
+<pre><code>## {xml_nodeset (6)}
+## [1] &lt;li class=&quot;summary-class&quot;&gt;Popular tools that use artificial intelligence  ...
+## [2] &lt;li class=&quot;summary-class&quot;&gt;The rise of chatbots like ChatGPT is prompting  ...
+## [3] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Britain also plans to lobby the U.S., ...
+## [4] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Hundreds of homes outside of Scottsda ...
+## [5] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;On Dr. Martin Luther King Jr.’s birth ...
+## [6] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Companies that reaped windfalls helpi ...</code></pre>
+<p>The easiest way to obtain a CSS selector is opening the inspect mode, find the element you desire and right click on it. Then click on <code>copy</code> and <code>copy selector</code>.</p>
+</div>
+<div id="xpath" class="section level3">
+<h3>XPath</h3>
+<p>Parsing with <strong>XPath</strong> is similar to parsing using <strong>selectors</strong>. In fact, we just need to repeat what we did above using XPath of the element of interest. Moreover, obtaining an element’s XPath is not different form selector: <code>inspector mode -&gt; right click on element of interest -&gt; copy -&gt; copy XPath</code>.</p>
+<p>Repeating what we did above with XPath:</p>
+<pre class="r"><code>summaries_xpath &lt;- NYT_page %&gt;%
+  html_elements(xpath = &quot;//*[contains(@class, &#39;summary-class&#39;)]&quot;)
+
+head(summaries_xpath)</code></pre>
+<pre><code>## {xml_nodeset (6)}
+## [1] &lt;li class=&quot;summary-class&quot;&gt;Popular tools that use artificial intelligence  ...
+## [2] &lt;li class=&quot;summary-class&quot;&gt;The rise of chatbots like ChatGPT is prompting  ...
+## [3] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Britain also plans to lobby the U.S., ...
+## [4] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Hundreds of homes outside of Scottsda ...
+## [5] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;On Dr. Martin Luther King Jr.’s birth ...
+## [6] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Companies that reaped windfalls helpi ...</code></pre>
+<p>Obviously the data we collected with CSS selector and XPath are exactly the same.</p>
+</div>
+</div>
+<div id="getting-attributes" class="section level2">
+<h2>Getting attributes</h2>
+<p>Since the chunk of code above collect all the elements <code>p</code> with the class <code>summary</code>, we render all the elements of <code>NYT_summary_css</code> as a text using the <code>html_text</code> function:</p>
+<pre class="r"><code>NYT_summaries_css &lt;- html_text(summaries_css)
+NYT_summaries_xpath &lt;- html_text(summaries_xpath)</code></pre>
+<p>We only print some of them:</p>
+<pre class="r"><code>head(NYT_summaries_css)</code></pre>
+<pre><code>## [1] &quot;Popular tools that use artificial intelligence can deliver information, explain concepts, generate ideas — and, in some cases, write entire papers.&quot;               
+## [2] &quot;The rise of chatbots like ChatGPT is prompting a potentially huge shift in teaching and learning, with some colleges completely redesigning courses.&quot;              
+## [3] &quot;Britain also plans to lobby the U.S., Canada and Europe to send their own tanks to Ukraine.&quot;                                                                       
+## [4] &quot;Hundreds of homes outside of Scottsdale can no longer get water from the city, a consequence of unregulated growth colliding with water shortages.&quot;                
+## [5] &quot;On Dr. Martin Luther King Jr.’s birthday, President Biden assured an audience at Ebenezer Baptist Church that he would continue working on voting rights measures.&quot;
+## [6] &quot;Companies that reaped windfalls helping the government implement strict pandemic controls are now struggling to pay and keep workers.&quot;</code></pre>
+</div>
+</div>
+<div id="a-real-application-of-web-scraping-in-r" class="section level1">
+<h1>A real application of web scraping in R</h1>
+<p><img src="images/f1.jpg" style="width:100.0%" /></p>
+<p>To conclude this brief introduction to web scraping we want to use the <code>rvest</code> package in a real word application of web scraping. The goal is to scrape data from <a href="https://en.wikipedia.org/wiki/List_of_Formula_One_drivers">Formula 1 Wikipedia’s voice</a> and create a CSV file containing the name, the nationality, the number of podiums and some other statistics for every pilot.</p>
+<p>The table we are going to scrape is the following:</p>
+<p><img src="images/table_screenshot.png" style="width:100.0%" /></p>
+<p>If you haven’t done so, you need to install the <code>rvest</code> package:</p>
+<pre class="r"><code>install.packages(&quot;rvest&quot;)</code></pre>
+<p>and then load it:</p>
+<pre class="r"><code>library(rvest)</code></pre>
+<div id="http-get-request-1" class="section level2">
+<h2>HTTP GET request</h2>
+<p>The GET request is the easiest part of scraping, we just need the following line of code:</p>
+<pre class="r"><code>link &lt;- &quot;https://en.wikipedia.org/wiki/List_of_Formula_One_drivers&quot;</code></pre>
+</div>
+<div id="parsing-html-content-and-getting-attributes" class="section level2">
+<h2>Parsing HTML content and getting attributes</h2>
+<p>Again we repeat what we did before with the NYT example:</p>
+<pre class="r"><code>page &lt;- read_html(link)</code></pre>
+<p>Searching in the HTML code we find that the table is a <code>table</code> element with the <code>sortable</code> attribute:</p>
+<p><img src="images/table_screenshot2.png" style="width:100.0%" /></p>
+<p>Therefore we run the following lines of code:</p>
+<pre class="r"><code>drivers_F1 &lt;- html_element(page, &quot;table.sortable&quot;) %&gt;%
+  html_table()</code></pre>
+<p>In the chunk of code above, the <code>html_table</code> function is used to render the HTML code into tables.</p>
+<p>To inspect it, we display the first and last observations, and the structure of the dataset:</p>
+<pre class="r"><code>head(drivers_F1) # first 6 rows</code></pre>
+<pre><code>## # A tibble: 6 × 11
+##   `Driver Name`  Natio…¹ Seaso…² Drive…³ Race …⁴ Race …⁵ Pole …⁶ Race …⁷ Podiums
+##   &lt;chr&gt;          &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+## 1 Carlo Abate    Italy   1962–1… 0       3       0       0       0       0      
+## 2 George Abecas… United… 1951–1… 0       2       2       0       0       0      
+## 3 Kenny Acheson  United… 1983, … 0       10      3       0       0       0      
+## 4 Andrea de Ada… Italy   1968, … 0       36      30      0       0       0      
+## 5 Philippe Adams Belgium 1994    0       2       2       0       0       0      
+## 6 Walt Ader      United… 1950    0       1[b]    1       0       0       0      
+## # … with 2 more variables: `Fastest laps` &lt;chr&gt;, `Points[a]` &lt;chr&gt;, and
+## #   abbreviated variable names ¹​Nationality, ²​`Seasons Competed`,
+## #   ³​`Drivers&#39; Championships`, ⁴​`Race Entries`, ⁵​`Race Starts`,
+## #   ⁶​`Pole Positions`, ⁷​`Race Wins`</code></pre>
+<pre class="r"><code>tail(drivers_F1) # last 6 rows</code></pre>
+<pre><code>## # A tibble: 6 × 11
+##   `Driver Name`  Natio…¹ Seaso…² Drive…³ Race …⁴ Race …⁵ Pole …⁶ Race …⁷ Podiums
+##   &lt;chr&gt;          &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+## 1 Emilio Zapico  Spain   1976    0       1       0       0       0       0      
+## 2 Zhou Guanyu*   China   2022    0       22      22      0       0       0      
+## 3 Ricardo Zonta  Brazil  1999–2… 0       37      36      0       0       0      
+## 4 Renzo Zorzi    Italy   1975–1… 0       7       7       0       0       0      
+## 5 Ricardo Zunino Argent… 1979–1… 0       11      10      0       0       0      
+## 6 Driver Name    Nation… Season… Driver… Race E… Race S… Pole P… Race W… Podiums
+## # … with 2 more variables: `Fastest laps` &lt;chr&gt;, `Points[a]` &lt;chr&gt;, and
+## #   abbreviated variable names ¹​Nationality, ²​`Seasons Competed`,
+## #   ³​`Drivers&#39; Championships`, ⁴​`Race Entries`, ⁵​`Race Starts`,
+## #   ⁶​`Pole Positions`, ⁷​`Race Wins`</code></pre>
+<pre class="r"><code>str(drivers_F1) # structure of the dataset</code></pre>
+<pre><code>## tibble [869 × 11] (S3: tbl_df/tbl/data.frame)
+##  $ Driver Name           : chr [1:869] &quot;Carlo Abate&quot; &quot;George Abecassis&quot; &quot;Kenny Acheson&quot; &quot;Andrea de Adamich&quot; ...
+##  $ Nationality           : chr [1:869] &quot;Italy&quot; &quot;United Kingdom&quot; &quot;United Kingdom&quot; &quot;Italy&quot; ...
+##  $ Seasons Competed      : chr [1:869] &quot;1962–1963&quot; &quot;1951–1952&quot; &quot;1983, 1985&quot; &quot;1968, 1970–1973&quot; ...
+##  $ Drivers&#39; Championships: chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
+##  $ Race Entries          : chr [1:869] &quot;3&quot; &quot;2&quot; &quot;10&quot; &quot;36&quot; ...
+##  $ Race Starts           : chr [1:869] &quot;0&quot; &quot;2&quot; &quot;3&quot; &quot;30&quot; ...
+##  $ Pole Positions        : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
+##  $ Race Wins             : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
+##  $ Podiums               : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
+##  $ Fastest laps          : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
+##  $ Points[a]             : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;6&quot; ...</code></pre>
+<p>Now that we have a tibble (a sort of dataframe used in the <code>tidyverse</code> universe), we just need to select the variables of interest and eliminate the last row that contains the name of the variables:</p>
+<pre class="r"><code>drivers_F1 &lt;- drivers_F1[c(1:4, 7:9)] # select variables
+
+drivers_F1 &lt;- drivers_F1[-nrow(drivers_F1), ] # remove last row</code></pre>
+<p>At this point we may want to clean our data. For example, we notice that <code>Drivers' Championships</code> has a small formatting issue: it returns not only the number of championships the driver won, but also the years of the victories. To extract only the number of victories (without the years) we use the <code>substr()</code> function:</p>
+<pre class="r"><code>drivers_F1$`Drivers&#39; Championships` &lt;- substr(drivers_F1$`Drivers&#39; Championships`,
+  start = 1, stop = 1
+)</code></pre>
+<p>With this code, we actually extract only the first character since we start at 1 and stop at 1. At the moment, the maximum number of championships won by a driver is 7 (Lewis Hamilton), so it is fine to extract only the first digit.</p>
+<p><em>Et voila!</em> With only a few lines of code, we scraped a table and we are now ready to perform our analysis.</p>
+<p>If you want to save the dataset, you can always do so:</p>
+<pre class="r"><code>write.csv(drivers_F1, &quot;F1_drivers.csv&quot;, row.names = FALSE)</code></pre>
+</div>
+<div id="analysis-on-the-database" class="section level2">
+<h2>Analysis on the database</h2>
+<p>To convince you that this is a real database, we will now answer some simple questions.</p>
+<p>First of all, we load the <code>tidyverse</code> package:</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<ol style="list-style-type: decimal">
+<li>Which country has the largest number of wins?</li>
+</ol>
+<pre class="r"><code>drivers_F1 %&gt;%
+  group_by(Nationality) %&gt;%
+  summarise(championship_country = sum(as.double(`Drivers&#39; Championships`))) %&gt;%
+  arrange(desc(championship_country))</code></pre>
+<pre><code>## # A tibble: 48 × 2
+##    Nationality    championship_country
+##    &lt;chr&gt;                         &lt;dbl&gt;
+##  1 United Kingdom                   20
+##  2 Germany                          12
+##  3 Brazil                            8
+##  4 Argentina                         5
+##  5 Australia                         4
+##  6 Austria                           4
+##  7 Finland                           4
+##  8 France                            4
+##  9 Italy                             3
+## 10 Netherlands                       2
+## # … with 38 more rows</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Who has the most Championships?</li>
+</ol>
+<pre class="r"><code>drivers_F1 %&gt;%
+  group_by(`Driver Name`) %&gt;%
+  summarise(championship_pilot = sum(as.double(`Drivers&#39; Championships`))) %&gt;%
+  arrange(desc(championship_pilot))</code></pre>
+<pre><code>## # A tibble: 868 × 2
+##    `Driver Name`       championship_pilot
+##    &lt;chr&gt;                            &lt;dbl&gt;
+##  1 Lewis Hamilton~                      7
+##  2 Michael Schumacher^                  7
+##  3 Juan Manuel Fangio^                  5
+##  4 Alain Prost^                         4
+##  5 Sebastian Vettel^                    4
+##  6 Ayrton Senna^                        3
+##  7 Jack Brabham^                        3
+##  8 Jackie Stewart^                      3
+##  9 Nelson Piquet^                       3
+## 10 Niki Lauda^                          3
+## # … with 858 more rows</code></pre>
+<p>Sorry Michael, it looks like Lewis dethroned you.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Is there a relation between the number of Championships won and the number of race pole positions?</li>
+</ol>
+<pre class="r"><code>drivers_F1 %&gt;%
+  filter(`Pole Positions` &gt; 1) %&gt;%
+  ggplot(aes(x = as.double(`Pole Positions`), y = as.double(`Drivers&#39; Championships`))) +
+  geom_point(position = &quot;jitter&quot;) +
+  labs(y = &quot;Championships won&quot;, x = &quot;Pole positions&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-23-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>As expected, there seems to be a relationship between the number of pole positions and the number of Championships won. To quantify this relationship, we could build a <a href="/blog/multiple-linear-regression-made-simple/">linear model</a> but this is beyond the scope of the article.</p>
+</div>
+</div>
+<div id="to-go-further" class="section level1">
+<h1>To go further</h1>
+<p>As you have seen, <code>rvest</code> is a powerful tool. The goal of the article is to show just the tip of the iceberg regarding web scraping in R. There are many resources online that you can read if you want to know more:</p>
+<ul>
+<li><a href="https://bookdown.org/paul/2021_computational_social_science/web-scraping-basics.html">Web scraping: Basics</a> by Paul Bauer</li>
+<li><a href="https://cran.r-project.org/web/packages/rvest/rvest.pdf">rvest</a> CRAN documentation</li>
+<li><a href="https://cran.r-project.org/web/packages/xml2/xml2.pdf">xml2</a> CRAN documentation</li>
+<li><a href="https://cran.r-project.org/web/packages/httr/httr.pdf">httr</a> CRAN documentation</li>
+<li><a href="https://cran.r-project.org/web/packages/rvest/vignettes/rvest.html">rvest</a> CRAN vignette</li>
+<li><a href="https://cran.r-project.org/web/packages/httr/vignettes/quickstart.html">httr</a> CRAN vignette</li>
+<li><a href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/">Beautiful Soup</a> documentation</li>
+<li><a href="https://robobrowser.readthedocs.io/en/latest/readme.html">RoboBrowser</a> documentation</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML">HTML</a> documentation</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS">CSS</a> documentation</li>
+</ul>
+<p>Thanks for reading. As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
