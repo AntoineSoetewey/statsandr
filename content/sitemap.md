@@ -21,6 +21,5 @@ For you robots out there is an [XML version](/sitemap.xml) available for digesti
 * [Contribute - Guest post](/contribute/)
 * [Support the blog](/support/)
 * [Press](/press/)
-* [Useful links](/links/)
 * [Terms and policies](/terms/)
 * [Sitemap](/sitemap/)

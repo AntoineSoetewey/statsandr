@@ -122,7 +122,7 @@ Yes, I am open to one-on-one teaching or consulting to help:
 - **Students** and academics in their studies through the success of their exam or the statistical part of their thesis, thanks to tailor-made courses and personalized support in statistics and probability.
 - **Professionals** and companies in their research, data analysis and informed decision-making by bringing a statistical dimension to their projects, regardless of the sector, core business or size of the company.
 
-If you need help in statistics, data analysis, probability or R for your academic or work related projects, feel free to contact me via [datanalyze.be](https://datanalyze.be/)!
+If you need help in statistics, data analysis, probability or R for your academic or work related projects, feel free to contact me ([here](https://easystat.be/contact-en/) if you are a student, and [here](https://datanalyze.be/#contact) if you are a professional)!
 
 ## 14. I have a question that is not mentioned here
 
