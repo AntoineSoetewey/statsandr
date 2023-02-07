@@ -1,0 +1,603 @@
+---
+title: Top 10 errors in R and how to fix them
+author: Antoine Soetewey
+date: '2023-02-07'
+slug: top-10-errors-in-r
+categories: []
+tags:
+  - Basics
+  - R
+  - Tips
+meta_img: blog/top-10-errors-in-r/images/top-10-errors-in-r.avif
+description: We present a tool that allows to extract data directly from a web page. This technique, referred as web scraping, is illustrated in R with a real life example
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 2
+    # df_print: paged
+# draft: true
+# bibliography: bibliography.bib
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#unmatched-parentheses-curly-braces-square-brackets-or-quotes" id="toc-unmatched-parentheses-curly-braces-square-brackets-or-quotes">1. Unmatched parentheses, curly braces, square brackets or quotes</a></li>
+<li><a href="#using-a-function-that-is-not-installed-or-loaded" id="toc-using-a-function-that-is-not-installed-or-loaded">2. Using a function that is not installed or loaded</a></li>
+<li><a href="#typos-in-function-variable-dataset-object-or-package-names" id="toc-typos-in-function-variable-dataset-object-or-package-names">3. Typos in function, variable, dataset, object or package names</a></li>
+<li><a href="#missing-incorrect-or-misspelled-arguments-in-functions" id="toc-missing-incorrect-or-misspelled-arguments-in-functions">4. Missing, incorrect or misspelled arguments in functions</a></li>
+<li><a href="#wrong-inappropriate-or-inconsistent-data-types" id="toc-wrong-inappropriate-or-inconsistent-data-types">5. Wrong, inappropriate or inconsistent data types</a></li>
+<li><a href="#forgetting-the-sign-in-ggplot2" id="toc-forgetting-the-sign-in-ggplot2">6. Forgetting the + sign in ggplot2</a></li>
+<li><a href="#misunderstanding-between-and" id="toc-misunderstanding-between-and">7. Misunderstanding between = and ==</a></li>
+<li><a href="#undefined-columns-selected" id="toc-undefined-columns-selected">8. Undefined columns selected</a></li>
+<li><a href="#problem-when-importing-or-using-the-wrong-data-file" id="toc-problem-when-importing-or-using-the-wrong-data-file">9. Problem when importing or using the wrong data file</a></li>
+<li><a href="#problem-when-using-the-operator" id="toc-problem-when-using-the-operator">10. Problem when using the $ operator</a>
+<ul>
+<li><a href="#operator-is-invalid-for-atomic-vectors" id="toc-operator-is-invalid-for-atomic-vectors">$ operator is invalid for atomic vectors</a></li>
+<li><a href="#object-of-type-closure-is-not-subsettable" id="toc-object-of-type-closure-is-not-subsettable">object of type ‘closure’ is not subsettable</a></li>
+</ul></li>
+<li><a href="#warnings" id="toc-warnings">Warnings</a>
+<ul>
+<li><a href="#nas-introduced-by-coercion" id="toc-nas-introduced-by-coercion">NAs introduced by coercion</a></li>
+<li><a href="#removed-rows-containing-non-finite-values-stat_bin" id="toc-removed-rows-containing-non-finite-values-stat_bin">Removed … rows containing non-finite values (stat_bin())</a></li>
+</ul></li>
+</ul>
+</div>
+
+<p><img src="images/top-10-errors-in-r.avif" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>If you are just starting with R, you will often encounter errors in your code which prevent it to run. I remember when I was just starting to use R, errors in my code were so frequent that I almost gave up learning this programming language. I even recall that I went back to Excel a few times to finish my analyses because I could not find what was causing the issue.</p>
+<p>Fortunately, I forced myself to continue despite the difficulties of the beginning. And today, even if I still encounter errors almost every time I write R code, with experience and practice, it takes less and less time to fix them. If you are also struggling at the beginning, rest assured, it is normal: everyone experiences some frustration when learning a new programming language (and this is the case not only with R).</p>
+<p>In this post, I highlight the <strong>10 most common errors in R and how to fix them</strong>. Of course, errors depend on your code and your analyses, so it is impossible to cover all of them (and Google does it way better than me). However, I would like to focus on some common syntax mistakes that are frequent when learning R, and which can sometimes take a long time to be fixed before realizing that the solution is right in front of our eyes.</p>
+<p>This collection is based on my personal experience and the errors encountered by my students when I <a href="https://antoinesoetewey.com/teaching/">teach</a> R. This list being non-exhaustive, feel free to comment (at the end of the post) with errors you often face when using R.</p>
+<p>For each error, I provide examples and solutions to fix them.</p>
+</div>
+<div id="unmatched-parentheses-curly-braces-square-brackets-or-quotes" class="section level1">
+<h1>1. Unmatched parentheses, curly braces, square brackets or quotes</h1>
+<p>One rather trivial but still quite frequent error is a missing parenthesis, curly brace, square bracket or quotation mark.</p>
+<p>This type of error is applicable to many programming languages. In R, for instance:</p>
+<pre class="r"><code>## missing a closing parenthesis:
+mean(c(1, 7, 13)
+     
+## missing a curly brace before &quot;else&quot;:
+x &lt;- 7 
+if(x &gt; 10) {
+  print(&quot;x &gt; 10&quot;)
+ else {
+  print(&quot;x &lt;= 10&quot;)
+ }
+  
+## missing a square bracket:
+summary(ggplot2::diamonds[, &quot;price&quot;)
+
+## missing a closing quote in 2nd element:
+grp &lt;- c(&quot;Group 1&quot;, &quot;Group 2) 
+grp</code></pre>
+<p>These errors are easy to detect when the code is basic, but can become much harder to spot with a more complex code, for instance:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<pre class="r"><code>for (i in y) {
+  for (j in x) {
+    p &lt;- ggboxplot(dat,
+      x = colnames(dat[j]), y = colnames(dat[i]),
+      color = colnames(dat[j]),
+      legend = &quot;none&quot;,
+      palette = &quot;npg&quot;,
+      add = &quot;jitter&quot;
+    )
+    print(
+      p + stat_compare_means(aes(label = paste0(..method.., &quot;, p-value = &quot;, ..p.format..),
+        method = method1, label.y = max(dat[, i], na.rm = TRUE)
+      )
+      + stat_compare_means(comparisons = my_comparisons, method = method2, label = &quot;p.format&quot;)
+    )
+  }</code></pre>
+<p>Thankfully, if you use RStudio,<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> a closing parenthesis, curly brace, square bracket or quotation mark will automatically be written when you open one.</p>
+<p>Bear in mind that when installing a package, you <em>must</em> use (single or double) quotation marks around the package’s name:</p>
+<pre class="r"><code>## NOT correct:
+install.packages(ggplot2)</code></pre>
+<pre class="r"><code>## Error in install.packages : object &#39;ggplot2&#39; not found</code></pre>
+<pre class="r"><code>## correct:
+install.packages(&quot;ggplot2&quot;)
+
+## also correct:
+install.packages(&quot;ggplot2&quot;)</code></pre>
+<div id="solution" class="section level3">
+<h3>Solution</h3>
+<p>The solution of course is to simply match all opening parentheses, curly braces, square brackets and quotation marks with their closing counterparts:</p>
+<pre class="r"><code>mean(c(1, 7, 13))</code></pre>
+<pre><code>## [1] 7</code></pre>
+<pre class="r"><code>x &lt;- 7
+if (x &gt; 10) {
+  print(&quot;x &gt; 10&quot;)
+} else {
+  print(&quot;x &lt;= 10&quot;)
+}</code></pre>
+<pre><code>## [1] &quot;x &lt;= 10&quot;</code></pre>
+<pre class="r"><code>summary(ggplot2::diamonds[, &quot;price&quot;])</code></pre>
+<pre><code>##      price      
+##  Min.   :  326  
+##  1st Qu.:  950  
+##  Median : 2401  
+##  Mean   : 3933  
+##  3rd Qu.: 5324  
+##  Max.   :18823</code></pre>
+<pre class="r"><code>grp &lt;- c(&quot;Group 1&quot;, &quot;Group 2&quot;)
+grp</code></pre>
+<pre><code>## [1] &quot;Group 1&quot; &quot;Group 2&quot;</code></pre>
+<p>Also, make sure:</p>
+<ul>
+<li>to correctly place commas:</li>
+</ul>
+<pre class="r"><code>## NOT correct (misplaced comma):
+c(&quot;Group 1,&quot; &quot;Group 2&quot;)</code></pre>
+<pre class="r"><code>## Error: unexpected string constant in &quot;c(&quot;Group 1,&quot; &quot;Group 2&quot;&quot;</code></pre>
+<pre class="r"><code>## also NOT correct (missing comma):
+c(&quot;Group 1&quot; &quot;Group 2&quot;)</code></pre>
+<pre class="r"><code>## Error: unexpected string constant in &quot;c(&quot;Group 1&quot; &quot;Group 2&quot;&quot;</code></pre>
+<pre class="r"><code>## correct:
+c(&quot;Group 1&quot;, &quot;Group 2&quot;)</code></pre>
+<ul>
+<li>you do not mix single and double quotation marks for the same element:</li>
+</ul>
+<pre class="r"><code>## NOT correct:
+c(&quot;Group 1&#39;)
+
+## correct:
+c(&quot;Group 1&quot;)
+
+## also correct:
+c(&#39;Group 1&#39;)</code></pre>
+<p>Note that <code>c('Group 1', "Group 2")</code> does not throw an error but for consistency, it is not recommended to mix single and double quotes within the same vector.</p>
+</div>
+</div>
+<div id="using-a-function-that-is-not-installed-or-loaded" class="section level1">
+<h1>2. Using a function that is not installed or loaded</h1>
+<p>If you encounter the following error: “Error in … : could not find function ‘…’”, for example:</p>
+<p><img src="images/could-not-find-function-R.png" style="width:75.0%" /></p>
+<p>it means you are trying to use a function belonging to a package which is not yet installed or loaded.</p>
+<div id="solution-1" class="section level3">
+<h3>Solution</h3>
+<p>To solve this error, you have to install the package (if it is not installed yet) and load it with the <code>install.packages()</code> and <code>library()</code> functions, respectively:</p>
+<pre class="r"><code>## install package:
+install.packages(&quot;ggplot2&quot;)
+
+## load package:
+library(ggplot2)</code></pre>
+<p>If you are not sure about the usage of these two functions, see more details about <a href="/blog/an-efficient-way-to-install-and-load-r-packages/">installing and loading a package in R</a>.</p>
+</div>
+</div>
+<div id="typos-in-function-variable-dataset-object-or-package-names" class="section level1">
+<h1>3. Typos in function, variable, dataset, object or package names</h1>
+<p>Another common mistake is to misspell a function, a variable, a dataset, an object or a package’s name, for example:</p>
+<pre class="r"><code>## typo in function name:
+maen(c(1, 7, 13))</code></pre>
+<pre class="r"><code>## Error in maen(c(1, 7, 13)) : could not find function &quot;maen&quot;</code></pre>
+<pre class="r"><code>## typo in variable name:
+summary(ggplot2::diamonds[, &quot;detph&quot;])</code></pre>
+<pre class="r"><code>## Error: Column `detph` doesn&#39;t exist</code></pre>
+<pre class="r"><code>## typo in dataset name:
+data &lt;- data.frame(
+  x = rnorm(10),
+  y = rnorm(10)
+)
+summary(dta[, 2])</code></pre>
+<pre class="r"><code>## Error in summary(dta[, 2]) : object &#39;dta&#39; not found</code></pre>
+<pre class="r"><code>## typo in object name:
+test &lt;- c(1, 7, 13)
+mean(tset)</code></pre>
+<pre class="r"><code>## Error in mean(tset) : object &#39;tset&#39; not found</code></pre>
+<pre class="r"><code>## typo in package name:
+library(&quot;tydiverse&quot;)</code></pre>
+<pre class="r"><code>## Error in library(&quot;tydiverse&quot;) : there is no package called ‘tydiverse’</code></pre>
+<div id="solution-2" class="section level3">
+<h3>Solution</h3>
+<p>Make sure that you correctly spell all your functions, variables, datasets, objects and packages:</p>
+<p>Note that <strong>R is case sensitive</strong>; <code>mean()</code> is considered different than <code>Mean()</code> for R!</p>
+<pre class="r"><code>mean(c(1, 7, 13))</code></pre>
+<pre><code>## [1] 7</code></pre>
+<pre class="r"><code>summary(ggplot2::diamonds[, &quot;depth&quot;])</code></pre>
+<pre><code>##      depth      
+##  Min.   :43.00  
+##  1st Qu.:61.00  
+##  Median :61.80  
+##  Mean   :61.75  
+##  3rd Qu.:62.50  
+##  Max.   :79.00</code></pre>
+<pre class="r"><code>data &lt;- data.frame(
+  x = rnorm(10),
+  y = rnorm(10)
+)
+data[, 2]</code></pre>
+<pre><code>##  [1]  1.3048697  2.2866454 -1.3888607 -0.2787888 -0.1333213  0.6359504
+##  [7] -0.2842529 -2.6564554 -2.4404669  1.3201133</code></pre>
+<pre class="r"><code>test &lt;- c(1, 7, 13)
+mean(test)</code></pre>
+<pre><code>## [1] 7</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
+## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
+## ✔ readr   2.1.3      ✔ forcats 0.5.2 
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<p>If you are sure that you correctly spelled an object, a function or a dataset but you still have an error stating that “object ‘…’ is not found”, make sure that you defined your object/function/dataset <em>before</em> calling it!</p>
+<p>It often happens that a student asks me to come to his/her computer because he/she runs the exact same code than me, but cannot make it work. Most of the time, if his/her code is indeed exactly the same than mine, he/she simply has not executed a object/function/dataset before running the code which includes that object/function/dataset. In other words, he/she simply tries to use an undefined object or variable.</p>
+<p>Remember that writing code in a R script (contrarily to the console) does not mean it is compiled. You actually have to run it (by clicking on the Run button or using the keyboard shortcut) in order the code to be executed and used later. If you are still struggling with this, see the <a href="/blog/how-to-install-r-and-rstudio/">basics of R and RStudio</a>.</p>
+</div>
+</div>
+<div id="missing-incorrect-or-misspelled-arguments-in-functions" class="section level1">
+<h1>4. Missing, incorrect or misspelled arguments in functions</h1>
+<p>Most R functions require arguments. For example, the <code>rnorm()</code> function requires at least the number of observations, specified via the argument <code>n</code>.</p>
+<p>Your code will not run if you do not specify compulsory arguments, or if incorrectly specify an argument. Moreover, the result might not be what you expect if you misspell an argument:</p>
+<pre class="r"><code>## missing compulsory argument:
+rnorm()</code></pre>
+<pre class="r"><code>## Error in rnorm() : argument &quot;n&quot; is missing, with no default</code></pre>
+<pre class="r"><code>## incorrect argument:
+rnorm(n = 3, var = 1)</code></pre>
+<pre class="r"><code>## Error in rnorm(n = 3, var = 1) : unused argument (var = 1)</code></pre>
+<pre class="r"><code>## misspelled argument:
+mean(c(1, 7, 13, NA), narm = TRUE)</code></pre>
+<pre><code>## [1] NA</code></pre>
+<p>The last piece of code does not throw an error, but the result is not what we want.</p>
+<div id="solution-3" class="section level3">
+<h3>Solution</h3>
+<p>To solve these errors, make sure to specify <strong>at least all compulsory arguments</strong> of the function, and the correct ones:</p>
+<ul>
+<li>In <code>rnorm()</code>, it is the standard deviation, <code>sd</code>, which can be specified in addition to the number of observations <code>n</code> (instead of the variance <code>var</code>).</li>
+<li>Removing <code>NA</code> is done with <code>na.rm</code> (instead of <code>narm</code>).</li>
+</ul>
+<pre class="r"><code>rnorm(n = 3, sd = 1)</code></pre>
+<pre><code>## [1] -0.3066386 -1.7813084 -0.1719174</code></pre>
+<pre class="r"><code>mean(c(1, 7, 13, NA), na.rm = TRUE)</code></pre>
+<pre><code>## [1] 7</code></pre>
+<p>If you do not know the arguments of a function by heart, you can always check the documentation with <code>?function_name</code> or <code>help(function_name)</code>, for example:</p>
+<pre class="r"><code>?rnorm()
+
+## or:
+help(rnorm)</code></pre>
+</div>
+</div>
+<div id="wrong-inappropriate-or-inconsistent-data-types" class="section level1">
+<h1>5. Wrong, inappropriate or inconsistent data types</h1>
+<p>There are several <a href="/blog/data-types-in-r/">data types in R</a>, the main ones being:</p>
+<ul>
+<li>Numeric</li>
+<li>Character</li>
+<li>Factor</li>
+<li>Logical</li>
+</ul>
+<p>You know that some operations and analyses are possible and appropriate only with some specific types of data.</p>
+<p>For example, it is not appropriate to compute the <a href="/blog/descriptive-statistics-in-r/#mean">mean</a> of a factor or character variable:</p>
+<pre class="r"><code>gender &lt;- factor(c(&quot;female&quot;, &quot;female&quot;, &quot;male&quot;, &quot;female&quot;, &quot;male&quot;))
+
+mean(gender)</code></pre>
+<pre><code>## Warning in mean.default(gender): argument is not numeric or logical: returning
+## NA</code></pre>
+<pre><code>## [1] NA</code></pre>
+<p>Likewise, although it is technically possible, it makes little sense to draw a <a href="/blog/descriptive-statistics-in-r/#barplot">barplot</a> of a <a href="/blog/variable-types-and-examples/">quantitative continuous</a> variable because in most cases, the frequency will be 1 for each value:</p>
+<pre class="r"><code>barplot(table(rnorm(10)))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-33-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><em>(By the way, if your data is not already displayed in the form of a table, do not forget to add <code>table()</code> inside the <code>barplot()</code> function.)</em></p>
+<div id="solution-4" class="section level3">
+<h3>Solution</h3>
+<p>Make sure to use the appropriate operation and type of analysis depending on the variable(s) of interest.</p>
+<p>For example:</p>
+<ul>
+<li>for factor variables, it is more appropriate to compute frequencies and/or relative frequencies, and draw barplots</li>
+<li>for quantitative continuous variables, it is more appropriate to compute the mean, median, etc. and draw histograms, boxplots, etc.</li>
+<li>for logical variables, the mean,<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> a frequency table and a barplot are appropriate</li>
+<li>for character variables, <a href="/blog/draw-a-word-cloud-with-a-shiny-app/">word clouds</a> are the most appropriate (unless the variable can be considered as a factor variable because there are not too many different levels)</li>
+</ul>
+<p>We now illustrate the examples in R:<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<pre class="r"><code>## factor:
+table(gender)</code></pre>
+<pre><code>## gender
+## female   male 
+##      3      2</code></pre>
+<pre class="r"><code>prop.table(table(gender))</code></pre>
+<pre><code>## gender
+## female   male 
+##    0.6    0.4</code></pre>
+<pre class="r"><code>barplot(table(gender))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-34-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>## quantitative continuous:
+x &lt;- rnorm(100)
+
+summary(x)</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -2.99309 -0.74143  0.01809 -0.08570  0.58937  2.70189</code></pre>
+<pre class="r"><code>par(mfrow = c(1, 2)) ## combine two plots
+hist(x)
+boxplot(x)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-34-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>## logical:
+x &lt;- c(TRUE, FALSE, FALSE, TRUE, TRUE)
+
+mean(x)</code></pre>
+<pre><code>## [1] 0.6</code></pre>
+<pre class="r"><code>table(x)</code></pre>
+<pre><code>## x
+## FALSE  TRUE 
+##     2     3</code></pre>
+<pre class="r"><code>barplot(table(x))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>For the interested reader, see the most common <a href="/blog/descriptive-statistics-in-r/">descriptive statistics in R</a> for different types of data.</p>
+<p>Note that, as for descriptive statistics, the choice of the statistical test depends on the variable’s type. See this <a href="/blog/what-statistical-test-should-i-do/">flowchart</a> to help you in selecting the most appropriate statistical test depending on the number of variables and their types.</p>
+<p>An error linked to the one mentioned above is <strong>inconsistent</strong> data type. See it in practice with the following example:</p>
+<pre class="r"><code>x &lt;- c(2.4, 3.7, 5.1, 9.8)
+class(x)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>y &lt;- c(2.4, 3.7, 5.1, &quot;9.8&quot;)
+class(y)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>As you can see, vector <code>x</code> is numerical, whereas vector <code>y</code> is in the form of character. This is due to the fact that the last element of <code>y</code> is surrounded with quotation marks (and thus considered as a string instead of a numerical value), so the entire vector takes the character form.</p>
+<p>This can happen when you <a href="/blog/how-to-import-an-excel-file-in-rstudio/">import a dataset into R</a> and one or several elements of a variable are not encoded correctly. This leads to the entire variable to be considered as a character variable by R.</p>
+<p>To avoid this, it is a good practice to check the structure of your dataset (with <code>str()</code>) after importing it to make sure all your variables have the desired format. If not, you can either correct the values in the initial file or change the format in R (with <code>as.numeric()</code>).</p>
+</div>
+</div>
+<div id="forgetting-the-sign-in-ggplot2" class="section level1">
+<h1>6. Forgetting the + sign in ggplot2</h1>
+<p>If you just learned to use the <a href="/blog/graphics-in-r-with-ggplot2/">ggplot2 package</a> for your visualizations (and I highly recommend it!), a common mistake is to forget the <code>+</code> sign.</p>
+<p>You know that a visualization made with ggplot2 is constructed by adding several layers:</p>
+<pre class="r"><code>## load package:
+library(ggplot2)
+
+## first layer, the dataset:
+ggplot(data = diamonds) +
+  ## second layer, the aesthetics:
+  aes(x = cut, y = price) +
+  ## third layer, the type of plot:
+  geom_boxplot() +
+  ## add more layers:
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-37-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<div id="solution-5" class="section level3">
+<h3>Solution</h3>
+<p>For all your graphics with ggplot2, do not forget to add a <strong><code>+</code> sign after each layer <em>except</em> the last one</strong>.</p>
+</div>
+</div>
+<div id="misunderstanding-between-and" class="section level1">
+<h1>7. Misunderstanding between = and ==</h1>
+<p>Assignment in R can be done in three ways, from the most to the least common:</p>
+<ol style="list-style-type: decimal">
+<li><code>&lt;-</code></li>
+<li><code>=</code></li>
+<li><code>assign()</code></li>
+</ol>
+<p>The second method, that is <code>=</code>, should not be confused with <code>==</code>.</p>
+<p>Indeed, assigning an object (with any of the three above methods) is used to save something in R. For example, if we want to save the vector <code>(1, 3, 7)</code> and rename that vector <code>x</code>, we can write:</p>
+<pre class="r"><code>x &lt;- c(1, 3, 7)
+
+## or:
+x = c(1, 3, 7)
+
+## or:
+assign(&quot;x&quot;, c(1, 3, 7))</code></pre>
+<p>When executing this piece of code, you will see that the vector <code>x</code> of size 3 appears in the tab “Environment” (the top right panel if you use the default view of RStudio):</p>
+<p><img src="images/R-environment.png" style="width:75.0%" /></p>
+<p>From now on, we can use that vector simply by calling it by its name:</p>
+<pre class="r"><code>x</code></pre>
+<pre><code>## [1] 1 3 7</code></pre>
+<p>By no means, you can assign an object with <code>==</code>:</p>
+<pre class="r"><code>## NOT correct if we want to assign c(1, 3, 7) to x:
+x == c(1, 3, 7)</code></pre>
+<p>So you are wondering, when would we need to use <code>==</code>? Actually, it is used when you want to use an equal sign.</p>
+<p>I understand that it may be abstract and confusing at the moment, so let’s suppose the following two scenarios as examples (which are the two most common cases when we use <code>==</code>):</p>
+<ol style="list-style-type: decimal">
+<li>we want to check whether an assigned object or variable respects some conditions, and</li>
+<li>we want to subset a dataframe based on one or several conditions.</li>
+</ol>
+<p>For these examples, suppose a <a href="/blog/what-is-the-difference-between-population-and-sample/">sample</a> of 5 children:</p>
+<pre class="r"><code>## create dataframe:
+dat &lt;- data.frame(
+  Name = c(&quot;Mary&quot;, &quot;Linda&quot;, &quot;James&quot;, &quot;John&quot;, &quot;Patricia&quot;),
+  Age = c(7, 10, 3, 9, 7),
+  Gender = c(&quot;Girl&quot;, &quot;Girl&quot;, &quot;Boy&quot;, &quot;Boy&quot;, &quot;Girl&quot;)
+)
+
+## print dataframe:
+dat</code></pre>
+<pre><code>##       Name Age Gender
+## 1     Mary   7   Girl
+## 2    Linda  10   Girl
+## 3    James   3    Boy
+## 4     John   9    Boy
+## 5 Patricia   7   Girl</code></pre>
+<p>Let’s now write different pieces of code for these two scenarios to illustrate them:</p>
+<ul>
+<li>We want to check whether the variable <code>Age</code> is equal to the vector <code>(1, 2, 3, 4, 5)</code>:</li>
+</ul>
+<pre class="r"><code>dat$Age == 1:5</code></pre>
+<pre><code>## [1] FALSE FALSE  TRUE FALSE FALSE</code></pre>
+<p>With this code, we ask whether the first element of the variable <code>Age</code> is equal to 1, the second element of the variable <code>Age</code> is equal to 2, and so on. The answer is of course <code>FALSE</code>, <code>FALSE</code>, <code>TRUE</code>, <code>FALSE</code> and <code>FALSE</code> since only the third child has an age <strong>equal</strong> to 3 years.</p>
+<ul>
+<li>We want to know which of our 5 sampled children are girls:</li>
+</ul>
+<pre class="r"><code>dat$Gender == &quot;Girl&quot;</code></pre>
+<pre><code>## [1]  TRUE  TRUE FALSE FALSE  TRUE</code></pre>
+<p>The results show that the first, second and fifth children are girls, while the third and fourth children are not girls.</p>
+<p>If you write any of these two lines:</p>
+<pre class="r"><code>## this overwrites Age and Gender:
+dat$Age = 1:5
+dat$Gender = &quot;Girl&quot;</code></pre>
+<p>You actually overwrite the <code>Age</code> and <code>Gender</code> variables, such that our 5 children will have an age from 1 to 5 (1 year for the first child, up to 5 years for the fifth child) and all of them will be girls.</p>
+<ul>
+<li>Now suppose we want to subset our dataframe based on a condition, namely, we want to extract only the children who are 7 years old:</li>
+</ul>
+<pre class="r"><code>subset(dat, Age == 7)</code></pre>
+<pre><code>##       Name Age Gender
+## 1     Mary   7   Girl
+## 5 Patricia   7   Girl</code></pre>
+<p>If you do not want to use the subset function, you can also use square brackets:</p>
+<pre class="r"><code>dat[dat$Age == 7, ]</code></pre>
+<pre><code>##       Name Age Gender
+## 1     Mary   7   Girl
+## 5 Patricia   7   Girl</code></pre>
+<p>As you can see in the previous examples, we do not want to assign anything. Instead, we are asking “is this variable or vector <em>equal</em> to something else?”. For that specific need, we use <code>==</code>.</p>
+<p>So to sum up, for technical reasons and in order to distinguish between the two concepts, R uses <code>=</code> for assignments, and <code>==</code> for the equality sign. Make sure to understand the difference between the two to avoid any errors.</p>
+</div>
+<div id="undefined-columns-selected" class="section level1">
+<h1>8. Undefined columns selected</h1>
+<p>If you are used to subset dataframes with square brackets, <code>[]</code>, instead of the <code>subset()</code> or <code>filter()</code> functions, you may have faced the error “Error in [.data.frame(…) : undefined columns selected”.</p>
+<p>This occurs when R does not understand the column you want to use while subsetting the dataset.</p>
+<p>Considering the same sample of 5 children introduced earlier, the following code will throw an error:</p>
+<pre class="r"><code>dat[dat$Age == 7]</code></pre>
+<pre class="r"><code>## Error in `[.data.frame`(dat, dat$Age == 7) : undefined columns selected</code></pre>
+<p>because it does not specify the column dimension.</p>
+<div id="solution-6" class="section level3">
+<h3>Solution</h3>
+<p>Remember that dataframes in R have two dimensions:</p>
+<ol style="list-style-type: decimal">
+<li>the rows (one for each experimental unit), and</li>
+<li>the columns (one for each variable)</li>
+</ol>
+<p>and <strong>in that particular order</strong> (so row first, then column)!</p>
+<p>Since dataframes have two dimensions, R expects two dimensions when you call <code>dat[]</code>.</p>
+<p>In particular, it expects the first and then the second dimension, <strong>separated by a comma</strong>:</p>
+<pre class="r"><code>dat[dat$Age == 7, ]</code></pre>
+<pre><code>##       Name Age Gender
+## 1     Mary   7   Girl
+## 5 Patricia   7   Girl</code></pre>
+<p>This code means that we are extracting all rows where <code>Age</code> is equal to 7 (first dimension, i.e. before the comma), for all variables of the dataset (since we did not specify any column after the comma).</p>
+<p>For the interested reader, see more ways to <a href="/blog/data-manipulation-in-r/">subset and manipulate data in R</a>.</p>
+</div>
+</div>
+<div id="problem-when-importing-or-using-the-wrong-data-file" class="section level1">
+<h1>9. Problem when importing or using the wrong data file</h1>
+<p>Importing a dataset in R can be quite challenging for beginners, mainly due to the misunderstanding about the working directory.</p>
+<p>When importing a file, <strong>R will not search for the file in all your folders</strong> of your computer. Instead, it will look only in one specific folder. If your dataset is not inside that folder, it will result in an error such as “cannot open file ‘…’: No such file or directory”:</p>
+<p><img src="images/cannot-open-file-no-such-file-or-directory.png" style="width:75.0%" /></p>
+<p>To fix this, you must specify the path to the folder where your dataset is located. In other words, you need to tell R in which folder you want it to work, hence the name working directory.</p>
+<p>Setting the working directory can be done with the <code>setwd()</code> function or via the “Files” tab in the lower right panel of RStudio:</p>
+<p><img src="images/files-r-studio.png" style="width:75.0%" /></p>
+<p>Alternatively, you can move the dataset in the folder where R is currently working (this can be found with <code>setwd()</code>). See more details on <a href="/blog/how-to-import-an-excel-file-in-rstudio/">importing a file into R and about the working directory</a>.</p>
+<p>Another related problem is to use the wrong file. This error is different than the previous ones in the sense that you will not encounter an error but your analyses will still be wrong.</p>
+<p>It may sound trivial, but make sure to import and use the correct data file! This is particularly the case if you have files for different points in time and which have a common structure (for example weekly or monthly data files with the exact same variables). It happened to me that I reported results for the wrong week (fortunately, without much consequence).</p>
+<p>Also, make sure that you actually use all the rows you want to include in your analyses. It happened to me that, in order to test a model (and avoid long computing times), I extracted a random sample of the original dataset, and almost forgot about this sampling when running my final analyses.</p>
+<p>It is thus a good practice to remind you to remove sampling and filters after you have tested your code (and before interpreting the final results).</p>
+</div>
+<div id="problem-when-using-the-operator" class="section level1">
+<h1>10. Problem when using the $ operator</h1>
+<p>For the last error of this top 10, I would like to focus on two related errors:</p>
+<ol style="list-style-type: decimal">
+<li>“$ operator is invalid for atomic vectors”, and</li>
+<li>“object of type ‘closure’ is not subsettable”.</li>
+</ol>
+<p>I gather them in one single section because they are linked to each other in the sense that they both involve the <code>$</code> operator.</p>
+<div id="operator-is-invalid-for-atomic-vectors" class="section level2">
+<h2>$ operator is invalid for atomic vectors</h2>
+<p>To understand this error, we first must recall that an atomic vector is a <em>one</em>-dimensional object (usually created with <code>c()</code>). This is different than dataframes or matrices which are <em>two</em>-dimensional (i.e., rows form the first dimension and columns correspond to the second dimension).</p>
+<p>The error “$ operator is invalid for atomic vectors” occurs when we try to access an element of an atomic vector using the dollar operator (<code>$</code>):</p>
+<pre class="r"><code>## define atomic vector:
+x &lt;- c(1, 3, 7)
+
+## set names:
+names(x) &lt;- LETTERS[1:3]
+
+## print vector:
+x</code></pre>
+<pre><code>## A B C 
+## 1 3 7</code></pre>
+<pre class="r"><code>## access value of element C:
+x$C</code></pre>
+<pre class="r"><code>## Error in x$C : $ operator is invalid for atomic vectors</code></pre>
+<div id="solution-7" class="section level3">
+<h3>Solution</h3>
+<p>The <code>$</code> operator cannot be used to extract elements in atomic vectors. Instead, we must use double brackets <code>[[]]</code> notation:</p>
+<pre class="r"><code>x[[&quot;C&quot;]]</code></pre>
+<pre><code>## [1] 7</code></pre>
+<p>Remember that the <code>$</code> operator can be used with dataframes, so we can also fix this error by first converting the atomic vector to a dataframe,<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> and then access an element by its name with the <code>$</code> operator:</p>
+<pre class="r"><code>## convert atomic vector to dataframe:
+x &lt;- as.data.frame(t(x))
+
+## print x:
+x</code></pre>
+<pre><code>##   A B C
+## 1 1 3 7</code></pre>
+<pre class="r"><code>## access value of element C:
+x$C</code></pre>
+<pre><code>## [1] 7</code></pre>
+</div>
+</div>
+<div id="object-of-type-closure-is-not-subsettable" class="section level2">
+<h2>object of type ‘closure’ is not subsettable</h2>
+<p>Another error (which I must admit is quite obscure and confusing when learning R) is the following: “object of type ‘closure’ is not subsettable”.</p>
+<p>This error occurs when we try to subset or access some elements of a function. An example with the well-known <code>mean()</code> function:</p>
+<pre class="r"><code>mean[1:3]</code></pre>
+<pre class="r"><code>## Error in mean[1:3] : object of type &#39;closure&#39; is not subsettable</code></pre>
+<p>In R, we can subset lists, vectors, matrices, dataframes, but not functions. So it throws an error because it is impossible to subset an object of type “closure”, and a function is of that type:</p>
+<pre class="r"><code>typeof(mean)</code></pre>
+<pre><code>## [1] &quot;closure&quot;</code></pre>
+<p>Most of the times, you will not encounter this error when using a basic function such as the <code>mean()</code> function (because it is unlikely that your goal is really to subset a function…).</p>
+<p>Indeed, you will most likely face this error when trying to subset a dataset named <code>data</code>, but this dataset is not defined in the environment (because it has not been imported or created properly for instance).</p>
+<p>To understand the concept, see the following examples:</p>
+<pre class="r"><code>## create dataset:
+data &lt;- data.frame(
+  x = rnorm(10),
+  y = rnorm(10)
+)
+
+## print variable x:
+data$x</code></pre>
+<pre><code>##  [1]  1.12288964  1.43985574 -1.09711377 -0.11731956  1.20149840 -0.46972958
+##  [7] -0.05246948 -0.08610730 -0.88767902 -0.44468400</code></pre>
+<p>So far so good. Now suppose we made a mistake when creating the dataset:</p>
+<pre class="r"><code>## create dataset (with mistake):
+data &lt;- data.frame(x = rnorm(10)
+                   y = rnorm(10))</code></pre>
+<p>You will notice that a comma is missing between variables <code>x</code> and <code>y</code>. As a result, the dataset named <code>data</code> is not created and thus not defined.</p>
+<p>Therefore, if we now try to access the variable <code>x</code> from that dataset <code>data</code>, R will actually try to subset the function named <code>data</code> instead of the dataset named <code>data</code>!</p>
+<pre class="r"><code>data$x</code></pre>
+<pre class="r"><code>## Error in data$x : object of type &#39;closure&#39; is not subsettable</code></pre>
+<p>This happens because, I repeat, the dataset <code>data</code> does not exist, so R looks for an object named <code>data</code> and find a function with that name:</p>
+<pre class="r"><code>class(data)</code></pre>
+<pre><code>## [1] &quot;function&quot;</code></pre>
+</div>
+</div>
+<div id="warnings" class="section level1">
+<h1>Warnings</h1>
+<p>Warnings are different than errors in the sense that they alert you about something, but it does not prevent you from running the code. It is a good practice to read these warnings as they may give you valuable information.</p>
+<p>There are too many warnings to mention them all, but I would like to focus on two common ones:</p>
+<ol style="list-style-type: decimal">
+<li>“NAs introduced by coercion”, and</li>
+<li>“Removed … rows containing non-finite values (stat_bin())”.</li>
+</ol>
+<div id="nas-introduced-by-coercion" class="section level2">
+<h2>NAs introduced by coercion</h2>
+<p>This warning occurs when you try to convert a vector which includes at least one non-numerical value to a numeric vector:</p>
+<pre class="r"><code>x &lt;- c(1, 3, 7, &quot;Emma&quot;)
+
+as.numeric(x)</code></pre>
+<pre><code>## Warning: NAs introduced by coercion</code></pre>
+<pre><code>## [1]  1  3  7 NA</code></pre>
+<p>You do not need to fix it since it is only a warning and not an error. R is simply informing you that at least one element in the initial vector was converted to <code>NA</code> because it could not be converted to a numeric value.</p>
+</div>
+<div id="removed-rows-containing-non-finite-values-stat_bin" class="section level2">
+<h2>Removed … rows containing non-finite values (stat_bin())</h2>
+<p>This warning occurs when you use <a href="/blog/graphics-in-r-with-ggplot2/">ggplot2</a> to draw plots. For instance:</p>
+<pre class="r"><code>ggplot(airquality) +
+  aes(x = Ozone) +
+  geom_histogram()</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<pre><code>## Warning: Removed 37 rows containing non-finite values (`stat_bin()`).</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-65-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Again, as it is a warning you do not need to fix it. It is simply informing you that there are some missing values (<code>NA</code>) in the variable of interest and that these missing values are removed to construct the plot.</p>
+<p>Thanks for reading. I hope that this collection of errors prevented you from making some coding mistakes, or that it helped you in debugging your code.</p>
+<p>If you still cannot fix your error, I would recommend to read the documentation of the function (if you struggle with a function in particular), or look online for the solution. Bear in mind that if you encounter an error, it is very likely that someone else posted the answer online (Stack Overflow is usually a good resource).</p>
+<p>R has a steep learning curve, in particular if you are not familiar with another programming language. Nonetheless, with practice and time, you will make less and less coding errors, but more importantly, you will be more and more proficient in typing the right keywords in search engines, resulting in less time spent looking for the solution.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>There are 2 mistakes in that piece of code, feel free to try to fix them as an exercise.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>And I strongly recommend using RStudio and not just R. See the differences <a href="/blog/how-to-install-r-and-rstudio/">here</a>.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Note that <code>mean()</code> applied to a logical variable gives the proportion of <code>TRUE</code>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p><code>par(mfrow = c(1, 2))</code> is used to put two plots next to each other.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Note that we also need to take the transpose of the vector <code>x</code> in order to have it as 1 row, 3 columns.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
