@@ -25,6 +25,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](/blog/2020-08-11-outliers-detection-in-r_files/outliers-detection-in-R.jpeg){width=100%}
@@ -35,15 +37,19 @@ An **outlier** is a value or an **observation that is distant from other observa
 
 An observation must always be compared to other observations made on the same phenomenon before actually calling it an outlier. Indeed, someone who is 200 cm tall (6'7" in US) will most likely be considered as an outlier compared to the general population, but that same person may not be considered as an outlier if we measured the height of basketball players.
 
-An outlier may be due to the variability inherent in the observed phenomenon. For example, it is often the case that there are outliers when collecting data on salaries, as some people make much more money than the rest. Outliers can also arise due to an experimental, measurement or encoding error. For instance, a human weighting 786 kg (1733 pounds) is clearly an error when encoding the weight of the subject. Her or his weight is most probably 78.6 kg (173 pounds) or 7.86 kg (17 pounds) depending on whether weights of adults or babies have been measured.
+An outlier may be due to the variability inherent in the observed phenomenon. For example, it is often the case that there are outliers when collecting data on salaries, as some people make much more money than the rest.
 
-For this reason, it sometimes makes sense to formally distinguish two classes of outliers: (i) extreme values and (ii) mistakes. Extreme values are statistically and philosophically more interesting, because they are possible but unlikely responses. (Thanks Felix Kluxen for the valuable suggestion.)
+Outliers can also arise due to an experimental, measurement or encoding error. For instance, a human weighting 786 kg (1733 pounds) is clearly an error when encoding the weight of the subject. Her or his weight is most probably 78.6 kg (173 pounds) or 7.86 kg (17 pounds) depending on whether weights of adults or babies have been measured.
+
+For this reason, it sometimes makes sense to formally distinguish two classes of outliers: (i) extreme values and (ii) mistakes. Extreme values are statistically and philosophically more interesting, because they are possible but unlikely responses.^[Thanks Felix Kluxen for the valuable suggestion.]
 
 In this article, I present several approaches to detect outliers in R, from simple techniques such as [descriptive statistics](/blog/descriptive-statistics-in-r/) (including minimum, maximum, histogram, boxplot and percentiles) to more formal techniques such as the Hampel filter, the Grubbs, the Dixon and the Rosner tests for outliers.
 
 Although there is no strict or unique rule whether outliers should be removed or not from the dataset before doing statistical analyses, it is quite common to, at least, remove or impute outliers that are due to an experimental or measurement error (like the weight of 786 kg (1733 pounds) for a human). Some [statistical tests](/blog/what-statistical-test-should-i-do/) require the absence of outliers in order to draw sound conclusions, but removing outliers is not recommended in all cases and must be done with caution.
 
-This article will not tell you whether you should remove outliers or not (nor if you should impute them with the median, mean, mode or any other value), but it will help you to detect them in order to, as a first step, verify them. After their verification, it is then your choice to exclude or include them for your analyses (and this usually requires a thoughtful reflection on the researcher's side). Removing or keeping outliers mostly depend on three factors:
+This article will not tell you whether you should remove outliers or not (nor if you should impute them with the median, mean, mode or any other value), but it will help you to detect them in order to, as a first step, verify them. After their verification, it is then your choice to exclude or include them for your analyses (and this usually requires a thoughtful reflection on the researcher's side).
+
+Removing or keeping outliers mostly depend on three factors:
 
 1. The domain/context of your analyses and the research question. In some domains, it is common to remove outliers as they often occur due to a malfunctioning process. In other fields, outliers are kept because they contain valuable information. It also happens that analyses are performed twice, once with and once without outliers to evaluate their impact on the conclusions. If results change drastically due to some influential values, this should caution the researcher to make overambitious claims.
 1. Whether the tests you are going to apply are robust to the presence of outliers or not. For instance, the slope of a simple [linear regression](/blog/multiple-linear-regression-made-simple/) may significantly varies with just one outlier, whereas non-parametric tests such as the [Wilcoxon test](/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/) are usually robust to outliers.
@@ -124,7 +130,11 @@ ggplot(dat) +
  theme_minimal()
 ```
 
-A boxplot helps to visualize a quantitative variable by displaying five common location summary (minimum, median, first and third quartiles and maximum) and any observation that was classified as a suspected outlier using the [interquartile range (IQR)](/blog/descriptive-statistics-in-r/#interquartile-range) criterion. The IQR criterion means that all observations above $q_{0.75} + 1.5 \cdot IQR$ or below $q_{0.25} - 1.5 \cdot IQR$ (where $q_{0.25}$ and $q_{0.75}$ correspond to first and third quartile respectively, and IQR is the difference between the third and first quartile) are considered as potential outliers by R. In other words, all observations outside of the following interval will be considered as potential outliers:
+A boxplot helps to visualize a quantitative variable by displaying five common location summary (minimum, median, first and third quartiles and maximum) and any observation that was classified as a suspected outlier using the [interquartile range (IQR)](/blog/descriptive-statistics-in-r/#interquartile-range) criterion.
+
+The IQR criterion means that all observations above $q_{0.75} + 1.5 \cdot IQR$ or below $q_{0.25} - 1.5 \cdot IQR$ (where $q_{0.25}$ and $q_{0.75}$ correspond to first and third quartile respectively, and IQR is the difference between the third and first quartile) are considered as potential outliers by R.
+
+In other words, all observations outside of the following interval will be considered as potential outliers:
 
 $$I = [q_{0.25} - 1.5 \cdot IQR; q_{0.75} + 1.5 \cdot IQR]$$
 
@@ -165,7 +175,9 @@ mtext(paste("Outliers: ", paste(out, collapse = ", ")))
 
 ## Percentiles
 
-This method of outliers detection is based on the [percentiles](/blog/descriptive-statistics-by-hand/#a-note-on-deciles-and-percentiles). With the percentiles method, all observations that lie outside the interval formed by the 2.5 and 97.5 percentiles will be considered as potential outliers. Other percentiles such as the 1 and 99, or the 5 and 95 percentiles can also be considered to construct the interval.
+This method of outliers detection is based on the [percentiles](/blog/descriptive-statistics-by-hand/#a-note-on-deciles-and-percentiles).
+
+With the percentiles method, all observations that lie outside the interval formed by the 2.5 and 97.5 percentiles will be considered as potential outliers. Other percentiles such as the 1 and 99, or the 5 and 95 percentiles can also be considered to construct the interval.
 
 The values of the lower and upper percentiles (and thus the lower and upper limits of the interval) can be computed with the `quantile()` function:
 
@@ -302,7 +314,9 @@ if we want to test the highest value, or:
 
 if we want to test the lowest value.
 
-As for any [statistical test](/blog/what-statistical-test-should-i-do/), if the **[*p*-value](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha) is less** than the chosen **significance threshold** (generally $\alpha = 0.05$) then the null hypothesis is rejected and we will conclude that the **lowest/highest value is an outlier**. On the contrary, if the ***p*-value is greater or equal** than the significance level, the null hypothesis is not rejected, and we will conclude that, based on the data, we do not reject the hypothesis that the **lowest/highest value is not an outlier**.
+As for any [statistical test](/blog/what-statistical-test-should-i-do/), if the **[*p*-value](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha) is less** than the chosen **significance threshold** (generally $\alpha = 0.05$) then the null hypothesis is rejected and we will conclude that the **lowest/highest value is an outlier**.
+
+On the contrary, if the ***p*-value is greater or equal** than the significance level, the null hypothesis is not rejected, and we will conclude that, based on the data, we do not reject the hypothesis that the **lowest/highest value is not an outlier**.
 
 Note that the Grubbs test is not appropriate for sample size of 6 or less ($n \le 6$).
 
@@ -349,7 +363,7 @@ Similar to the Grubbs test, Dixon test is used to test whether a single low or h
 
 Note that Dixon test is most useful for small sample size (usually $n \le 25$).
 
-To perform the Dixon's test in R, we use the `dixon.test()` function from the `{outliers}` package. However, we [restrict our dataset](/blog/data-manipulation-in-r/#subset-a-data-frame) to the 20 first observations as the Dixon test can only be done on small sample size (R will throw an error and accepts only dataset of 3 to 30 observations):
+To perform the Dixon's test in R, we use the `dixon.test()` function from the `{outliers}` package. However, we [restrict our dataset](/blog/data-manipulation-in-r/#subset-a-data-frame) to the 20 first observations as the Dixon test can only be done on small sample size (R will throw an [error](/blog/top-10-errors-in-r/) and accepts only dataset of 3 to 30 observations):
 
 ```{r}
 subdat <- dat[1:20, ]
@@ -378,7 +392,9 @@ boxplot(subdat$hwy,
 mtext(paste("Outliers: ", paste(out, collapse = ", ")))
 ```
 
-From the boxplot, we see that we could also apply the Dixon test on the value 20 in addition to the value 15 done previously. This can be done by finding the row number of the minimum value, excluding this row number from the dataset and then finally apply the Dixon test on this new dataset:
+From the boxplot, we see that we could also apply the Dixon test on the value 20 in addition to the value 15 done previously.
+
+This can be done by finding the row number of the minimum value, excluding this row number from the dataset and then finally apply the Dixon test on this new dataset:
 
 ```{r}
 # find and exclude lowest value
@@ -439,7 +455,13 @@ res <- aq.plot(Y)
 
 Note also that some transformations may "naturally" eliminate outliers. The natural log or square root of a value reduces the variation caused by extreme values, so in some cases applying these transformations will eliminate the outliers.
 
-Thanks for reading. I hope this article helped you to detect outliers in R via several [descriptive statistics](/blog/descriptive-statistics-in-r/) (including minimum, maximum, histogram, boxplot and percentiles) or thanks to more formal techniques of outliers detection (including Hampel filter, Grubbs, Dixon and Rosner test). It is now your turn to verify them, and if they are correct, decide how to treat them (i.e., keeping, removing or imputing them) before conducting your analyses.
+# Conclusion
+
+Thanks for reading.
+
+I hope this article helped you to detect outliers in R via several [descriptive statistics](/blog/descriptive-statistics-in-r/) (including minimum, maximum, histogram, boxplot and percentiles) or thanks to more formal techniques of outliers detection (including Hampel filter, Grubbs, Dixon and Rosner test).
+
+It is now your turn to verify them, and if they are correct, decide how to treat them (i.e., keeping, removing or imputing them) before conducting your analyses.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
 
