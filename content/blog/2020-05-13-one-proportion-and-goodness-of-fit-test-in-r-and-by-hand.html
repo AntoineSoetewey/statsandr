@@ -20,47 +20,48 @@ output:
 # bibliography: bibliography.bib
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#in-r">In R</a>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#in-r" id="toc-in-r">In R</a>
 <ul>
-<li><a href="#data">Data</a></li>
-<li><a href="#one-proportion-test">One-proportion test</a>
+<li><a href="#data" id="toc-data">Data</a></li>
+<li><a href="#one-proportion-test" id="toc-one-proportion-test">One-proportion test</a>
 <ul>
-<li><a href="#assumption-of-prop.test-and-binom.test">Assumption of <code>prop.test()</code> and <code>binom.test()</code></a></li>
+<li><a href="#assumption-of-prop.test-and-binom.test" id="toc-assumption-of-prop.test-and-binom.test">Assumption of <code>prop.test()</code> and <code>binom.test()</code></a></li>
 </ul></li>
-<li><a href="#chi-square-goodness-of-fit-test">Chi-square goodness of fit test</a>
+<li><a href="#chi-square-goodness-of-fit-test" id="toc-chi-square-goodness-of-fit-test">Chi-square goodness of fit test</a>
 <ul>
-<li><a href="#assumptions">Assumptions</a></li>
-<li><a href="#does-my-distribution-follow-a-given-distribution">Does my distribution follow a given distribution?</a>
+<li><a href="#assumptions" id="toc-assumptions">Assumptions</a></li>
+<li><a href="#does-my-distribution-follow-a-given-distribution" id="toc-does-my-distribution-follow-a-given-distribution">Does my distribution follow a given distribution?</a>
 <ul>
-<li><a href="#observed-frequencies">Observed frequencies</a></li>
-<li><a href="#expected-frequencies">Expected frequencies</a></li>
-<li><a href="#observed-vs.-expected-frequencies">Observed vs. expected frequencies</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-<li><a href="#by-hand">By hand</a>
-<ul>
-<li><a href="#one-proportion-test-1">One-proportion test</a>
-<ul>
-<li><a href="#verification-in-r">Verification in R</a></li>
-</ul></li>
-<li><a href="#goodness-of-fit-test">Goodness of fit test</a>
-<ul>
-<li><a href="#verification-in-r-1">Verification in R</a></li>
+<li><a href="#observed-frequencies" id="toc-observed-frequencies">Observed frequencies</a></li>
+<li><a href="#expected-frequencies" id="toc-expected-frequencies">Expected frequencies</a></li>
+<li><a href="#observed-vs.-expected-frequencies" id="toc-observed-vs.-expected-frequencies">Observed vs. expected frequencies</a></li>
 </ul></li>
 </ul></li>
+</ul></li>
+<li><a href="#by-hand" id="toc-by-hand">By hand</a>
+<ul>
+<li><a href="#one-proportion-test-1" id="toc-one-proportion-test-1">One-proportion test</a>
+<ul>
+<li><a href="#verification-in-r" id="toc-verification-in-r">Verification in R</a></li>
+</ul></li>
+<li><a href="#goodness-of-fit-test" id="toc-goodness-of-fit-test">Goodness of fit test</a>
+<ul>
+<li><a href="#verification-in-r-1" id="toc-verification-in-r-1">Verification in R</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
 </ul>
 </div>
 
 <p><img src="/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/One-proportion%20and%20goodness%20of%20fit%20test%20in%20R%20and%20by%20hand.jpeg" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>In a previous article, I presented the <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence in R</a> which is used to test the independence between two <a href="/blog/variable-types-and-examples/#qualitative">categorical</a> variables. In this article, I show how to perform, first in R and then by hand, the:</p>
+<p>In a previous article, I presented the <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence in R</a> which is used to test the independence between two <a href="/blog/variable-types-and-examples/#qualitative">categorical</a> variables.</p>
+<p>In this article, I show how to perform, first in R and then by hand, the:</p>
 <ol style="list-style-type: decimal">
 <li>one-proportion test (also referred as one-sample proportion test)</li>
 <li>Chi-square goodness of fit test</li>
@@ -166,7 +167,8 @@ ggpiestats(
 <div id="assumption-of-prop.test-and-binom.test" class="section level3">
 <h3>Assumption of <code>prop.test()</code> and <code>binom.test()</code></h3>
 <p>Note that <code>prop.test()</code> uses a normal approximation to the binomial distribution. Therefore, one assumption of this test is that the sample size is large enough (usually, <em>n &gt; 30</em>). If the sample size is small, it is recommended to use the exact binomial test.</p>
-<p>The exact binomial test can be performed with the <code>binom.test()</code> function and accepts the same arguments as the <code>prop.test()</code> function. For this example, suppose now that we have a sample of 12 big and 3 small flowers and we want to test whether the proportions are the same among both sizes:</p>
+<p>The exact binomial test can be performed with the <code>binom.test()</code> function and accepts the same arguments as the <code>prop.test()</code> function.</p>
+<p>For this example, suppose now that we have a sample of 12 big and 3 small flowers and we want to test whether the proportions are the same among both sizes:</p>
 <pre class="r"><code># barplot
 barplot(c(12, 3), # observed counts
   names.arg = c(&quot;big&quot;, &quot;small&quot;), # rename labels
@@ -304,7 +306,8 @@ dat</code></pre>
 </div>
 <div id="expected-frequencies" class="section level4">
 <h4>Expected frequencies</h4>
-<p>In order to compare the observed frequencies to a binomial distribution and see if both distributions match, we first need to determine the expected frequencies that would be obtained in case of a binomial distribution. The expected frequencies assuming a probability of 0.5 of having a girl (for each of the 5 children) are as follows:</p>
+<p>In order to compare the observed frequencies to a binomial distribution and see if both distributions match, we first need to determine the expected frequencies that would be obtained in case of a binomial distribution.</p>
+<p>The expected frequencies assuming a probability of 0.5 of having a girl (for each of the 5 children) are as follows:</p>
 <pre class="r"><code># create expected frequencies for a binomial distribution
 x &lt;- 0:5
 df &lt;- data.frame(
@@ -501,12 +504,16 @@ test</code></pre>
 ## data:  dat$observed_freq
 ## X-squared = 7.52, df = 5, p-value = 0.1847</code></pre>
 <p>The test statistic and degrees of freedom are exactly the same than the ones found by hand. The <em>p</em>-value is 0.185 which, still at the 5% significance level, leads to the same conclusion than by hand (i.e., failing to reject the null hypothesis).</p>
-<p>Thanks for reading. I hope this article helped you to understand and perform the one-proportion and chi-square goodness of fit test in R and by hand.</p>
+</div>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Thanks for reading.</p>
+<p>I hope this article helped you to understand and perform the one-proportion and chi-square goodness of fit test in R and by hand. Learn more about the Chi-square test of independence <a href="/blog/chi-square-test-of-independence-in-r/">in R</a> and <a href="/blog/chi-square-test-of-independence-by-hand/">by hand</a> if you want to analyze <em>two</em> categorical variables instead of one.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
-</div>
-</div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
 <li id="fn1"><p>Choosing big or small as the success event gives the exact same conclusion.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>

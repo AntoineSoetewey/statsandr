@@ -28,13 +28,17 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](/blog/2020-05-13-one-proportion-and-goodness-of-fit-test-in-r-and-by-hand_files/One-proportion and goodness of fit test in R and by hand.jpeg){width=100%}
 
 # Introduction
 
-In a previous article, I presented the [Chi-square test of independence in R](/blog/chi-square-test-of-independence-in-r/) which is used to test the independence between two [categorical](/blog/variable-types-and-examples/#qualitative) variables. In this article, I show how to perform, first in R and then by hand, the:
+In a previous article, I presented the [Chi-square test of independence in R](/blog/chi-square-test-of-independence-in-r/) which is used to test the independence between two [categorical](/blog/variable-types-and-examples/#qualitative) variables.
+
+In this article, I show how to perform, first in R and then by hand, the:
 
 1. one-proportion test (also referred as one-sample proportion test)
 1. Chi-square goodness of fit test
@@ -137,7 +141,9 @@ The conclusion remains however the same, that is, we do not reject the null hypo
 
 Note that `prop.test()` uses a normal approximation to the binomial distribution. Therefore, one assumption of this test is that the sample size is large enough (usually, *n > 30*). If the sample size is small, it is recommended to use the exact binomial test.
 
-The exact binomial test can be performed with the `binom.test()` function and accepts the same arguments as the `prop.test()` function. For this example, suppose now that we have a sample of 12 big and 3 small flowers and we want to test whether the proportions are the same among both sizes:
+The exact binomial test can be performed with the `binom.test()` function and accepts the same arguments as the `prop.test()` function.
+
+For this example, suppose now that we have a sample of 12 big and 3 small flowers and we want to test whether the proportions are the same among both sizes:
 
 ```{r}
 # barplot
@@ -293,7 +299,9 @@ dat
 
 #### Expected frequencies
 
-In order to compare the observed frequencies to a binomial distribution and see if both distributions match, we first need to determine the expected frequencies that would be obtained in case of a binomial distribution. The expected frequencies assuming a probability of 0.5 of having a girl (for each of the 5 children) are as follows:
+In order to compare the observed frequencies to a binomial distribution and see if both distributions match, we first need to determine the expected frequencies that would be obtained in case of a binomial distribution.
+
+The expected frequencies assuming a probability of 0.5 of having a girl (for each of the 5 children) are as follows:
 
 ```{r}
 # create expected frequencies for a binomial distribution
@@ -567,6 +575,10 @@ test
 
 The test statistic and degrees of freedom are exactly the same than the ones found by hand. The *p*-value is `r round(test$p.value, 3)` which, still at the 5% significance level, leads to the same conclusion than by hand (i.e., failing to reject the null hypothesis).
 
-Thanks for reading. I hope this article helped you to understand and perform the one-proportion and chi-square goodness of fit test in R and by hand.
+# Conclusion
+
+Thanks for reading.
+
+I hope this article helped you to understand and perform the one-proportion and chi-square goodness of fit test in R and by hand. Learn more about the Chi-square test of independence [in R](/blog/chi-square-test-of-independence-in-r/) and [by hand](/blog/chi-square-test-of-independence-by-hand/) if you want to analyze *two* categorical variables instead of one.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
