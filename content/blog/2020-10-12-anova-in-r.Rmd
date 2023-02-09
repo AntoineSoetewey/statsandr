@@ -28,6 +28,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](/blog/2020-10-12-anova-in-r_files/anova-in-r.jpeg){width=100%}
@@ -108,7 +110,9 @@ The null and alternative hypothesis of an ANOVA are:
 * $H_0$: $\mu_{Adelie} = \mu_{Chinstrap} = \mu_{Gentoo}$ ($\Rightarrow$ the 3 species are equal in terms of flipper length)
 * $H_1$: *at least* one mean is different ($\Rightarrow$ at least one species is different from the other 2 species in terms of flipper length)
 
-Be careful that the alternative hypothesis is ***not*** that all means are different. The opposite of all means being equal ($H_0$) is that *at least* one mean is different from the others ($H_1$). In this sense, if the null hypothesis is rejected, it means that at least one species is different from the other 2, but not necessarily that all 3 species are different from each other. It could be that flipper length for the species Gentoo is different than for the species Chinstrap and Adelie, but flipper length is similar between Chinstrap and Adelie. Other types of test (known as post-hoc tests and covered in this [section](/blog/anova-in-r/#post-hoc-test)) must be performed to test whether all 3 species differ.
+Be careful that the alternative hypothesis is ***not*** that all means are different. The opposite of all means being equal ($H_0$) is that *at least* one mean is different from the others ($H_1$). 
+
+In this sense, if the null hypothesis is rejected, it means that at least one species is different from the other 2, but not necessarily that all 3 species are different from each other. It could be that flipper length for the species Gentoo is different than for the species Chinstrap and Adelie, but flipper length is similar between Chinstrap and Adelie. Other types of test (known as post-hoc tests and covered in this [section](/blog/anova-in-r/#post-hoc-test)) must be performed to test whether all 3 species differ.
 
 # Underlying assumptions of ANOVA
 
@@ -150,11 +154,15 @@ The dependent variable `flipper_length_mm` is a [quantitative](/blog/variable-ty
 
 Independence of the observations is assumed as data have been collected from a randomly selected portion of the population and measurements within and between the 3 samples are not related.
 
-The independence assumption is most often verified based on the design of the experiment and on the good control of experimental conditions, as it is the case here. If you really want to test it more formally, you can, however, test it via a statistical test---the Durbin-Watson test (in R: `durbinWatsonTest(res_lm)` where `res_lm` is a linear model). The null hypothesis of this test specifies an autocorrelation coefficient = 0, while the alternative hypothesis specifies an autocorrelation coefficient $\ne$ 0.
+The independence assumption is most often verified based on the design of the experiment and on the good control of experimental conditions, as it is the case here.
+
+If you really want to test it more formally, you can, however, test it via a statistical test---the Durbin-Watson test (in R: `durbinWatsonTest(res_lm)` where `res_lm` is a linear model). The null hypothesis of this test specifies an autocorrelation coefficient = 0, while the alternative hypothesis specifies an autocorrelation coefficient $\ne$ 0.
 
 ## Normality
 
-Since the smallest sample size per group (i.e., per species) is `r min(table(dat$species))`, we have large samples. Therefore, we do not need to check normality. Normally, we would directly test the homogeneity of the variances without testing normality. However, for the sake of illustration, we act as if the sample sizes were small in order to illustrate what would need to be done in that case.
+Since the smallest sample size per group (i.e., per species) is `r min(table(dat$species))`, we have large samples. Therefore, we do not need to check normality.
+
+Usually, we would directly test the homogeneity of the variances without testing normality. However, for the sake of illustration, we act as if the sample sizes were small in order to illustrate what would need to be done in that case.
 
 Remember that [normality](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) of residuals can be tested visually via a [histogram](/blog/descriptive-statistics-in-r/#histogram) and a [QQ-plot](/blog/descriptive-statistics-in-r/#qq-plot), and/or formally via a [normality test](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test) (Shapiro-Wilk test for instance).
 
@@ -189,7 +197,9 @@ Some researchers stop here and assume that normality is met, while others also t
 
 In practice, I tend to prefer the (i) visual approach only, but again, this is a matter of personal choice and also depends on the context of the analysis.
 
-Still for the sake of illustration, we also now test the normality assumption via a normality test. You can use the Shapiro-Wilk test or the Kolmogorov-Smirnov test, among others. Remember that the null and alternative hypothesis are:
+Still for the sake of illustration, we also now test the normality assumption via a normality test. You can use the Shapiro-Wilk test or the Kolmogorov-Smirnov test, among others.
+
+Remember that the null and alternative hypothesis of these tests are:
 
 * $H_0$: data come from a normal distribution
 * $H_1$: data do ***not*** come from a normal distribution
@@ -245,7 +255,9 @@ dotplot(flipper_length_mm ~ species,
 )
 ```
 
-Both the boxplot and the dotplot show a similar variance for the different species. In the boxplot, this can be seen by the fact that the boxes and the whiskers have a comparable size for all species. There are a couple of [outliers](/blog/outliers-detection-in-r/) as shown by the points outside the whiskers, but this does not change the fact that the [dispersion](/blog/descriptive-statistics-by-hand/#dispersion) is more or less the same between the different species.
+Both the boxplot and the dotplot show a similar variance for the different species. In the boxplot, this can be seen by the fact that the boxes and the whiskers have a comparable size for all species.
+
+There are a couple of [outliers](/blog/outliers-detection-in-r/) as shown by the points outside the whiskers, but this does not change the fact that the [dispersion](/blog/descriptive-statistics-by-hand/#dispersion) is more or less the same between the different species.
 
 In the dotplot, this can be seen by the fact that points for all 3 species have more or less the same [range](/blog/descriptive-statistics-in-r/#range), a sign of the dispersion and thus the [variance](/blog/descriptive-statistics-by-hand/#variance) being similar.
 
@@ -303,7 +315,9 @@ There is one outlier in the group `Adelie`, as defined by the [interquartile ran
 
 # ANOVA
 
-We showed that all assumptions of the ANOVA are met. We can thus proceed to the implementation of the ANOVA in R, but first, let's do some preliminary analyses to better understand the research question.
+We showed that all assumptions of the ANOVA are met.
+
+We can thus proceed to the implementation of the ANOVA in R, but first, let's do some preliminary analyses to better understand the research question.
 
 ## Preliminary analyses
 
@@ -329,7 +343,9 @@ ggplot(dat) +
 
 The boxplots above show that, at least for our sample, penguins of the species `Gentoo` seem to have the biggest flipper, and `Adelie` species the smallest flipper.
 
-Besides a boxplot for each species, it is also a good practice to compute some [**descriptive statistics**](/blog/descriptive-statistics-in-r/) such as the [mean](/blog/descriptive-statistics-in-r/#mean) and [standard deviation](/blog/descriptive-statistics-in-r/#standard-deviation-and-variance) by species. This can be done, for instance, with the `aggregate()` function:
+Besides a boxplot for each species, it is also a good practice to compute some [**descriptive statistics**](/blog/descriptive-statistics-in-r/) such as the [mean](/blog/descriptive-statistics-in-r/#mean) and [standard deviation](/blog/descriptive-statistics-in-r/#standard-deviation-and-variance) by species.
+
+This can be done, for instance, with the `aggregate()` function:
 
 ```{r}
 aggregate(flipper_length_mm ~ species,
@@ -416,13 +432,17 @@ Note that the `report()` function can be used for other analyses. See  more [tip
 
 ## What's next?
 
-If the **null hypothesis is not rejected** (*p*-value $\ge$ 0.05), it means that we do not reject the hypothesis that all groups are equal. The ANOVA more or less stops here. Other types of analyses can be performed of course, but---given the data at hand---we could not prove that at least one group was different so we usually do not go further with the ANOVA.
+If the **null hypothesis is not rejected** (*p*-value $\ge$ 0.05), it means that we do not reject the hypothesis that all groups are equal. The ANOVA more or less stops here.
+
+Other types of analyses can be performed of course, but---given the data at hand---we could not prove that at least one group was different so we usually do not go further with the ANOVA.
 
 On the contrary, if the **null hypothesis is rejected** (as it is our case since the *p*-value < 0.05), we proved that at least one group is different. We can decide to stop here if we are only interested to test whether all species are equal in terms of flippers length.
 
 But most of the time, when we showed thanks to an ANOVA that at least one group is different, we are also interested in knowing **which** one(s) is(are) different. Results of an ANOVA, however, do ***NOT*** tell us which group(s) is(are) different from the others.
 
-To test this, we need to use other types of test, referred as post-hoc tests (in Latin, "after this", so after obtaining statistically significant ANOVA results) or multiple pairwise-comparison tests.^[Note that, as discussed in the comments at the end of the article, post-hoc tests can under some circumstances be done directly (without an ANOVA). See the comments or @hsu1996multiple for more details.] This family of statistical tests is the topic of the following sections.
+To test this, we need to use other types of test, referred as post-hoc tests (in Latin, "after this", so after obtaining statistically significant ANOVA results) or multiple pairwise-comparison tests.^[Note that, as discussed in the comments at the end of the article, post-hoc tests can under some circumstances be done directly (without an ANOVA). See the comments or @hsu1996multiple for more details.]
+
+This family of statistical tests is the topic of the following sections.
 
 # Post-hoc test
 
@@ -438,7 +458,9 @@ In theory, we could compare species thanks to 3 [Student's t-tests](/blog/studen
 
 However, if several t-tests are performed, the issue of **multiple testing** (also referred as multiplicity) arises. In short, when several [statistical tests](/blog/what-statistical-test-should-i-do/) are performed, some will have *p*-values less than $\alpha$ purely by chance, even if all null hypotheses are in fact true.
 
-To demonstrate the problem, consider our case where we have 3 hypotheses to test and a desired significance level of 0.05. The probability of observing at least one significant result (at least one *p*-value < 0.05) just due to chance is:
+To demonstrate the problem, consider our case where we have 3 hypotheses to test and a desired significance level of 0.05.
+
+The probability of observing at least one significant result (at least one *p*-value < 0.05) just due to chance is:
 
 \begin{equation}
 \begin{split}
@@ -450,7 +472,9 @@ P(\text{at least 1 sig. result}) & = 1 - P(\text{no sig. results}) \\
 
 So, with as few as 3 tests being considered, we already have a 14.26% chance of observing at least one significant result, even if all of the tests are actually not significant.
 
-And as the number of groups increases, the number of comparisons increases as well, so the probability of having a significant result simply due to chance keeps increasing. For example, with 10 groups we need to make 45 comparisons and the probability of having at least one significant result by chance becomes $1 - (1 - 0.05)^{45} = 90\%$. So it is very likely to observe a significant result just by chance when comparing 10 groups, and when we have 14 groups or more we are almost certain (99%) to have a false positive!
+And as the number of groups increases, the number of comparisons increases as well, so the probability of having a significant result simply due to chance keeps increasing.
+
+For example, with 10 groups we need to make 45 comparisons and the probability of having at least one significant result by chance becomes $1 - (1 - 0.05)^{45} = 90\%$. So it is very likely to observe a significant result just by chance when comparing 10 groups, and when we have 14 groups or more we are almost certain (99%) to have a false positive!
 
 Post-hoc tests take into account that multiple tests are done and deal with the problem by adjusting $\alpha$ in some way, so that the probability of observing at least one significant result due to chance remains below our desired significance level.^[Note that you could in principle apply the Bonferroni correction to all tests. For example, in the example above, with 3 tests and a global desired significance level of $\alpha$ = 0.05, we would only reject a null hypothesis if the *p*-value is less than $\frac{0.05}{3}$ = 0.0167. This method is, however, known to be quite conservative, leading to a potentially high rate of false negatives.]
 
@@ -460,9 +484,11 @@ Post-hoc tests are a family of statistical tests so there are several of them. T
 
 - **Tukey HSD**, used to compare **all groups** to each other (so all possible comparisons of 2 groups).
 - **Dunnett**, used to make comparisons with a **reference group**. For example, consider 2 treatment groups and one control group. If you only want to compare the 2 treatment groups with respect to the control group, and you do not want to compare the 2 treatment groups to each other, the Dunnett's test is preferred.
-- **Bonferroni correction** if have a set of planned comparisons to do.
+- **Bonferroni correction** if one has a set of planned comparisons to do.
 
-The Bonferroni correction is simple: you simply divide the desired global $\alpha$ level by the number of comparisons. In our example, we have 3 comparisons so if we want to keep a global $\alpha = 0.05$, we have $\alpha' = \frac{0.05}{3} = 0.0167$. We can then simply perform a Student's t-test for each comparison, and compare the obtained $p$-values with this new $\alpha'$.
+The Bonferroni correction is simple: you simply divide the desired global $\alpha$ level by the number of comparisons.
+
+In our example, we have 3 comparisons so if we want to keep a global $\alpha = 0.05$, we have $\alpha' = \frac{0.05}{3} = 0.0167$. We can then simply perform a Student's t-test for each comparison, and compare the obtained $p$-values with this new $\alpha'$.
 
 The other two post-hoc tests are presented in the next sections.
 
@@ -524,7 +550,9 @@ plot(TukeyHSD(res_aov))
 
 We have seen in this [section](/blog/anova-in-r/#issue-of-multiple-testing) that as the number of groups increases, the number of comparisons also increases. And as the number of **comparisons increases**, the post-hoc analysis must lower the individual significance level even further, which leads to **lower statistical power** (so a difference between group means in the population is less likely to be detected).
 
-One method to mitigate this and increase the statistical power is by reducing the number of comparisons. This reduction allows the post-hoc procedure to use a larger individual error rate to achieve the desired global error rate. While comparing all possible groups with a Tukey HSD test is a common approach, many studies have a control group and several treatment groups. For these studies, you may need to compare the treatment groups only to the control group, which reduces the number of comparisons.
+One method to mitigate this and increase the statistical power is by reducing the number of comparisons. This reduction allows the post-hoc procedure to use a larger individual error rate to achieve the desired global error rate.
+
+While comparing all possible groups with a Tukey HSD test is a common approach, many studies have a control group and several treatment groups. For these studies, you may need to compare the treatment groups only to the control group, which reduces the number of comparisons.
 
 Dunnett's test does precisely this---it only compares a group taken as reference to all other groups, but it does not compare all groups to each others.
 
@@ -553,7 +581,9 @@ The interpretation is the same as for the Tukey HSD test's except that in the Du
 1. Chinstrap versus Adelie (line `Chinstrap - Adelie == 0`)
 1. Gentoo vs. Adelie (line `Gentoo - Adelie == 0`)
 
-Both adjusted *p*-values (displayed in the last column) are below 0.05, so we reject the null hypothesis for both comparisons. This means that both the **species Chinstrap and Gentoo are significantly different from the reference species Adelie** in terms of flippers length. (Nothing can be said about the comparison between Chinstrap and Gentoo though.)
+Both adjusted *p*-values (displayed in the last column) are below 0.05, so we reject the null hypothesis for both comparisons.
+
+This means that both the **species Chinstrap and Gentoo are significantly different from the reference species Adelie** in terms of flippers length. (Nothing can be said about the comparison between Chinstrap and Gentoo though.)
 
 Again, the results of the post-hoc test can be visualized with the `plot()` function:
 
@@ -618,7 +648,7 @@ By default, the Holm method is applied but other methods exist. See `?p.adjust` 
 
 If you are interested in including results of ANOVA and post-hoc tests on the same plot (directly on the boxplots), here are two pieces of code which may be of interest to you.
 
-The first one is edited by myself based on the code found in this [article](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/){target="_blank"}:
+The first one is edited by me based on the code found in this [article](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/){target="_blank"}:
 
 ```{r}
 # Edit from here
@@ -643,7 +673,7 @@ for (i in y) {
       add = "jitter"
     )
     print(
-      p + stat_compare_means(aes(label = paste0(..method.., ", p-value = ", ..p.format..)),
+      p + stat_compare_means(aes(label = paste0(after_stat(method), ", p-value = ", after_stat(p.format))),
         method = method1, label.y = max(dat[, i], na.rm = TRUE)
       )
       + stat_compare_means(comparisons = my_comparisons, method = method2, label = "p.format") # remove if p-value of ANOVA or Kruskal-Wallis test >= alpha
