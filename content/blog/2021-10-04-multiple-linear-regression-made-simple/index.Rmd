@@ -26,13 +26,19 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](images/multiple-linear-regression.jpeg){width=100%}
 
 # Introduction
 
-Remember that [descriptive statistics](/blog/descriptive-statistics-in-r/) is a branch of statistics that allows to describe your data at hand. Inferential statistics (with the popular [hypothesis tests](/blog/hypothesis-test-by-hand/) and confidence intervals) is another branch of statistics that allows to make inferences, that is, to draw conclusions about a population based on a [sample](/blog/what-is-the-difference-between-population-and-sample/). The last branch of statistics is about **modeling the relationship between two or more variables**.^[Some people see regression analysis as a part of inferential statistics. It is true, as a sample is taken to evaluate the link between two or more variables in a population of interest. I tend to distinguish regression from inferential statistics for the simple reasons that (i) regressions are often used to a broader extent (for predictive analyses, among others), and because (ii) the main goal of linear regression (see this [section](/blog/multiple-linear-regression-made-simple/#simple-linear-regression-reminder)) differs from the objectives of confidence intervals and hypothesis testing well known in the field of inferential statistics.] The most common statistical tool to describe and evaluate the link between variables is linear regression.
+Remember that [descriptive statistics](/blog/descriptive-statistics-in-r/) is a branch of statistics that allows to describe your data at hand.
+
+Inferential statistics (with the popular [hypothesis tests](/blog/hypothesis-test-by-hand/) and confidence intervals) is another branch of statistics that allows to make inferences, that is, to draw conclusions about a population based on a [sample](/blog/what-is-the-difference-between-population-and-sample/).
+
+The last branch of statistics is about **modeling the relationship between two or more variables**.^[Some people see regression analysis as a part of inferential statistics. It is true, as a sample is taken to evaluate the link between two or more variables in a population of interest. I tend to distinguish regression from inferential statistics for the simple reasons that (i) regressions are often used to a broader extent (for predictive analyses, among others), and because (ii) the main goal of linear regression (see this [section](/blog/multiple-linear-regression-made-simple/#simple-linear-regression-reminder)) differs from the objectives of confidence intervals and hypothesis testing well known in the field of inferential statistics.] The most common statistical tool to describe and evaluate the link between variables is linear regression.
 
 There are two types of linear regression:
 
@@ -57,7 +63,9 @@ Simple linear regression is an asymmetric procedure in which:
 
 Simple linear regression allows to **evaluate the existence of a *linear* relationship between two variables** and to quantify this link. Note that linearity is a strong assumption in linear regression in the sense that it tests and quantifies whether the two variables are *linearly* dependent.
 
-What makes linear regression a powerful statistical tool is that it allows to **quantify by what quantity the response/dependent variable varies when the explanatory/independent variable increases by one unit**. This concept is key in linear regression and helps to answer the following questions:
+What makes linear regression a powerful statistical tool is that it allows to **quantify by what quantity the response/dependent variable varies when the explanatory/independent variable increases by one unit**.
+
+This concept is key in linear regression and helps to answer the following questions:
 
 - Is there a link between the amount spent in advertising and the sales during a certain period?
 - Is the number of years of schooling valued, in financial terms, in the first job?
@@ -65,7 +73,9 @@ What makes linear regression a powerful statistical tool is that it allows to **
 - What is the most likely price of an apartment, depending on the area?
 - Does a person's reaction time to a stimulus depend on gender?
 
-Simple linear regression can be seen as an extension to the [analysis of variance (ANOVA)](/blog/anova-in-r/) and the [Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/). ANOVA and t-test allow to compare groups in terms of a quantitative variable---2 groups for t-test and 3 or more groups for ANOVA.^[Formally, ANOVA can also be used to compare 2 groups, but in practice we tend to use it for 3 or more groups, leaving the t-test for 2 groups.] For these tests, the independent variable, that is, the grouping variable forming the different groups to compare must be a qualitative variable. Linear regression is an extension because in addition to be used to compare groups, it is also used with quantitative independent variables (which is not possible with t-test and ANOVA).
+Simple linear regression can be seen as an extension to the [analysis of variance (ANOVA)](/blog/anova-in-r/) and the [Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/). ANOVA and t-test allow to compare groups in terms of a quantitative variable---2 groups for t-test and 3 or more groups for ANOVA.^[Formally, ANOVA can also be used to compare 2 groups, but in practice we tend to use it for 3 or more groups, leaving the t-test for 2 groups.]
+
+For these tests, the independent variable, that is, the grouping variable forming the different groups to compare must be a qualitative variable. Linear regression is an extension because in addition to be used to compare groups, it is also used with quantitative independent variables (which is not possible with t-test and ANOVA).
 
 In this article, we are interested in assessing whether there is a linear relationship between the distance traveled with a gallon of fuel and the weight of cars. For this example, we use the `mtcars` dataset (preloaded in R).
 
@@ -194,7 +204,9 @@ The `summary()` function gives the results of the model:
 summary(model)
 ```
 
-In practice, we usually check the conditions of application *before* interpreting the coefficients (because if they are not respected, results may be biased). In this article, however, I present the interpretations before testing the conditions because the point is to show how to interpret the results, and less about finding a valid model.
+In practice, we usually check the conditions of application *before* interpreting the coefficients (because if they are not respected, results may be biased).
+
+In this article, however, I present the interpretations before testing the conditions because the point is to show how to interpret the results, and less about finding a valid model.
 
 The results can be summarized as follows (see the column `Estimate` in the table `Coefficients`):
 
@@ -207,7 +219,9 @@ The results can be summarized as follows (see the column `Estimate` in the table
   
 Another useful interpretation of the intercept is when the independent variable is centered around its mean. In this case, the intercept is interpreted as the mean value of $Y$ for individuals who have a value of $X$ equal to the mean of $X$.
 
-Let's see it in practice. We first center the `wt` variable around the mean then rerun a simple linear model with this new variable:
+Let's see it in practice.
+
+We first center the `wt` variable around the mean then rerun a simple linear model with this new variable:
 
 ```{r}
 dat_centered <- dat
@@ -231,11 +245,15 @@ This centering is particularly interesting:
 - when the continuous independent variable has **no** meaningful value of 0 (which is the case here as a car with a weight of 0 lbs is not meaningful), or
 - when interpreting the intercept is important.
 
-Note that centering does not have to be done around the mean only. The independent variable can also be centered at some value that is actually in the range of the data. The exact value you center on does not matter as long it's meaningful and within the range of data (it is not recommended to center it on a value that is not in the range of the data because we are not sure about the type of relationship between the two variables outside that range). For our example, we may find that choosing the lowest value or the highest value of weight is the best option. So it's up to us to decide the weight at which it's most meaningful to interpret the intercept.
+Note that centering does not have to be done around the mean only. The independent variable can also be centered at some value that is actually in the range of the data. The exact value you center on does not matter as long it's meaningful and within the range of data (it is not recommended to center it on a value that is not in the range of the data because we are not sure about the type of relationship between the two variables outside that range).
+
+For our example, we may find that choosing the lowest value or the highest value of weight is the best option. So it's up to us to decide the weight at which it's most meaningful to interpret the intercept.
   
 ## Significance of the relationship
 
-As mentioned earlier, the **value of the slope does not**, by itself, make it possible to **assess the significance of the linear relationship**. In other words, a slope different from 0 does not necessarily mean it is *significantly* different from 0, so it does not mean that there is a **significant** relationship between the two variables in the population. There could be a slope of 10 that is not significant, and a slope of 2 that is significant.
+As mentioned earlier, the **value of the slope does not**, by itself, make it possible to **assess the significance of the linear relationship**.
+
+In other words, a slope different from 0 does not necessarily mean it is *significantly* different from 0, so it does not mean that there is a **significant** relationship between the two variables in the population. There could be a slope of 10 that is not significant, and a slope of 2 that is significant.
 
 Significance of the relationship also depends on the variability of the slope, which is measured by its standard error and generally noted $se(\widehat\beta_1)$.
 
@@ -252,7 +270,9 @@ Roughly speaking, if this ratio is greater than 2 in absolute value then the slo
 
 The standard error and the test statistic are shown in the column `Std. Error` and `t value` in the table `Coefficients`.
 
-Fortunately, R gives a more precise and easier way to assess to the significance of the relationship. The information is provided in the column `Pr(>|t|)` of the `Coefficients` table. This is the [*p*-value](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha) of the test. As for any [statistical test](/blog/what-statistical-test-should-i-do/), if the *p*-value is greater than or equal to the significance level (usually $\alpha = 0.05$), we do not reject the null hypothesis, and if the *p*-value is lower than the significance level, we reject the null hypothesis. If we do not reject the null hypothesis, we do not reject the hypothesis of no relationship between the two variables (because we do not reject the hypothesis of a slope of 0). On the contrary, if we reject the null hypothesis of no relationship, we can conclude that there is a significant linear relationship between the two variables.
+Fortunately, R gives a more precise and easier way to assess to the significance of the relationship. The information is provided in the column `Pr(>|t|)` of the `Coefficients` table. This is the [*p*-value](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha) of the test. As for any [statistical test](/blog/what-statistical-test-should-i-do/), if the *p*-value is greater than or equal to the significance level (usually $\alpha = 0.05$), we do not reject the null hypothesis, and if the *p*-value is lower than the significance level, we reject the null hypothesis.
+
+If we do not reject the null hypothesis, we do not reject the hypothesis of no relationship between the two variables (because we do not reject the hypothesis of a slope of 0). On the contrary, if we reject the null hypothesis of no relationship, we can conclude that there is a significant linear relationship between the two variables.
 
 In our example, the *p*-value = 1.29e-10 < 0.05 so we reject the null hypothesis at the significance level $\alpha = 5\%$. We therefore conclude that there is a **significant relationship between a car's weight and its fuel consumption**.
 
@@ -269,11 +289,15 @@ A significant relationship between $X$ and $Y$ can appear in several cases:
 - a third variable cause $X$ and $Y$
 - a combination of these three reasons
 
-A statistical model alone cannot establish a causal link between two variables. Demonstrating causality between two variables is more complex and requires, among others, a specific experimental design, the repeatability of the results over time, as well as various samples. This is the reason you will often read "[Correlation does not imply causation](/blog/correlation-coefficient-and-correlation-test-in-r/#correlation-does-not-imply-causation)" and linear regression follows the same principle.
+A statistical model alone cannot establish a causal link between two variables. Demonstrating causality between two variables is more complex and requires, among others, a specific experimental design, the repeatability of the results over time, as well as various samples.
+
+This is the reason you will often read "[Correlation does not imply causation](/blog/correlation-coefficient-and-correlation-test-in-r/#correlation-does-not-imply-causation)" and linear regression follows the same principle.
 
 ## Conditions of application
 
-Linear regression cannot be used in all situations. In addition to the requirement that the dependent variable must be a continuous quantitative variables, simple linear regression requires that the data satisfy the following conditions:
+Unfortunately, linear regression cannot be used in all situations.
+
+In addition to the requirement that the dependent variable must be a continuous quantitative variables, simple linear regression requires that the data satisfy the following conditions:
 
 1. **Linearity:** The relationship between the two variables should be linear (at least roughly). For this reason it is always necessary to represent graphically the data with a scatterplot before performing a simple linear regression.^[Note that linearity can be checked with a scatterplot of the two variables, or via a scatterplot of the residuals and the fitted values. See more about this in this [section](/blog/multiple-linear-regression-made-simple/#conditions-of-application-1).]
 
@@ -322,7 +346,9 @@ p1 + p2
 
 *Tip:* I remember the first 4 conditions thanks to the acronym "LINE", for Linearity, Independence, Normality and Equality of variance.
 
-If any of the condition is not met, the tests and the conclusions could be erroneous so it is best to avoid using and interpreting the model. If this is the case, sometimes the conditions can be met by transforming the data (e.g., logarithmic transformation, square or square root, Box-Cox transformation, etc.) or by adding a quadratic term to the model. If it does not help, it could be worth thinking about removing some variables or adding other variables, or even considering other types of models such as non-linear models.
+If any of the condition is not met, the tests and the conclusions could be erroneous so it is best to avoid using and interpreting the model. If this is the case, sometimes the conditions can be met by transforming the data (e.g., logarithmic transformation, square or square root, Box-Cox transformation, etc.) or by adding a quadratic term to the model.
+
+If it does not help, it could be worth thinking about removing some variables or adding other variables, or even considering other types of models such as non-linear models.
 
 Keep in mind that in practice, **conditions of application should be verified before drawing any conclusion** based on the model. I refrain here from testing the conditions on our data because it will be covered in details in the context of multiple linear regression (see this [section](/blog/multiple-linear-regression-made-simple/#conditions-of-application-1)).
 
@@ -350,7 +376,7 @@ ggplot(dat, aes(x = wt, y = mpg)) +
   geom_smooth(method="lm") +
   geom_point() +
   stat_regline_equation(label.x=3, label.y=32) + # for regression equation
-  stat_cor(aes(label=..rr.label..), label.x=3, label.y=30) + # for R^2
+  stat_cor(aes(label=after_stat(rr.label)), label.x=3, label.y=30) + # for R^2
   theme_minimal()
 ```
 
@@ -420,7 +446,9 @@ $$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_p X_p + \epsilon$$
 
 It is similar than the equation of simple linear regression, except that there is more than one independent variables ($X_1, X_2, \dots, X_p$).
 
-Estimation of the parameters $\beta_0, \dots, \beta_p$ by the method of least squares is based on the same principle as that of simple linear regression, but applied to $p$ dimensions. It is thus no longer a question of finding the best line (the one which passes closest to the pairs of points ($y_i, x_i$)), but finding the $p$-dimensional plane which passes closest to the coordinate points ($y_i, x_{i1}, \dots, x_{ip}$). This is done by ***minimizing* the sum of the squares of the deviations of the points on the plane**:
+Estimation of the parameters $\beta_0, \dots, \beta_p$ by the method of least squares is based on the same principle as that of simple linear regression, but applied to $p$ dimensions. It is thus no longer a question of finding the best line (the one which passes closest to the pairs of points ($y_i, x_i$)), but finding the $p$-dimensional plane which passes closest to the coordinate points ($y_i, x_{i1}, \dots, x_{ip}$).
+
+This is done by ***minimizing* the sum of the squares of the deviations of the points on the plane**:
 
 ![Source: Thaddeussegura](images/multiple-linear-regression-plane.png){width=100%}
 
@@ -461,7 +489,9 @@ Based on the output of our model, we conclude that:
 - We do not reject the hypothesis of no relationship between miles/gallon and displacement when weight and horsepower stay constant (because $p$-value = 0.929 > 0.05).
 - (For completeness but it should be interpreted only when it makes sense: for a weight, horsepower and displacement = 0, we can expect that a car has, on average, a fuel consumption of `r round(coef(model2)[1], 2)` miles/gallon ($p$-value < 0.001). See a more useful interpretation of the intercept when the independent variables are centered in this [section](/blog/multiple-linear-regression-made-simple/#another-interpretation-of-the-intercept).)
 
-This is how to interpret quantitative independent variables. **Interpreting qualitative independent variables** is slightly different in the sense that it quantifies the effect of a level in comparison with the reference level, sill all else being equal. So it compares the different groups (formed by the different levels of the categorical variable) in terms of the dependent variable (this is why linear regression can be seen as an extension to the t-test and ANOVA).
+This is how to interpret quantitative independent variables. **Interpreting qualitative independent variables** is slightly different in the sense that it quantifies the effect of a level in comparison with the reference level, sill all else being equal.
+
+So it compares the different groups (formed by the different levels of the categorical variable) in terms of the dependent variable (this is why linear regression can be seen as an extension to the t-test and ANOVA).
 
 For the illustration, we model the fuel consumption (`mpg`) on the weight (`wt`) and the shape of the engine (`vs`). The variable `vs` has two levels: V-shaped (the [reference level](/blog/data-manipulation-in-r/#change-reference-level)) and straight engine.^[You can always change the reference level with the `relevel()` function. See more [data manipulation techniques](/blog/data-manipulation-in-r/).]
 
@@ -539,7 +569,9 @@ ggplot(dat, aes(x=disp, y=mpg))+
   theme_minimal()
 ```
 
-It seems that the relationship between miles/gallon and horsepower is not linear, which could be the main component of the slight linearity defect of the model. To improve linearity, the variable could be removed, a transformation could be applied (logarithmic and/or squared for instance) or a quadratic term could be added to the model.^[If you apply a logarithmic transformation, see two guides on how to interpret the results: in [English](https://sites.google.com/site/curtiskephart/ta/econ113/interpreting-beta){target="_blank"} and in [French](https://www.parisschoolofeconomics.eu/docs/yin-remi/interpretation-des-coefficients.pdf){target="_blank"}.] If this does not fix the issue of linearity, other types of models could be considered.
+It seems that the relationship between miles/gallon and horsepower is not linear, which could be the main component of the slight linearity defect of the model.
+
+To improve linearity, the variable could be removed, a transformation could be applied (logarithmic and/or squared for instance) or a quadratic term could be added to the model.^[If you apply a logarithmic transformation, see two guides on how to interpret the results: in [English](https://sites.google.com/site/curtiskephart/ta/econ113/interpreting-beta){target="_blank"} and in [French](https://www.parisschoolofeconomics.eu/docs/yin-remi/interpretation-des-coefficients.pdf){target="_blank"}.] If this does not fix the issue of linearity, other types of models could be considered.
 
 If you want to read more about these conditions of applications and how to deal with them, here is a very complete [chapter](http://quantpsych.net/stats_modeling/diagnostics.html) on diagnostics for linear models written by Prof. Dustin Fife.
 
@@ -589,7 +621,9 @@ $R^2$ varies between 0 and 1:
 - $0 < R^2 < 1$: the model explains part of the variability
 - the higher the $R^2$, the better the model explains the dependent variable. As a rule of thumb, a $R^2 > 0.7$ indicates a good fit of the model^[Note that a high $R^2$ does not guarantee that you selected the best variables or that your model is good. It simply tells that the model fits the data quite well. It is advised to apply common sense when comparing models and not only refer to $R^2$ (in particular when $R^2$ are close).]
 
-Note that in a simple linear regression model, the coefficient of determination is equal to the square of the [correlation coefficient](/blog/correlation-coefficient-and-correlation-test-in-r/): $R^2 = corr(X, Y)^2$.
+Note that in a simple linear regression model, the coefficient of determination is equal to the square of the [correlation coefficient](/blog/correlation-coefficient-and-correlation-test-in-r/):
+
+$$R^2 = corr(X, Y)^2$$
 
 Applied on our `model2` with miles/gallon as dependent variable, and weight, horsepower and displacement as independent variables, we have:
 
@@ -601,7 +635,9 @@ $R^2$ is displayed at the bottom of the `summary()` output or can be extracted w
 
 $R^2$ for this model is `r round(summary(model2)$r.squared, 4)`, which means that `r round(summary(model2)$r.squared * 100, 2)`% of the variability of the distance traveled with a gallon is explained by the weight, horsepower and displacement of the car. The relatively high $R^2$ means that the weight, horsepower and displacement of a car are good characteristics to explain the distance it can drive with a gallon of fuel.
 
-Note that if you want to compare models with different number of independent variables, it is best to refer to the adjusted $R^2$ (= `r round(summary(model2)$adj.r.squared, 4)` here). Indeed, adding variables to the model cannot make the $R^2$ to decrease, even if the variables are not related to the dependent variables (so the $R^2$ will artificially increase when adding variables to the model, or at least stay constant). Therefore, the adjusted $R^2$ takes into account the complexity of the model (the number of variables) by penalizing for additional variables, so it is a compromise between goodness of fit and parsimony.
+Note that if you want to compare models with different number of independent variables, it is best to refer to the adjusted $R^2$ (= `r round(summary(model2)$adj.r.squared, 4)` here).
+
+Indeed, adding variables to the model cannot make the $R^2$ to decrease, even if the variables are not related to the dependent variables (so the $R^2$ will artificially increase when adding variables to the model, or at least stay constant). Therefore, the adjusted $R^2$ takes into account the complexity of the model (the number of variables) by penalizing for additional variables, so it is a compromise between goodness of fit and parsimony.
 
 ### Parsimony
 
@@ -630,7 +666,7 @@ model4 <- lm(mpg ~ .,
 model4 <- step(model4, trace = FALSE)
 ```
 
-(The formula `mpg ~ .` is a shortcut to consider all variables present in the dataset as independent variables, except the one that has been specified as the dependent variable (`mpg` here)).
+(*Tip:* The formula `mpg ~ .` is a shortcut to consider all variables present in the dataset as independent variables, except the one that has been specified as the dependent variable (`mpg` here)).
 
 The model that has been selected according to this criterion is the following:
 
@@ -724,6 +760,7 @@ You can easily extract the equation of your linear model in LaTeX or directly in
 
 ```{r}
 library(equatiomatic)
+
 extract_eq(model4,
            use_coefs = TRUE, # display coefficients
            wrap = TRUE, # multiple lines
@@ -740,7 +777,7 @@ The `report()` function from the package of the same name allows to automaticall
 ```{r}
 library(report)
 
-report(model4)
+report(model4)[1]
 ```
 
 Note that the function also works for dataframes, [statistical tests](/blog/what-statistical-test-should-i-do/) and other models.
@@ -821,7 +858,9 @@ From this analysis of variance table, we conclude that:
 
 ### Interaction
 
-So far we have covered multiple linear regression without any interaction. There is an **interaction** effect between factors A and B **if the effect of factor A on the response depends on the level taken by factor B**.
+So far we have covered multiple linear regression without any interaction.
+
+There is an **interaction** effect between factors A and B **if the effect of factor A on the response depends on the level taken by factor B**.
 
 In R, interaction can be added as follows:
 
@@ -856,7 +895,9 @@ In this article, we started with a reminder of [simple linear regression](/blog/
 
 This laid the foundations for a better understanding of [multiple linear regression](/blog/multiple-linear-regression-made-simple/#multiple-linear-regression). After explaining its [principle](/blog/multiple-linear-regression-made-simple/#principle-1), we showed how to [interpret the output](/blog/multiple-linear-regression-made-simple/#interpretations-of-coefficients-widehatbeta-1) and how to choose a [good linear model](/blog/multiple-linear-regression-made-simple/#how-to-choose-a-good-linear-model). We then mentioned a couple of [visualizations](/blog/multiple-linear-regression-made-simple/#visualizations-1) and finished the article with some more [advanced topics](/blog/multiple-linear-regression-made-simple/#to-go-further).
 
-Thanks for reading. I hope this article helped you to understand better linear regression and gave you the confidence to do your own regressions in R.
+Thanks for reading.
+
+I hope this article helped you to understand better linear regression and gave you the confidence to do your own regressions in R.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
 
