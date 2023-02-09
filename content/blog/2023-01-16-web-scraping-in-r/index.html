@@ -48,11 +48,12 @@ output:
 <li><a href="#analysis-on-the-database" id="toc-analysis-on-the-database">Analysis on the database</a></li>
 </ul></li>
 <li><a href="#to-go-further" id="toc-to-go-further">To go further</a></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
 </ul>
 </div>
 
 <p><img src="images/web-scraping-in-r.jpeg" style="width:100.0%" /></p>
-<p><em>This post has been written in collaboration with <a href="https://www.zanotp.com/">Pietro Zanotta</a>.</em></p>
+<p><em>This post has been written in collaboration with <a href="https://www.zanotp.com/" target="_blank">Pietro Zanotta</a>.</em></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>Almost anyone is familiar with web pages (otherwise you would not be here), but what if we tell you that how you see a site is different from how Google or your browser does?</p>
@@ -65,7 +66,7 @@ output:
 </ul>
 <p><strong>Web scraping</strong> is the art of extracting information from the HTML, CSS and Javascript lines of code. The term usually refers to an automated process, which is less error-prone and faster than gathering data by hand.</p>
 <p>It is important to note that web scraping can raise <strong>ethical concerns</strong>, as it involves accessing and using data from websites without the explicit permission of the website owner. It is a good practice to respect the terms of use for a website, and to seek written permission before scraping large amounts of data.</p>
-<p>This article aims to cover the basics of how to do web scraping in R. We will conclude by creating a database on Formula 1 drivers from <a href="https://en.wikipedia.org/wiki/List_of_Formula_One_drivers">Wikipedia</a>.</p>
+<p>This article aims to cover the basics of how to do web scraping in R. We will conclude by creating a database on Formula 1 drivers from <a href="https://en.wikipedia.org/wiki/List_of_Formula_One_drivers" target="_blank">Wikipedia</a>.</p>
 <p>Note that this article doesn’t want to be exhaustive on topic. To learn more, see <a href="/blog/web-scraping-in-r/#to-go-further">this section</a>.</p>
 <div id="html-and-css" class="section level3">
 <h3>HTML and CSS</h3>
@@ -142,9 +143,9 @@ output:
 
 NYT_page</code></pre>
 <pre><code>## {html_document}
-## &lt;html lang=&quot;en&quot; class=&quot; nytapp-vi-homepage&quot; xmlns:og=&quot;http://opengraphprotocol.org/schema/&quot;&gt;
+## &lt;html lang=&quot;en-US&quot; xmlns:og=&quot;http://opengraphprotocol.org/schema/&quot;&gt;
 ## [1] &lt;head&gt;\n&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8 ...
-## [2] &lt;body&gt;\n    &lt;div id=&quot;app&quot;&gt;\n&lt;a class=&quot;css-kgn7zc&quot; href=&quot;#site-index&quot;&gt;Skip ...</code></pre>
+## [2] &lt;body&gt;\n    &lt;div id=&quot;app&quot;&gt;\n&lt;a class=&quot;css-kgn7zc&quot; href=&quot;#site-content&quot;&gt;Sk ...</code></pre>
 </div>
 <div id="parsing-html-content" class="section level2">
 <h2>Parsing HTML content</h2>
@@ -163,7 +164,7 @@ NYT_page</code></pre>
   html_elements(css = &quot;&quot;)</code></pre>
 <div id="css-selector" class="section level3">
 <h3>CSS selector</h3>
-<p>Suppose that for a project you need the summaries of the articles of the NYT (note that what is in the following picture is not what you see in the <a href="https://www.nytimes.com/">New York Times web page</a>).</p>
+<p>Suppose that for a project you need the summaries of the articles of the NYT (note that what is in the following picture is not what you see in the <a href="https://www.nytimes.com/" target="_blank">New York Times web page</a>).</p>
 <p><img src="images/NYT_screenshot.png" style="width:100.0%" /></p>
 <p>Searching in the HTML code, it is not that complex to find <code>&lt;p class="summary-class"&gt;</code>, which is the markup of what we are looking for. To parse the HTML using this selector we use the <code>html_element</code> function:</p>
 <pre class="r"><code>summaries_css &lt;- NYT_page %&gt;%
@@ -171,12 +172,12 @@ NYT_page</code></pre>
 
 head(summaries_css)</code></pre>
 <pre><code>## {xml_nodeset (6)}
-## [1] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Tens of thousands of inmates have joi ...
-## [2] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Will the Florida Republican continue  ...
-## [3] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Antony Blinken, the U.S. secretary of ...
-## [4] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;While the target’s purpose is unclear ...
-## [5] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;City leaders had praised the new grou ...
-## [6] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;A Times analysis found that officers  ...</code></pre>
+## [1] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;China has been looking for ways to ma ...
+## [2] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;A humanitarian convoy crossed from Tu ...
+## [3] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;President Volodymyr Zelensky of Ukrai ...
+## [4] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;In cities dealing with bombardment an ...
+## [5] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;President Biden plans to use his visi ...
+## [6] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;The repeated outbursts that interrupt ...</code></pre>
 <p>The easiest way to obtain a CSS selector is opening the inspect mode, find the element you desire and right click on it. Then click on <code>copy</code> and <code>copy selector</code>.</p>
 </div>
 <div id="xpath" class="section level3">
@@ -188,12 +189,12 @@ head(summaries_css)</code></pre>
 
 head(summaries_xpath)</code></pre>
 <pre><code>## {xml_nodeset (6)}
-## [1] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Tens of thousands of inmates have joi ...
-## [2] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Will the Florida Republican continue  ...
-## [3] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Antony Blinken, the U.S. secretary of ...
-## [4] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;While the target’s purpose is unclear ...
-## [5] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;City leaders had praised the new grou ...
-## [6] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;A Times analysis found that officers  ...</code></pre>
+## [1] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;China has been looking for ways to ma ...
+## [2] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;A humanitarian convoy crossed from Tu ...
+## [3] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;President Volodymyr Zelensky of Ukrai ...
+## [4] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;In cities dealing with bombardment an ...
+## [5] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;President Biden plans to use his visi ...
+## [6] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;The repeated outbursts that interrupt ...</code></pre>
 <p>Obviously the data we collected with CSS selector and XPath are exactly the same.</p>
 </div>
 </div>
@@ -204,18 +205,18 @@ head(summaries_xpath)</code></pre>
 NYT_summaries_xpath &lt;- html_text(summaries_xpath)</code></pre>
 <p>We only print some of them:</p>
 <pre class="r"><code>head(NYT_summaries_css)</code></pre>
-<pre><code>## [1] &quot;Tens of thousands of inmates have joined a mercenary group fighting in Ukraine. Some are returning home, trained and often traumatized.&quot;                    
-## [2] &quot;Will the Florida Republican continue in his role as a limelight seeker? Or will he assert himself more on substance and push his far-right agenda?&quot;         
-## [3] &quot;Antony Blinken, the U.S. secretary of state, will sit down with Prime Minister Benjamin Netanyahu as violence and protests rattle his country.&quot;             
-## [4] &quot;While the target’s purpose is unclear, the city of Isfahan is a major center of Iranian missile production, research and development.&quot;                      
-## [5] &quot;City leaders had praised the new group as a key strategy for fighting crime. Now they are trying to assess whether it was flawed from the start.&quot;           
-## [6] &quot;A Times analysis found that officers gave dozens of contradictory and unachievable orders to Mr. Nichols. The punishment was severe — and eventually fatal.&quot;</code></pre>
+<pre><code>## [1] &quot;China has been looking for ways to make balloons harder to detect. It has also been testing them as platforms to fire advanced weapons.&quot;                 
+## [2] &quot;A humanitarian convoy crossed from Turkey into opposition-controlled Syria on Thursday, three days after the devastating earthquake.&quot;                    
+## [3] &quot;President Volodymyr Zelensky of Ukraine plans to meet the E.U.’s 27 heads of government in Brussels, where the topic of sanctions could be on the table.&quot;
+## [4] &quot;In cities dealing with bombardment and blackouts, the Patrol Police have taken a lead in trying to ensure a sense of security for a traumatized public.&quot; 
+## [5] &quot;President Biden plans to use his visit to the University of Tampa to warn about what he says are G.O.P. proposals to cut Medicare and Social Security.&quot;  
+## [6] &quot;The repeated outbursts that interrupted President Biden’s State of the Union address encapsulated the ethos of a Trump-era Republican majority.&quot;</code></pre>
 </div>
 </div>
 <div id="a-real-application-of-web-scraping-in-r" class="section level1">
 <h1>A real application of web scraping in R</h1>
 <p><img src="images/f1.jpg" style="width:100.0%" /></p>
-<p>To conclude this brief introduction to web scraping we want to use the <code>rvest</code> package in a real word application of web scraping. The goal is to scrape data from <a href="https://en.wikipedia.org/wiki/List_of_Formula_One_drivers">Formula 1 Wikipedia’s voice</a> and create a CSV file containing the name, the nationality, the number of podiums and some other statistics for every pilot.</p>
+<p>To conclude this brief introduction to web scraping we want to use the <code>rvest</code> package in a real word application of web scraping. The goal is to scrape data from <a href="https://en.wikipedia.org/wiki/List_of_Formula_One_drivers" target="_blank">Formula 1 Wikipedia’s voice</a> and create a CSV file containing the name, the nationality, the number of podiums and some other statistics for every pilot.</p>
 <p>The table we are going to scrape is the following:</p>
 <p><img src="images/table_screenshot.png" style="width:100.0%" /></p>
 <p>If you haven’t done so, you need to install the <code>rvest</code> package:</p>
@@ -357,16 +358,21 @@ drivers_F1 &lt;- drivers_F1[-nrow(drivers_F1), ] # remove last row</code></pre>
 <h1>To go further</h1>
 <p>As you have seen, <code>rvest</code> is a powerful tool. The goal of the article is to show just the tip of the iceberg regarding web scraping in R. There are many resources online that you can read if you want to know more:</p>
 <ul>
-<li><a href="https://bookdown.org/paul/2021_computational_social_science/web-scraping-basics.html">Web scraping: Basics</a> by Paul Bauer</li>
-<li><a href="https://cran.r-project.org/web/packages/rvest/rvest.pdf">rvest</a> CRAN documentation</li>
-<li><a href="https://cran.r-project.org/web/packages/xml2/xml2.pdf">xml2</a> CRAN documentation</li>
-<li><a href="https://cran.r-project.org/web/packages/httr/httr.pdf">httr</a> CRAN documentation</li>
-<li><a href="https://cran.r-project.org/web/packages/rvest/vignettes/rvest.html">rvest</a> CRAN vignette</li>
-<li><a href="https://cran.r-project.org/web/packages/httr/vignettes/quickstart.html">httr</a> CRAN vignette</li>
-<li><a href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/">Beautiful Soup</a> documentation</li>
-<li><a href="https://robobrowser.readthedocs.io/en/latest/readme.html">RoboBrowser</a> documentation</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML">HTML</a> documentation</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS">CSS</a> documentation</li>
+<li><a href="https://bookdown.org/paul/2021_computational_social_science/web-scraping-basics.html" target="_blank">Web scraping: Basics</a> by Paul Bauer</li>
+<li><a href="https://cran.r-project.org/web/packages/rvest/rvest.pdf" target="_blank">rvest</a> CRAN documentation</li>
+<li><a href="https://cran.r-project.org/web/packages/xml2/xml2.pdf" target="_blank">xml2</a> CRAN documentation</li>
+<li><a href="https://cran.r-project.org/web/packages/httr/httr.pdf" target="_blank">httr</a> CRAN documentation</li>
+<li><a href="https://cran.r-project.org/web/packages/rvest/vignettes/rvest.html" target="_blank">rvest</a> CRAN vignette</li>
+<li><a href="https://cran.r-project.org/web/packages/httr/vignettes/quickstart.html" target="_blank">httr</a> CRAN vignette</li>
+<li><a href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/" target="_blank">Beautiful Soup</a> documentation</li>
+<li><a href="https://robobrowser.readthedocs.io/en/latest/readme.html" target="_blank">RoboBrowser</a> documentation</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank">HTML</a> documentation</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS" target="_blank">CSS</a> documentation</li>
 </ul>
-<p>Thanks for reading. As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Thanks for reading.</p>
+<p>I hope this article helped you to learn about web scraping in R, and gave you the incentive to use it for your projects.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
