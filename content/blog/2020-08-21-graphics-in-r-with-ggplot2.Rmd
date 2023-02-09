@@ -27,6 +27,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 <center>
@@ -51,7 +53,9 @@ In this article, we will see how to create common plots such as scatter plots, l
 
 # Data
 
-To illustrate plots with the `{ggplot2}` package we will use the `mpg` dataset available in the package. The dataset contains observations collected by the US Environmental Protection Agency on fuel economy from 1999 to 2008 for 38 popular models of cars (run `?mpg` for more information about the data):
+To illustrate plots with the `{ggplot2}` package we will use the `mpg` dataset available in the package.
+
+The dataset contains observations collected by the US Environmental Protection Agency on fuel economy from 1999 to 2008 for 38 popular models of cars (run `?mpg` for more information about the data):
 
 ```{r}
 library(ggplot2)
@@ -92,7 +96,7 @@ ggplot(data) +
 ```
 
 * `data` in `ggplot()` is the name of the data frame which contains the variables `var_x` and `var_y`.
-* The `+` symbol is used to indicate the different layers that will be added to the plot. Make sure to write the `+` *symbol at the end of the line* of code and not at the beginning of the line, otherwise R throws an error.
+* The `+` symbol is used to indicate the different layers that will be added to the plot. Make sure to write the `+` *symbol at the end of the line* of code and not at the beginning of the line, otherwise [R throws an error](/blog/top-10-errors-in-r/#forgetting-the-sign-in-ggplot2).
 * The layer `aes()` indicates what variables will be used in the plot and more generally, the aesthetic elements of the plot.
 * Finally, `x` in `geom_x()` represents the type of plot.
 * Other layers are usually not required unless we want to personalize the plot further.
@@ -107,8 +111,10 @@ In the following sections we will show how to draw the following plots:
 * line plot
 * histogram
 * density plot
+* dotplot
 * boxplot
 * barplot
+* raincloud plot
 
 In order to focus on the construction of the different plots and the use of `{ggplot2}`, we will restrict ourselves to drawing basic (yet beautiful) plots without unnecessary layers. For the sake of completeness, we will briefly discuss and illustrate different layers to further personalize a plot at the end of the article (see this [section](/blog/graphics-in-r-with-ggplot2/#further-personalization)).
 
@@ -207,7 +213,7 @@ We can also superimpose a histogram and a density curve on the same plot:
 
 ```{r}
 ggplot(dat) +
-  aes(x = hwy, y = ..density..) +
+  aes(x = hwy, y = after_stat(density)) +
   geom_histogram() +
   geom_density()
 ```
@@ -221,6 +227,28 @@ ggplot(dat) +
 ```
 
 The argument `alpha = 0.25` has been added for some transparency. More information about this argument can be found in this [section](/blog/graphics-in-r-with-ggplot2/#further-personalization).
+
+## Dotplot
+
+A [dotplot](/blog/descriptive-statistics-in-r/#dotplot) in `{ggplot2}` can be built with `geom_dotplot()`:
+
+```{r}
+# Dotplot for one variable
+ggplot(dat) +
+  aes(x = "", y = hwy) +
+  geom_dotplot(binaxis = "y", stackdir= "center")
+
+# Dotplot by factor
+ggplot(dat) +
+  aes(x = drv, y = hwy) +
+  geom_dotplot(binaxis = "y", stackdir = "center",
+               dotsize = 0.75 # decrease dot size
+               )
+```
+
+Dotplots are more appropriate with small samples (because the plot may be hard to read with too many points). For large samples, a boxplot may be used.
+
+For the interested reader, see many personalization that is possible with a dotplot in this [tutorial](http://www.sthda.com/english/wiki/ggplot2-dot-plot-quick-start-guide-r-software-and-data-visualization){target="_blank"}.
 
 ## Boxplot
 
@@ -347,6 +375,86 @@ ggplot(dat) +
   geom_bar(aes(x = drv, fill = year), position = "dodge")
 ```
 
+## Raincloud plot
+
+A raincloud plot is a graph that combines 3 visualizations:
+
+1. a density plot,
+1. a boxplot,
+1. and the raw data in the form of a dotplot or jittered points.
+
+The advantage of this plot is that it illustrates, **all at once**, the distribution (with the density curve), the summary measures (first, second and third [quartiles](/blog/descriptive-statistics-in-r/#first-and-third-quartile), and maximum/mininum without [outliers](/blog/outliers-detection-in-r/) thanks to the boxplot) and the number of observations (either via a dotplot or via jittered points).
+
+Let's illustrate the raincloud plot, first with jittered points (more appropriate with large samples):^[Code inspired from Claire Della Vedova ([DellaData](https://delladata.fr/raincloud-plot/){target="_blank"}) and [Cédric Scherer](https://www.cedricscherer.com/2021/06/06/visualizing-distributions-with-raincloud-plots-and-how-to-create-them-with-ggplot2/){target="_blank"}. Thanks to both of them for this nice plot!]
+
+```{r}
+library(tidyverse)
+library(ggdist)
+
+# density plot:
+dat %>%
+  ggplot(aes(x = drv, y = hwy, fill = drv)) +
+  stat_halfeye(
+    adjust = 0.5, # set the smoothing parameter
+    width = 0.5, # set the height of the curves
+    justification = -0.2, # move curves to the right
+    .width = 0, point_colour = NA # remove interval present by default
+  ) + 
+  # boxplot:
+  geom_boxplot(
+    width = 0.12, # width of boxes
+    outlier.color = NA, # remove color of outliers
+    alpha = 0.5 # add transparency
+  ) + 
+  # jittered points:
+  geom_point(aes(colour = drv), # add color on points
+    size = 1.3, # size of points
+    alpha = .3, # add transparency
+    position = position_jitter( # obtain shifted points
+      seed = 1, # set seed for same random representation
+      width = .09 # manage the width of the offset
+    )
+  ) +
+  # further personalization:
+  coord_flip() + # rotate plot
+  theme(legend.position = "none") # remove legend
+```
+
+Now the same chart but with dotplots this time (more appropriate with small [samples](/blog/what-is-the-difference-between-population-and-sample/)):
+
+```{r}
+# density plot:
+dat %>%
+  sample_n(100) %>% # random sample of size 100
+  ggplot(aes(x = drv, y = hwy, fill = drv)) +
+  stat_halfeye(
+    adjust = 0.5, # set the smoothing parameter
+    width = 0.5, # set the height of the curves
+    justification = -0.2, # move curves to the right
+    .width = 0, point_colour = NA # remove interval present by default
+  ) +
+  # boxplot:
+  geom_boxplot(
+    width = 0.12, # width of boxes
+    outlier.color = NA, # remove color of outliers
+    alpha = 0.5 # add transparency
+  ) +
+  # dotplot:
+  stat_dots(
+    dotsize = 0.5, # size of points
+    side = "left", # place points on opposite side of density curve
+    justification = 1.1, # move points away from boxplot
+    binwidth = 1 # group points together
+  ) +
+  # further personalization:
+  coord_flip() + # rotate plot
+  theme(legend.position = "none") # remove legend
+```
+
+The code is much longer compared to the other plots, but the only line(s) to edit to adapt to your dataset is the aesthetics (`aes()`). The rest is mainly adjustments that should not be changed.
+
+You may have notice that at the end of the code, there are some personalization which allow to improve the plot even further. The most common personalization are presented in the next section.
+
 ## Further personalization
 
 ### Title and axis labels
@@ -367,7 +475,9 @@ p + labs(
 )
 ```
 
-As you can see in the above code, you can save one or more layers of the plot in an object for later use. This way, you can save your "main" plot, and add more layers of personalization until you get the desired output. Here we saved the main scatter plot in an object called `p` and we will refer to it for the subsequent personalizations.
+As you can see in the above code, you can save one or more layers of the plot in an object for later use.
+
+This way, you can save your "main" plot, and add more layers of personalization until you get the desired output. Here we saved the main scatter plot in an object called `p` and we will refer to it for the subsequent personalization.
 
 You can also edit the alignment, the size and the shape of the title and subtitle via the `theme()` layer and the `element_text()` function:
 
@@ -453,25 +563,35 @@ It is also possible to simply take a subset of the dataset with the `subset()` o
 
 ### Scales for better axis formats
 
-Depending on your data, it is possible to format axes in a certain way with the `{scales}` package. The formats I use the most are `comma` and `label_number_si()` which format large numbers in a more-readable way.
+Depending on your data, it is possible to format axes in a certain way with the `{scales}` package. The format I use the most is `comma` which formats large numbers in a more-readable way.
 
-For this example, we multiply both variables by 1000 to have larger numbers and then we apply a different format to each axis:
+For this example, we multiply both variables by 10000 to have larger numbers and then we apply the format to the y-axis (only to the y-axis so we can see the difference with the x-axis which is not formatted):
 
 ```{r}
 ggplot(dat) +
-  aes(x = displ * 1000, y = hwy * 1000) +
+  aes(x = displ * 10000, y = hwy * 10000) +
   geom_point() +
-  scale_y_continuous(labels = scales::label_number_si()) + # format y-axis
-  scale_x_continuous(labels = scales::comma) # format x-axis
+  scale_y_continuous(labels = scales::comma) # format y-axis
 ```
 
-As you can see, numbers on the y-axis are automatically labeled with the best SI prefix ("K" for values $\ge$ 10e3, "M" for $\ge$ 10e6, "B" for $\ge$ 10e9, and "T" for $\ge$ 10e12) and numbers on the x-axis are displayed as 2,000, 3,000, etc. instead of 2000, 3000, etc.
+As you can see, numbers on the y-axis are displayed as 200,000, 300,000, etc. instead of 200000, 300000, etc., which makes it more readable.
 
-These two formats make large numbers easier to read. Other formats are possible such as using dollar signs, percentage signs, dates etc. See more information in the [package's documentation](https://scales.r-lib.org/){target="_blank"}.
+Another common format is `percent` to display numbers as percentages:
+
+```{r}
+ggplot(dat) +
+  aes(x = displ, y = hwy / 100) +
+  geom_point() +
+  scale_y_continuous(labels = scales::percent) # format y-axis
+```
+
+These two formats make large numbers and percentages easier to read. Other formats are possible such as using dollar signs, dates etc. See more information in the [package's documentation](https://scales.r-lib.org/){target="_blank"}.
 
 ### Legend
 
-By default, the legend is located to the right side of the plot (when there is a legend to be displayed of course). To control the position of the legend, we need to use the `theme()` function in addition to the `legend.position` argument:
+By default, the legend is located to the right side of the plot (when there is a legend to be displayed of course).
+
+To control the position of the legend, we need to use the `theme()` function in addition to the `legend.position` argument:
 
 ```{r}
 p + aes(color = class) +
@@ -617,7 +737,9 @@ In a scatter plot, it is possible to add a smooth line fitted to the data:
 p + geom_smooth()
 ```
 
-In the context of simple [linear regression](/blog/multiple-linear-regression-made-simple/), it is often the case that the regression line is displayed on the plot. This can be done by adding `method = lm` (`lm` stands for linear model) in the `geom_smooth()` layer:
+In the context of simple [linear regression](/blog/multiple-linear-regression-made-simple/), it is often the case that the regression line is displayed on the plot.
+
+This can be done by adding `method = lm` (`lm` stands for linear model) in the `geom_smooth()` layer:
 
 ```{r}
 p + geom_smooth(method = lm)
@@ -655,7 +777,9 @@ p + facet_grid(. ~ drv) +
 
 ### Themes
 
-Several functions are available in the `{ggplot2}` package to change the theme of the plot. The most common themes after the default theme (i.e., `theme_gray()`) are the black and white (`theme_bw()`), minimal (`theme_minimal()`) and classic (`theme_classic()`) themes:
+Several functions are available in the `{ggplot2}` package to change the theme of the plot.
+
+The most common themes after the default theme (i.e., `theme_gray()`) are the black and white (`theme_bw()`), minimal (`theme_minimal()`) and classic (`theme_classic()`) themes:
 
 ```{r}
 # Black and white theme
@@ -881,7 +1005,7 @@ ggplot(dat) +
 
 I recently learned a tip very useful when drawing plots with `{ggplot2}`. If like me, you often comment and uncomment some lines of code in your plot, you know that you cannot transform the last line into a comment without removing the `+` sign in the line just above.
 
-Adding a line `NULL` at the end of your plots will avoid an error if you forget to remove the `+` sign in the last line of your code. See with this basic example:
+Adding a line `NULL` at the end of your plots will avoid an [error](/blog/top-10-errors-in-r/#forgetting-the-sign-in-ggplot2) if you forget to remove the `+` sign in the last line of your code. See with this basic example:
 
 ```{r}
 ggplot(dat) +
@@ -906,6 +1030,10 @@ By now you have seen that `{ggplot2}` is a very powerful and complete package to
 * the [`{ggplot2}` cheat sheet](/blog/files/ggplot2-cheatsheet.pdf)
 * this [presentation](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1) by Garrick Aden-Buie
 
-Thanks for reading. I hope this article helped you to create your first plots with the `{ggplot2}` package. As a reminder, for simple graphs, it is sometimes easier to draw them via the [{esquisse} addin](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse). After some time, you will quickly learn how to create them by yourselves and in no time you will be able to build complex and sophisticated data visualizations.
+# Conclusion
+
+Thanks for reading.
+
+I hope this article helped you to create your first plots with the `{ggplot2}` package. As a reminder, for simple graphs, it is sometimes easier to draw them via the [{esquisse} addin](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse). After some time, you will quickly learn how to create them by yourselves and in no time you will be able to build complex and sophisticated data visualizations.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
