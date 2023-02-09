@@ -14,7 +14,7 @@ tags:
   - Visualization
   - Shiny
 meta_img: blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way.jpeg
-description: Learn how to compare samples for multiple variables at once in R thanks to a Student t-test or ANOVA and communicate the results in a better way
+description: Learn how to compare groups for multiple variables at once in R thanks to a Student t-test or ANOVA and communicate the results in a better way
 output:
   blogdown::html_page:
     toc: true
@@ -23,7 +23,6 @@ output:
 bibliography: bibliography.bib
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
@@ -39,6 +38,7 @@ bibliography: bibliography.bib
 </ul></li>
 <li><a href="#to-go-even-further" id="toc-to-go-even-further">To go even further</a></li>
 <li><a href="#update-with-the-ggstatsplot-package" id="toc-update-with-the-ggstatsplot-package">Update with the <code>{ggstatsplot}</code> package</a></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
 <li><a href="#references" id="toc-references">References</a></li>
 </ul>
 </div>
@@ -194,7 +194,7 @@ for (i in y) {
       )
     )
     #  Add p-value
-    print(p + stat_compare_means(aes(label = paste0(..method.., &quot;, p-value = &quot;, ..p.format..)),
+    print(p + stat_compare_means(aes(label = paste0(after_stat(method), &quot;, p-value = &quot;, after_stat(p.format))),
       method = method,
       paired = paired,
       # group.by = NULL,
@@ -377,14 +377,21 @@ for (i in y) {
       add = &quot;jitter&quot;
     )
     print(
-      p + stat_compare_means(aes(label = paste0(..method.., &quot;, p-value = &quot;, ..p.format..)),
+      p + stat_compare_means(aes(label = paste0(after_stat(method), &quot;, p-value = &quot;, after_stat(p.format))),
         method = method1, label.y = max(dat[, i], na.rm = TRUE)
       )
       + stat_compare_means(comparisons = my_comparisons, method = method2, label = &quot;p.format&quot;) # remove if p-value of ANOVA or Kruskal-Wallis test &gt;= alpha
     )
   }
 }</code></pre>
-<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-2.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-3.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-4.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre><code>## [1] FALSE</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre><code>## [1] FALSE</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre><code>## [1] FALSE</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-3.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre><code>## [1] FALSE</code></pre>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-4.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Like the improved routine for the t-test, I have noticed that students and non-expert professionals understand ANOVA results presented this way much more easily compared to the default R outputs.</p>
 <p>With one graph for each variable, it is easy to see that all species are different from each other in terms of all 4 variables.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <p>If you want to apply the same automated process to your data, you will need to modify the name of the grouping variable (<code>Species</code>), the names of the variables you want to test (<code>Sepal.Length</code>, etc.), whether you want to perform an <a href="/blog/anova-in-r/">ANOVA</a> (<code>anova</code>) or <a href="/blog/kruskal-wallis-test-nonparametric-version-anova/">Kruskal-Wallis test</a> (<code>kruskal.test</code>) and finally specify the comparisons for the <a href="/blog/anova-in-r/#post-hoc-test">post-hoc tests</a>.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
@@ -449,6 +456,7 @@ str(dat)</code></pre>
 ##  $ year             : int [1:344] 2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...</code></pre>
 <p>We illustrate the routine for two groups with the variables <code>sex</code> (two factors) as independent variable, and the 4 quantitative continuous variables <code>bill_length_mm</code>, <code>bill_depth_mm</code>, <code>bill_depth_mm</code> and <code>body_mass_g</code> as dependent variables:</p>
 <pre class="r"><code>library(ggstatsplot)
+library(tibble)
 
 # Comparison between sexes
 
@@ -481,8 +489,7 @@ plotlist &lt;-
 
 # print all plots together with statistical results
 for (i in 1:length(plotlist)) {
-  print(plotlist[[i]] +
-    labs(caption = NULL)) # remove caption
+  print(plotlist[[i]])
 }</code></pre>
 <p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-2.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-3.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-10-4.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>We now illustrate the routine for 3 groups or more with the variable <code>species</code> (three factors) as independent variable, and the 4 same dependent variables:</p>
@@ -517,8 +524,7 @@ plotlist &lt;-
 
 # print all plots together with statistical results
 for (i in 1:length(plotlist)) {
-  print(plotlist[[i]] +
-    labs(caption = NULL)) # remove caption
+  print(plotlist[[i]])
 }</code></pre>
 <p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-2.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-3.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-11-4.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As you can see, I only have to specify:</p>
@@ -536,9 +542,14 @@ for (i in 1:length(plotlist)) {
 <li>I can automate it on many variables at once and I do not need to write the variable names manually anymore,</li>
 <li>at the same time, I can choose the appropriate test among all the available ones (depending on the number of groups, whether they are paired or not, and whether I want to use the parametric or nonparametric version).</li>
 </ul>
-<p>Nonetheless, I must also admit that I am still <strong>not satisfied</strong> with the level of details of the statistical results. As already mentioned, many students get confused and get lost in front of so much information (except the <span class="math inline">\(p\)</span>-value and the number of observations, most of it is rather obscure to them because uncovered in introductory statistic classes). I saved time thanks to all improvements in comparison to my previous routine, but I definitely lose time when I have to point out to them what they should look for. After discussing with other professors, I noticed that they have the same problem.</p>
+<p>Nonetheless, I must also admit that I am still <strong>not satisfied</strong> with the level of details of the statistical results. As already mentioned, many students get confused and get lost in front of so much information (except the <span class="math inline">\(p\)</span>-value and the number of observations, most of the details are rather obscure to them because they are not covered in introductory statistic classes).</p>
+<p>I saved time thanks to all improvements in comparison to my previous routine, but I definitely lose time when I have to point out to them what they should look for. After discussing with other professors, I noticed that they have the same problem.</p>
 <p>For the moment, you can only print all results or none. I have opened an <a href="https://github.com/IndrajeetPatil/ggstatsplot/issues/669" target="_blank">issue</a> kindly requesting to add the possibility to display only a summary (with the <span class="math inline">\(p\)</span>-value and the name of the test for instance).<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> I will update again this article if the maintainer of the package includes this feature in the future. So stay tuned!</p>
-<p>Thanks for reading. I hope this article will help you to perform t-tests and ANOVA for multiple variables at once and make the results more easily readable and interpretable by nonscientists. Learn more about the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">t-test</a> to compare two samples, or the <a href="/blog/anova-in-r/">ANOVA</a> to compare 3 samples or more.</p>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Thanks for reading.</p>
+<p>I hope this article will help you to perform t-tests and ANOVA for multiple variables at once and make the results more easily readable and interpretable by non-scientists. Learn more about the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">t-test</a> to compare two groups, or the <a href="/blog/anova-in-r/">ANOVA</a> to compare 3 groups or more.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
@@ -558,7 +569,7 @@ Patil, Indrajeet. 2021. <span>“<span class="nocase">Visualizations with statis
 <div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
-<li id="fn1"><p>In theory, an ANOVA can also be used to compare two groups as it will give the same results compared to a Student’s t-test, but in practice we use the Student’s t-test to compare two samples and the ANOVA to compare three samples or more.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>In theory, an ANOVA can also be used to compare two groups as it will give the same results compared to a Student’s t-test, but in practice we use the Student’s t-test to compare two groups and the ANOVA to compare three groups or more.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>Do not forget to separate the variables you want to test with <code>|</code>.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 <li id="fn3"><p>Do not forget to adjust the <span class="math inline">\(p\)</span>-values or the significance level <span class="math inline">\(\alpha\)</span>. If you use the Bonferroni correction, the adjusted <span class="math inline">\(\alpha\)</span> is simply the desired <span class="math inline">\(\alpha\)</span> level divided by the number of comparisons.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
 <li id="fn4"><p>Post-hoc test is only the name used to refer to a specific type of statistical tests. Post-hoc test includes, among others, the Tukey HSD test, the Bonferroni correction, Dunnett’s test. Even if an ANOVA or a Kruskal-Wallis test can determine whether there is at least one group that is different from the others, it does not allow us to conclude <strong>which</strong> are different from each other. For this purpose, there are post-hoc tests that compare all groups two by two to determine which ones are different, after adjusting for multiple comparisons. Concretely, post-hoc tests are performed to each possible pair of groups <strong>after</strong> an ANOVA or a Kruskal-Wallis test has shown that there is at least one group which is different (hence “post” in the name of this type of test). The null and alternative hypotheses and the interpretations of these tests are similar to a Student’s t-test for two samples.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>

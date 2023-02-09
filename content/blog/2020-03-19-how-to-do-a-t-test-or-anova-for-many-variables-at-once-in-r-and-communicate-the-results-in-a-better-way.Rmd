@@ -14,7 +14,7 @@ tags:
   - Visualization
   - Shiny
 meta_img: blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way.jpeg
-description: Learn how to compare samples for multiple variables at once in R thanks to a Student t-test or ANOVA and communicate the results in a better way
+description: Learn how to compare groups for multiple variables at once in R thanks to a Student t-test or ANOVA and communicate the results in a better way
 output:
   blogdown::html_page:
     toc: true
@@ -31,6 +31,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/How to do a t-test or ANOVA for many variables at once in R and communicate the results in a better way.jpeg){width=100%}
@@ -41,7 +43,7 @@ As part of my teaching assistant position in a Belgian university, students ofte
 
 A frequent question is how to compare groups of patients in terms of several [quantitative continuous](/blog/variable-types-and-examples/#continuous) variables. Most of us know that:
 
-* To compare two groups, a [Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) should be used^[In theory, an ANOVA can also be used to compare two groups as it will give the same results compared to a Student's t-test, but in practice we use the Student's t-test to compare two samples and the ANOVA to compare three samples or more.]
+* To compare two groups, a [Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) should be used^[In theory, an ANOVA can also be used to compare two groups as it will give the same results compared to a Student's t-test, but in practice we use the Student's t-test to compare two groups and the ANOVA to compare three groups or more.]
 * To compare three groups or more, an [ANOVA](/blog/anova-in-r/) should be performed
 
 These two tests are quite basic and have been extensively documented online and in statistical textbooks so the difficulty is not in how to perform these tests.
@@ -158,7 +160,7 @@ for (i in y) {
       )
     )
     #  Add p-value
-    print(p + stat_compare_means(aes(label = paste0(..method.., ", p-value = ", ..p.format..)),
+    print(p + stat_compare_means(aes(label = paste0(after_stat(method), ", p-value = ", after_stat(p.format))),
       method = method,
       paired = paired,
       # group.by = NULL,
@@ -355,7 +357,7 @@ for (i in y) {
       add = "jitter"
     )
     print(
-      p + stat_compare_means(aes(label = paste0(..method.., ", p-value = ", ..p.format..)),
+      p + stat_compare_means(aes(label = paste0(after_stat(method), ", p-value = ", after_stat(p.format))),
         method = method1, label.y = max(dat[, i], na.rm = TRUE)
       )
       + stat_compare_means(comparisons = my_comparisons, method = method2, label = "p.format") # remove if p-value of ANOVA or Kruskal-Wallis test >= alpha
@@ -428,6 +430,7 @@ We illustrate the routine for two groups with the variables `sex` (two factors) 
 
 ```{r}
 library(ggstatsplot)
+library(tibble)
 
 # Comparison between sexes
 
@@ -459,8 +462,7 @@ plotlist <-
 
 # print all plots together with statistical results
 for (i in 1:length(plotlist)) {
-  print(plotlist[[i]] +
-          labs(caption = NULL)) # remove caption
+  print(plotlist[[i]])
 }
 ```
 
@@ -497,8 +499,7 @@ plotlist <-
 
 # print all plots together with statistical results
 for (i in 1:length(plotlist)) {
-  print(plotlist[[i]] +
-          labs(caption = NULL)) # remove caption
+  print(plotlist[[i]])
 }
 ```
 
@@ -520,11 +521,17 @@ I must admit I am quite **satisfied** with this routine, now that:
 - I can automate it on many variables at once and I do not need to write the variable names manually anymore,
 - at the same time, I can choose the appropriate test among all the available ones (depending on the number of groups, whether they are paired or not, and whether I want to use the parametric or nonparametric version).
 
-Nonetheless, I must also admit that I am still **not satisfied** with the level of details of the statistical results. As already mentioned, many students get confused and get lost in front of so much information (except the $p$-value and the number of observations, most of it is rather obscure to them because uncovered in introductory statistic classes). I saved time thanks to all improvements in comparison to my previous routine, but I definitely lose time when I have to point out to them what they should look for. After discussing with other professors, I noticed that they have the same problem.
+Nonetheless, I must also admit that I am still **not satisfied** with the level of details of the statistical results. As already mentioned, many students get confused and get lost in front of so much information (except the $p$-value and the number of observations, most of the details are rather obscure to them because they are not covered in introductory statistic classes).
+
+I saved time thanks to all improvements in comparison to my previous routine, but I definitely lose time when I have to point out to them what they should look for. After discussing with other professors, I noticed that they have the same problem.
 
 For the moment, you can only print all results or none. I have opened an [issue](https://github.com/IndrajeetPatil/ggstatsplot/issues/669){target="_blank"} kindly requesting to add the possibility to display only a summary (with the $p$-value and the name of the test for instance).^[I am open to contribute to the package if I can help!] I will update again this article if the maintainer of the package includes this feature in the future. So stay tuned!
 
-Thanks for reading. I hope this article will help you to perform t-tests and ANOVA for multiple variables at once and make the results more easily readable and interpretable by nonscientists. Learn more about the [t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) to compare two samples, or the [ANOVA](/blog/anova-in-r/) to compare 3 samples or more.
+# Conclusion
+
+Thanks for reading.
+
+I hope this article will help you to perform t-tests and ANOVA for multiple variables at once and make the results more easily readable and interpretable by non-scientists. Learn more about the [t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) to compare two groups, or the [ANOVA](/blog/anova-in-r/) to compare 3 groups or more.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
 
