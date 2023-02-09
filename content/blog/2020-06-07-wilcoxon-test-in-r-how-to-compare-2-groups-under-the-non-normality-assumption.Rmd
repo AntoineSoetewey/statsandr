@@ -27,17 +27,25 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](/blog/2020-06-07-wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption_files/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption.jpeg){width=100%}
 
 # Introduction
 
-In a previous article, we showed how to [compare two groups under different scenarios using the Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/). The Student's t-test requires that the distributions follow a [normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) when in presence of small samples.^[Remember that the normality assumption can be tested via 3 complementary methods: (i) histogram, (ii) QQ-plot and (iii) normality tests (with the most common being the Shapiro-Wilk test). See [how to determine if a distribution follows a normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) if you need a refresh.] In this article, we show how to **compare two groups when the normality assumption is violated**, using the **Wilcoxon test**.
+In a previous article, we showed how to [compare two groups under different scenarios using the Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/). The Student's t-test requires that the distributions follow a [normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) when in presence of small samples.^[Remember that the normality assumption can be tested via 3 complementary methods: (i) histogram, (ii) QQ-plot and (iii) normality tests (with the most common being the Shapiro-Wilk test). See [how to determine if a distribution follows a normal distribution](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/) if you need a refresh.]
 
-The Wilcoxon test is a **non-parametric test**, meaning that it does not rely on data belonging to any particular parametric family of probability distributions. Non-parametric tests have the same objective as their parametric counterparts. However, they have two advantages over parametric tests: they **do not require the assumption of normality** of distributions and they can deal with [outliers](/blog/outliers-detection-in-r/). A Student's t-test for instance is only applicable if the data are Gaussian or if the sample size is large enough (usually $n \ge 30$, thanks to the central limit theorem). A non-parametric test should be used in other cases.
+In this article, we show how to **compare two groups when the normality assumption is violated**, using the **Wilcoxon test**.
 
-One may wonder why we would not always use a non-parametric test so we do not have to bother about testing for normality. The reason is that non-parametric tests are usually less powerful than corresponding parametric tests when the normality assumption holds. Therefore, all else being equal, with a non-parametric test you are less likely to reject the [null hypothesis](/blog/hypothesis-test-by-hand/#step-1-stating-the-null-and-alternative-hypothesis) when it is false if the data follows a normal distribution. It is thus preferred to use the parametric version of a [statistical test](/blog/what-statistical-test-should-i-do/) when the assumptions are met.
+The Wilcoxon test is a **non-parametric test**, meaning that it does not rely on data belonging to any particular parametric family of probability distributions. Non-parametric tests have the same objective as their parametric counterparts. However, they have two advantages over parametric tests: they **do not require the assumption of normality** of distributions and they can deal with [outliers](/blog/outliers-detection-in-r/).
+
+A Student's t-test for instance is only applicable if the data are Gaussian or if the sample size is large enough (usually $n \ge 30$, thanks to the central limit theorem). A non-parametric test should be used in other cases.
+
+One may wonder why we would not always use a non-parametric test so we do not have to bother about testing for normality. The reason is that non-parametric tests are usually less powerful than corresponding parametric tests when the normality assumption holds.
+
+Therefore, all else being equal, with a non-parametric test you are less likely to reject the [null hypothesis](/blog/hypothesis-test-by-hand/#step-1-stating-the-null-and-alternative-hypothesis) when it is false if the data follows a normal distribution. It is thus preferred to use the parametric version of a [statistical test](/blog/what-statistical-test-should-i-do/) when the assumptions are met.
 
 In the remaining of the article, we present the two scenarios of the Wilcoxon test and how to perform them in R through two examples.
 
@@ -210,7 +218,7 @@ ggbetweenstats( # independent samples
 )
 ```
 
-The *p*-value (displayed after `p =` in the subtitle of the plot) indicates that we reject the null hypothesis, and we conclude that grades are significantly different between girls and boys (*p*-value = 0.021).
+The *p*-value (displayed after `p =` in the subtitle of the plot) indicates that we reject the null hypothesis, and we conclude that grades are significantly different between girls and boys (*p*-value = 0.02).
 
 ## Paired samples
 
@@ -230,7 +238,7 @@ ggwithinstats( # paired samples
 )
 ```
 
-The *p*-value (displayed after `p =` in the subtitle of the plot) indicates that we do not reject the null hypothesis, so we do not reject the hypothesis that grades are equal before and after the semester (*p*-value = 0.169).
+The *p*-value (displayed after `p =` in the subtitle of the plot) indicates that we do not reject the null hypothesis, so we do not reject the hypothesis that grades are equal before and after the semester (*p*-value = 0.17).
 
 The point of this section was to illustrate how to easily draw plots together with statistical results, which is exactly the aim of the `{ggstatsplot}` package. See more details and examples in this [article](/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/).
 
@@ -240,11 +248,17 @@ As written at the beginning of the article, the Wilcoxon test does not require t
 
 Regarding the assumption of equal variances, this assumption may or may not be needed depending on your goal. If you only want to compare the two groups, you do not have to test the equality of variances because the two distributions do not have to have the same shape. However, if your goal is to **compare medians of the two groups**, then you will need to make sure that the two distributions have the same shape (and thus, the same variance).^[See these three articles for a more detailed discussion on the assumption of equal variances in Wilcoxon test: [1](https://statistics.laerd.com/statistical-guides/mann-whitney-u-test-assumptions.php), [2](https://influentialpoints.com/Training/Wilcoxon-Mann-Whitney_U_test_use_and_misuse.htm) & [3](https://influentialpoints.com/Training/Wilcoxon_matched_pairs_signed_rank_test_use_and_misuse.htm).]
 
-So results of your test of equality of variances will change your interpretation: differences in the "distributions" of two groups or differences in the "medians" of two groups. In this article I do not wish to compare medians, I only want compare the groups by determining whether there are differences in the distributions of the two groups. This is the reason I do not test for equality of variances.
+So results of your test of equality of variances will change your interpretation: differences in the "distributions" of two groups or differences in the "medians" of two groups.
+
+In this article I do not wish to compare medians, I only want compare the groups by determining whether there are differences in the distributions of the two groups. This is the reason I do not test for equality of variances.
 
 Note that this is equivalent when performing the [Kruskal-Wallis test](/blog/kruskal-wallis-test-nonparametric-version-anova/) to compare three groups or more (i.e., the non-parametric version of the [ANOVA](/blog/anova-in-r/)): if you only want to test whether there are differences  in the groups you do not need homoscedasticity, whereas if you want to compare the medians this assumption must be met.
 
-Thanks for reading. I hope this article helped you to compare two groups that do not follow a normal distribution in R using the Wilcoxon test. See also:
+# Conclusion
+
+Thanks for reading.
+
+I hope this article helped you to compare two groups that do not follow a normal distribution in R using the Wilcoxon test. See also:
 
 - the [one-sample Wilcoxon test](/blog/one-sample-wilcoxon-test-in-r/) if you have only one group and want to compare it to a default given value,
 - the [Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) if you need to perform the parametric version of the two-sample Wilcoxon test,
