@@ -29,6 +29,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/correlation-coefficient-and-correlation-test-in-r.jpeg){width=100%}
@@ -135,7 +137,7 @@ p1 <- ggplot(dat_outlier) +
   aes(x = x, y = y) +
   geom_point(color = "steelblue") +
   theme_minimal() +
-  stat_cor(aes(label = ..r.label..), label.x = 0.5) +
+  stat_cor(aes(label = after_stat(r.label)), label.x = 0.5) +
   labs(
     title = "Outlier excluded"
   ) +
@@ -148,7 +150,7 @@ p2 <- ggplot(dat_outlier) +
   aes(x = x, y = y) +
   geom_point(color = "steelblue") +
   theme_minimal() +
-  stat_cor(aes(label = ..r.label..), label.x = 0.5) +
+  stat_cor(aes(label = after_stat(r.label)), label.x = 0.5) +
   labs(
     title = "Outlier included"
   ) +
@@ -171,7 +173,7 @@ ggplot(dat_link) +
   aes(x = x, y = y) +
   geom_point(color = "steelblue") +
   theme_minimal() +
-  stat_cor(aes(label = ..r.label..), label.x = 0.5)
+  stat_cor(aes(label = after_stat(r.label)), label.x = 0.5)
 ```
 
 The Pearson correlation coefficient is equal to 0, indicating no relationship between the two variables, because it measures the **linear** relationship and it is clear from the plot that the link is non-linear.
@@ -266,7 +268,9 @@ The *p*-value of the correlation test between these 2 variables is `r round(test
 
 This test proves that even if the correlation coefficient is different from 0 (the correlation is `r round(test$estimate, 2)` in the sample), it is actually not significantly different from 0 in the population.
 
-Note that the *p*-value of a correlation test is based on the correlation coefficient **and** the sample size. The larger the sample size and the more extreme the correlation (closer to -1 or 1), the more likely the null hypothesis of no correlation will be rejected. With a small sample size, it is thus possible to obtain a *relatively* large correlation in the sample (based on the correlation coefficient), but still find a correlation not significantly different from 0 in the population (based on the correlation test). For this reason, it is recommended to always perform a correlation test before interpreting a correlation coefficient to avoid flawed conclusions.
+Note that the *p*-value of a correlation test is based on the correlation coefficient **and** the sample size. The larger the sample size and the more extreme the correlation (closer to -1 or 1), the more likely the null hypothesis of no correlation will be rejected.
+
+With a small sample size, it is thus possible to obtain a *relatively* large correlation in the sample (based on the correlation coefficient), but still find a correlation not significantly different from 0 in the population (based on the correlation test). For this reason, it is recommended to always perform a correlation test before interpreting a correlation coefficient to avoid flawed conclusions.
 
 <!-- A nice and easy way to report results of a correlation test in R is with the `report()` function from the `{report}` package: -->
 
@@ -444,7 +448,11 @@ However, this causal link is not always present even if the correlation is signi
 
 This example shows that one must be very cautious when interpreting correlations and avoid over-interpreting a correlation as a causal relationship.
 
-Thanks for reading. I hope this article helped you to compute correlations and perform correlation tests in R.
+# Conclusion
+
+Thanks for reading.
+
+I hope this article helped you to compute correlations and perform correlation tests in R.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
 
