@@ -27,6 +27,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](images/kruskal-wallis-test-nonparametric-version-anova.jpeg){width=100%}
@@ -50,7 +52,9 @@ Data for the present article is based on the `penguins` dataset (an alternative 
 library(palmerpenguins)
 ```
 
-The original dataset contains data for 344 penguins of 3 different species (Adelie, Chinstrap and Gentoo). It contains 8 variables, but we focus only on the flipper length and the species for this article, so we keep only those 2 variables:
+The original dataset contains data for 344 penguins of 3 different species (Adelie, Chinstrap and Gentoo).
+
+It contains 8 variables, but we focus only on the flipper length and the species for this article, so we keep only those 2 variables:
 
 ```{r}
 library(tidyverse)
@@ -86,7 +90,9 @@ Based on the boxplots and the summary statistics, we already see that, in our [s
 
 ## Aim and hypotheses
 
-As mentioned earlier, the Kruskal-Wallis test allows to compare three or more groups. More precisely, it is used to compare three or more groups in terms of a [quantitative variable](/blog/variable-types-and-examples/#quantitative). It can be seen as the extension to the [Mann-Whitney](/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/) test which allows to compare 2 groups under the non-normality assumption.
+As mentioned earlier, the Kruskal-Wallis test allows to compare three or more groups. More precisely, it is used to compare three or more groups in terms of a [quantitative variable](/blog/variable-types-and-examples/#quantitative).
+
+It can be seen as the extension to the [Mann-Whitney](/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/) test which allows to compare 2 groups under the non-normality assumption.
 
 In the context of our example, we are going to use the Kruskal-Wallis test to help us answer the following question: "Is the length of the flippers different between the 3 species of penguins?".
 
@@ -95,7 +101,9 @@ The null and alternative hypotheses of the Kruskal-Wallis test are:
 * $H_0$: The 3 species are equal in terms of flipper length
 * $H_1$: At least one species is different from the other 2 species in terms of flipper length
 
-Be careful that, as for the ANOVA, the alternative hypothesis is ***not*** that all species are different in terms of flipper length. The opposite of all species being equal ($H_0$) is that *at least* one species is different from the others ($H_1$). In this sense, if the null hypothesis is rejected, it means that at least one species is different from the other 2, but not necessarily that all 3 species are different from each other. It could be that flipper length for the species Gentoo is different than for the species Chinstrap and Adelie, but flipper length is similar between Chinstrap and Adelie. Other types of test (known as post-hoc tests and covered later) must be performed to test whether all 3 species differ.
+Be careful that, as for the ANOVA, the alternative hypothesis is ***not*** that all species are different in terms of flipper length. The opposite of all species being equal ($H_0$) is that *at least* one species is different from the others ($H_1$).
+
+In this sense, if the null hypothesis is rejected, it means that at least one species is different from the other 2, but not necessarily that all 3 species are different from each other. It could be that flipper length for the species Gentoo is different than for the species Chinstrap and Adelie, but flipper length is similar between Chinstrap and Adelie. Other types of test (known as post-hoc tests and covered later) must be performed to test whether all 3 species differ.
 
 ## Assumptions
 
