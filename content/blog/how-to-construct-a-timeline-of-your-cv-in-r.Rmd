@@ -25,6 +25,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](/blog/how-to-construct-a-timeline-of-your-cv-in-r_files/how-to-create-a-timeline-of-your-cv.jpeg){width=100%}
@@ -105,19 +107,19 @@ plot_timeline2 <- function(event, start, end = start + 1, label = NA, group = NA
       fill = "white",
       colour = NA
     ), axis.ticks = element_blank(), panel.grid.major.x = element_line(
-      size = 0.25,
+      linewidth = 0.25,
       colour = "grey80"
     ))
   if (!is.na(cvlong$type)[1] | length(unique(cvlong$type)) >
       1) {
-    p <- p + geom_line(aes(color = type), size = size) +
+    p <- p + geom_line(aes(color = type), linewidth = size) +
       facet_grid(type ~ ., scales = "free", space = "free") +
       guides(colour = "none") +
       scale_colour_manual(values = c("#F8766D", "#00BA38", "#619CFF")) +
       theme(strip.text.y = element_text(size = 10))
   }
   else {
-    p <- p + geom_line(size = size)
+    p <- p + geom_line(linewidth = size)
   }
   p <- p + geom_label(aes(x = label_pos),
                       colour = "black",
@@ -167,7 +169,11 @@ Experienced R users may wish to edit the `plot_timeline2` function to their need
 
 Instead of editing the code according to your roles directly in the script, you can also create an Excel file with the required data (job title, workplace, type, start date, end date) and then [import it into R](/blog/how-to-import-an-excel-file-in-rstudio/). Editing the Excel file is easier and less prone to coding errors. Moreover, if you have a long career, the code may become long while if you import the Excel file, it will always stay short and concise.
 
-Thanks for reading. I hope this article helped you to create a timeline of your CV in R. If you would like to see a more complete and live example, see <a href="https://www.antoinesoetewey.com/files/CV_timeline_antoinesoetewey.html" target="_blank" rel="noopener">my timeline CV</a>.
+# Conclusion
+
+Thanks for reading.
+
+I hope this article helped you to create a timeline of your CV in R. If you would like to see a more complete and live example, see <a href="https://www.antoinesoetewey.com/files/CV_timeline_antoinesoetewey.html" target="_blank" rel="noopener">my timeline CV</a>.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
 
