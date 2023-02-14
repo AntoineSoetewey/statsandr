@@ -23,8 +23,12 @@ bibliography: bibliography.bib
 knitr::opts_chunk$set(
   fig.align = "center",
   out.width = "100%",
-  tidy = "styler"
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample_files/0_73Z2pBxY4UbGaVXz.jpeg){width=100%}
@@ -87,13 +91,13 @@ Like many [statistical tests](/blog/what-statistical-test-should-i-do/), this ca
 
 Remember that the Fisher's exact test is used when there is at least one cell in the contingency table of the expected frequencies below 5. To retrieve the expected frequencies, use the `chisq.test()` function together with `$expected`:
 
-```{r}
+```{r, warning = TRUE}
 chisq.test(dat)$expected
 ```
 
 The contingency table above confirms that we should use the Fisher's exact test instead of the Chi-square test because there is at least one cell below 5.
 
-*Tip*: although it is a good practice to check the expected frequencies **before** deciding between the Chi-square and the Fisher test, it is not a big issue if you forget. As you can see above, when doing the Chi-square test in R (with `chisq.test()`), a warning such as "Chi-squared approximation may be incorrect" will appear. This warning means that the smallest expected frequencies is lower than 5. Therefore, do not worry if you forgot to check the expected frequencies before applying the appropriate test to your data, R will warn you that you should use the Fisher's exact test instead of the Chi-square test if that is the case.
+*Tip*: although it is a good practice to check the expected frequencies **before** deciding between the Chi-square and the Fisher test, it is not a big issue if you forget. As you can see above, when doing the Chi-square test in R (with `chisq.test()`), a [warning](/blog/top-10-errors-in-r/#warnings) such as "Chi-squared approximation may be incorrect" will appear. This warning means that the smallest expected frequencies is lower than 5. Therefore, do not worry if you forgot to check the expected frequencies before applying the appropriate test to your data, R will warn you that you should use the Fisher's exact test instead of the Chi-square test if that is the case.
 
 (Remember that, as for the Chi-square test of independence, the observations must be independent in order for the Fisher's exact test to be valid. See more details about the independence assumption in this [section](/blog/chi-square-test-of-independence-in-r/#chi-square-test-of-independence-in-r).)
 
@@ -163,7 +167,11 @@ From the plot, it is clear that the proportion of smokers among non-athletes is 
 
 This is confirmed thanks to the $p$-value displayed in the subtitle of the plot. As previously, we reject the null hypothesis and we conclude that the variables smoking habits and being an athlete or not are dependent ($p$-value = `r round(test$p.value, 3)`).
 
-Thanks for reading. I hope the article helped you to perform the Fisher's exact test of independence in R and interpret its results. Learn more about the Chi-square test of independence [by hand](/blog/chi-square-test-of-independence-by-hand/) or [in R](/blog/chi-square-test-of-independence-in-r/).
+# Conclusion
+
+Thanks for reading.
+
+I hope the article helped you to perform the Fisher's exact test of independence in R and interpret its results. Learn more about the Chi-square test of independence [by hand](/blog/chi-square-test-of-independence-by-hand/) or [in R](/blog/chi-square-test-of-independence-in-r/).
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
 
