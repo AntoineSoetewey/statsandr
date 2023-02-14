@@ -21,8 +21,13 @@ bibliography: bibliography.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   fig.align = "center",
-  out.width='100%'
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r_files/Do-my-data-follow-a-normal-distribution.jpeg){width=100%}
@@ -359,7 +364,7 @@ bw <- 2
 n_obs <- sum(!is.na(dat_hist$value))
 
 ggplot(dat_hist, aes(value)) +
-  geom_histogram(aes(y = ..density..), fill = "steelblue", binwidth = bw, colour = "black") +
+  geom_histogram(aes(y = after_stat(density)), fill = "steelblue", binwidth = bw, colour = "black") +
   stat_function(fun = dnorm, args = list(mean = mean(dat_hist$value), sd = sd(dat_hist$value))) +
   theme_minimal() +
   labs(x = "Height (cm)", title = "Histogram of adult height and normal curve", subtitle = paste0("N = ", N, ", mean = ", round(mu, 2), ", variance = ", round(variance, 2)))
@@ -398,7 +403,7 @@ bw <- 2
 n_obs <- sum(!is.na(dat_hist$value))
 
 ggplot(dat_hist, aes(value)) +
-  geom_histogram(aes(y = ..density..), fill = "steelblue", binwidth = bw, colour = "black") +
+  geom_histogram(aes(y = after_stat(density)), fill = "steelblue", binwidth = bw, colour = "black") +
   stat_function(fun = dnorm, args = list(mean = mean(dat_hist$value), sd = sd(dat_hist$value))) +
   theme_minimal() +
   labs(x = "Height (cm)", title = "Histogram of adult height and normal curve", subtitle = paste0("N = ", N, ", mean = ", round(mu, 2), ", variance = ", round(variance, 2)))
@@ -416,7 +421,7 @@ bw <- 2
 n_obs <- sum(!is.na(dat_hist$value))
 
 ggplot(dat_hist, aes(value)) +
-  geom_histogram(aes(y = ..density..), fill = "steelblue", binwidth = bw, colour = "black") +
+  geom_histogram(aes(y = after_stat(density)), fill = "steelblue", binwidth = bw, colour = "black") +
   stat_function(fun = dnorm, args = list(mean = mean(dat_hist$value), sd = sd(dat_hist$value))) +
   theme_minimal() +
   labs(x = "Height (cm)", title = "Histogram of adult height and normal curve", subtitle = paste0("N = ", N, ", mean = ", round(mu, 2), ", variance = ", round(variance, 2)))
@@ -517,7 +522,11 @@ A normality test is a [hypothesis test](/blog/hypothesis-test-by-hand/), so as t
 
 I personally tend to prefer QQ-plots over histograms and normality tests so I do not have to bother about the sample size. This article showed the different methods that are available, your choice will of course depends on the type of your data and the context of your analyses.
 
-Thanks for reading. I hope the article helped you to learn more about the normal distribution and how to test for normality in R.
+# Conclusion
+
+Thanks for reading.
+
+I hope the article helped you to learn more about the normal distribution and how to test for normality in R.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
 
