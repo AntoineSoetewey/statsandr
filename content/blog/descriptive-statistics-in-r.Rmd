@@ -26,6 +26,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+
+set.seed(42)
 ```
 
 ![](/blog/descriptive-statistics-in-r_files/descriptive-statistics-in-r.jpeg){width=100%}
@@ -60,7 +62,7 @@ The dataset contains 150 observations and 5 variables, representing the length a
 
 Regarding plots, we present the default graphs and the graphs from the well-known `{ggplot2}` package. Graphs from the `{ggplot2}` package usually have a better look but it requires more advanced coding skills (see the article "[Graphics in R with ggplot2](/blog/graphics-in-r-with-ggplot2/)" to learn more). If you need to publish or share your graphs, I suggest using `{ggplot2}` if you can, otherwise the default graphics will do the job.
 
-**Tip: I recently discovered the ggplot2 builder from the `{esquisse}` addins. See how you can easily [draw graphs from the `{ggplot2}` package](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/) without having to code it yourself.**
+*Tip:* I recently discovered the ggplot2 builder from the `{esquisse}` addins. See how you can easily [draw graphs from the `{ggplot2}` package](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/) without having to code it yourself.
 
 All plots displayed in this article can be customized. For instance, it is possible to edit the title, x and y-axis labels, color, etc. However, customizing plots is beyond the scope of this article so all plots are presented without any customization. Interested readers will find numerous resources online.
 
@@ -257,9 +259,15 @@ summary(dat$Species)
 
 # Correlation
 
-Another descriptive statistics is the correlation coefficient. A correlation measures the *linear* relationship between two variables.
+Another descriptive statistics is the correlation coefficient.
 
-Computing correlation in R requires a detailed explanation so I wrote an article covering [correlation and correlation test](/blog/correlation-coefficient-and-correlation-test-in-r/).
+The correlation measures the *linear* relationship between two variables, and it can be computed with the `cor()` function:
+
+```{r}
+cor(dat$Sepal.Length, dat$Sepal.Width)
+```
+
+Computing correlation in R and interpreting the results deserve a detailed explanation, so I wrote an article covering [correlation and correlation test](/blog/correlation-coefficient-and-correlation-test-in-r/).
 
 # Contingency table
 
@@ -383,7 +391,9 @@ By default, the number of bins is 30. You can change this value with `geom_histo
 
 # Boxplot
 
-Boxplots are really useful in descriptive statistics and are often underused (mostly because it is not well understood by the public). A boxplot graphically represents the distribution of a quantitative variable by visually displaying five common location summary (minimum, median, first/third quartiles and maximum) and any observation that was classified as a suspected [outlier](/blog/outliers-detection-in-r/) using the interquartile range (IQR) criterion. The IQR criterion means that all observations above $q_{0.75} + 1.5 \cdot IQR$ or below $q_{0.25} - 1.5 \cdot IQR$ (where $q_{0.25}$ and $q_{0.75}$ correspond to first and third quartile respectively) are considered as potential outliers by R. The minimum and maximum in the boxplot are represented without these suspected outliers.
+Boxplots are really useful in descriptive statistics and are often underused (mostly because it is not well understood by the public). A boxplot graphically represents the distribution of a quantitative variable by visually displaying five common location summary (minimum, median, first/third quartiles and maximum) and any observation that was classified as a suspected [outlier](/blog/outliers-detection-in-r/) using the interquartile range (IQR) criterion.
+
+The IQR criterion means that all observations above $q_{0.75} + 1.5 \cdot IQR$ or below $q_{0.25} - 1.5 \cdot IQR$ (where $q_{0.25}$ and $q_{0.75}$ correspond to first and third quartile respectively) are considered as potential outliers by R. The minimum and maximum in the boxplot are represented without these suspected outliers.
 
 Seeing all these information on the same plot help to have a good first overview of the dispersion and the location of the data. Before drawing a boxplot of our data, see below a graph explaining the information present on a boxplot:
 
@@ -411,13 +421,28 @@ ggplot(dat) +
 
 # Dotplot
 
-A dotplot is more or less similar than a boxplot, except that observations are represented as points and there is no summary statistics presented on the plot:
+A dotplot is more or less similar than a boxplot, except that:
+
+- observations are represented as points
+- it does not easily tell us about the median, first and third quartiles.
 
 ```{r}
 library(lattice)
 
 dotplot(dat$Sepal.Length ~ dat$Species)
 ```
+
+In `{ggplot2}`:
+
+```{r}
+ggplot(dat) +
+  aes(x = Species, y = Sepal.Length) +
+  geom_dotplot(binaxis = "y", stackdir = "center")
+```
+
+The advantage of using `{ggplot2}` for this plot is that we can easily see the mode.
+
+Note that a dotplot is particularly useful when there are a limited number of observations, whereas a boxplot is more appropriate with large datasets.
 
 # Scatterplot
 
@@ -642,7 +667,7 @@ descr(dat,
       )
 ```
 
-*Tip*: if you have a large number of variables, add the `transpose = TRUE` argument for a better display.
+*Tip:* if you have a large number of variables, add the `transpose = TRUE` argument for a better display.
 
 In order to compute these descriptive statistics by group (e.g., `Species` in our dataset), use the `descr()` function in combination with the `stby()` function:
 
@@ -715,7 +740,11 @@ group_by(dat, Species) %>%
   )
 ```
 
-Thanks for reading. I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, I invite you to read the article "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)".
+# Conclusion
+
+Thanks for reading.
+
+I hope this article helped you to do descriptive statistics in R. If you would like to do the same by hand or understand what these statistics represent, I invite you to read the article "[Descriptive statistics by hand](/blog/descriptive-statistics-by-hand/)".
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
 
