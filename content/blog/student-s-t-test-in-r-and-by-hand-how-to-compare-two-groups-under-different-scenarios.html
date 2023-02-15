@@ -19,7 +19,6 @@ output:
 bibliography: bibliography.bib
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 <script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
 <script src="/rmarkdown-libs/viz/viz.js"></script>
 <link href="/rmarkdown-libs/DiagrammeR-styles/styles.css" rel="stylesheet" />
@@ -57,6 +56,7 @@ bibliography: bibliography.bib
 </ul></li>
 </ul></li>
 <li><a href="#assumptions" id="toc-assumptions">Assumptions</a></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
 <li><a href="#references" id="toc-references">References</a></li>
 </ul>
 </div>
@@ -755,7 +755,10 @@ library(&quot;report&quot;) # Load the package every time you start R
 report(test)</code></pre>
 <pre><code>## Effect sizes were labelled following Cohen&#39;s (1988) recommendations.
 ## 
-## The Two Sample t-test testing the difference between dat2$sample1 and dat2$sample2 (mean of x = 1.25, mean of y = 0.10) suggests that the effect is positive, statistically significant, and large (difference = 1.15, 95% CI [0.53, Inf], t(9) = 3.41, p = 0.004; Cohen&#39;s d = 2.07, 95% CI [0.75, Inf])</code></pre>
+## The Two Sample t-test testing the difference between dat2$sample1 and
+## dat2$sample2 (mean of x = 1.25, mean of y = 0.10) suggests that the effect is
+## positive, statistically significant, and large (difference = 1.15, 95% CI
+## [0.53, Inf], t(9) = 3.41, p = 0.004; Cohen&#39;s d = 2.07, 95% CI [0.75, Inf])</code></pre>
 <p>As you can see, the function interprets the test (together with the <em>p</em>-value) for you.</p>
 <p>Note that the <code>report()</code> function can be used for other analyses. See more <a href="/blog/tips-and-tricks-in-rstudio-and-r-markdown/">tips and tricks in R</a> if you find this one useful.</p>
 <p>If your data is formatted in the long format (which is even better), simply use the tilde (<code>~</code>). For instance, imagine the exact same data presented like this:</p>
@@ -965,12 +968,12 @@ test</code></pre>
 ## 
 ## data:  dat5$after and dat5$before
 ## t = 4.4721, df = 4, p-value = 0.005528
-## alternative hypothesis: true difference in means is greater than 0
+## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
 ##  4.186437      Inf
 ## sample estimates:
-## mean of the differences 
-##                       8</code></pre>
+## mean difference 
+##               8</code></pre>
 <p>Note that we wrote <code>after</code> and then <code>before</code> in this order. If you write <code>before</code> and then <code>after</code>, make sure to change the alternative to <code>alternative = "less"</code>.</p>
 <p>If your data is in the long format, use the tilde <code>~</code>:</p>
 <pre class="r"><code>dat5 &lt;- data.frame(
@@ -1000,12 +1003,12 @@ test</code></pre>
 ## 
 ## data:  value by time
 ## t = 4.4721, df = 4, p-value = 0.005528
-## alternative hypothesis: true difference in means is greater than 0
+## alternative hypothesis: true mean difference is greater than 0
 ## 95 percent confidence interval:
 ##  4.186437      Inf
 ## sample estimates:
-## mean of the differences 
-##                       8</code></pre>
+## mean difference 
+##               8</code></pre>
 <p>The output above recaps all the information needed to perform the test (compare these results found in R with the results found by hand).</p>
 <p>The <em>p</em>-value can be extracted as usual:</p>
 <pre class="r"><code>test$p.value</code></pre>
@@ -1054,7 +1057,7 @@ ggbetweenstats(
 ) +
   labs(caption = NULL) # remove caption</code></pre>
 <p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-36-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<p>Based on the output, we reject the null hypothesis that the two population means are equal (<em>p</em>-value = 0.014).</p>
+<p>Based on the output, we reject the null hypothesis that the two population means are equal (<em>p</em>-value = 0.01).</p>
 <p>Note that the <em>p</em>-value displayed in the subtitle of the plot is also two times larger than with the <code>t.test()</code> function for the same reason than above.</p>
 </div>
 <div id="scenario-5-paired-samples-where-the-variance-of-the-differences-is-unknown-2" class="section level3">
@@ -1069,7 +1072,7 @@ ggbetweenstats(
 ) +
   labs(caption = NULL) # remove caption</code></pre>
 <p><img src="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios_files/figure-html/unnamed-chunk-38-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<p>Based on the output, we reject the null hypothesis that mean of the differences between the two populations is equal to 0 (<em>p</em>-value = 0.011).</p>
+<p>Based on the output, we reject the null hypothesis that mean of the differences between the two populations is equal to 0 (<em>p</em>-value = 0.01).</p>
 <p>Again the <em>p</em>-value in the subtitle of the plot is twice the one obtained with the <code>t.test()</code> function for the same reason than above.</p>
 <p>The point of this section was to illustrate how to easily draw plots together with statistical results, which is exactly the aim of the <code>{ggstatsplot}</code> package. See more details and examples in this <a href="/blog/how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way/">article</a>.</p>
 </div>
@@ -1095,7 +1098,11 @@ ggbetweenstats(
 <li>or remove them (be careful)</li>
 </ul></li>
 </ul>
-<p>This concludes a relatively long article. Thanks for reading it. I hope this article helped you to understand how the different versions of the Student’s t-test for two samples work and how to perform them by hand and in R. If you are interested, here is a <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand/">Shiny app</a> to perform these tests by hand easily (you just need to enter your data and select the appropriate version of the test thanks to the sidebar menu).</p>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>This concludes a relatively long article. Thanks for reading.</p>
+<p>I hope this article helped you to understand how the different versions of the Student’s t-test for two samples work and how to perform them by hand and in R. If you are interested, here is a <a href="/blog/a-shiny-app-for-inferential-statistics-by-hand/">Shiny app</a> to perform these tests by hand easily (you just need to enter your data and select the appropriate version of the test thanks to the sidebar menu).</p>
 <p>Moreover, I invite you to read:</p>
 <ul>
 <li>this <a href="/blog/how-to-perform-a-one-sample-t-test-by-hand-and-in-r-test-on-one-mean/">article</a> if you would like to know how to compute the Student’s t-test but this time, for one sample,</li>
