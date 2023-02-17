@@ -30,7 +30,6 @@ Before submitting your article, please read the following points:
 * It is your responsibility to ensure you have the permission to use all content, images, and videos you include in your articles. I might therefore remove images where the source is not clearly cited to avoid copyright violations. Pixabay.com and Unsplash.com are two popular websites that offer images that can be used freely for any purpose.
 * You can edit and remove your article from the blog at any time, without any justification needed. Please note that I can also delete guest posts for any reason.
 * This blog is written in R and deployed thanks to the `{blogdown}` package. Therefore, it is much easier for me to publish articles written in R Markdown (`.Rmd`) or Markdown (`.md`). However, if your article is in another format, feel free to submit it as well.
-* At the moment, there is no financial retribution for writing a guest post.
 
 ## After publishing
 
