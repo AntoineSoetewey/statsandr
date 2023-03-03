@@ -52,6 +52,7 @@ Thanks in advance for reading. Feel free to [contact me](/contact/) if you have 
 You can also reach me out on:
 
 - [Twitter](https://twitter.com/statsandr)
+- <a rel="me" href="https://fosstodon.org/@statsandr">Mastodon</a>
 - [Medium](https://antoinesoetewey.medium.com/)
 - [GitHub](https://github.com/AntoineSoetewey)
 
