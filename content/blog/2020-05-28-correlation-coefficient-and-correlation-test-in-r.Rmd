@@ -41,7 +41,7 @@ Correlations between variables play an important role in a [descriptive analysis
 
 In this article, I show how to compute **correlation coefficients**, how to perform **correlation tests** and how to **visualize relationships** between variables in R.
 
-Correlation is usually computed on two [quantitative](/blog/variable-types-and-examples/#quantitative) variables, but it can also be computed on two [qualitative ordinal](/blog/variable-types-and-examples/#ordinal) variables. See the [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/) if you need to study the relationship between two [qualitative nominal](/blog/variable-types-and-examples/#nominal) variables.
+Correlation is usually computed on two [quantitative](/blog/variable-types-and-examples/#quantitative) variables, but it can also be computed on two [qualitative ordinal](/blog/variable-types-and-examples/#ordinal) variables.^[It is true that there is the point-biserial correlation which can be used with a nominal variable (consisting of two factors). Nonetheless, this type of correlation is much less known and usually not covered in introductory statistics classes; with one continuous and one nominal variable, it is much more frequent to learn about the [Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) (for a nominal variable with 2 groups) or [ANOVA](/blog/anova-in-r/) (for a nominal variable with 3 or more groups). More information about choosing the most appropriate measure of association depending on the type of variable can be found in this [article](https://journals.sagepub.com/doi/pdf/10.1177/8756479308317006){target="_blank"}.] See the [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/) if you need to study the relationship between two [qualitative nominal](/blog/variable-types-and-examples/#nominal) variables.
 
 If you need to *quantify* the relationship between two variables, I refer you to the article about [linear regression](/blog/multiple-linear-regression-made-simple/).
 
@@ -89,11 +89,13 @@ cor(dat$hp, dat$mpg,
     method = "spearman")
 ```
 
-There are several correlation methods (Run `?cor` for more information about the different methods available in the `cor()` function):
+The most common correlation methods (Run `?cor` for more information about the different methods available in the `cor()` function) are:
 
 * **Pearson** correlation is often used for [quantitative continuous](/blog/variable-types-and-examples/#continuous) variables that have a linear relationship
 * **Spearman** correlation (which is actually similar to Pearson but based on the ranked values for each variable rather than on the raw data) is often used to evaluate relationships involving at least one [qualitative ordinal](/blog/variable-types-and-examples/#ordinal) variable or two quantitative variables if the link is partially linear
 * **Kendall's tau-b** which is computed from the number of concordant and discordant pairs is often used for qualitative ordinal variables
+
+Note that there exists the *point-biserial correlation* (which can be used to measure the association between a continuous variable and a nominal variable of two levels), but this correlation is not covered here.
 
 ## Correlation matrix: correlations for all variables
 
@@ -309,11 +311,13 @@ If you need to do this for a few pairs of variables, I recommend using the `ggsc
 ```{r}
 ## plot with statistical results
 library(ggstatsplot)
+
 ggscatterstats(
   data = dat,
   x = wt,
   y = mpg,
-  bf.message = FALSE
+  bf.message = FALSE,
+  marginal = FALSE # remove histograms
 )
 ```
 
