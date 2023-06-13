@@ -143,14 +143,14 @@ output:
 
 NYT_page</code></pre>
 <pre><code>## {html_document}
-## &lt;html lang=&quot;en-US&quot; xmlns:og=&quot;http://opengraphprotocol.org/schema/&quot;&gt;
+## &lt;html lang=&quot;en&quot; class=&quot; nytapp-vi-homepage&quot; xmlns:og=&quot;http://opengraphprotocol.org/schema/&quot;&gt;
 ## [1] &lt;head&gt;\n&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8 ...
 ## [2] &lt;body&gt;\n    &lt;div id=&quot;app&quot;&gt;\n&lt;a class=&quot;css-kgn7zc&quot; href=&quot;#site-content&quot;&gt;Sk ...</code></pre>
 </div>
 <div id="parsing-html-content" class="section level2">
 <h2>Parsing HTML content</h2>
 <p>As we saw in the last chunk of code, <code>NYT_page</code> contains the raw HTML code, which is not so easily readable.</p>
-<p>In order to make it readable from R it has to be parsed, which means generating a Document Object Model (DOM) from the raw HTML. DOM is what connects scripts and web pages by representing the structure of a document in memory.</p>
+<p>In order to make it readable from R it has to be parsed, which means generating a Document Object Model (DOM) from the raw HTML. DOM is what connects scripts and web pages by representing the structure of a document in memory. If you retrieve the <a href="https://www.knowledgehut.com/blog/web-development/creating-http-server-with-node-js" target="_blank">HTTP request using Node.js</a>, you can give the raw HTML response to R for parsing and further analysis.</p>
 <p><code>rvest</code> provides 2 ways to select HTML elements:</p>
 <ol style="list-style-type: decimal">
 <li><strong>XPath</strong></li>
@@ -172,12 +172,12 @@ NYT_page</code></pre>
 
 head(summaries_css)</code></pre>
 <pre><code>## {xml_nodeset (6)}
-## [1] &lt;li class=&quot;summary-class&quot;&gt;Five other people are in critical condition aft ...
-## [2] &lt;li class=&quot;summary-class&quot;&gt;The suspect, who died of a self-inflicted gunsh ...
-## [3] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;The Biden administration is looking i ...
-## [4] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Republicans have pulled back on legis ...
-## [5] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Since a disastrous earthquake a week  ...
-## [6] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Hundreds of people facing long prison ...</code></pre>
+## [1] &lt;p class=&quot;summary-class css-dcsqcp&quot;&gt;Donald Trump, the first former U.S. p ...
+## [2] &lt;p class=&quot;summary-class css-yg12w5&quot;&gt;Consumer prices rose 4 percent in the ...
+## [3] &lt;p class=&quot;summary-class css-yg12w5&quot;&gt;At least 11 people were killed and 28 ...
+## [4] &lt;p class=&quot;summary-class css-yg12w5&quot;&gt;Outnumbered, outgunned and out-tanked ...
+## [5] &lt;p class=&quot;summary-class css-yg12w5&quot;&gt;Artificial intelligence in medicine h ...
+## [6] &lt;p class=&quot;summary-class css-yg12w5&quot;&gt;Thousands of Indian women have been a ...</code></pre>
 <p>The easiest way to obtain a CSS selector is opening the inspect mode, find the element you desire and right click on it. Then click on <code>copy</code> and <code>copy selector</code>.</p>
 </div>
 <div id="xpath" class="section level3">
@@ -189,12 +189,12 @@ head(summaries_css)</code></pre>
 
 head(summaries_xpath)</code></pre>
 <pre><code>## {xml_nodeset (6)}
-## [1] &lt;li class=&quot;summary-class&quot;&gt;Five other people are in critical condition aft ...
-## [2] &lt;li class=&quot;summary-class&quot;&gt;The suspect, who died of a self-inflicted gunsh ...
-## [3] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;The Biden administration is looking i ...
-## [4] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Republicans have pulled back on legis ...
-## [5] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Since a disastrous earthquake a week  ...
-## [6] &lt;p class=&quot;summary-class css-9lwb1u&quot;&gt;Hundreds of people facing long prison ...</code></pre>
+## [1] &lt;p class=&quot;summary-class css-dcsqcp&quot;&gt;Donald Trump, the first former U.S. p ...
+## [2] &lt;p class=&quot;summary-class css-yg12w5&quot;&gt;Consumer prices rose 4 percent in the ...
+## [3] &lt;p class=&quot;summary-class css-yg12w5&quot;&gt;At least 11 people were killed and 28 ...
+## [4] &lt;p class=&quot;summary-class css-yg12w5&quot;&gt;Outnumbered, outgunned and out-tanked ...
+## [5] &lt;p class=&quot;summary-class css-yg12w5&quot;&gt;Artificial intelligence in medicine h ...
+## [6] &lt;p class=&quot;summary-class css-yg12w5&quot;&gt;Thousands of Indian women have been a ...</code></pre>
 <p>Obviously the data we collected with CSS selector and XPath are exactly the same.</p>
 </div>
 </div>
@@ -205,12 +205,12 @@ head(summaries_xpath)</code></pre>
 NYT_summaries_xpath &lt;- html_text(summaries_xpath)</code></pre>
 <p>We only print some of them:</p>
 <pre class="r"><code>head(NYT_summaries_css)</code></pre>
-<pre><code>## [1] &quot;Five other people are in critical condition after shootings on the campus.&quot;                                                                               
-## [2] &quot;The suspect, who died of a self-inflicted gunshot wound, is a 43-year-old man who is not affiliated with the university, the police said.&quot;                
-## [3] &quot;The Biden administration is looking into mysterious U.F.O. encounters and pushing back against China over accusations of widespread espionage.&quot;           
-## [4] &quot;Republicans have pulled back on legislation to crack down on immigration as internal disputes conspire with a tiny majority to freeze them in place.&quot;     
-## [5] &quot;Since a disastrous earthquake a week ago, little aid has come to the hard-hit northwest of Syria, which is under the control of opposition forces.&quot;       
-## [6] &quot;Hundreds of people facing long prison sentences are being spirited out of the country, with one trip using six different cars over more than 4,000 miles.&quot;</code></pre>
+<pre><code>## [1] &quot;Donald Trump, the first former U.S. president to face federal charges, is scheduled to be arraigned at 3 p.m. Eastern. He is expected to plead not guilty.&quot;
+## [2] &quot;Consumer prices rose 4 percent in the year through May, another sign of cooling inflation as the Federal Reserve considers whether to raise rates.&quot;        
+## [3] &quot;At least 11 people were killed and 28 injured on Tuesday in Kryvyi Rih, a city already reeling from the Kakhovka dam disaster.&quot;                            
+## [4] &quot;Outnumbered, outgunned and out-tanked, Ukraine is putting up a scrappy defense of Marinka, a city near Bakhmut that is a few blocks from falling.&quot;         
+## [5] &quot;Artificial intelligence in medicine has its drawbacks, but some physicians find that ChatGPT helps them communicate empathetically with patients.&quot;         
+## [6] &quot;Thousands of Indian women have been abandoned by men working overseas, leaving them trapped in their in-laws’ homes, and often scammed out of dowries.&quot;</code></pre>
 </div>
 </div>
 <div id="a-real-application-of-web-scraping-in-r" class="section level1">
@@ -241,42 +241,40 @@ NYT_summaries_xpath &lt;- html_text(summaries_xpath)</code></pre>
 <p>To inspect it, we display the first and last observations, and the structure of the dataset:</p>
 <pre class="r"><code>head(drivers_F1) # first 6 rows</code></pre>
 <pre><code>## # A tibble: 6 × 11
-##   `Driver Name`  Natio…¹ Seaso…² Drive…³ Race …⁴ Race …⁵ Pole …⁶ Race …⁷ Podiums
-##   &lt;chr&gt;          &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
-## 1 Carlo Abate    Italy   1962–1… 0       3       0       0       0       0      
-## 2 George Abecas… United… 1951–1… 0       2       2       0       0       0      
-## 3 Kenny Acheson  United… 1983, … 0       10      3       0       0       0      
-## 4 Andrea de Ada… Italy   1968, … 0       36      30      0       0       0      
-## 5 Philippe Adams Belgium 1994    0       2       2       0       0       0      
-## 6 Walt Ader      United… 1950    0       1[b]    1       0       0       0      
-## # … with 2 more variables: `Fastest laps` &lt;chr&gt;, `Points[a]` &lt;chr&gt;, and
-## #   abbreviated variable names ¹​Nationality, ²​`Seasons Competed`,
-## #   ³​`Drivers&#39; Championships`, ⁴​`Race Entries`, ⁵​`Race Starts`,
-## #   ⁶​`Pole Positions`, ⁷​`Race Wins`</code></pre>
+##   `Driver name`     Nationality    `Seasons competed` `Drivers&#39; Championships`
+##   &lt;chr&gt;             &lt;chr&gt;          &lt;chr&gt;              &lt;chr&gt;                   
+## 1 Carlo Abate       Italy          1962–1963          0                       
+## 2 George Abecassis  United Kingdom 1951–1952          0                       
+## 3 Kenny Acheson     United Kingdom 1983, 1985         0                       
+## 4 Andrea de Adamich Italy          1968, 1970–1973    0                       
+## 5 Philippe Adams    Belgium        1994               0                       
+## 6 Walt Ader         United States  1950               0                       
+## # ℹ 7 more variables: `Race entries` &lt;chr&gt;, `Race starts` &lt;chr&gt;,
+## #   `Pole positions` &lt;chr&gt;, `Race wins` &lt;chr&gt;, Podiums &lt;chr&gt;,
+## #   `Fastest laps` &lt;chr&gt;, `Points[a]` &lt;chr&gt;</code></pre>
 <pre class="r"><code>tail(drivers_F1) # last 6 rows</code></pre>
 <pre><code>## # A tibble: 6 × 11
-##   `Driver Name`  Natio…¹ Seaso…² Drive…³ Race …⁴ Race …⁵ Pole …⁶ Race …⁷ Podiums
-##   &lt;chr&gt;          &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
-## 1 Emilio Zapico  Spain   1976    0       1       0       0       0       0      
-## 2 Zhou Guanyu*   China   2022    0       22      22      0       0       0      
-## 3 Ricardo Zonta  Brazil  1999–2… 0       37      36      0       0       0      
-## 4 Renzo Zorzi    Italy   1975–1… 0       7       7       0       0       0      
-## 5 Ricardo Zunino Argent… 1979–1… 0       11      10      0       0       0      
-## 6 Driver Name    Nation… Season… Driver… Race E… Race S… Pole P… Race W… Podiums
-## # … with 2 more variables: `Fastest laps` &lt;chr&gt;, `Points[a]` &lt;chr&gt;, and
-## #   abbreviated variable names ¹​Nationality, ²​`Seasons Competed`,
-## #   ³​`Drivers&#39; Championships`, ⁴​`Race Entries`, ⁵​`Race Starts`,
-## #   ⁶​`Pole Positions`, ⁷​`Race Wins`</code></pre>
+##   `Driver name`  Nationality `Seasons competed`   `Drivers&#39; Championships`
+##   &lt;chr&gt;          &lt;chr&gt;       &lt;chr&gt;                &lt;chr&gt;                   
+## 1 Emilio Zapico  Spain       1976                 0                       
+## 2 Zhou Guanyu*   China       2022                 0                       
+## 3 Ricardo Zonta  Brazil      1999–2001, 2004–2005 0                       
+## 4 Renzo Zorzi    Italy       1975–1977            0                       
+## 5 Ricardo Zunino Argentina   1979–1981            0                       
+## 6 Driver name    Nationality Seasons competed     Drivers&#39; Championships  
+## # ℹ 7 more variables: `Race entries` &lt;chr&gt;, `Race starts` &lt;chr&gt;,
+## #   `Pole positions` &lt;chr&gt;, `Race wins` &lt;chr&gt;, Podiums &lt;chr&gt;,
+## #   `Fastest laps` &lt;chr&gt;, `Points[a]` &lt;chr&gt;</code></pre>
 <pre class="r"><code>str(drivers_F1) # structure of the dataset</code></pre>
 <pre><code>## tibble [869 × 11] (S3: tbl_df/tbl/data.frame)
-##  $ Driver Name           : chr [1:869] &quot;Carlo Abate&quot; &quot;George Abecassis&quot; &quot;Kenny Acheson&quot; &quot;Andrea de Adamich&quot; ...
+##  $ Driver name           : chr [1:869] &quot;Carlo Abate&quot; &quot;George Abecassis&quot; &quot;Kenny Acheson&quot; &quot;Andrea de Adamich&quot; ...
 ##  $ Nationality           : chr [1:869] &quot;Italy&quot; &quot;United Kingdom&quot; &quot;United Kingdom&quot; &quot;Italy&quot; ...
-##  $ Seasons Competed      : chr [1:869] &quot;1962–1963&quot; &quot;1951–1952&quot; &quot;1983, 1985&quot; &quot;1968, 1970–1973&quot; ...
+##  $ Seasons competed      : chr [1:869] &quot;1962–1963&quot; &quot;1951–1952&quot; &quot;1983, 1985&quot; &quot;1968, 1970–1973&quot; ...
 ##  $ Drivers&#39; Championships: chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
-##  $ Race Entries          : chr [1:869] &quot;3&quot; &quot;2&quot; &quot;10&quot; &quot;36&quot; ...
-##  $ Race Starts           : chr [1:869] &quot;0&quot; &quot;2&quot; &quot;3&quot; &quot;30&quot; ...
-##  $ Pole Positions        : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
-##  $ Race Wins             : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
+##  $ Race entries          : chr [1:869] &quot;3&quot; &quot;2&quot; &quot;10&quot; &quot;36&quot; ...
+##  $ Race starts           : chr [1:869] &quot;0&quot; &quot;2&quot; &quot;3&quot; &quot;30&quot; ...
+##  $ Pole positions        : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
+##  $ Race wins             : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
 ##  $ Podiums               : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
 ##  $ Fastest laps          : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...
 ##  $ Points[a]             : chr [1:869] &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;6&quot; ...</code></pre>
@@ -318,16 +316,16 @@ drivers_F1 &lt;- drivers_F1[-nrow(drivers_F1), ] # remove last row</code></pre>
 ##  8 France                            4
 ##  9 Italy                             3
 ## 10 Netherlands                       2
-## # … with 38 more rows</code></pre>
+## # ℹ 38 more rows</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Who has the most Championships?</li>
 </ol>
 <pre class="r"><code>drivers_F1 %&gt;%
-  group_by(`Driver Name`) %&gt;%
+  group_by(`Driver name`) %&gt;%
   summarise(championship_pilot = sum(as.double(`Drivers&#39; Championships`))) %&gt;%
   arrange(desc(championship_pilot))</code></pre>
 <pre><code>## # A tibble: 868 × 2
-##    `Driver Name`       championship_pilot
+##    `Driver name`       championship_pilot
 ##    &lt;chr&gt;                            &lt;dbl&gt;
 ##  1 Lewis Hamilton~                      7
 ##  2 Michael Schumacher^                  7
@@ -339,14 +337,14 @@ drivers_F1 &lt;- drivers_F1[-nrow(drivers_F1), ] # remove last row</code></pre>
 ##  8 Jackie Stewart^                      3
 ##  9 Nelson Piquet^                       3
 ## 10 Niki Lauda^                          3
-## # … with 858 more rows</code></pre>
+## # ℹ 858 more rows</code></pre>
 <p>Sorry Michael, it looks like Lewis dethroned you.</p>
 <ol start="3" style="list-style-type: decimal">
 <li>Is there a relation between the number of Championships won and the number of race pole positions?</li>
 </ol>
 <pre class="r"><code>drivers_F1 %&gt;%
-  filter(`Pole Positions` &gt; 1) %&gt;%
-  ggplot(aes(x = as.double(`Pole Positions`), y = as.double(`Drivers&#39; Championships`))) +
+  filter(`Pole positions` &gt; 1) %&gt;%
+  ggplot(aes(x = as.double(`Pole positions`), y = as.double(`Drivers&#39; Championships`))) +
   geom_point(position = &quot;jitter&quot;) +
   labs(y = &quot;Championships won&quot;, x = &quot;Pole positions&quot;) +
   theme_minimal()</code></pre>
