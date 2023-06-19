@@ -1,0 +1,658 @@
+---
+title: Two-way ANOVA in R
+author: Antoine Soetewey
+date: '2023-06-19'
+slug: two-way-anova-in-r
+categories: []
+tags:
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: blog/two-way-anova-in-r/images/two-way-anova-in-r.jpeg
+description: Learn how to do a two-way ANOVA in R. You will also learn its aim, hypotheses, assumptions, and how to interpret the results of the two-way ANOVA
+output:
+  blogdown::html_page:
+    toc: false
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+
+
+<p><img src="images/two-way-anova-in-r.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The two-way ANOVA (analysis of variance) is a statistical method that allows to <strong>evaluate the simultaneous effect of two <a href="/blog/variable-types-and-examples/#qualitative">categorical</a> variables on a <a href="/blog/variable-types-and-examples/#continuous">quantitative continuous</a> variable</strong>.</p>
+<p>The two-way ANOVA is an extension of the one-way ANOVA since it allows to evaluate the effects on a numerical response of <strong>two</strong> categorical variables instead of one. The advantage of a two-way ANOVA over a one-way ANOVA is that we test the relationship between two variables, while taking into account the effect of a third variable. Moreover, it also allows to include the possible <em>interaction</em> of the two categorical variables on the response.</p>
+<p>The advantage of a two-way over a one-way ANOVA is quite similar to the advantage of a <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation</a> over a <a href="/blog/multiple-linear-regression-made-simple/">multiple linear regression</a>:</p>
+<ul>
+<li>The correlation measures the relationship between two quantitative variables. The multiple linear regression also measures the relationship between two variables, but this time taking into account the potential effect of other covariates.</li>
+<li>The one-way ANOVA tests whether a quantitative variable is different between groups. The two-way ANOVA also tests whether a quantitative variable is different between groups, but this time taking into account the effect of another qualitative variable.</li>
+</ul>
+<p>Previously, we have discussed about <a href="/blog/anova-in-r/">one-way ANOVA in R</a>. Now, we show when, why and how to perform a <strong>two-way</strong> ANOVA in R.</p>
+<p>Before going further, I would like to mention and briefly describe some related statistical methods and tests in order to avoid any confusion:</p>
+<ul>
+<li>A <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test</a> is used to evaluate the effect of one categorical variable on a quantitative continuous variable, <strong>when the categorical variable has exactly 2 levels</strong>:
+<ul>
+<li>Student’s t-test <em>for independent samples</em> if the observations are <strong>independent</strong> (for example: if we compare the age between women and men)</li>
+<li>Student’s t-test <em>for paired samples</em> if the observations are <strong>dependent</strong>, that is, when they come in pairs (it is the case when the same subjects are measured twice, at two different points in time, before and after a treatment for example)</li>
+</ul></li>
+<li>To evaluate the effect of one categorical variable on a quantitative variable, <strong>when the categorical variable has 3 or more levels</strong>:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
+<ul>
+<li><em><a href="/blog/anova-in-r/">one-way ANOVA</a></em> (often simply referred as ANOVA) if the groups are <strong>independent</strong> (for example a group of patients who received treatment A, another group of patients who received treatment B, and the last group of patients who received no treatment or a placebo)</li>
+<li><em>repeated measures ANOVA</em> if the groups are <strong>dependent</strong> (when the same subjects are measured three times, at three different points in time, before, during and after a treatment for example)</li>
+</ul></li>
+<li>A two-way ANOVA is used to evaluate the effects of 2 categorical variables (and their potential interaction) on a quantitative continuous variable. This is the topic of the post.</li>
+<li><a href="/blog/multiple-linear-regression-made-simple/">Linear regression</a> is used to evaluate the relationship between a quantitative continuous dependent variable and one or several independent variables:
+<ul>
+<li>simple linear regression if there is only one independent variable (which can be quantitative or qualitative)</li>
+<li>multiple linear regression if there is at least two independent variables (which can be quantitative, qualitative, or a mix of both)</li>
+</ul></li>
+<li>An ANCOVA (analysis of covariance) is used to evaluate the effect of a categorical variable on a quantitative variable, while controlling for the effect of another quantitative variable (known as covariate). ANCOVA is actually a special case of multiple linear regression with a mix of one qualitative and one quantitative independent variable.</li>
+</ul>
+<p>In this post, we start by explaining when and why a two-way ANOVA is useful, we then do some preliminary descriptive analyses and present how to conduct a two-way ANOVA in R. Finally, we show how to interpret and visualize the results. We also briefly mention and illustrate how to verify the underlying assumptions.</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>To illustrate how to perform a two-way ANOVA in R, we use the <code>penguins</code> dataset, available from the <code>{palmerpenguins}</code> package.</p>
+<p>We do not need to <a href="/blog/how-to-import-an-excel-file-in-rstudio/">import the dataset</a>, but we need to <a href="/blog/an-efficient-way-to-install-and-load-r-packages/">load the package</a> first and then call the dataset:</p>
+<pre class="r"><code># install.packages(&quot;palmerpenguins&quot;)
+library(palmerpenguins)
+
+dat &lt;- penguins # rename dataset
+str(dat) # structure of dataset</code></pre>
+<pre><code>## tibble [344 × 8] (S3: tbl_df/tbl/data.frame)
+##  $ species          : Factor w/ 3 levels &quot;Adelie&quot;,&quot;Chinstrap&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ island           : Factor w/ 3 levels &quot;Biscoe&quot;,&quot;Dream&quot;,..: 3 3 3 3 3 3 3 3 3 3 ...
+##  $ bill_length_mm   : num [1:344] 39.1 39.5 40.3 NA 36.7 39.3 38.9 39.2 34.1 42 ...
+##  $ bill_depth_mm    : num [1:344] 18.7 17.4 18 NA 19.3 20.6 17.8 19.6 18.1 20.2 ...
+##  $ flipper_length_mm: int [1:344] 181 186 195 NA 193 190 181 195 193 190 ...
+##  $ body_mass_g      : int [1:344] 3750 3800 3250 NA 3450 3650 3625 4675 3475 4250 ...
+##  $ sex              : Factor w/ 2 levels &quot;female&quot;,&quot;male&quot;: 2 1 1 NA 1 2 1 2 NA NA ...
+##  $ year             : int [1:344] 2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...</code></pre>
+<p>The dataset contains 8 variables for 344 penguins, summarized below:</p>
+<pre class="r"><code>summary(dat)</code></pre>
+<pre><code>##       species          island    bill_length_mm  bill_depth_mm  
+##  Adelie   :152   Biscoe   :168   Min.   :32.10   Min.   :13.10  
+##  Chinstrap: 68   Dream    :124   1st Qu.:39.23   1st Qu.:15.60  
+##  Gentoo   :124   Torgersen: 52   Median :44.45   Median :17.30  
+##                                  Mean   :43.92   Mean   :17.15  
+##                                  3rd Qu.:48.50   3rd Qu.:18.70  
+##                                  Max.   :59.60   Max.   :21.50  
+##                                  NA&#39;s   :2       NA&#39;s   :2      
+##  flipper_length_mm  body_mass_g       sex           year     
+##  Min.   :172.0     Min.   :2700   female:165   Min.   :2007  
+##  1st Qu.:190.0     1st Qu.:3550   male  :168   1st Qu.:2007  
+##  Median :197.0     Median :4050   NA&#39;s  : 11   Median :2008  
+##  Mean   :200.9     Mean   :4202                Mean   :2008  
+##  3rd Qu.:213.0     3rd Qu.:4750                3rd Qu.:2009  
+##  Max.   :231.0     Max.   :6300                Max.   :2009  
+##  NA&#39;s   :2         NA&#39;s   :2</code></pre>
+<p>In this post, we will focus on the following three variables:</p>
+<ul>
+<li><code>species</code>: the species of the penguin (Adelie, Chinstrap or Gentoo)</li>
+<li><code>sex</code>: sex of the penguin (female and male)</li>
+<li><code>body_mass_g</code>: body mass of the penguin (in grams)</li>
+</ul>
+<p>If needed, more information about this dataset can be found by running <code>?penguins</code> in R.</p>
+<p><code>body_mass_g</code> is the quantitative continuous variable and will be the dependent variable, whereas <code>species</code> and <code>sex</code> are both qualitative variables.</p>
+<p>Those two last variables will be our independent variables, also referred as factors. Make sure that they are read as <a href="/blog/data-types-in-r/#factor">factors</a> by R. If it is not the case, they will need to be <a href="/blog/data-manipulation-in-r/#factors">transformed to factors</a>.</p>
+</div>
+<div id="aim-and-hypotheses-of-a-two-way-anova" class="section level1">
+<h1>Aim and hypotheses of a two-way ANOVA</h1>
+<p>As mentioned above, a two-way ANOVA is used to <strong>evaluate simultaneously the effect of two categorical variables on one quantitative continuous variable</strong>.</p>
+<p>It is referred as <strong>two</strong>-way ANOVA because we are comparing groups which are formed by <strong>two</strong> independent categorical variables.</p>
+<p>Here, we would like to know if body mass depends on species and/or sex. In particular, we are interested in:</p>
+<ol style="list-style-type: decimal">
+<li>measuring and testing the relationship between species and body mass,</li>
+<li>measuring and testing the relationship between sex and body mass, and</li>
+<li>potentially check whether the relationship between species and body mass is different for females and males (which is equivalent than checking whether the relationship between sex and body mass depends on the species)</li>
+</ol>
+<p>The first two relationships are referred as <strong>main effects</strong>, while the third point is known as the <strong>interaction effect</strong>.</p>
+<p>The main effects test whether at least one group is different from another one (while controlling for the other independent variable). On the other hand, the interaction effect aims at testing whether the relationship between two variables differs <em>depending on the level of a third variable</em>.</p>
+<p>When performing a two-way ANOVA, testing the interaction effect is not mandatory. However, omitting an interaction effect may lead to erroneous conclusions if the interaction effect is present.</p>
+<p>If we go back to our example, we have the following <a href="/blog/hypothesis-test-by-hand/">hypothesis tests</a>:</p>
+<ul>
+<li>Main effect of sex on body mass:
+<ul>
+<li><span class="math inline">\(H_0\)</span>: mean body mass is equal between females and males</li>
+<li><span class="math inline">\(H_1\)</span>: mean body mass is different between females and males</li>
+</ul></li>
+<li>Main effect of species on body mass:
+<ul>
+<li><span class="math inline">\(H_0\)</span>: mean body mass is equal between all 3 species</li>
+<li><span class="math inline">\(H_1\)</span>: mean body mass is different for at least one species</li>
+</ul></li>
+<li>Interaction between sex and species:
+<ul>
+<li><span class="math inline">\(H_0\)</span>: there is no interaction between sex and species, meaning that the relationship between species and body mass is the same for females and males (similarly, the relationship between sex and body mass is the same for all 3 species)</li>
+<li><span class="math inline">\(H_1\)</span>: there is an interaction between sex and species, meaning that the relationship between species and body mass is different for females than for males (similarly, the relationship between sex and body mass depends on the species)</li>
+</ul></li>
+</ul>
+</div>
+<div id="assumptions-of-a-two-way-anova" class="section level1">
+<h1>Assumptions of a two-way ANOVA</h1>
+<p>Most statistical tests require some assumptions for the results to be valid, and a two-way ANOVA is not an exception.</p>
+<p>Assumptions of a two-way ANOVA are similar than for a one-way ANOVA. To summarize:</p>
+<ul>
+<li><strong>Variable type</strong>: the dependent variable must be quantitative continuous, while the two independent variables must be categorical (with at least two levels).</li>
+<li><strong>Independence</strong>: the observations should be independent between groups and within each group.</li>
+<li><strong>Normality</strong>:
+<ul>
+<li>For small samples, data should follow approximately a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normal distribution</a></li>
+<li>For large samples (usually <span class="math inline">\(n \ge 30\)</span> in each group/sample), normality is not required (thanks to the central limit theorem)</li>
+</ul></li>
+<li><strong>Equality of variances</strong>: variances should be equal across groups.</li>
+<li><strong>Outliers</strong>: There should be no significant <a href="/blog/outliers-detection-in-r/">outliers</a> in any group.</li>
+</ul>
+<p>More details about these assumptions can be found in the <a href="/blog/anova-in-r/#underlying-assumptions-of-anova">assumptions of a one-way ANOVA</a>.</p>
+<p>Now that we have seen the underlying assumptions of the two-way ANOVA, we review them specifically for our dataset before applying the test and interpreting the results.</p>
+<div id="variable-type" class="section level2">
+<h2>Variable type</h2>
+<p>The dependent variable body mass is <a href="/blog/variable-types-and-examples/#continuous">quantitative continuous</a>, while both independent variables sex and species are <a href="/blog/variable-types-and-examples/#qualitative">qualitative variables</a> (with at least 2 levels).</p>
+<p>Therefore, this assumption is met.</p>
+</div>
+<div id="independence" class="section level2">
+<h2>Independence</h2>
+<p>Independence is usually checked based on the design of the experiment and how data have been collected.</p>
+<p>To keep it simple, observations are usually:</p>
+<ul>
+<li><strong>independent</strong> if each experimental unit (here a penguin) has been measured only once and the observations are collected from a representative and randomly selected portion of the population, or</li>
+<li><strong>dependent</strong> if each experimental unit has been measured at least twice (as it is often the case in the medical field for example, with two measurements on the same subjects; one before and one after the treatment).</li>
+</ul>
+<p>In our case, body mass has been measured only once on each penguin, and on a representative and random sample of the population, so the independence assumption is met.</p>
+</div>
+<div id="normality" class="section level2">
+<h2>Normality</h2>
+<p>We have a large sample in all subgroups (each combination of the levels of the two factors, called cell):</p>
+<pre class="r"><code>table(dat$species, dat$sex)</code></pre>
+<pre><code>##            
+##             female male
+##   Adelie        73   73
+##   Chinstrap     34   34
+##   Gentoo        58   61</code></pre>
+<p>so normality does not need to be checked.</p>
+<p>For completeness, we still show how to verify normality, as if we had a small samples.</p>
+<p>There are several methods to test the normality assumption. The most common methods being:</p>
+<ul>
+<li>a <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a> by group or on the residuals, and/or</li>
+<li>a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> by group or on the residuals, and/or</li>
+<li>a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">normality test</a> (Shapiro-Wilk test for instance) by group or on the residuals.</li>
+</ul>
+<p>The easiest/shortest way is to verify the normality with a QQ-plot on the residuals. To draw this plot, we first need to save the model:</p>
+<pre class="r"><code># save model
+mod &lt;- aov(body_mass_g ~ sex * species,
+  data = dat
+)</code></pre>
+<p>This piece of code will be explained further.</p>
+<p>Now we can draw the QQ-plot on the residuals. We show two ways to do so, first with the <code>plot()</code> function and second with the <code>qqPlot()</code> function from the <code>{car}</code> package:</p>
+<pre class="r"><code># method 1
+plot(mod, which = 2)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># method 2
+library(car)
+
+qqPlot(mod$residuals,
+  id = FALSE # remove point identification
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Code for method 1 is slightly shorter, but it misses the confidence interval around the reference line.</p>
+<p>If points follow the straight line (called Henry’s line) and fall within the confidence band, we can assume normality. This is the case here.</p>
+<p>If you prefer to verify the normality based on a histogram of the residuals, here is the code:</p>
+<pre class="r"><code># histogram
+hist(mod$residuals)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The histogram of the residuals show a gaussian distribution, which is in line with the conclusion from the QQ-plot.</p>
+<p>Although the QQ-plot and histogram is largely enough to verify the normality, if you want to test it more formally with a statistical test, the Shapiro-Wilk test can be applied on the residuals as well:</p>
+<pre class="r"><code># normality test
+shapiro.test(mod$residuals)</code></pre>
+<pre><code>## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  mod$residuals
+## W = 0.99776, p-value = 0.9367</code></pre>
+<p><span class="math inline">\(\Rightarrow\)</span> We do not reject the null hypothesis that the residuals follow a normal distribution (<span class="math inline">\(p\)</span>-value = 0.937).</p>
+<p>From the QQ-plot, histogram and Shapiro-Wilk test, we conclude that we do not reject the null hypothesis of normality of the residuals.</p>
+<p>The normality assumption is thus verified, we can now check the equality of the variances.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+</div>
+<div id="homogeneity-of-variances" class="section level2">
+<h2>Homogeneity of variances</h2>
+<p>Equality of variances, also referred as homogeneity of variances or homoscedasticity, can be verified visually with the <code>plot()</code> function:</p>
+<pre class="r"><code>plot(mod, which = 3)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Since the spread of the residuals is constant, the red smooth line is horizontal and flat, so it looks like the constant variance assumption is satisfied here.</p>
+<p>The diagnostic plot above is sufficient, but if you prefer it can also be tested more formally with the Levene’s test (also from the <code>{car}</code> package):<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<pre class="r"><code>leveneTest(mod)</code></pre>
+<pre><code>## Levene&#39;s Test for Homogeneity of Variance (center = median)
+##        Df F value Pr(&gt;F)
+## group   5  1.3908 0.2272
+##       327</code></pre>
+<p><span class="math inline">\(\Rightarrow\)</span> We do not reject the null hypothesis that the variances are equal (<span class="math inline">\(p\)</span>-value = 0.227).</p>
+<p>Both the visual and formal approaches give the same conclusion; we do not reject the hypothesis of homogeneity of the variances.</p>
+</div>
+<div id="outliers" class="section level2">
+<h2>Outliers</h2>
+<p>The easiest and most common way to <a href="/blog/descriptive-statistics-in-r/">detect outliers</a> is visually thanks to boxplots by groups.</p>
+<p>For females and males:</p>
+<pre class="r"><code>library(ggplot2)
+
+# boxplots by sex
+ggplot(dat) +
+  aes(x = sex, y = body_mass_g) +
+  geom_boxplot()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>For the three species:</p>
+<pre class="r"><code># boxplots by species
+ggplot(dat) +
+  aes(x = species, y = body_mass_g) +
+  geom_boxplot()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>There are, as defined by the <a href="/blog/descriptive-statistics-in-r/#interquartile-range">interquartile range criterion</a>, two outliers for the species Chinstrap. These points are, nonetheless, not extreme enough to bias results.</p>
+<p>Therefore, we consider that the assumption of no significant outliers is met.</p>
+</div>
+</div>
+<div id="two-way-anova" class="section level1">
+<h1>Two-way ANOVA</h1>
+<p>We have shown that all assumptions are met, so we can now proceed to the implementation of the two-way ANOVA in R.</p>
+<p>This will allow us to answer the following research questions:</p>
+<ul>
+<li>Controlling for the species, is body mass significantly different between the two sexes?</li>
+<li>Controlling for the sex, is body mass significantly different for at least one species?</li>
+<li>Is the relationship between species and body mass different between female and male penguins?</li>
+</ul>
+<div id="preliminary-analyses" class="section level2">
+<h2>Preliminary analyses</h2>
+<p>Before performing any statistical test, it is a good practice to make some <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a> in order to have a first overview of the data, and perhaps, have a glimpse of the results to be expected.</p>
+<p>This can be done via descriptive statistics or plots.</p>
+<div id="descriptive-statistics" class="section level3">
+<h3>Descriptive statistics</h3>
+<p>If we want to keep it simple, we can compute only the mean for each subgroup:</p>
+<pre class="r"><code># mean by group
+aggregate(body_mass_g ~ species + sex,
+  data = dat,
+  FUN = mean
+)</code></pre>
+<pre><code>##     species    sex body_mass_g
+## 1    Adelie female    3368.836
+## 2 Chinstrap female    3527.206
+## 3    Gentoo female    4679.741
+## 4    Adelie   male    4043.493
+## 5 Chinstrap   male    3938.971
+## 6    Gentoo   male    5484.836</code></pre>
+<p>Or eventually, the mean and <a href="/blog/descriptive-statistics-by-hand/#standard-deviation">standard deviation</a> for each subgroup using the <code>{dplyr}</code> package:</p>
+<pre class="r"><code># mean and sd by group
+library(dplyr)
+
+group_by(dat, sex, species) %&gt;%
+  summarise(
+    mean = round(mean(body_mass_g, na.rm = TRUE)),
+    sd = round(sd(body_mass_g, na.rm = TRUE))
+  )</code></pre>
+<pre><code>## # A tibble: 8 × 4
+## # Groups:   sex [3]
+##   sex    species    mean    sd
+##   &lt;fct&gt;  &lt;fct&gt;     &lt;dbl&gt; &lt;dbl&gt;
+## 1 female Adelie     3369   269
+## 2 female Chinstrap  3527   285
+## 3 female Gentoo     4680   282
+## 4 male   Adelie     4043   347
+## 5 male   Chinstrap  3939   362
+## 6 male   Gentoo     5485   313
+## 7 &lt;NA&gt;   Adelie     3540   477
+## 8 &lt;NA&gt;   Gentoo     4588   338</code></pre>
+</div>
+<div id="plots" class="section level3">
+<h3>Plots</h3>
+<p>If you are a frequent reader of the blog, you know that I like to draw plots to visualize the data at hand before interpreting results of a test.</p>
+<p>The most appropriate plot when we have one quantitative and two qualitative variables is a <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplot</a> by group. This can easily be made with the <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code> package</a>:</p>
+<pre class="r"><code># boxplot by group
+library(ggplot2)
+
+ggplot(dat) +
+  aes(x = species, y = body_mass_g, fill = sex) +
+  geom_boxplot()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Some observations are missing for the sex, we can remove them to have a more concise plot:</p>
+<pre class="r"><code>dat %&gt;%
+  filter(!is.na(sex)) %&gt;%
+  ggplot() +
+  aes(x = species, y = body_mass_g, fill = sex) +
+  geom_boxplot()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Note that we could also have made the following plot:</p>
+<pre class="r"><code>dat %&gt;%
+  filter(!is.na(sex)) %&gt;%
+  ggplot() +
+  aes(x = sex, y = body_mass_g, fill = species) +
+  geom_boxplot()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>But for a more readable plot, I tend to prefer putting the variable with the smallest number of levels as color (which is in fact the argument <code>fill</code> in the <code>aes()</code> layer) and the variable with the largest number of categories on the x-axis (i.e., the argument <code>x</code> in the <code>aes()</code> layer).</p>
+<p>From the means and the boxplots by subgroup, we can already see that, <em>in our sample</em>:</p>
+<ul>
+<li>female penguins tend to have a lower body mass than males, and that is the case for all the considered species, and</li>
+<li>body mass is higher for Gentoo penguins than for the other two species.</li>
+</ul>
+<p>Bear in mind that these conclusions are only valid within our <a href="/blog/what-is-the-difference-between-population-and-sample/">sample</a>! To generalize these conclusions to the <a href="/blog/what-is-the-difference-between-population-and-sample/">population</a>, we need to perform the two-way ANOVA and check the significance of the explanatory variables. This is the aim of the next section.</p>
+</div>
+</div>
+<div id="two-way-anova-in-r" class="section level2">
+<h2>Two-way ANOVA in R</h2>
+<p>As mentioned earlier, including an interaction effect in a two-way ANOVA is not compulsory. However, in order to avoid flawed conclusions, it is recommended to first check whether the interaction is significant or not, and depending on the results, include it or not.</p>
+<p>If the interaction is not significant, it is safe to remove it from the final model. On the contrary, if the interaction is significant, it should be included in the final model which will be used to interpret results.</p>
+<p>We thus start with a model which includes the two main effects (i.e., sex and species) and the interaction:</p>
+<pre class="r"><code># Two-way ANOVA with interaction
+# save model
+mod &lt;- aov(body_mass_g ~ sex * species,
+  data = dat
+)
+
+# print results
+summary(mod)</code></pre>
+<pre><code>##              Df    Sum Sq  Mean Sq F value   Pr(&gt;F)    
+## sex           1  38878897 38878897 406.145  &lt; 2e-16 ***
+## species       2 143401584 71700792 749.016  &lt; 2e-16 ***
+## sex:species   2   1676557   838278   8.757 0.000197 ***
+## Residuals   327  31302628    95727                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 11 observations deleted due to missingness</code></pre>
+<p>The sum of squares (column <code>Sum Sq</code>) shows that the species explain a large part of the variability of body mass. It is the most important factor in explaining this variability.</p>
+<p>The <span class="math inline">\(p\)</span>-values are displayed in the last column of the output above (<code>Pr(&gt;F)</code>). From these <span class="math inline">\(p\)</span>-values, we conclude that, at the 5% significance level:</p>
+<ul>
+<li>controlling for the species, body mass is significantly different between the two sexes,</li>
+<li>controlling for the sex, body mass is significantly different for at least one species, and</li>
+<li>the interaction between sex and species (displayed at the line <code>sex:species</code> in the output above) is significant.</li>
+</ul>
+<p>So from the significant interaction effect, we have just seen that the relationship between body mass and species is different between males and females. Since it is significant, we have to keep it in the model and we should interpret results from that model.</p>
+<p>If, on the contrary, the interaction was not significant (that is, if the <span class="math inline">\(p\)</span>-value <span class="math inline">\(\ge\)</span> 0.05) we would have removed this interaction effect from the model. For illustrative purposes, below the code for a two-way ANOVA without interaction, referred as an additive model:</p>
+<pre class="r"><code># Two-way ANOVA without interaction
+aov(body_mass_g ~ sex + species,
+  data = dat
+)</code></pre>
+<p>For the readers who are used to perform <a href="/blog/multiple-linear-regression-made-simple/">linear regressions in R</a>, you will notice that the structure of the code for a two-way ANOVA is in fact similar:</p>
+<ul>
+<li>the formula is <code>dependent variable ~ independent variables</code></li>
+<li>the <code>+</code> sign is used to include independent variables <em>without</em> an interaction<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></li>
+<li>the <code>*</code> sign is used to include independent variables <em>with</em> an interaction</li>
+</ul>
+<p>The resemblance with a linear regression is not a surprise because a two-way ANOVA, like all ANOVA, is actually a linear model.</p>
+<p>Note that the following code works as well, and give the same results:</p>
+<pre class="r"><code># method 2
+mod2 &lt;- lm(body_mass_g ~ sex * species,
+  data = dat
+)
+
+Anova(mod2)</code></pre>
+<pre><code>## Anova Table (Type II tests)
+## 
+## Response: body_mass_g
+##                Sum Sq  Df F value    Pr(&gt;F)    
+## sex          37090262   1 387.460 &lt; 2.2e-16 ***
+## species     143401584   2 749.016 &lt; 2.2e-16 ***
+## sex:species   1676557   2   8.757 0.0001973 ***
+## Residuals    31302628 327                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Note that the <code>aov()</code> function assumes a <strong>balanced design</strong>, meaning that we have equal sample sizes within levels of our independent grouping variables.</p>
+<p>For <strong>unbalanced design</strong>, that is, unequal numbers of subjects in each subgroup, the recommended methods are:</p>
+<ul>
+<li>the Type-II ANOVA when there is <strong>no</strong> significant interaction, which can be done in R with <code>Anova(mod, type = "II")</code>,<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> and</li>
+<li>the Type-III ANOVA when there is a significant interaction, which can be done in R with <code>Anova(mod, type = "III")</code>.</li>
+</ul>
+<p>This is beyond the scope of the post and we assume a balanced design here. For the interested reader, see this <a href="https://mcfromnz.wordpress.com/2011/03/02/anova-type-iiiiii-ss-explained/" target="_blank">detailed discussion</a> about type I, type II and type III ANOVA.</p>
+</div>
+<div id="pairwise-comparisons" class="section level2">
+<h2>Pairwise comparisons</h2>
+<p>Through the two main effects being significant, we concluded that:</p>
+<ul>
+<li>controlling for the species, body mass is different between females and males, and</li>
+<li>controlling for the sex, body mass is different for at least one species.</li>
+</ul>
+<p>If body mass is different between the two sexes, given that there are exactly two sexes, it must be because body mass is significantly different between females and males.</p>
+<p>If one wants to know which sex has the highest body mass, it can be deduced from the means and/or boxplots by subgroup. Here, it is clear that males have a significantly higher body mass than females.</p>
+<p>However, it is not so straightforward for the species. Let me explain why it is not as easy as for the sexes.</p>
+<p>There are three species (Adelie, Chinstrap and Gentoo), so there are 3 pairs of species:</p>
+<ol style="list-style-type: decimal">
+<li>Adelie and Chinstrap</li>
+<li>Adelie and Gentoo</li>
+<li>Chinstrap and Gentoo</li>
+</ol>
+<p>If body mass is significantly different for at least one species, it could be that:</p>
+<ul>
+<li>body mass is significantly different between Adelie and Chinstrap but not significantly different between Adelie and Gentoo, and not significantly different between Chinstrap and Gentoo, or</li>
+<li>body mass is significantly different between Adelie and Gentoo but not significantly different between Adelie and Chinstrap, and not significantly different between Chinstrap and Gentoo, or</li>
+<li>body mass is significantly different between Chinstrap and Gentoo but not significantly different between Adelie and Chinstrap, and not significantly different between Adelie and Gentoo.</li>
+</ul>
+<p>Or, it could also be that:</p>
+<ul>
+<li>body mass is significantly different between Adelie and Chinstrap, and between Adelie and Gentoo, but not significantly different between Chinstrap and Gentoo, or</li>
+<li>body mass is significantly different between Adelie and Chinstrap, and between Chinstrap and Gentoo, but not significantly different between Adelie and Gentoo, or</li>
+<li>body mass is significantly different between Chinstrap and Gentoo, and between Adelie and Gentoo, but not significantly different between Adelie and Chinstrap.</li>
+</ul>
+<p>Last, it could also be that body mass is significantly different between <strong>all</strong> species.</p>
+<p>As for a <a href="/blog/anova-in-r/">one-way ANOVA</a>, we cannot, at this stage, know precisely which species is different from which one in terms of body mass. To know this, we need to compare each species two by two thanks to post-hoc tests (also known as pairwise comparisons).</p>
+<p>There are several post-hoc tests, the most common one being the Tukey HSD, which tests all possible pairs of groups. As mentioned earlier, this test only needs to be done on the species variable because there are only two levels for the sex.</p>
+<p>As for the one-way ANOVA, the Tukey HSD can be done in R as follows:</p>
+<pre class="r"><code># method 1
+TukeyHSD(mod,
+  which = &quot;species&quot;
+)</code></pre>
+<pre><code>##   Tukey multiple comparisons of means
+##     95% family-wise confidence level
+## 
+## Fit: aov(formula = body_mass_g ~ sex * species, data = dat)
+## 
+## $species
+##                        diff       lwr       upr     p adj
+## Chinstrap-Adelie   26.92385  -80.0258  133.8735 0.8241288
+## Gentoo-Adelie    1377.65816 1287.6926 1467.6237 0.0000000
+## Gentoo-Chinstrap 1350.73431 1239.9964 1461.4722 0.0000000</code></pre>
+<p>or using the <code>{multcomp}</code> package:</p>
+<pre class="r"><code># method 2
+library(multcomp)
+
+summary(glht(
+  aov(body_mass_g ~ sex + species,
+    data = dat
+  ),
+  linfct = mcp(species = &quot;Tukey&quot;)
+))</code></pre>
+<pre><code>## 
+## 	 Simultaneous Tests for General Linear Hypotheses
+## 
+## Multiple Comparisons of Means: Tukey Contrasts
+## 
+## 
+## Fit: aov(formula = body_mass_g ~ sex + species, data = dat)
+## 
+## Linear Hypotheses:
+##                         Estimate Std. Error t value Pr(&gt;|t|)    
+## Chinstrap - Adelie == 0    26.92      46.48   0.579     0.83    
+## Gentoo - Adelie == 0     1377.86      39.10  35.236   &lt;1e-05 ***
+## Gentoo - Chinstrap == 0  1350.93      48.13  28.067   &lt;1e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## (Adjusted p values reported -- single-step method)</code></pre>
+<p>or using the <code>pairwise.t.test()</code> function using the <span class="math inline">\(p\)</span>-value adjustment method of your choice:<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
+<pre class="r"><code># method 3
+pairwise.t.test(dat$body_mass_g, dat$species,
+  p.adjust.method = &quot;BH&quot;
+)</code></pre>
+<pre><code>## 
+## 	Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  dat$body_mass_g and dat$species 
+## 
+##           Adelie Chinstrap
+## Chinstrap 0.63   -        
+## Gentoo    &lt;2e-16 &lt;2e-16   
+## 
+## P value adjustment method: BH</code></pre>
+<p>Note that when using the second method, it is the model without the interaction that needs to be specified into the <code>glht()</code> function, even if the interaction is significant. Moreover, do not forget to replace <code>mod</code> and <code>species</code> in my code with the name of your model and the name of your independent variable.</p>
+<p>Both methods give the same results, that is:</p>
+<ul>
+<li>body mass is <em>not</em> significantly different between Chinstrap and Adelie (adjusted <span class="math inline">\(p\)</span>-value = 0.83),</li>
+<li>body mass is significantly different between Gentoo and Adelie (adjusted <span class="math inline">\(p\)</span>-value &lt; 0.001), and</li>
+<li>body mass is significantly different between Gentoo and Chinstrap (adjusted <span class="math inline">\(p\)</span>-value &lt; 0.001).</li>
+</ul>
+<p>Remember that it is the <strong>adjusted</strong> <span class="math inline">\(p\)</span>-values that are reported, to prevent the <a href="/blog/anova-in-r/#issue-of-multiple-testing">issue of multiple testing</a> which occurs when comparing several pairs of groups.</p>
+<p>If you would like to compare all combinations of groups, it can be done with the <code>TukeyHSD()</code> function and specifying the interaction in the <code>which</code> argument:</p>
+<pre class="r"><code># all combinations of sex and species
+TukeyHSD(mod,
+  which = &quot;sex:species&quot;
+)</code></pre>
+<pre><code>##   Tukey multiple comparisons of means
+##     95% family-wise confidence level
+## 
+## Fit: aov(formula = body_mass_g ~ sex * species, data = dat)
+## 
+## $`sex:species`
+##                                      diff       lwr       upr     p adj
+## male:Adelie-female:Adelie        674.6575  527.8486  821.4664 0.0000000
+## female:Chinstrap-female:Adelie   158.3703  -25.7874  342.5279 0.1376213
+## male:Chinstrap-female:Adelie     570.1350  385.9773  754.2926 0.0000000
+## female:Gentoo-female:Adelie     1310.9058 1154.8934 1466.9181 0.0000000
+## male:Gentoo-female:Adelie       2116.0004 1962.1408 2269.8601 0.0000000
+## female:Chinstrap-male:Adelie    -516.2873 -700.4449 -332.1296 0.0000000
+## male:Chinstrap-male:Adelie      -104.5226 -288.6802   79.6351 0.5812048
+## female:Gentoo-male:Adelie        636.2482  480.2359  792.2606 0.0000000
+## male:Gentoo-male:Adelie         1441.3429 1287.4832 1595.2026 0.0000000
+## male:Chinstrap-female:Chinstrap  411.7647  196.6479  626.8815 0.0000012
+## female:Gentoo-female:Chinstrap  1152.5355  960.9603 1344.1107 0.0000000
+## male:Gentoo-female:Chinstrap    1957.6302 1767.8040 2147.4564 0.0000000
+## female:Gentoo-male:Chinstrap     740.7708  549.1956  932.3460 0.0000000
+## male:Gentoo-male:Chinstrap      1545.8655 1356.0392 1735.6917 0.0000000
+## male:Gentoo-female:Gentoo        805.0947  642.4300  967.7594 0.0000000</code></pre>
+<p>Or with the <code>HSD.test()</code> function from the <code>{agricolae}</code> package, which denotes subgroups that are not significantly different from each other with the same letter:</p>
+<pre class="r"><code>library(agricolae)
+
+HSD.test(mod,
+  trt = c(&quot;sex&quot;, &quot;species&quot;),
+  console = TRUE # print results
+)</code></pre>
+<pre><code>## 
+## Study: mod ~ c(&quot;sex&quot;, &quot;species&quot;)
+## 
+## HSD Test for body_mass_g 
+## 
+## Mean Square Error:  95726.69 
+## 
+## sex:species,  means
+## 
+##                  body_mass_g      std  r  Min  Max
+## female:Adelie       3368.836 269.3801 73 2850 3900
+## female:Chinstrap    3527.206 285.3339 34 2700 4150
+## female:Gentoo       4679.741 281.5783 58 3950 5200
+## male:Adelie         4043.493 346.8116 73 3325 4775
+## male:Chinstrap      3938.971 362.1376 34 3250 4800
+## male:Gentoo         5484.836 313.1586 61 4750 6300
+## 
+## Alpha: 0.05 ; DF Error: 327 
+## Critical Value of Studentized Range: 4.054126 
+## 
+## Groups according to probability of means differences and alpha level( 0.05 )
+## 
+## Treatments with the same letter are not significantly different.
+## 
+##                  body_mass_g groups
+## male:Gentoo         5484.836      a
+## female:Gentoo       4679.741      b
+## male:Adelie         4043.493      c
+## male:Chinstrap      3938.971      c
+## female:Chinstrap    3527.206      d
+## female:Adelie       3368.836      d</code></pre>
+<p>If you have many groups to compare, plotting them might be easier to interpret:</p>
+<pre class="r"><code># set axis margins so labels do not get cut off
+par(mar = c(4.1, 13.5, 4.1, 2.1))
+
+# create confidence interval for each comparison
+plot(TukeyHSD(mod, which = &quot;sex:species&quot;),
+  las = 2 # rotate x-axis ticks
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-25-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>From the outputs and plot above, we conclude that all combinations of sex and species are significantly different, except between female Chinstrap and female Adelie (<span class="math inline">\(p\)</span>-value = 0.138) and male Chinstrap and male Adelie (<span class="math inline">\(p\)</span>-value = 0.581).</p>
+<p>These results, which are by the way in line with the boxplots shown above and which will be confirmed with the visualizations below, concludes the two-way ANOVA in R.</p>
+</div>
+<div id="visualizations" class="section level2">
+<h2>Visualizations</h2>
+<p>If you would like to visualize results in a different way to what has already been presented in the preliminary analyses, below are some ideas of useful plots.</p>
+<p>First, with the mean and standard error of the mean by subgroup using the <code>allEffects()</code> function from the <code>{effects}</code> package:</p>
+<pre class="r"><code># method 1
+library(effects)
+
+plot(allEffects(mod))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Or using the <code>{ggpubr}</code> package:</p>
+<pre class="r"><code># method 2
+library(ggpubr)
+
+ggline(subset(dat, !is.na(sex)), # remove NA level for sex
+  x = &quot;species&quot;,
+  y = &quot;body_mass_g&quot;,
+  color = &quot;sex&quot;,
+  add = c(&quot;mean_se&quot;) # add mean and standard error
+) +
+  labs(y = &quot;Mean of body mass (g)&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Alternatively, using <code>{Rmisc}</code> and <code>{ggplot2}</code>:</p>
+<pre class="r"><code>library(Rmisc)
+
+# compute mean and standard error of the mean by subgroup
+summary_stat &lt;- summarySE(dat,
+  measurevar = &quot;body_mass_g&quot;,
+  groupvars = c(&quot;species&quot;, &quot;sex&quot;)
+)
+
+# plot mean and standard error of the mean
+ggplot(
+  subset(summary_stat, !is.na(sex)), # remove NA level for sex
+  aes(x = species, y = body_mass_g, colour = sex)
+) +
+  geom_errorbar(aes(ymin = body_mass_g - se, ymax = body_mass_g + se), # add error bars
+    width = 0.1 # width of error bars
+  ) +
+  geom_point() +
+  labs(y = &quot;Mean of body mass (g)&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-28-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Second, if you prefer to draw only the mean by subgroup:</p>
+<pre class="r"><code>with(
+  dat,
+  interaction.plot(species, sex, body_mass_g)
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-29-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Last but not least, for those of you who are familiar with GraphPad, you are most likely familiar with plotting means and error bars as follows:</p>
+<pre class="r"><code># plot mean and standard error of the mean as barplots
+ggplot(
+  subset(summary_stat, !is.na(sex)), # remove NA level for sex
+  aes(x = species, y = body_mass_g, fill = sex)
+) +
+  geom_bar(position = position_dodge(), stat = &quot;identity&quot;) +
+  geom_errorbar(aes(ymin = body_mass_g - se, ymax = body_mass_g + se), # add error bars
+    width = 0.25, # width of error bars
+    position = position_dodge(.9)
+  ) +
+  labs(y = &quot;Mean of body mass (g)&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>In this post, we started with a few reminders of the different tests that exist to compare a quantitative variable across groups. We then focused on the two-way ANOVA, starting from its goal and hypotheses to its implementation in R, together with the interpretations and some visualizations. We also briefly mentioned its underlying assumptions and one post-hoc test to compare all subgroups.</p>
+<p>All this was illustrated with the <code>penguins</code> dataset available from the <code>{palmerpenguins}</code> package.</p>
+<p>Thanks for reading.</p>
+<p>I hope this article will help you in conducting a two-way ANOVA with your data.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>In theory, a one-way ANOVA can also be used to compare 2 groups, and not only 3 or more. Nonetheless, in practice, it is often the case that a Student’s t-test is performed to compare 2 groups, and a one-way ANOVA to compare 3 or more groups. Conclusions obtained via a Student’s t-test for independent samples and a one-way ANOVA with 2 groups will be similar.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Note that if the normality assumption is not met, many transformations can be applied to improve it, the most common one being the logarithmic transformation (<code>log()</code> function in R).<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Note that the Bartlett’s test is also appropriate to test the assumption of equal variances.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>An additive model makes the assumption that the 2 explanatory variables are independent; they do not interact with each other.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Where <code>mod</code> is the name of your saved model.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>Here, we use the Benjamini &amp; Hochberg (1995) correction, but you can choose between several methods. See <code>?p.adjust</code> for more details.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
