@@ -37,7 +37,9 @@ set.seed(42)
 
 The two-way ANOVA (analysis of variance) is a statistical method that allows to **evaluate the simultaneous effect of two [categorical](/blog/variable-types-and-examples/#qualitative) variables on a [quantitative continuous](/blog/variable-types-and-examples/#continuous) variable**.
 
-The two-way ANOVA is an extension of the one-way ANOVA since it allows to evaluate the effects on a numerical response of **two** categorical variables instead of one. The advantage of a two-way ANOVA over a one-way ANOVA is that we test the relationship between two variables, while taking into account the effect of a third variable. Moreover, it also allows to include the possible *interaction* of the two categorical variables on the response.
+The two-way ANOVA is an extension of the one-way ANOVA since it allows to evaluate the effects on a numerical response of **two** categorical variables instead of one. 
+
+The advantage of a two-way ANOVA over a one-way ANOVA is that we test the relationship between two variables, while taking into account the effect of a third variable. Moreover, it also allows to include the possible *interaction* of the two categorical variables on the response to evaluate whether or not they act **jointly** on the response variable.
 
 The advantage of a two-way over a one-way ANOVA is quite similar to the advantage of a [multiple linear regression](/blog/multiple-linear-regression-made-simple/) over a [correlation](/blog/correlation-coefficient-and-correlation-test-in-r/):
 
@@ -59,6 +61,7 @@ Before going further, I would like to mention and briefly describe some related 
   + simple linear regression if there is only one independent variable (which can be quantitative or qualitative)
   + multiple linear regression if there is at least two independent variables (which can be quantitative, qualitative, or a mix of both)
 - An ANCOVA (analysis of covariance) is used to evaluate the effect of a categorical variable on a quantitative variable, while controlling for the effect of another quantitative variable (known as covariate). ANCOVA is actually a special case of multiple linear regression with a mix of one qualitative and one quantitative independent variable.
+- A mixed ANOVA is used to test differences between two or more groups whilst subjecting participants to repeated measures: one factor (a fixed effects factor) is a between-subjects variable (for example, treatment A and B, with patients receiving only one of the two treatments) and the other (a random effects factor) is a within-subjects variable (for example, measurements are made on day 1, day 2 and day 3 on all subjects).
 
 In this post, we start by explaining when and why a two-way ANOVA is useful, we then do some preliminary descriptive analyses and present how to conduct a two-way ANOVA in R. Finally, we show how to interpret and visualize the results. We also briefly mention and illustrate how to verify the underlying assumptions.
 
@@ -108,7 +111,7 @@ Here, we would like to know if body mass depends on species and/or sex. In parti
 
 The first two relationships are referred as **main effects**, while the third point is known as the **interaction effect**.
 
-The main effects test whether at least one group is different from another one (while controlling for the other independent variable). On the other hand, the interaction effect aims at testing whether the relationship between two variables differs *depending on the level of a third variable*.
+The main effects test whether at least one group is different from another one (while controlling for the other independent variable). On the other hand, the interaction effect aims at testing whether the relationship between two variables differs *depending on the level of a third variable*. In other words, if the evolution between the response and the first categorical variable does not depend on the modalities of the second categorical variable, then there is no interaction between the two variables. If, on the contrary, there is a modification of this evolution, either by an increase in the effect of the first variable, or by a decrease, then there is an interaction.
 
 When performing a two-way ANOVA, testing the interaction effect is not mandatory. However, omitting an interaction effect may lead to erroneous conclusions if the interaction effect is present.
 
@@ -148,9 +151,11 @@ The dependent variable body mass is [quantitative continuous](/blog/variable-typ
 
 Therefore, this assumption is met.
 
+If your dependent variable is [quantitative discrete](/blog/variable-types-and-examples/#discrete), this is count data, which, strictly speaking, should be analyzed using a generalized linear model, not an ANOVA.
+
 ## Independence
 
-Independence is usually checked based on the design of the experiment and how data have been collected.
+Independence is usually checked based on the design of the experiment and how data have been collected.^[If you really want to test the independence, you can do so visually with a plot of the residuals vs. fitted values. This plot can be done in R with `plot(mod, which = 1)`, where `mod` corresponds to the name of your model. Or you can do so with the Durbin-Watson test. In R, it can be done with the `durbinWatsonTest()` function from the `{car}` package.]
 
 To keep it simple, observations are usually:
 
@@ -158,6 +163,8 @@ To keep it simple, observations are usually:
 - **dependent** if each experimental unit has been measured at least twice (as it is often the case in the medical field for example, with two measurements on the same subjects; one before and one after the treatment).
 
 In our case, body mass has been measured only once on each penguin, and on a representative and random sample of the population, so the independence assumption is met.
+
+Note that if your data correspond to observations made several times on the same experimental units (for example, if one of the factors is a treatment (A or B) and the second factor is time (day 1, day 2 and day 3), and measurements are made at each time point on the same subjects), a two-way *mixed* ANOVA should be used.
 
 ## Normality
 
@@ -226,7 +233,9 @@ $\Rightarrow$ We do not reject the null hypothesis that the residuals follow a n
 
 From the QQ-plot, histogram and Shapiro-Wilk test, we conclude that we do not reject the null hypothesis of normality of the residuals.
 
-The normality assumption is thus verified, we can now check the equality of the variances.^[Note that if the normality assumption is not met, many transformations can be applied to improve it, the most common one being the logarithmic transformation (`log()` function in R).]
+The normality assumption is thus verified, we can now check the equality of the variances.
+
+Note that if the normality assumption is not met, many transformations can be applied on the dependent variable to improve it, the most common ones being the logarithmic (`log()` function in R) and the Box-Cox transformations. If the normality assumption is still not met on the transformed data, the non-parametric version of the two-way ANOVA, the [Scheirer–Ray–Hare test](https://rcompanion.org/handbook/F_14.html){target="_blank"}, can be used. Alternatively, a permutation test can also be used.
 
 ## Homogeneity of variances
 
@@ -238,7 +247,7 @@ plot(mod, which = 3)
 
 Since the spread of the residuals is constant, the red smooth line is horizontal and flat, so it looks like the constant variance assumption is satisfied here.
 
-The diagnostic plot above is sufficient, but if you prefer it can also be tested more formally with the Levene's test (also from the `{car}` package):^[Note that the Bartlett's test is also appropriate to test the assumption of equal variances.]
+The diagnostic plot above is sufficient, but if you prefer it can also be tested more formally with the Levene's test (also from the `{car}` package):^[Note that the Bartlett's  and Fligner-Killeen tests are also appropriate to test the assumption of equal variances.]
 
 ```{r}
 leveneTest(mod)
@@ -247,6 +256,8 @@ leveneTest(mod)
 $\Rightarrow$ We do not reject the null hypothesis that the variances are equal ($p$-value = 0.227).
 
 Both the visual and formal approaches give the same conclusion; we do not reject the hypothesis of homogeneity of the variances.
+
+Note that, as for the normality, the logarithmic and Box-Cox transformations may improve homogeneity of the residuals.
 
 ## Outliers
 
@@ -380,7 +391,16 @@ mod <- aov(body_mass_g ~ sex * species,
 summary(mod)
 ```
 
-The sum of squares (column `Sum Sq`) shows that the species explain a large part of the variability of body mass. It is the most important factor in explaining this variability.
+Similar to a one-way ANOVA, the principle of a two-way ANOVA is based on the total dispersion of the data, and its decomposition into four components:
+
+1. the share attributable to the first factor
+1. the share attributable to the second factor
+1. the share attributable to the interaction of the 2 factors
+1. the unexplained, or residual portion.
+
+The sum of squares (column `Sum Sq`) shows these four components. The two-way ANOVA consists of using a statistical test to determine whether each of the dispersion component (attributable to the 2 factors studied and to their interaction) is significantly greater than the residual component. If this is the case, we conclude that the effect considered (factor A, factor B or the interaction) is significant.
+
+We see that the species explain a large part of the variability of body mass. It is the most important factor in explaining this variability.
 
 The $p$-values are displayed in the last column of the output above (`Pr(>F)`). From these $p$-values, we conclude that, at the 5% significance level:
 
@@ -409,7 +429,7 @@ For the readers who are used to perform [linear regressions in R](/blog/multiple
 
 The resemblance with a linear regression is not a surprise because a two-way ANOVA, like all ANOVA, is actually a linear model.
 
-Note that the following code works as well, and give the same results:
+Note that the following code works as well, and give the same results:^[To not be confused with the `anova()` function because it provides sequential results that depend on the order in which the variables appear in the model.]
 
 ```{r}
 # method 2
@@ -424,8 +444,8 @@ Note that the `aov()` function assumes a **balanced design**, meaning that we ha
 
 For **unbalanced design**, that is, unequal numbers of subjects in each subgroup, the recommended methods are:
 
-- the type II ANOVA when there is **no** significant interaction, which can be done in R with `Anova(mod, type = "II")`,^[Where `mod` is the name of your saved model.] and
-- the type III ANOVA when there is a significant interaction, which can be done in R with `Anova(mod, type = "III")`.
+- the type II ANOVA when there is **no** significant interaction, which can be done in R with `Anova(mod, type = "II")` or `Anova(mod, type = 2)`, where `mod` is the name of your saved model, and
+- the type III ANOVA when there is a significant interaction, which can be done in R with `Anova(mod, type = "III")` or `Anova(mod, type = 3)`.
 
 This is beyond the scope of the post and we assume a balanced design here. For the interested reader, see this [detailed discussion](https://mcfromnz.wordpress.com/2011/03/02/anova-type-iiiiii-ss-explained/){target="_blank"} about type I, type II and type III ANOVA.
 
@@ -464,9 +484,11 @@ Last, it could also be that body mass is significantly different between **all**
 
 As for a [one-way ANOVA](/blog/anova-in-r/), we cannot, at this stage, know precisely which species is different from which one in terms of body mass. To know this, we need to compare each species two by two thanks to post-hoc tests (also known as pairwise comparisons).
 
-There are several post-hoc tests, the most common one being the Tukey HSD, which tests all possible pairs of groups. As mentioned earlier, this test only needs to be done on the species variable because there are only two levels for the sex.
+There are several post-hoc tests, the most common ones being the Tukey HSD which tests all possible pairs of groups, and the Dunett's test which compares all groups to a reference group. As mentioned earlier, these tests should not be done on the sex variable because there are only two levels.
 
-As for the one-way ANOVA, the Tukey HSD can be done in R as follows:
+In this post, we show only the Tukey HSD test. For the interested reader, the Dunnett's test is illustrated [here](/blog/anova-in-r/#dunnetts-test).
+
+As for the one-way ANOVA, the Tukey HSD test can be done in R as follows:
 
 ```{r}
 # method 1
@@ -481,12 +503,14 @@ or using the `{multcomp}` package:
 # method 2
 library(multcomp)
 
-summary(glht(
+res_tukey <- glht(
   aov(body_mass_g ~ sex + species,
     data = dat
   ),
   linfct = mcp(species = "Tukey")
-))
+)
+
+summary(res_tukey)
 ```
 
 or using the `pairwise.t.test()` function using the $p$-value adjustment method of your choice:^[Here, we use the Benjamini & Hochberg (1995) correction, but you can choose between several methods. See `?p.adjust` for more details.]
