@@ -1,0 +1,130 @@
+---
+title: Scrape Yahoo search engine results with R
+author: Antoine Soetewey
+date: '2023-08-24'
+slug: scrape-yahoo-search-engine-results-with-r
+categories: []
+tags:
+  - Guest post
+  - Collaboration
+  - Web
+  - R
+meta_img: blog/scrape-yahoo-search-engine-results-with-r/images/Scrape-Yahoo-search-engine-results-with-R-statsandr.jpeg
+description: Learn how to scrape Yahoo search engine results with R using the rvest package
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
+)
+
+set.seed(42)
+```
+
+![](images/Scrape-Yahoo-search-engine-results-with-R-statsandr.jpeg){width=100%}
+
+*Note: This is a guest post by Manthan Koolwal, founder of Scrapingdog.*
+
+# Introduction
+
+Web scraping is the process of extracting data from websites. It is usually done in an automated manner to obtain a large amounts of data through various websites, without the need to gather data by hand.
+
+In a [previous post](/blog/web-scraping-in-r/), we introduced this method and illustrated it with a Wikipedia page. Although there are a lot of [use cases of web scraping](https://www.scrapingdog.com/blog/web-scraping-use-cases/){target="_blank"}, in this blog post, we are restricting ourselves to scraping search results from Yahoo using R. Scraping search engine results can help you with SEO analysis, competitor analysis, keyword research, trend analysis, etc.
+
+# Scraping Yahoo search engine results with R
+
+After [installing R and RStudio](/blog/how-to-install-r-and-rstudio/), we first need to load the necessary packages by running the following commands:^[Note that, as for any R package, it must first be installed (with the `install.packages()` function) before being loaded (with the `library()` function).]
+
+```{r}
+# install.packages("rvest")
+# install.packages("jsonlite")
+# install.packages("purrr")
+
+library(rvest)
+library(jsonlite)
+library(purrr)
+```
+
+The `{rvest}` package is for web scraping, the `{jsonlite}` package is for working with JSON data and the `{purrr}` package is for working with functions and vectors.
+
+It is always better to decide in advance what exactly we are going to scrape. For this tutorial, we are going to scrape search results from this [URL](https://search.yahoo.com/search?p=pizza){target="_blank"}:
+
+![](images/Scrape-Yahoo-search-engine-results-with-R-statsandr_2.png){width=100%}
+
+We are going to scrape the following data points from this page:
+
+- Link
+- Title
+- Description
+
+For this, we define the URL of the Yahoo search results page that we want to scrape. In this case, we are searching for the word "pizza".
+
+```{r}
+# URL of the Yahoo search results page
+url <- "https://search.yahoo.com/search?p=pizza"
+```
+
+We then use the `read_html()` function from the `{rvest}` package to read the HTML content of the provided URL:
+
+```{r}
+# Read the HTML content of the page
+page <- read_html(url)
+```
+
+This creates an HTML document object that we can work with:
+
+```{r}
+str(page)
+```
+
+Here's where we start the process of extracting the search results:
+
+```{r}
+# Extract search results
+results <- page %>%
+  html_nodes(".algo-sr") %>% # Selector for search result elements
+  html_nodes("a") %>% # Select the <a> elements within the search results
+  # Extract link, title, and description attributes
+  map_df(~ data.frame(
+    link = .x %>% html_attr("href"),
+    title = .x %>% html_text(),
+    description = .x %>% html_attr("title"),
+    stringsAsFactors = FALSE
+  ))
+```
+
+In the code above:
+
+- We use `%>%` (pipe operator) to chain multiple operations together for clarity.
+- First, we use `html_nodes(".algo-sr")` to select the search result elements with the class `.algo-sr`. These elements contain the links to the search results.
+- Within each search result element, we further select the `<a>` elements using `html_nodes("a")`. These `<a>` elements contain the link, title, and description information.
+- Using `map_df()`, we iterate through each `<a>` element and extract the link, title, and description attributes.
+- We create a data frame with these attributes for each search result.
+
+Finally, we convert the results data frame into JSON format using the `toJSON()` function from the `{jsonlite}` package. The `pretty = TRUE` argument adds indentation for better readability. We use `cat()` to print the JSON-formatted results to the console.
+
+```{r}
+# Print the results in JSON format
+cat(toJSON(results, pretty = TRUE))
+```
+
+# Conclusion
+
+Thanks for reading.
+
+This was a simple tutorial in which we scraped Yahoo search results with R. Following the same process, you can create your own web crawler which can scrape search results from Yahoo for any web query. 
+
+Of course, you can scrape other search engines with almost the same technique. Also, you can check out this tutorial on [web scraping Google search results using Python](https://www.scrapingdog.com/blog/scrape-google-search-results/){target="_blank"}.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
+

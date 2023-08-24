@@ -1,0 +1,183 @@
+---
+title: Scrape Yahoo search engine results with R
+author: Antoine Soetewey
+date: '2023-08-24'
+slug: scrape-yahoo-search-engine-results-with-r
+categories: []
+tags:
+  - Guest post
+  - Collaboration
+  - Web
+  - R
+meta_img: blog/scrape-yahoo-search-engine-results-with-r/images/Scrape-Yahoo-search-engine-results-with-R-statsandr.jpeg
+description: Learn how to scrape Yahoo search engine results with R using the rvest package
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#scraping-yahoo-search-engine-results-with-r" id="toc-scraping-yahoo-search-engine-results-with-r">Scraping Yahoo search engine results with R</a></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
+</ul>
+</div>
+
+<p><img src="images/Scrape-Yahoo-search-engine-results-with-R-statsandr.jpeg" style="width:100.0%" /></p>
+<p><em>Note: This is a guest post by Manthan Koolwal, founder of Scrapingdog.</em></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Web scraping is the process of extracting data from websites. It is usually done in an automated manner to obtain a large amounts of data through various websites, without the need to gather data by hand.</p>
+<p>In a <a href="/blog/web-scraping-in-r/">previous post</a>, we introduced this method and illustrated it with a Wikipedia page. Although there are a lot of <a href="https://www.scrapingdog.com/blog/web-scraping-use-cases/" target="_blank">use cases of web scraping</a>, in this blog post, we are restricting ourselves to scraping search results from Yahoo using R. Scraping search engine results can help you with SEO analysis, competitor analysis, keyword research, trend analysis, etc.</p>
+</div>
+<div id="scraping-yahoo-search-engine-results-with-r" class="section level1">
+<h1>Scraping Yahoo search engine results with R</h1>
+<p>After <a href="/blog/how-to-install-r-and-rstudio/">installing R and RStudio</a>, we first need to load the necessary packages by running the following commands:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<pre class="r"><code># install.packages(&quot;rvest&quot;)
+# install.packages(&quot;jsonlite&quot;)
+# install.packages(&quot;purrr&quot;)
+
+library(rvest)
+library(jsonlite)
+library(purrr)</code></pre>
+<p>The <code>{rvest}</code> package is for web scraping, the <code>{jsonlite}</code> package is for working with JSON data and the <code>{purrr}</code> package is for working with functions and vectors.</p>
+<p>It is always better to decide in advance what exactly we are going to scrape. For this tutorial, we are going to scrape search results from this <a href="https://search.yahoo.com/search?p=pizza" target="_blank">URL</a>:</p>
+<p><img src="images/Scrape-Yahoo-search-engine-results-with-R-statsandr_2.png" style="width:100.0%" /></p>
+<p>We are going to scrape the following data points from this page:</p>
+<ul>
+<li>Link</li>
+<li>Title</li>
+<li>Description</li>
+</ul>
+<p>For this, we define the URL of the Yahoo search results page that we want to scrape. In this case, we are searching for the word “pizza”.</p>
+<pre class="r"><code># URL of the Yahoo search results page
+url &lt;- &quot;https://search.yahoo.com/search?p=pizza&quot;</code></pre>
+<p>We then use the <code>read_html()</code> function from the <code>{rvest}</code> package to read the HTML content of the provided URL:</p>
+<pre class="r"><code># Read the HTML content of the page
+page &lt;- read_html(url)</code></pre>
+<p>This creates an HTML document object that we can work with:</p>
+<pre class="r"><code>str(page)</code></pre>
+<pre><code>## List of 2
+##  $ node:&lt;externalptr&gt; 
+##  $ doc :&lt;externalptr&gt; 
+##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;xml_document&quot; &quot;xml_node&quot;</code></pre>
+<p>Here’s where we start the process of extracting the search results:</p>
+<pre class="r"><code># Extract search results
+results &lt;- page %&gt;%
+  html_nodes(&quot;.algo-sr&quot;) %&gt;% # Selector for search result elements
+  html_nodes(&quot;a&quot;) %&gt;% # Select the &lt;a&gt; elements within the search results
+  # Extract link, title, and description attributes
+  map_df(~ data.frame(
+    link = .x %&gt;% html_attr(&quot;href&quot;),
+    title = .x %&gt;% html_text(),
+    description = .x %&gt;% html_attr(&quot;title&quot;),
+    stringsAsFactors = FALSE
+  ))</code></pre>
+<p>In the code above:</p>
+<ul>
+<li>We use <code>%&gt;%</code> (pipe operator) to chain multiple operations together for clarity.</li>
+<li>First, we use <code>html_nodes(".algo-sr")</code> to select the search result elements with the class <code>.algo-sr</code>. These elements contain the links to the search results.</li>
+<li>Within each search result element, we further select the <code>&lt;a&gt;</code> elements using <code>html_nodes("a")</code>. These <code>&lt;a&gt;</code> elements contain the link, title, and description information.</li>
+<li>Using <code>map_df()</code>, we iterate through each <code>&lt;a&gt;</code> element and extract the link, title, and description attributes.</li>
+<li>We create a data frame with these attributes for each search result.</li>
+</ul>
+<p>Finally, we convert the results data frame into JSON format using the <code>toJSON()</code> function from the <code>{jsonlite}</code> package. The <code>pretty = TRUE</code> argument adds indentation for better readability. We use <code>cat()</code> to print the JSON-formatted results to the console.</p>
+<pre class="r"><code># Print the results in JSON format
+cat(toJSON(results, pretty = TRUE))</code></pre>
+<pre><code>## [
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08NtsVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzEEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.dominos.com%2fen%2f/RK=2/RS=0Yw3I.ROwngvCBu6CPZr8f5nvdk-&quot;,
+##     &quot;title&quot;: &quot;www.dominos.com › enPizza Delivery &amp; Carryout, Pasta, Chicken &amp; More | Domino&#39;s&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08NwsVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzIEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.pizzahut.com%2fmenu/RK=2/RS=EQoZv8ak0Kv5QDfk_wbfgy6ahJg-&quot;,
+##     &quot;title&quot;: &quot;www.pizzahut.com › menuPizza Hut Menu - Order Online | Pizza Hut&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08Nw8VXNyoA;_ylu=Y29sbwNiZjEEcG9zAzIEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=http%3a%2f%2fcc.bingj.com%2fcache.aspx%3fq%3dpizza%26d%3d4513525580824645%26mkt%3den-US%26setlang%3den-US%26w%3d7Hh_ulp0TXcEg4Q_eetSe-EjQiz044ye/RK=2/RS=PXALoofwnAAus3HXo5CkgXhtO5E-&quot;,
+##     &quot;title&quot;: &quot;Cached&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08NxMVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzMEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.pizzahut.com%2f/RK=2/RS=3RDQN4KRogvytQkkGZwJWJSmlFE-&quot;,
+##     &quot;title&quot;: &quot;www.pizzahut.comPizza Hut | Delivery &amp; Carryout - No One OutPizzas The Hut!&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08NxcVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzMEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=http%3a%2f%2fcc.bingj.com%2fcache.aspx%3fq%3dpizza%26d%3d4544062801248337%26mkt%3den-US%26setlang%3den-US%26w%3dtPWjDZhuaKMSZoUJhGr2O4uzzd46pLy3/RK=2/RS=AOVYaxqNvvOYyf1kY9ZCCsDOyZ4-&quot;,
+##     &quot;title&quot;: &quot;Cached&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08NxsVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzMEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.pizzahut.com%2f/RK=2/RS=3RDQN4KRogvytQkkGZwJWJSmlFE-&quot;,
+##     &quot;title&quot;: &quot;&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08Nx8VXNyoA;_ylu=Y29sbwNiZjEEcG9zAzMEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.pizzahut.com%2f/RK=2/RS=3RDQN4KRogvytQkkGZwJWJSmlFE-&quot;,
+##     &quot;title&quot;: &quot;&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08NyMVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzMEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.pizzahut.com%2f/RK=2/RS=3RDQN4KRogvytQkkGZwJWJSmlFE-&quot;,
+##     &quot;title&quot;: &quot;&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08NycVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzMEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.pizzahut.com%2f/RK=2/RS=3RDQN4KRogvytQkkGZwJWJSmlFE-&quot;,
+##     &quot;title&quot;: &quot;&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08NysVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzMEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.pizzahut.com%2f/RK=2/RS=3RDQN4KRogvytQkkGZwJWJSmlFE-&quot;,
+##     &quot;title&quot;: &quot;&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08N0sVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzQEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.papajohns.com%2f/RK=2/RS=bH8crJVzfX7dRqMLLvGYKpLDeMA-&quot;,
+##     &quot;title&quot;: &quot;www.papajohns.comPapa Johns Pizza Delivery &amp; Carryout - Best Deals on Pizza ...&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08N08VXNyoA;_ylu=Y29sbwNiZjEEcG9zAzQEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=http%3a%2f%2fcc.bingj.com%2fcache.aspx%3fq%3dpizza%26d%3d4855555305394749%26mkt%3den-US%26setlang%3den-US%26w%3d8IQPetFPzJugDURq7SF3Kq_9VpI1AXhm/RK=2/RS=3YXYmWt57xrxe48Sc5RSMJ1sHbM-&quot;,
+##     &quot;title&quot;: &quot;Cached&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08N1MVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzQEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.papajohns.com%2f/RK=2/RS=bH8crJVzfX7dRqMLLvGYKpLDeMA-&quot;,
+##     &quot;title&quot;: &quot;&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08N1cVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzQEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.papajohns.com%2f/RK=2/RS=bH8crJVzfX7dRqMLLvGYKpLDeMA-&quot;,
+##     &quot;title&quot;: &quot;&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08N1sVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzQEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.papajohns.com%2f/RK=2/RS=bH8crJVzfX7dRqMLLvGYKpLDeMA-&quot;,
+##     &quot;title&quot;: &quot;&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08N18VXNyoA;_ylu=Y29sbwNiZjEEcG9zAzQEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.papajohns.com%2f/RK=2/RS=bH8crJVzfX7dRqMLLvGYKpLDeMA-&quot;,
+##     &quot;title&quot;: &quot;&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08N2MVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzQEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2fwww.papajohns.com%2f/RK=2/RS=bH8crJVzfX7dRqMLLvGYKpLDeMA-&quot;,
+##     &quot;title&quot;: &quot;&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08N2cVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzUEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=https%3a%2f%2flocations.pizzahut.com%2f/RK=2/RS=cjaMfWJyHZ3zzhhnDKz8jypnxv0-&quot;,
+##     &quot;title&quot;: &quot;locations.pizzahut.comPizza Hut Near Me - Store Locations | Pizza Hut&quot;
+##   },
+##   {
+##     &quot;link&quot;: &quot;https://r.search.yahoo.com/_ylt=AwrErl78Qudk.08N2sVXNyoA;_ylu=Y29sbwNiZjEEcG9zAzUEdnRpZAMEc2VjA3Ny/RV=2/RE=1692906364/RO=10/RU=http%3a%2f%2fcc.bingj.com%2fcache.aspx%3fq%3dpizza%26d%3d4520534968571043%26mkt%3den-US%26setlang%3den-US%26w%3dqPujuHsBFl4Hs9ghSFz6b1ORVP8st7vj/RK=2/RS=7kcaBS39KfDSVMMdoJjrbyMyfWk-&quot;,
+##     &quot;title&quot;: &quot;Cached&quot;
+##   }
+## ]</code></pre>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Thanks for reading.</p>
+<p>This was a simple tutorial in which we scraped Yahoo search results with R. Following the same process, you can create your own web crawler which can scrape search results from Yahoo for any web query.</p>
+<p>Of course, you can scrape other search engines with almost the same technique. Also, you can check out this tutorial on <a href="https://www.scrapingdog.com/blog/scrape-google-search-results/" target="_blank">web scraping Google search results using Python</a>.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>Note that, as for any R package, it must first be installed (with the <code>install.packages()</code> function) before being loaded (with the <code>library()</code> function).<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
