@@ -1,0 +1,268 @@
+---
+title: 'How to: one-way ANOVA by hand'
+author: Antoine Soetewey
+date: '2023-08-30'
+slug: how-to-one-way-anova-by-hand
+categories: []
+tags:
+  - Basics
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: blog/how-to-one-way-anova-by-hand/images/how-to-one-way-anova-by-hand.jpeg
+description: Learn how to perform a one-way Analysis Of VAriance (ANOVA) by hand to compare a quantitative measure between three groups or more
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
+)
+
+set.seed(42)
+
+library(DT)
+```
+
+![](images/how-to-one-way-anova-by-hand.jpeg){width=100%}
+
+# Introduction
+
+An ANOVA is a statistical test used to compare a [quantitative variable](/blog/variable-types-and-examples/#quantitative) between groups. In theory, it can be done with two groups.^[In that case, a [Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) is usually preferred over an ANOVA, although both tests will lead to the exact same conclusions.] However, in practice, it is used to compare three or more groups.
+
+In a previous post, we showed how to perform a [one-way ANOVA in R](/blog/anova-in-r/). In this post, we illustrate how to conduct a one-way ANOVA by hand, via what is usually called an "ANOVA table".
+
+# Data and hypotheses
+
+To illustrate the method, suppose we take a sample of 12 students, divided equally into three classes (A, B and C) and we observe their age. Here is the [sample](/blog/what-is-the-difference-between-population-and-sample/):
+
+```{r}
+#| echo: false
+dat <- data.frame(A = c(24, 31, 26, 23),
+                  B = c(24, 21, 19, 24),
+                  C = c(15, 21, 18, 18))
+
+datatable(dat,
+          rownames = FALSE,
+          options = list(dom = 't'))
+```
+
+<br>
+
+We are interested in comparing the [population](/blog/what-is-the-difference-between-population-and-sample/) means between classes.
+
+Remember that the null hypothesis of the ANOVA is that all means are equal, whereas the alternative hypothesis is that at least one mean is different from the other two. Formally, we have:
+
+- $\mu_A = \mu_B = \mu_C$
+- at least one mean is different
+
+# ANOVA by hand
+
+As mentioned above, we are going to do an ANOVA table to conclude the test.
+
+## Overall and group means
+
+We first need to compute the [mean](/blog/descriptive-statistics-by-hand/#mean) age by class (referred as the group means):
+
+- class A: $\frac{24 + 31 + 26 + 23}{4} = 26$
+- class B: $\frac{24 + 21 + 19 + 24}{4} = 22$
+- class C: $\frac{15 + 21 + 18 + 18}{4} = 18$
+
+and the mean age for the whole sample (referred as the overall mean):
+
+$$\frac{24 + 31 + 26 + 23 + 24 + 21 + 19 + 24 + 15 + 21 + 18 + 18}{12} = 22$$
+
+## SSR and SSE
+
+We then need to compute the sum of squares regression (SSR), and the sum of squares error (SSE).
+
+The SSR is computed by taking the square of the difference between the mean group and the overall mean, multiplied by the number of observations in the group:
+
+```{r}
+#| echo: false
+dat3 <- data.frame(A = c("4 * ((26 - 22)^2) = 64"),
+                   B = c("4 * ((22 - 22)^2) = 0"),
+                   C = c("4 * ((18 - 26)^2) = 64")
+                  )
+
+datatable(dat3,
+          rownames = FALSE,
+          options = list(dom = 't'))
+```
+
+<br>
+
+and then taking the sum of all cells:
+
+$$64+0+64 = 128 = SSR$$
+
+The SSE is computed by taking the square of the difference between each observation and its group mean:
+
+```{r}
+#| echo: false
+dat2 <- data.frame(A = c("(24 - 26)^2 = 4", "(31 - 26)^2 = 25", "(26 - 26)^2 = 0", "(23 - 26)^2 = 9"),
+                   B = c("(24 - 22)^2 = 4", "(21 - 22)^2 = 1", "(19 - 22)^2 = 9", "(24 - 22)^2 = 4"),
+                   C = c("(15 - 18)^2 = 9", "(21 - 18)^2 = 9", "(18 - 18)^2 = 0", "(18 - 18)^2 = 0")
+                  )
+
+datatable(dat2,
+          rownames = FALSE,
+          options = list(dom = 't'))
+```
+
+<br>
+
+and then taking the sum of all cells:
+
+$$4+25+0+9+4+1+9+4+9+9+0+0 = 74 = SSE$$
+
+
+
+For those interested in computing the sum of square total (SST), it is simply the sum of SSR and SSE, that is,
+
+$$SST = SSR + SSE = 128 + 74 = 202$$
+
+## ANOVA table
+
+The ANOVA table looks as follows (we leave it empty and we are going to fill it in step by step):
+
+```{r}
+#| echo: false
+dat4 <- data.frame("Type" = c("Regression", "Error"),
+                   "Sum of Sq." = c(NA, NA),
+                   "Df" = c(NA, NA),
+                   "Mean Sq." = c(NA, NA),
+                   "F-value" = c(NA, NA)
+                  )
+
+datatable(dat4,
+          rownames = FALSE,
+          options = list(dom = 't'))
+```
+
+<br>
+
+We start to build the ANOVA table by plugging the SSR and SSE values found above into the table (in the "Sum.of.Sq." column):
+
+```{r}
+#| echo: false
+dat4$Sum.of.Sq. <- c(128, 74)
+
+datatable(dat4,
+          rownames = FALSE,
+          options = list(dom = 't'))
+```
+
+<br>
+
+The "Df" column corresponds to the degrees of freedom, and is computed as follows:
+
+- for the line regression: number of groups - 1 = 3 - 1 = 2
+- for the line error: number of observations - number of groups = 12 - 3 = 9
+
+With this information, the ANOVA table becomes:
+
+```{r}
+#| echo: false
+dat4$Df <- c(2, 9)
+
+datatable(dat4,
+          rownames = FALSE,
+          options = list(dom = 't'))
+```
+
+<br>
+
+The "Mean.Sq." column corresponds to the Mean Square, and is equal to the sum of square divided by the degrees of freedom, so the "Sum.of.Sq." column divided by the "Df" column:
+
+```{r}
+#| echo: false
+dat4$Mean.Sq. <- round(dat4$Sum.of.Sq. / dat4$Df, 3)
+
+datatable(dat4,
+          rownames = FALSE,
+          options = list(dom = 't'))
+```
+
+<br>
+
+Finally, the F-value corresponds to the ratio between the two mean squares, so $\frac{64}{8.222} = 7.78$:
+
+```{r}
+#| echo: false
+dat4$F.value[1] <- round(dat4[1, 4] / dat4[2, 4], 2)
+
+datatable(dat4,
+          rownames = FALSE,
+          options = list(dom = 't'))
+```
+
+<br>
+
+This F-value gives the test statistic (also referred as $F_{obs}$), which needs to be compared with the critical value found in the Fisher table to conclude the test.
+
+We find the critical value in the Fisher table based on the degrees of freedom (those used in the ANOVA table) and based on the significance level. Suppose we take a significance level $\alpha = 0.05$, the critical value can be found in the Fisher table as follows:
+
+![](images/anova-by-hand-fisher-table.png){width=100%}
+
+So we have
+
+$$F_{2; 9; 0.05} = 4.26$$
+
+If you are interested to find this value with R, it can be found with the `qf()` function, where 0.95 corresponds to $1 - \alpha$:
+
+```{r}
+qf(0.95, 2, 9)
+```
+
+## Conclusion of the test
+
+The rejection rule says that, if:
+
+- $F_{obs} > F_{2; 9; 0.05} \Rightarrow$ we reject the null hypothesis
+- $F_{obs} \le F_{2; 9; 0.05} \Rightarrow$ we *do not* reject the null hypothesis
+
+In our case,
+
+$$F_{obs} = 7.78 > F_{2; 9; 0.05} = 4.26$$
+
+$\Rightarrow$ We reject the null hypothesis that all means are equal. In other words, it means that at least one class is different than the other two in terms of age.^[Remember that an ANOVA cannot tell you which group is different than the other in terms of the quantitative dependent variable, nor whether they are all different or if only one is different. To answer this question, post-hoc tests are required. This is beyond the scope of the present post, but it can easily be done in R (see this [tutorial](/blog/anova-in-r/)).]
+
+To verify our results, here is the ANOVA table using R:
+
+```{r}
+#| echo: false
+dat_long <- data.frame(class = rep(c("A", "B", "C"), each = 4),
+                       age = c(dat$A, dat$B, dat$C))
+
+res_aov <- aov(age ~ class,
+  data = dat_long
+)
+
+summary(res_aov)
+```
+
+We found the same results by hand, but note that in R, the $p$-value is computed instead of comparing the $F_{obs}$ with the critical value. The $p$-value can easily be found in R based on the $F_{obs}$ and the degrees of freedom:
+
+```{r}
+pf(7.78, 2, 9,
+   lower.tail = FALSE)
+```
+
+# Conclusion
+
+Thanks for reading.
+
+I hope this article helped you to conduct a one-way ANOVA by hand. See this [tutorial](/blog/anova-in-r/) if you want to learn how to do it in R.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.

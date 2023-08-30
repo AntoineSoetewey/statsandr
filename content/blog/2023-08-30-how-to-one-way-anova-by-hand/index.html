@@ -1,0 +1,170 @@
+---
+title: 'How to: one-way ANOVA by hand'
+author: Antoine Soetewey
+date: '2023-08-30'
+slug: how-to-one-way-anova-by-hand
+categories: []
+tags:
+  - Basics
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: blog/how-to-one-way-anova-by-hand/images/how-to-one-way-anova-by-hand.jpeg
+description: Learn how to perform a one-way Analysis Of VAriance (ANOVA) by hand to compare a quantitative measure between three groups or more
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+<script src="{{< blogdown/postref >}}index_files/htmlwidgets/htmlwidgets.js"></script>
+<link href="{{< blogdown/postref >}}index_files/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/datatables-binding/datatables.js"></script>
+<script src="{{< blogdown/postref >}}index_files/jquery/jquery-3.6.0.min.js"></script>
+<link href="{{< blogdown/postref >}}index_files/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="{{< blogdown/postref >}}index_files/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/dt-core/js/jquery.dataTables.min.js"></script>
+<link href="{{< blogdown/postref >}}index_files/crosstalk/css/crosstalk.min.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/crosstalk/js/crosstalk.min.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#data-and-hypotheses" id="toc-data-and-hypotheses">Data and hypotheses</a></li>
+<li><a href="#anova-by-hand" id="toc-anova-by-hand">ANOVA by hand</a>
+<ul>
+<li><a href="#overall-and-group-means" id="toc-overall-and-group-means">Overall and group means</a></li>
+<li><a href="#ssr-and-sse" id="toc-ssr-and-sse">SSR and SSE</a></li>
+<li><a href="#anova-table" id="toc-anova-table">ANOVA table</a></li>
+<li><a href="#conclusion-of-the-test" id="toc-conclusion-of-the-test">Conclusion of the test</a></li>
+</ul></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
+</ul>
+</div>
+
+<p><img src="images/how-to-one-way-anova-by-hand.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>An ANOVA is a statistical test used to compare a <a href="/blog/variable-types-and-examples/#quantitative">quantitative variable</a> between groups. In theory, it can be done with two groups.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> However, in practice, it is used to compare three or more groups.</p>
+<p>In a previous post, we showed how to perform a <a href="/blog/anova-in-r/">one-way ANOVA in R</a>. In this post, we illustrate how to conduct a one-way ANOVA by hand, via what is usually called an “ANOVA table”.</p>
+</div>
+<div id="data-and-hypotheses" class="section level1">
+<h1>Data and hypotheses</h1>
+<p>To illustrate the method, suppose we take a sample of 12 students, divided equally into three classes (A, B and C) and we observe their age. Here is the <a href="/blog/what-is-the-difference-between-population-and-sample/">sample</a>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-1" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"filter":"none","vertical":false,"data":[[24,31,26,23],[24,21,19,24],[15,21,18,18]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>A<\/th>\n      <th>B<\/th>\n      <th>C<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>We are interested in comparing the <a href="/blog/what-is-the-difference-between-population-and-sample/">population</a> means between classes.</p>
+<p>Remember that the null hypothesis of the ANOVA is that all means are equal, whereas the alternative hypothesis is that at least one mean is different from the other two. Formally, we have:</p>
+<ul>
+<li><span class="math inline">\(\mu_A = \mu_B = \mu_C\)</span></li>
+<li>at least one mean is different</li>
+</ul>
+</div>
+<div id="anova-by-hand" class="section level1">
+<h1>ANOVA by hand</h1>
+<p>As mentioned above, we are going to do an ANOVA table to conclude the test.</p>
+<div id="overall-and-group-means" class="section level2">
+<h2>Overall and group means</h2>
+<p>We first need to compute the <a href="/blog/descriptive-statistics-by-hand/#mean">mean</a> age by class (referred as the group means):</p>
+<ul>
+<li>class A: <span class="math inline">\(\frac{24 + 31 + 26 + 23}{4} = 26\)</span></li>
+<li>class B: <span class="math inline">\(\frac{24 + 21 + 19 + 24}{4} = 22\)</span></li>
+<li>class C: <span class="math inline">\(\frac{15 + 21 + 18 + 18}{4} = 18\)</span></li>
+</ul>
+<p>and the mean age for the whole sample (referred as the overall mean):</p>
+<p><span class="math display">\[\frac{24 + 31 + 26 + 23 + 24 + 21 + 19 + 24 + 15 + 21 + 18 + 18}{12} = 22\]</span></p>
+</div>
+<div id="ssr-and-sse" class="section level2">
+<h2>SSR and SSE</h2>
+<p>We then need to compute the sum of squares regression (SSR), and the sum of squares error (SSE).</p>
+<p>The SSR is computed by taking the square of the difference between the mean group and the overall mean, multiplied by the number of observations in the group:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-2" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"filter":"none","vertical":false,"data":[["4 * ((26 - 22)^2) = 64"],["4 * ((22 - 22)^2) = 0"],["4 * ((18 - 26)^2) = 64"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>A<\/th>\n      <th>B<\/th>\n      <th>C<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>and then taking the sum of all cells:</p>
+<p><span class="math display">\[64+0+64 = 128 = SSR\]</span></p>
+<p>The SSE is computed by taking the square of the difference between each observation and its group mean:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-3" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-3">{"x":{"filter":"none","vertical":false,"data":[["(24 - 26)^2 = 4","(31 - 26)^2 = 25","(26 - 26)^2 = 0","(23 - 26)^2 = 9"],["(24 - 22)^2 = 4","(21 - 22)^2 = 1","(19 - 22)^2 = 9","(24 - 22)^2 = 4"],["(15 - 18)^2 = 9","(21 - 18)^2 = 9","(18 - 18)^2 = 0","(18 - 18)^2 = 0"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>A<\/th>\n      <th>B<\/th>\n      <th>C<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>and then taking the sum of all cells:</p>
+<p><span class="math display">\[4+25+0+9+4+1+9+4+9+9+0+0 = 74 = SSE\]</span></p>
+<p>For those interested in computing the sum of square total (SST), it is simply the sum of SSR and SSE, that is,</p>
+<p><span class="math display">\[SST = SSR + SSE = 128 + 74 = 202\]</span></p>
+</div>
+<div id="anova-table" class="section level2">
+<h2>ANOVA table</h2>
+<p>The ANOVA table looks as follows (we leave it empty and we are going to fill it in step by step):</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-4" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4">{"x":{"filter":"none","vertical":false,"data":[["Regression","Error"],[null,null],[null,null],[null,null],[null,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Type<\/th>\n      <th>Sum.of.Sq.<\/th>\n      <th>Df<\/th>\n      <th>Mean.Sq.<\/th>\n      <th>F.value<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>We start to build the ANOVA table by plugging the SSR and SSE values found above into the table (in the “Sum.of.Sq.” column):</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-5" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-5">{"x":{"filter":"none","vertical":false,"data":[["Regression","Error"],[128,74],[null,null],[null,null],[null,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Type<\/th>\n      <th>Sum.of.Sq.<\/th>\n      <th>Df<\/th>\n      <th>Mean.Sq.<\/th>\n      <th>F.value<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>The “Df” column corresponds to the degrees of freedom, and is computed as follows:</p>
+<ul>
+<li>for the line regression: number of groups - 1 = 3 - 1 = 2</li>
+<li>for the line error: number of observations - number of groups = 12 - 3 = 9</li>
+</ul>
+<p>With this information, the ANOVA table becomes:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-6" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-6">{"x":{"filter":"none","vertical":false,"data":[["Regression","Error"],[128,74],[2,9],[null,null],[null,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Type<\/th>\n      <th>Sum.of.Sq.<\/th>\n      <th>Df<\/th>\n      <th>Mean.Sq.<\/th>\n      <th>F.value<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[1,2]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>The “Mean.Sq.” column corresponds to the Mean Square, and is equal to the sum of square divided by the degrees of freedom, so the “Sum.of.Sq.” column divided by the “Df” column:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-7" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-7">{"x":{"filter":"none","vertical":false,"data":[["Regression","Error"],[128,74],[2,9],[64,8.222],[null,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Type<\/th>\n      <th>Sum.of.Sq.<\/th>\n      <th>Df<\/th>\n      <th>Mean.Sq.<\/th>\n      <th>F.value<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[1,2,3]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>Finally, the F-value corresponds to the ratio between the two mean squares, so <span class="math inline">\(\frac{64}{8.222} = 7.78\)</span>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-8" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-8">{"x":{"filter":"none","vertical":false,"data":[["Regression","Error"],[128,74],[2,9],[64,8.222],[7.78,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Type<\/th>\n      <th>Sum.of.Sq.<\/th>\n      <th>Df<\/th>\n      <th>Mean.Sq.<\/th>\n      <th>F.value<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[1,2,3,4]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>This F-value gives the test statistic (also referred as <span class="math inline">\(F_{obs}\)</span>), which needs to be compared with the critical value found in the Fisher table to conclude the test.</p>
+<p>We find the critical value in the Fisher table based on the degrees of freedom (those used in the ANOVA table) and based on the significance level. Suppose we take a significance level <span class="math inline">\(\alpha = 0.05\)</span>, the critical value can be found in the Fisher table as follows:</p>
+<p><img src="images/anova-by-hand-fisher-table.png" style="width:100.0%" /></p>
+<p>So we have</p>
+<p><span class="math display">\[F_{2; 9; 0.05} = 4.26\]</span></p>
+<p>If you are interested to find this value with R, it can be found with the <code>qf()</code> function, where 0.95 corresponds to <span class="math inline">\(1 - \alpha\)</span>:</p>
+<pre class="r"><code>qf(0.95, 2, 9)</code></pre>
+<pre><code>## [1] 4.256495</code></pre>
+</div>
+<div id="conclusion-of-the-test" class="section level2">
+<h2>Conclusion of the test</h2>
+<p>The rejection rule says that, if:</p>
+<ul>
+<li><span class="math inline">\(F_{obs} &gt; F_{2; 9; 0.05} \Rightarrow\)</span> we reject the null hypothesis</li>
+<li><span class="math inline">\(F_{obs} \le F_{2; 9; 0.05} \Rightarrow\)</span> we <em>do not</em> reject the null hypothesis</li>
+</ul>
+<p>In our case,</p>
+<p><span class="math display">\[F_{obs} = 7.78 &gt; F_{2; 9; 0.05} = 4.26\]</span></p>
+<p><span class="math inline">\(\Rightarrow\)</span> We reject the null hypothesis that all means are equal. In other words, it means that at least one class is different than the other two in terms of age.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>To verify our results, here is the ANOVA table using R:</p>
+<pre><code>##             Df Sum Sq Mean Sq F value Pr(&gt;F)  
+## class        2    128   64.00   7.784 0.0109 *
+## Residuals    9     74    8.22                 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>We found the same results by hand, but note that in R, the <span class="math inline">\(p\)</span>-value is computed instead of comparing the <span class="math inline">\(F_{obs}\)</span> with the critical value. The <span class="math inline">\(p\)</span>-value can easily be found in R based on the <span class="math inline">\(F_{obs}\)</span> and the degrees of freedom:</p>
+<pre class="r"><code>pf(7.78, 2, 9,
+  lower.tail = FALSE
+)</code></pre>
+<pre><code>## [1] 0.010916</code></pre>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Thanks for reading.</p>
+<p>I hope this article helped you to conduct a one-way ANOVA by hand. See this <a href="/blog/anova-in-r/">tutorial</a> if you want to learn how to do it in R.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>In that case, a <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test</a> is usually preferred over an ANOVA, although both tests will lead to the exact same conclusions.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Remember that an ANOVA cannot tell you which group is different than the other in terms of the quantitative dependent variable, nor whether they are all different or if only one is different. To answer this question, post-hoc tests are required. This is beyond the scope of the present post, but it can easily be done in R (see this <a href="/blog/anova-in-r/">tutorial</a>).<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
