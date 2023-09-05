@@ -1,0 +1,529 @@
+---
+title: Pearson, Spearman and Kendall correlation coefficients by hand
+author: Antoine Soetewey
+date: '2023-09-05'
+slug: pearson-spearman-kendall-correlation-by-hand
+categories: []
+tags:
+  - Basics
+  - Descriptive statistics
+  - R
+  - Statistics
+meta_img: blog/pearson-spearman-kendall-correlation-by-hand/images/pearson-spearman-kendall-correlation-by-hand.jpeg
+description: Learn how to compute the Pearson, Spearman and Kendall correlation coefficients by hand to evaluate the relationship between two variables
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+<script src="{{< blogdown/postref >}}index_files/htmlwidgets/htmlwidgets.js"></script>
+<link href="{{< blogdown/postref >}}index_files/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/datatables-binding/datatables.js"></script>
+<script src="{{< blogdown/postref >}}index_files/jquery/jquery-3.6.0.min.js"></script>
+<link href="{{< blogdown/postref >}}index_files/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="{{< blogdown/postref >}}index_files/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/dt-core/js/jquery.dataTables.min.js"></script>
+<link href="{{< blogdown/postref >}}index_files/crosstalk/css/crosstalk.min.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/crosstalk/js/crosstalk.min.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#data" id="toc-data">Data</a>
+<ul>
+<li><a href="#with-ties" id="toc-with-ties">With ties</a></li>
+<li><a href="#without-ties" id="toc-without-ties">Without ties</a></li>
+</ul></li>
+<li><a href="#correlation-coefficients-by-hand" id="toc-correlation-coefficients-by-hand">Correlation coefficients by hand</a>
+<ul>
+<li><a href="#pearson" id="toc-pearson">Pearson</a>
+<ul>
+<li><a href="#with-and-without-ties" id="toc-with-and-without-ties">With and without ties</a></li>
+</ul></li>
+<li><a href="#spearman" id="toc-spearman">Spearman</a>
+<ul>
+<li><a href="#with-ties-1" id="toc-with-ties-1">With ties</a></li>
+<li><a href="#without-ties-1" id="toc-without-ties-1">Without ties</a></li>
+</ul></li>
+<li><a href="#kendall" id="toc-kendall">Kendall</a>
+<ul>
+<li><a href="#without-ties-2" id="toc-without-ties-2">Without ties</a></li>
+<li><a href="#with-ties-2" id="toc-with-ties-2">With ties</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#verification-in-r" id="toc-verification-in-r">Verification in R</a></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
+</ul>
+</div>
+
+<p><img src="images/pearson-spearman-kendall-correlation-by-hand.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In statistics, a correlation is used to evaluate the relationship between two variables.</p>
+<p>In a previous post, we showed how to <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">compute a correlation and perform a correlation test in R</a>. In this post, we illustrate how to compute the Pearson, Spearman and Kendall correlation coefficients by hand and under two different scenarios (i.e., with and without ties).</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>To illustrate the methods with and without ties, we consider two different datasets, one with ties and another without ties.</p>
+<div id="with-ties" class="section level2">
+<h2>With ties</h2>
+<p>For the illustrations of the scenarios with ties, suppose we have the following sample of size 5:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-1" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"filter":"none","vertical":false,"data":[[-1,3,5,5,2],[-3,1,0,2,-1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>As we can see, there are some ties since there are two identical observations in the variable <span class="math inline">\(x\)</span>.</p>
+</div>
+<div id="without-ties" class="section level2">
+<h2>Without ties</h2>
+<p>For the scenarios which require no ties, we will consider the following sample of size 3:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-2" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"filter":"none","vertical":false,"data":[[3,5,2],[5,1,-1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-2.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="correlation-coefficients-by-hand" class="section level1">
+<h1>Correlation coefficients by hand</h1>
+<p>The three most common correlation methods are:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<ol style="list-style-type: decimal">
+<li>Pearson, used for two <a href="/blog/variable-types-and-examples/#continuous">quantitative continuous</a> variables which have a linear relationship</li>
+<li>Spearman, used for two quantitative variables if the link is partially linear, or for one <a href="/blog/variable-types-and-examples/#ordinal">qualitative ordinal</a> variable and one quantitative variable</li>
+<li>Kendall, often used for two qualitative ordinal variables</li>
+</ol>
+<p>Each method is presented in the next sections.</p>
+<p>Note that the aim of this post is to illustrate how to compute the three correlation coefficients by hand and under two different scenarios; we are not interested in verifying the underlying assumptions.</p>
+<div id="pearson" class="section level2">
+<h2>Pearson</h2>
+<p>Luckily, the procedure for computing the Pearson correlation coefficient is the same whether there are ties or not so we do not distinguish the two scenarios.</p>
+<div id="with-and-without-ties" class="section level3">
+<h3>With and without ties</h3>
+<p>The Pearson correlation coefficient, denoted <span class="math inline">\(r\)</span> in the case of a sample, can be computed as follows<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p><span class="math display">\[
+r = \frac{\sum^n_{i = 1} x_i y_i - n \bar{x} \bar{y}}{(n - 1) s_x s_y}
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(n\)</span> is the sample size</li>
+<li><span class="math inline">\(x_i\)</span> and <span class="math inline">\(y_i\)</span> are the observations</li>
+<li><span class="math inline">\(\bar{x}\)</span> and <span class="math inline">\(\bar{y}\)</span> are the sample <a href="/blog/descriptive-statistics-by-hand/#mean">means</a> of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span></li>
+<li><span class="math inline">\(s_x\)</span> and <span class="math inline">\(s_y\)</span> are the sample <a href="/blog/descriptive-statistics-by-hand/#standard-deviation">standard deviations</a> of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span></li>
+</ul>
+<p>We show how to compute it step by step.</p>
+<p><strong>Step 1.</strong></p>
+<p>As you can see, before computing the correlation coefficient we first need to compute the mean and the standard deviation for each of the two variables.</p>
+<p>The mean of <span class="math inline">\(x\)</span> is computed as follows:</p>
+<p><span class="math display">\[\bar{x} = \frac{1}{n}\sum^n_{i = 1} x_i\]</span></p>
+<p>The standard deviation of <span class="math inline">\(x\)</span> is computed as follows:</p>
+<p><span class="math display">\[s_x = \sqrt{\frac{1}{n - 1} \sum^n_{i = 1}(x_i - \bar{x})^2}\]</span></p>
+<p>The formulas can be used analogously for the variable <span class="math inline">\(y\)</span>.</p>
+<p>We start by computing the means of the two variables:</p>
+<ul>
+<li><span class="math inline">\(\bar{x} = \frac{-1 + 3 + 5 + 5 + 2}{5} = 2.8\)</span></li>
+<li><span class="math inline">\(\bar{y} = \frac{-3 + 1 + 0 + 2 - 1}{5} = -0.2\)</span></li>
+</ul>
+<p><strong>Step 2.</strong></p>
+<p>We now need to compute the standard deviation of each variable. To ease the computations, it is best to use a table, starting with the observations:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-3" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-3">{"x":{"filter":"none","vertical":false,"data":[[-1,3,5,5,2],[-3,1,0,2,-1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>To compute the standard deviations, we need the sum of the squared differences between each observation and its mean, that is, <span class="math inline">\(\sum^n_{i = 1}(x_i - \bar{x})^2\)</span> and <span class="math inline">\(\sum^n_{i = 1}(y_i - \bar{y})^2\)</span>. We start by creating two new columns in the table, denoted <code>x-xbar</code> and <code>y-ybar</code>, corresponding to <span class="math inline">\((x_i - \bar{x})\)</span> and <span class="math inline">\((y_i - \bar{y})\)</span>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-4" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4">{"x":{"filter":"none","vertical":false,"data":[[-1,3,5,5,2],[-3,1,0,2,-1],[-3.8,0.2,2.2,2.2,-0.8],[-2.8,1.2,0.2,2.2,-0.8]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>x-xbar<\/th>\n      <th>y-ybar<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>We take the square of these two new columns to have <span class="math inline">\((x_i - \bar{x})^2\)</span> and <span class="math inline">\((y_i - \bar{y})^2\)</span>, denoted <code>(x-xbar)^2</code> and <code>(y-ybar)^2</code>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-5" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-5">{"x":{"filter":"none","vertical":false,"data":[[-1,3,5,5,2],[-3,1,0,2,-1],[-3.8,0.2,2.2,2.2,-0.8],[-2.8,1.2,0.2,2.2,-0.8],[14.44,0.04,4.84,4.84,0.64],[7.84,1.44,0.04,4.84,0.64]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>x-xbar<\/th>\n      <th>y-ybar<\/th>\n      <th>(x-xbar)^2<\/th>\n      <th>(y-ybar)^2<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3,4,5]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>We then sum these two columns, which gives:</p>
+<ul>
+<li>for <span class="math inline">\(x\)</span>: <span class="math inline">\(\sum^n_{i = 1}(x_i - \bar{x})^2 =\)</span> 24.8</li>
+<li>for <span class="math inline">\(y\)</span>: <span class="math inline">\(\sum^n_{i = 1}(y_i - \bar{y})^2 =\)</span> 14.8</li>
+</ul>
+<p>The standard deviations are thus:</p>
+<ul>
+<li><span class="math inline">\(s_x = \sqrt{\frac{24.8}{5-1}} = 2.49\)</span></li>
+<li><span class="math inline">\(s_y = \sqrt{\frac{14.8}{5-1}} = 1.92\)</span></li>
+</ul>
+<p><strong>Step 3.</strong></p>
+<p>We now need <span class="math inline">\(\sum^n_{i = 1} x_i y_i\)</span>, so we add a new column in the table, corresponding to <span class="math inline">\(x_iy_i\)</span> and denoted <code>x*y</code>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-6" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-6">{"x":{"filter":"none","vertical":false,"data":[[-1,3,5,5,2],[-3,1,0,2,-1],[-3.8,0.2,2.2,2.2,-0.8],[-2.8,1.2,0.2,2.2,-0.8],[14.44,0.04,4.84,4.84,0.64],[7.84,1.44,0.04,4.84,0.64],[3,3,0,10,-2]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>x-xbar<\/th>\n      <th>y-ybar<\/th>\n      <th>(x-xbar)^2<\/th>\n      <th>(y-ybar)^2<\/th>\n      <th>x*y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3,4,5,6]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 4.</strong></p>
+<p>We take the sum of that last column, which gives <span class="math inline">\(\sum^n_{i = 1} x_i y_i =\)</span> 14.</p>
+<p><strong>Step 5.</strong></p>
+<p>Finally, the Pearson correlation coefficient can be computed by plugging values found above in the initial formula:</p>
+<p><span class="math display">\[
+\begin{split}
+r &amp;= \frac{\sum^n_{i = 1} x_i y_i - n \bar{x} \bar{y}}{(n - 1) s_x s_y} \\
+&amp;= \frac{14 - (5\times2.8\times-0.2)}{(5-1) \times 2.49\times1.92} \\
+&amp;= 0.88
+\end{split}
+\]</span></p>
+<p>Note that there are other formulas to compute the Pearson correlation coefficient. For instance,</p>
+<p><span class="math display">\[
+\begin{split}
+r &amp;= \frac{1}{n - 1} \sum^n_{i = 1} \left(\frac{x_i - \bar{x}}{s_x}\right)\left(\frac{y_i - \bar{x}}{s_y}\right) \\
+&amp;= \frac{\sum^n_{i = 1}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum^n_{i = 1}(x_i - \bar{x})^2} \sqrt{\sum^n_{i = 1}(y_i - \bar{y})^2}}
+\end{split}
+\]</span></p>
+<p>All formulas will of course give the exact same results.</p>
+</div>
+</div>
+<div id="spearman" class="section level2">
+<h2>Spearman</h2>
+<p>We now present the Spearman correlation coefficient, also referred as Spearman’s rank correlation coefficient. This coefficient is actually the same than Pearson coefficient, except that the computations are based on the <em>ranked values</em> rather than on the raw observations.</p>
+<p>Again, we present how to compute it by hand step by step, but this time we distinguish two scenarios:</p>
+<ol style="list-style-type: decimal">
+<li>if there are ties</li>
+<li>if there are no ties</li>
+</ol>
+<div id="with-ties-1" class="section level3">
+<h3>With ties</h3>
+<p>The Spearman correlation coefficient (with ties), denoted <span class="math inline">\(r_s\)</span>, is defined as follows</p>
+<p><span class="math display">\[
+r_s = \frac{\sum^n_{i = 1} Rx_i Ry_i - n \overline{Rx} \overline{Ry}}{(n - 1) s_{Rx} s_{Ry}}
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(n\)</span> is the sample size</li>
+<li><span class="math inline">\(Rx_i\)</span> and <span class="math inline">\(Ry_i\)</span> are the ranks for the two variables</li>
+<li><span class="math inline">\(\overline{Rx}\)</span> and <span class="math inline">\(\overline{Ry}\)</span> are the sample means of the ranks for the two variables</li>
+<li><span class="math inline">\(s_{Rx}\)</span> and <span class="math inline">\(s_{Ry}\)</span> are the sample standard deviations of the ranks for the two variables</li>
+</ul>
+<p>Here is how to compute it by hand.</p>
+<p><strong>Step 1.</strong></p>
+<p>As mentioned before, the Spearman coefficient is based on the ranks. So we first need to add the ranks of the observations (from lowest to highest), separately for each of the two variables.</p>
+<p>For <span class="math inline">\(y\)</span>, we see that:</p>
+<ul>
+<li>-3 is the smallest value, so we assign it the rank 1</li>
+<li>-1 is the second smallest value, so we assign it the rank 2</li>
+<li>then comes 0, so we assign it the rank 3</li>
+<li>then comes 1, so we assign it the rank 4</li>
+<li>finally, 2 is the largest value, so we assign it the rank 5</li>
+</ul>
+<p>The same goes for <span class="math inline">\(x\)</span>, except that here we have two observations with the value 5 (so there will be ties in the ranks). In this case, we take the mean rank:</p>
+<ul>
+<li>-1 is the smallest value, so we assign it the rank 1</li>
+<li>2 is the second smallest value, so we assign it the rank 2</li>
+<li>then comes 3, so we assign it the rank 3</li>
+<li>finally, the two largest values belongs to rank 4 and 5, so we assign both of them the rank 4.5</li>
+</ul>
+<p>We include the ranks in the table, denoted <code>Rx</code> and <code>Ry</code>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-7" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-7">{"x":{"filter":"none","vertical":false,"data":[[-1,3,5,5,2],[-3,1,0,2,-1],[1,3,4.5,4.5,2],[1,4,3,5,2]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>Rx<\/th>\n      <th>Ry<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 2.</strong></p>
+<p>From there, it is similar than the Pearson coefficient except that we work on the ranks and not on the initial observations anymore. To avoid any confusion in the remaining steps, we remove the initial observations from the table and we keep only the ranks:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-8" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-8">{"x":{"filter":"none","vertical":false,"data":[[1,3,4.5,4.5,2],[1,4,3,5,2]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Rx<\/th>\n      <th>Ry<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>We start with the means of the ranks:</p>
+<ul>
+<li><span class="math inline">\(\overline{Rx} = \frac{1+3+4.5+4.5+2}{5} = 3\)</span></li>
+<li><span class="math inline">\(\overline{Ry} = \frac{1+4+3+5+2}{5} = 3\)</span></li>
+</ul>
+<p>For the standard deviations, we use the table as we did for the Pearson coefficient:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-9" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-9">{"x":{"filter":"none","vertical":false,"data":[[1,3,4.5,4.5,2],[1,4,3,5,2],[-2,0,1.5,1.5,-1],[-2,1,0,2,-1],[4,0,2.25,2.25,1],[4,1,0,4,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Rx<\/th>\n      <th>Ry<\/th>\n      <th>Rx-Rxbar<\/th>\n      <th>Ry-Rybar<\/th>\n      <th>(Rx-Rxbar)^2<\/th>\n      <th>(Ry-Rybar)^2<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3,4,5]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>We sum the last two columns, which gives:</p>
+<ul>
+<li>for <span class="math inline">\(x\)</span>: <span class="math inline">\(\sum^n_{i = 1}(Rx_i - \overline{Rx})^2 =\)</span> 9.5</li>
+<li>for <span class="math inline">\(y\)</span>: <span class="math inline">\(\sum^n_{i = 1}(Ry_i - \overline{Ry})^2 =\)</span> 10</li>
+</ul>
+<p>The standard deviations are thus:</p>
+<ul>
+<li><span class="math inline">\(s_{Rx} = \sqrt{\frac{9.5}{5-1}} = 1.54\)</span></li>
+<li><span class="math inline">\(s_{Ry} = \sqrt{\frac{10}{5-1}} = 1.58\)</span></li>
+</ul>
+<p><strong>Step 3.</strong></p>
+<p>We now need <span class="math inline">\(\sum^n_{i = 1} Rx_i Ry_i\)</span>, so we add a new column in the table, corresponding to <span class="math inline">\(Rx_iRy_i\)</span> and denoted <code>Rx*Ry</code>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-10" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-10">{"x":{"filter":"none","vertical":false,"data":[[1,3,4.5,4.5,2],[1,4,3,5,2],[-2,0,1.5,1.5,-1],[-2,1,0,2,-1],[4,0,2.25,2.25,1],[4,1,0,4,1],[1,12,13.5,22.5,4]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Rx<\/th>\n      <th>Ry<\/th>\n      <th>Rx-Rxbar<\/th>\n      <th>Ry-Rybar<\/th>\n      <th>(Rx-Rxbar)^2<\/th>\n      <th>(Ry-Rybar)^2<\/th>\n      <th>Rx*Ry<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3,4,5,6]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 4.</strong></p>
+<p>We take the sum of that last column, which gives <span class="math inline">\(\sum^n_{i = 1} Rx_i Ry_i =\)</span> 53.</p>
+<p><strong>Step 5.</strong></p>
+<p>Finally, the Spearman correlation coefficient can be computed by plugging all values in the initial formula:</p>
+<p><span class="math display">\[
+\begin{split}
+r_s &amp;= \frac{\sum^n_{i = 1} Rx_i Ry_i - n \overline{Rx} \overline{Ry}}{(n - 1) s_{Rx} s_{Ry}} \\
+&amp;= \frac{53 - (5\times3\times3)}{(5-1) \times 1.54\times1.58} \\
+&amp;= 0.82
+\end{split}
+\]</span></p>
+</div>
+<div id="without-ties-1" class="section level3">
+<h3>Without ties</h3>
+<p>When all initial values are different within each variable, meaning that all ranks are distinct integers, there are no ties. In that specific case, the Spearman coefficient can be computed with the following shortened formula:</p>
+<p><span class="math display">\[
+r_s = 1 - \frac{6 \sum^n_{i = 1}(Rx_i - Ry_i)^2}{n (n^2 - 1)}
+\]</span></p>
+<p>For example, suppose the sample without ties introduced at the beginning of the post:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-11" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-11">{"x":{"filter":"none","vertical":false,"data":[[3,5,2],[5,1,-1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 1.</strong></p>
+<p>All observations within each variable are different, so all ranks are distinct integers and there are no ties:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-12" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-12">{"x":{"filter":"none","vertical":false,"data":[[3,5,2],[5,1,-1],[2,3,1],[3,2,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>Rx<\/th>\n      <th>Ry<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 2.</strong></p>
+<p>We only need to compute the difference between the two ranks of each row, denoted <code>Rx-Ry</code>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-13" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-13">{"x":{"filter":"none","vertical":false,"data":[[3,5,2],[5,1,-1],[2,3,1],[3,2,1],[-1,1,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>Rx<\/th>\n      <th>Ry<\/th>\n      <th>Rx-Ry<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3,4]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>Take the square of these differences, denoted <code>(Rx-Ry)^2</code>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-14" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-14">{"x":{"filter":"none","vertical":false,"data":[[3,5,2],[5,1,-1],[2,3,1],[3,2,1],[-1,1,0],[1,1,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>Rx<\/th>\n      <th>Ry<\/th>\n      <th>Rx-Ry<\/th>\n      <th>(Rx-Ry)^2<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3,4,5]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>And then take the sum of that last column, which gives <span class="math inline">\(\sum^n_{i = 1}(Rx_i - Ry_i)^2 =\)</span> 2.</p>
+<p><strong>Step 3.</strong></p>
+<p>Finally, we can fill in the initial formula to find the Spearman coefficient:</p>
+<p><span class="math display">\[
+\begin{split}
+r_s &amp;= 1 - \frac{6 \sum^n_{i = 1}(Rx_i - Ry_i)^2}{n (n^2 - 1)} \\
+&amp;= 1 - \frac{6 \times2}{3 (3^2 - 1)} \\
+&amp;= 1 - \frac{12}{24} \\
+&amp;= 0.5
+\end{split}
+\]</span></p>
+</div>
+</div>
+<div id="kendall" class="section level2">
+<h2>Kendall</h2>
+<p>Kendall coefficient correlation, also known as Kendall’s <span class="math inline">\(\tau\)</span> coefficient, is similar than Spearman coefficient, except that it is often preferred for small samples and when many rank ties.</p>
+<p>Here also we distinguish between two scenarios:</p>
+<ul>
+<li>if there are no ties</li>
+<li>if there are ties</li>
+</ul>
+<p>Unlike Spearman coefficient, we first illustrate the scenario when there are no ties, and then when there are ties.</p>
+<div id="without-ties-2" class="section level3">
+<h3>Without ties</h3>
+<p>When there are no ties, the Kendall coefficient, denoted <span class="math inline">\(\tau_a\)</span>, is defined as follows</p>
+<p><span class="math display">\[
+\tau_a = \frac{C - D}{C + D}
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(C\)</span> is the number of concordant pairs</li>
+<li><span class="math inline">\(D\)</span> is the number of discordant pairs</li>
+</ul>
+<p>This coefficient, also referred as Kendall tau-a, does not make any adjustment for ties.</p>
+<p>Let’s see what are concordant and discordant pairs using the data without ties (the same data than for Spearman correlation without ties):</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-15" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-15">{"x":{"filter":"none","vertical":false,"data":[[3,5,2],[5,1,-1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 1.</strong></p>
+<p>We start by computing the ranks for each variable (<code>Rx</code> and <code>Ry</code>), as we did for the Spearman coefficient:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-16" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-16">{"x":{"filter":"none","vertical":false,"data":[[3,5,2],[5,1,-1],[2,3,1],[3,2,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>Rx<\/th>\n      <th>Ry<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 2.</strong></p>
+<p>We then arbitrarily choose a reference variable among the two, <code>Rx</code> or <code>Ry</code>. Suppose we take <code>Rx</code> as the reference variable here.</p>
+<p>We sort the dataset by this reference variable:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-17" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-17">{"x":{"filter":"none","vertical":false,"data":[[2,3,5],[-1,5,1],[1,2,3],[1,3,2]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>Rx<\/th>\n      <th>Ry<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>From now, we only look at the ranks of the second variable (the one which is <em>not</em> the reference level, here <code>Ry</code>), so to avoid any confusion in the remaining steps we keep only the <code>Ry</code> column:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-18" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-18">{"x":{"filter":"none","vertical":false,"data":[[1,3,2]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 3.</strong></p>
+<p>We now take each row of <code>Ry</code> one by one and check whether the rows below it in the table are smaller or larger.</p>
+<p>In our table, the first row of <code>Ry</code> is 1. We see that the value just below it is 3, which is larger than 1. Since 3 is larger than 1, this is called a concordant pair. We write it in the table:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-19" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-19">{"x":{"filter":"none","vertical":false,"data":[[1,3,2],[null,"C",null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n      <th>1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>The next row, 2, is also larger than 1, so it is also a concordant pair. We also write it in the table:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-20" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-20">{"x":{"filter":"none","vertical":false,"data":[[1,3,2],[null,"C","C"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n      <th>1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>We start again with the second row of <code>Ry</code>, which is 3. Again, we look at the row below it and check whether it is larger or smaller. Here, the row below it is 2, which is smaller than 3, so we have a discordant pair. We add this information into the table:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-21" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-21">{"x":{"filter":"none","vertical":false,"data":[[1,3,2],[null,"C","C"],[null,null,"D"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n      <th>1<\/th>\n      <th>3<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 4.</strong></p>
+<p>We now compute the total number of concordant and discordant pairs. There are:</p>
+<ul>
+<li>2 concordant pairs so <span class="math inline">\(C = 2\)</span>, and</li>
+<li>1 discordant pair so <span class="math inline">\(D = 1\)</span>.</li>
+</ul>
+<p><strong>Step 5.</strong></p>
+<p>Finally, we plug the values we have just found in the initial formula:</p>
+<p><span class="math display">\[
+\begin{split}
+\tau_a &amp;= \frac{C - D}{C + D}\\
+&amp;= \frac{2 - 1}{2 + 1}\\
+&amp;= \frac{1}{3}\\
+&amp;= 0.33
+\end{split}
+\]</span></p>
+<p>Alternatively, we can also use the following formulas</p>
+<p><span class="math display">\[
+\begin{split}
+\tau_a &amp;= 1 - \frac{4D}{n(n - 1)}\\
+&amp;= \frac{4C}{n(n - 1)} - 1
+\end{split}
+\]</span></p>
+<p>where <span class="math inline">\(n\)</span> is still the sample size, and which both give the exact same results.</p>
+</div>
+<div id="with-ties-2" class="section level3">
+<h3>With ties</h3>
+<p>I must admit that the process with ties is slightly more complex than without ties.</p>
+<p>The Kendall tau-b coefficient, which makes adjustments for ties, is defined as follows</p>
+<p><span class="math display">\[
+\tau_b = \frac{C - D}{\sqrt{(C^2_n - n_x)(C^2_n - n_y)}}
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(C\)</span> and <span class="math inline">\(D\)</span> are still the number of concordant and discordant pairs, respectively</li>
+<li><span class="math inline">\(C^2_n\)</span> is the total number of possible pairs</li>
+<li><span class="math inline">\(n_x\)</span> is the number of possible pairs <em>with a tie</em> among the <span class="math inline">\(x\)</span> values</li>
+<li><span class="math inline">\(n_y\)</span> is the number of possible pairs <em>with a tie</em> among the <span class="math inline">\(y\)</span> values</li>
+</ul>
+<p>Note that here, the letter <span class="math inline">\(C\)</span> in <span class="math inline">\(C^2_n\)</span> denotes “combination” and not “concordant”.</p>
+<p>Let’s illustrate that scenario and the formula with the dataset used for the Pearson correlation and the Spearman correlation with ties, that is:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-22" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-22">{"x":{"filter":"none","vertical":false,"data":[[-1,3,5,5,2],[-3,1,0,2,-1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 1.</strong></p>
+<p>Similarly to with no ties, the process with ties is based on the ranks so we start by adding the ranks for each variable, denoted as usual as <code>Rx</code> and <code>Ry</code>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-23" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-23">{"x":{"filter":"none","vertical":false,"data":[[-1,3,5,5,2],[-3,1,0,2,-1],[1,3,4.5,4.5,2],[1,4,3,5,2]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>Rx<\/th>\n      <th>Ry<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 2.</strong></p>
+<p>One of the two variables (<span class="math inline">\(x\)</span> or <span class="math inline">\(y\)</span>) must be selected as the reference variable. This time, we do not choose it arbitrarily, but we choose the one which does not have any ties. In our case, variable <span class="math inline">\(x\)</span> has ties, while variable <span class="math inline">\(y\)</span> does not have any ties. So <span class="math inline">\(y\)</span> will be our reference variable.</p>
+<p>We then:</p>
+<ul>
+<li>order the dataset by the reference variable, here <code>Ry</code>, and</li>
+<li>we keep only the necessary columns to avoid any confusion in the remaining steps:</li>
+</ul>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-24" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-24">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5],[1,2,4.5,3,4.5]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n      <th>Rx<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 3.</strong></p>
+<p>We check whether it is a concordant or discordant pair the same way we did without ties, but this time we do not count ties.</p>
+<p>The first row in column <code>Rx</code> is 1. We compare all rows below it in the table with that value. All rows below 1 in the table are larger, so we write that they are concordant pairs:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-25" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-25">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5],[1,2,4.5,3,4.5],[null,"C","C","C","C"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n      <th>Rx<\/th>\n      <th>1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>We repeat the same process for each row.</p>
+<p>For instance, for the second row of the column <code>Rx</code>, we have the value 2. Again, all rows below in the table are larger so we write that they are concordant pairs:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-26" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-26">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5],[1,2,4.5,3,4.5],[null,"C","C","C","C"],[null,null,"C","C","C"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n      <th>Rx<\/th>\n      <th>1<\/th>\n      <th>2<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>For the third row of the column <code>Rx</code>, we have the value 4.5. The row just below in the table (= 3) is smaller than 4, so we write D for discordant pair:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-27" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-27">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5],[1,2,4.5,3,4.5],[null,"C","C","C","C"],[null,null,"C","C","C"],[null,null,null,"D",null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n      <th>Rx<\/th>\n      <th>1<\/th>\n      <th>2<\/th>\n      <th>4.5<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>Now, as you can see, the last row is also 4.5. Therefore, since it is equal to the value we are comparing to, it is neither a concordant nor a discordant pair, so we write “T” in the table for “ties”:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-28" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-28">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5],[1,2,4.5,3,4.5],[null,"C","C","C","C"],[null,null,"C","C","C"],[null,null,null,"D","T"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n      <th>Rx<\/th>\n      <th>1<\/th>\n      <th>2<\/th>\n      <th>4.5<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>Last, the fourth row in the column <code>Rx</code> is 3, which we compare to 4.5 to see that 4.5 is larger so it is a concordant pair:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-29" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-29">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5],[1,2,4.5,3,4.5],[null,"C","C","C","C"],[null,null,"C","C","C"],[null,null,null,"D","T"],[null,null,null,null,"C"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n      <th>Rx<\/th>\n      <th>1<\/th>\n      <th>2<\/th>\n      <th>4.5<\/th>\n      <th>3<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p><strong>Step 4.</strong></p>
+<p>We then sum the number of concordant and discordant pairs:</p>
+<ul>
+<li><span class="math inline">\(C = 8\)</span></li>
+<li><span class="math inline">\(D = 1\)</span></li>
+</ul>
+<p><strong>Step 5.</strong></p>
+<p>We now have all the information required to compute the numerator of <span class="math inline">\(\tau_b\)</span>, but we still need to find <span class="math inline">\(C^2_n\)</span>, <span class="math inline">\(n_x\)</span> and <span class="math inline">\(n_y\)</span> to compute the denominator.</p>
+<p>As mentioned above, <span class="math inline">\(C^2_n\)</span> is the total number of possible pairs, thus corresponding to the number of combinations of two values. This number of pairs can be found with the formula of the <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#combination">combination</a>, that is, <span class="math inline">\(C^2_n = \frac{n!}{2!(n - 2)!}\)</span> where <span class="math inline">\(n\)</span> is the sample size.</p>
+<p>In our case, we have a sample size of 5, so we have:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<p><span class="math display">\[
+\begin{split}
+C^2_n &amp;= \frac{n!}{2!(n - 2)!}\\
+&amp;= \frac{5!}{2!(5-2)!}\\
+&amp;= 10
+\end{split}
+\]</span></p>
+<p>Furthermore, <span class="math inline">\(n_x\)</span> and <span class="math inline">\(n_y\)</span> are the number of possible pairs <strong>with a tie</strong> among the <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> variables, respectively.</p>
+<p>When looking at <code>Ry</code> and <code>Rx</code>:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-30" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-30">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5],[1,2,4.5,3,4.5]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Ry<\/th>\n      <th>Rx<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>We see that there are:</p>
+<ul>
+<li>2 identical values for the variable <span class="math inline">\(x\)</span></li>
+<li>0 identical value for the variable <span class="math inline">\(y\)</span></li>
+</ul>
+<p>This means that the number of possible <strong>pairs</strong> with a tie is equal to:<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<ul>
+<li>1 for the variable <span class="math inline">\(x\)</span> (the only possible pair with a tie is the pair {4.5, 4.5})</li>
+<li>0 for the variable <span class="math inline">\(y\)</span> (since all ranks are distinct, there exists no pair with a tie)</li>
+</ul>
+<p>Therefore,</p>
+<p><span class="math display">\[
+\begin{split}
+n_x &amp;= 1\\
+n_y &amp;= 0
+\end{split}
+\]</span></p>
+<p>And we now have all the necessary information to compute the denominator of <span class="math inline">\(\tau_b\)</span>!</p>
+<p><strong>Step 6.</strong></p>
+<p>By plugging the values found above in the initial formula, we have</p>
+<p><span class="math display">\[
+\begin{split}
+\tau_b &amp;= \frac{C - D}{\sqrt{(C^2_n - n_x)(C^2_n - n_y)}}\\
+&amp;= \frac{8-1}{\sqrt{(10 - 1)(10 - 0)}}\\
+&amp;= \frac{7}{\sqrt{90}}\\
+&amp;= 0.74
+\end{split}
+\]</span></p>
+</div>
+</div>
+</div>
+<div id="verification-in-r" class="section level1">
+<h1>Verification in R</h1>
+<p>For the sake of completeness, we verify our results with the help of R for each coefficient and scenario.</p>
+<p><strong>Pearson:</strong></p>
+<pre class="r"><code>x &lt;- c(-1, 3, 5, 5, 2)
+y &lt;- c(-3, 1, 0, 2, -1)
+
+cor(x, y, method = &quot;pearson&quot;)</code></pre>
+<pre><code>## [1] 0.8769051</code></pre>
+<p><strong>Spearman with ties:</strong></p>
+<pre class="r"><code>cor(x, y, method = &quot;spearman&quot;)</code></pre>
+<pre><code>## [1] 0.8207827</code></pre>
+<p><strong>Spearman without ties:</strong></p>
+<pre class="r"><code>x2 &lt;- c(3, 5, 2)
+y2 &lt;- c(5, 1, -1)
+
+cor(x2, y2, method = &quot;spearman&quot;)</code></pre>
+<pre><code>## [1] 0.5</code></pre>
+<p><strong>Kendall without ties:</strong></p>
+<pre class="r"><code>cor(x2, y2, method = &quot;kendall&quot;)</code></pre>
+<pre><code>## [1] 0.3333333</code></pre>
+<p><strong>Kendall with ties:</strong></p>
+<pre class="r"><code>cor(x, y, method = &quot;kendall&quot;)</code></pre>
+<pre><code>## [1] 0.7378648</code></pre>
+<p>We indeed find the same results by hand than with R (any discrepancies is due to rounding)!</p>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Remember that a correlation coefficient (no matter whether it is Pearson, Spearman or Kendall) ranges from -1 to 1, with 0 being no correlation and the closer to 1 in absolute terms, the stronger the correlation.</p>
+<p>Broadly speaking, a positive correlation means that high values of one variable are associated with high values of the other variable (and vice versa). A negative correlation means that high values of one variable are associated with low values of the other variable.
+<!-- And a correlation close to 0 means that there are no linear relationship between the two variables of interest. --></p>
+<p>Last but not least, remember that the conclusions drawn from a correlation coefficient computed within a sample cannot be generalized to the population without a proper statistical test, that is, a <a href="/blog/correlation-coefficient-and-correlation-test-in-r/#correlation-test">correlation test</a>.</p>
+<p>Thanks for reading.</p>
+<p>I hope this article helped you to compute the Pearson, Spearman and Kendall correlation coefficients by hand (with and without ties).</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>For your information, the Pearson correlation coefficient is considered as a parametric procedure, whereas the Spearman and Kendall correlation coefficients are considered as non-parametric procedures.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Here, we suppose that we have a sample and not a population. In the case where the observations you have represent the entire population, the correlation coefficient is denoted <span class="math inline">\(\rho\)</span> and the formula differs slightly. See a recap of the <a href="/blog/what-is-the-difference-between-population-and-sample/">difference between a sample and a population</a> if needed.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Remember that the factorial of <span class="math inline">\(n\)</span>, denoted <span class="math inline">\(n!\)</span>, is <span class="math inline">\(n! = n \times (n - 1) \times \cdots \times 1\)</span>. So for instance, <span class="math inline">\(5! = 5\times4\times3\times2\times1 = 120\)</span>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>If you have many identical values and want to count the number of possible pairs thanks to a formula rather than by counting them manually, you can again use the formula of the <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/#combination">combination</a>, that is, <span class="math inline">\(C^2_n = \frac{n!}{x!(n - x)!}\)</span> where <span class="math inline">\(n\)</span> is the number of identical values in a given group of ties. Bear in mind that the number of combinations must be summed up for all group of ties. In our case, we have only one group of ties with 2 values, so <span class="math inline">\(n_x = C^2_2 = \frac{2!}{2!(2 - 2)!} = 1\)</span>.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
