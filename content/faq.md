@@ -12,7 +12,7 @@ description: "Frequently asked questions. Feel free to contact me if you have an
 1. [I would like to replicate an analysis you have done in one of your article, can I have access to the entire code?](#6-i-would-like-to-replicate-an-analysis-you-have-done-in-one-of-your-article-can-i-have-access-to-the-entire-code)
 1. [I believe there is mistake/bug, what is the best way to report it?](#7-i-believe-there-is-mistakebug-what-is-the-best-way-to-report-it)
 1. [I have a question, how can I contact you?](#8-i-have-a-question-how-can-i-contact-you)
-1. [Is it possible to contribute to this blog?](#9-is-it-possible-to-contribute-to-this-blog)
+1. [Is it possible to contribute to this blog?](#9-is-it-possible-to-write-a-guest-post-or-contribute-to-this-blog)
 1. [How can I support you and support this blog?](#10-how-can-i-support-you-and-support-this-blog)
 1. [Can you link to my website?](#11-can-you-link-to-my-website)
 1. [Can you write about this specific topic?](#12-can-you-write-about-this-specific-topic)
@@ -86,9 +86,9 @@ In order for me to answer you as soon as possible, here are the best communicati
 * For mistakes or bugs, please inform me about them by [raising an issue on GitHub](https://github.com/AntoineSoetewey/statsandr/issues). Note that the code for all articles and pages of this blog can be found on [GitHub](https://github.com/AntoineSoetewey/statsandr/tree/master/content/blog)
 * For all other requests, please use the contact form on the [contact page](/contact/)
 
-## 9. Is it possible to contribute to this blog?
+## 9. Is it possible to write a guest post or contribute to this blog?
 
-Absolutely! To share your post on this blog, please send it via the [contribution page](/contribute/).
+Absolutely! To share your post on this blog (as a guest post), please see more information on the [contribution page](/contribute/).
 
 I am open to other forms of collaborations too. See more information in [this section](/blog/track-blog-performance-in-r/#future-plans).
 
