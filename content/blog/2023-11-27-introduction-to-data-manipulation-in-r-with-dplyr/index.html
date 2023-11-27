@@ -1,0 +1,1018 @@
+---
+title: Introduction to data manipulation in R with {dplyr}
+author: Antoine Soetewey
+date: '2023-11-27'
+slug: introduction-to-data-manipulation-in-r-with-dplyr
+categories: []
+tags:
+  - Basics
+  - R
+meta_img: blog/introduction-to-data-manipulation-in-r-with-dplyr/images/introduction-to-data-manipulation-in-r-with-dplyr.jpeg
+description: Learn to use the dplyr package in R which helps you to solve the most common data manipulation challenges such as filtering, summarizing or sorting observations
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#data" id="toc-data">Data</a></li>
+<li><a href="#dplyr-package" id="toc-dplyr-package">{dplyr} package</a>
+<ul>
+<li><a href="#filter-observations" id="toc-filter-observations">Filter observations</a>
+<ul>
+<li><a href="#the-pipe-operator" id="toc-the-pipe-operator">The pipe operator</a></li>
+</ul></li>
+<li><a href="#extract-observations" id="toc-extract-observations">Extract observations</a>
+<ul>
+<li><a href="#based-on-their-positions" id="toc-based-on-their-positions">Based on their positions</a></li>
+<li><a href="#based-on-their-values" id="toc-based-on-their-values">Based on their values</a></li>
+</ul></li>
+<li><a href="#sample-observations" id="toc-sample-observations">Sample observations</a></li>
+<li><a href="#sort-observations" id="toc-sort-observations">Sort observations</a></li>
+<li><a href="#select-variables" id="toc-select-variables">Select variables</a></li>
+<li><a href="#rename-variables" id="toc-rename-variables">Rename variables</a></li>
+<li><a href="#create-or-modify-variables" id="toc-create-or-modify-variables">Create or modify variables</a></li>
+<li><a href="#summarize-observations" id="toc-summarize-observations">Summarize observations</a></li>
+<li><a href="#identify-distinct-values" id="toc-identify-distinct-values">Identify distinct values</a></li>
+<li><a href="#connected-operations" id="toc-connected-operations">Connected operations</a>
+<ul>
+<li><a href="#group-by" id="toc-group-by">Group by</a></li>
+<li><a href="#number-of-observations" id="toc-number-of-observations">Number of observations</a></li>
+<li><a href="#number-of-distinct-values" id="toc-number-of-distinct-values">Number of distinct values</a></li>
+<li><a href="#first-last-or-nth-value" id="toc-first-last-or-nth-value">First, last or nth value</a></li>
+<li><a href="#if-else" id="toc-if-else">If else</a></li>
+<li><a href="#case-when" id="toc-case-when">Case when</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#conclusion-and-other-resources" id="toc-conclusion-and-other-resources">Conclusion and other resources</a></li>
+</ul>
+</div>
+
+<p><img src="images/introduction-to-data-manipulation-in-r-with-dplyr.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In a previous post, we showed how to <a href="/blog/data-manipulation-in-r/">manipulate data in R</a>. In particular, we illustrated how to create and manipulate vectors, factors, lists and data frames. This served as an introduction to R and was aimed at beginners. Moreover, as long as it was possible, all manipulations were made in base R, that is, without having to load any package.</p>
+<p>In this post, we would like to show again how to manipulate data in R, but this time using the <code>{dplyr}</code> package.</p>
+<p>The <code>{dplyr}</code> package, developed by Hadley Wickham and colleagues at posit, provides a complete set of functions that help you solve the most common data manipulation challenges such as:</p>
+<ul>
+<li>filtering observations based on their values</li>
+<li>extracting observations based on their values or positions</li>
+<li>sampling observations based on a specific number or fraction of rows</li>
+<li>sorting observations based on one or several variables</li>
+<li>selecting variables based on their names or positions</li>
+<li>renaming variables</li>
+<li>adding new variables based on existing ones</li>
+<li>summarizing observations or variables to a single descriptive measure</li>
+<li>performing any operation by group</li>
+<li>categorizing observations into two or more groups</li>
+<li>etc.</li>
+</ul>
+<p>More information about the package can be found at <a href="https://dplyr.tidyverse.org/" target="_blank">dplyr.tidyverse.org</a>.</p>
+<p>In this post, we will present the most common functions for data manipulation and data management using the <code>{dplyr}</code> package (illustrated on a data frame). This is however not an exhaustive list! It is likely that you will need other functions that the ones presented here. For the interested readers, see the end of this post for further resources.</p>
+<p>A question I am often asked is whether it is best to first learn data manipulation with base R and <em>then</em> with <code>{dplyr}</code>, or directly learn <code>{dplyr}</code>.</p>
+<p>Everyone may not agrees, but here is what I tend to answer. The interest in terms of efficiency and clarity/readability of the code that <code>{dplyr}</code> brings is obvious. So even when I give a <a href="https://datanalyze.be/trainings/">training</a> targeted to statisticians, I present the <code>{dplyr}</code> package. However, I still do believe that learning data manipulation with base R is important for two reasons:</p>
+<ol style="list-style-type: decimal">
+<li>Everyone will, at some point, be confronted with code written in base R (either from collaboration with other R users, or from code found in textbooks or online).</li>
+<li>Through the feedback I receive from my students, I notice that <code>{dplyr}</code> is relatively easy to learn when you are familiar with base R (which is quite rewarding for those who struggled at the beginning).</li>
+</ol>
+<p>For these reasons, I tend to teach data manipulation with base R first and then slowly switch to <code>{dplyr}</code> (up to the point that for some advanced training courses, I hardly use base R at all by the end of the course). As a side note, this is the approach I follow for data visualization in R as well: I teach first how to plot data with base R, then I gradually teach them <a href="/blog/graphics-in-r-with-ggplot2/">how to use <code>{ggplot2}</code></a>.</p>
+<p>With this approach, some students may have the impression that they wasted their time learning base R. At least, some may have this impression during the training. However, as soon as the training is done and they have to learn R by themselves or work on real projects, they are grateful of having learned both.</p>
+<p>I am curious to hear from other teachers regarding their approach, so feel free to share your opinion.</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>To present the different functions, we will use the data frame <code>penguins</code>, available within the <code>{palmerpenguins}</code> package:</p>
+<pre class="r"><code># install.packages(&quot;palmerpenguins&quot;)
+library(palmerpenguins)</code></pre>
+<p>Before going further, we rename the data frame as <code>dat</code>:</p>
+<pre class="r"><code>dat &lt;- penguins</code></pre>
+<p>I like to call data frames I am working on with a generic name such as <code>dat</code> for two reasons:</p>
+<ol style="list-style-type: decimal">
+<li>Every time I need to write the name of the data frame, it is usually shorter to write <code>dat</code> than to write the name of the data frame (which is in this case <code>penguins</code>).</li>
+<li>If I need to do similar analyses or plots on different data frames, the code I wrote in the past can be reused with only a few modifications. With this very simple trick, most of the time I only have to edit the names of the variables, but the name of the data frame does not need to be changed (which saves me a lot of time).</li>
+</ol>
+<p>The data frame contains data for 344 penguins and 8 variables describing the species, the island, some measurements of the size of the bill, flipper and body mass, the sex and the study year. More information about the data frame can be found by running <code>?penguins</code> (after loading the <code>{palmerpenguins}</code> package).</p>
+<p>For this post, we will focus only on the variables <code>species</code>, <code>body_mass_g</code>, <code>sex</code> and <code>year</code>.</p>
+<p>Before proceeding with the different data manipulation techniques, let’s first inspect the data by displaying its structure, the first 6 rows and a summary of it:</p>
+<pre class="r"><code>str(dat) # structure of the data</code></pre>
+<pre><code>## tibble [344 × 4] (S3: tbl_df/tbl/data.frame)
+##  $ species    : Factor w/ 3 levels &quot;Adelie&quot;,&quot;Chinstrap&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ body_mass_g: int [1:344] 3750 3800 3250 NA 3450 3650 3625 4675 3475 4250 ...
+##  $ sex        : Factor w/ 2 levels &quot;female&quot;,&quot;male&quot;: 2 1 1 NA 1 2 1 2 NA NA ...
+##  $ year       : int [1:344] 2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...</code></pre>
+<pre class="r"><code>head(dat) # display first 6 rows</code></pre>
+<pre><code>## # A tibble: 6 × 4
+##   species body_mass_g sex     year
+##   &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+## 1 Adelie         3750 male    2007
+## 2 Adelie         3800 female  2007
+## 3 Adelie         3250 female  2007
+## 4 Adelie           NA &lt;NA&gt;    2007
+## 5 Adelie         3450 female  2007
+## 6 Adelie         3650 male    2007</code></pre>
+<pre class="r"><code>summary(dat) # summary</code></pre>
+<pre><code>##       species     body_mass_g       sex           year     
+##  Adelie   :152   Min.   :2700   female:165   Min.   :2007  
+##  Chinstrap: 68   1st Qu.:3550   male  :168   1st Qu.:2007  
+##  Gentoo   :124   Median :4050   NA&#39;s  : 11   Median :2008  
+##                  Mean   :4202                Mean   :2008  
+##                  3rd Qu.:4750                3rd Qu.:2009  
+##                  Max.   :6300                Max.   :2009  
+##                  NA&#39;s   :2</code></pre>
+</div>
+<div id="dplyr-package" class="section level1">
+<h1>{dplyr} package</h1>
+<p>Without further ado, let’s illustrate the different functions for data manipulation available in the <code>{dplyr}</code> package in the following sections.</p>
+<p>As for any package, we first need to install and load it before using it:</p>
+<pre class="r"><code># install.packages(&quot;dplyr&quot;)
+library(dplyr)</code></pre>
+<p>Note that all functions presented below requires tidy data, which means that:</p>
+<ul>
+<li>each variable is in its own column,</li>
+<li>each observation, or case, is in its own row, and</li>
+<li>each value is in its own cell.</li>
+</ul>
+<div class="float">
+<img src="images/tidy-data.png" style="width:100.0%" alt="Rules of a tidy data frame: variables are columns, observations are rows, and values are cells. Source: R for Data Science (2e) by H. Wickham, M. Çetinkaya-Rundel and G. Grolemund." />
+<div class="figcaption">Rules of a tidy data frame: variables are columns, observations are rows, and values are cells. Source: R for Data Science (2e) by H. Wickham, M. Çetinkaya-Rundel and G. Grolemund.</div>
+</div>
+<div id="filter-observations" class="section level2">
+<h2>Filter observations</h2>
+<p>Filtering observations based on their values can be done with the <code>filter()</code> function. This function works on both <a href="/blog/variable-types-and-examples/#quantitative">quantitative</a> and <a href="/blog/variable-types-and-examples/#qualitative">qualitative</a> variables:</p>
+<pre class="r"><code># filter observations based on a quantitative variable
+filter(dat, body_mass_g &gt; 4000)</code></pre>
+<pre><code>## # A tibble: 172 × 4
+##    species body_mass_g sex    year
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt; &lt;int&gt;
+##  1 Adelie         4675 male   2007
+##  2 Adelie         4250 &lt;NA&gt;   2007
+##  3 Adelie         4400 male   2007
+##  4 Adelie         4500 male   2007
+##  5 Adelie         4200 male   2007
+##  6 Adelie         4150 male   2007
+##  7 Adelie         4650 male   2007
+##  8 Adelie         4400 male   2007
+##  9 Adelie         4600 male   2007
+## 10 Adelie         4150 male   2007
+## # ℹ 162 more rows</code></pre>
+<pre class="r"><code># filter observations based on a qualitative variable
+filter(dat, sex == &quot;female&quot;)</code></pre>
+<pre><code>## # A tibble: 165 × 4
+##    species body_mass_g sex     year
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+##  1 Adelie         3800 female  2007
+##  2 Adelie         3250 female  2007
+##  3 Adelie         3450 female  2007
+##  4 Adelie         3625 female  2007
+##  5 Adelie         3200 female  2007
+##  6 Adelie         3700 female  2007
+##  7 Adelie         3450 female  2007
+##  8 Adelie         3325 female  2007
+##  9 Adelie         3400 female  2007
+## 10 Adelie         3800 female  2007
+## # ℹ 155 more rows</code></pre>
+<p>You can combine several conditions with <code>&amp;</code> (if the conditions must be cumulative) or <code>|</code> (if the conditions are alternatives), for instance:</p>
+<pre class="r"><code># filter observations based on 2 cumulative conditions
+filter(dat, body_mass_g &gt; 4000 &amp; sex == &quot;female&quot;)</code></pre>
+<pre><code>## # A tibble: 58 × 4
+##    species body_mass_g sex     year
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+##  1 Gentoo         4500 female  2007
+##  2 Gentoo         4450 female  2007
+##  3 Gentoo         4550 female  2007
+##  4 Gentoo         4800 female  2007
+##  5 Gentoo         4400 female  2007
+##  6 Gentoo         4650 female  2007
+##  7 Gentoo         4650 female  2007
+##  8 Gentoo         4200 female  2007
+##  9 Gentoo         4150 female  2007
+## 10 Gentoo         4800 female  2007
+## # ℹ 48 more rows</code></pre>
+<p>Notice that variable names do <em>not</em> have to be written inside single nor double quotation marks (<code>''</code> or <code>""</code>). This is the case for all functions presented below.</p>
+<div id="the-pipe-operator" class="section level3">
+<h3>The pipe operator</h3>
+<p>As you can see from the code above, the <code>filter()</code> functions requires the name of the data frame as first argument, then the condition (with the usual logical operators <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>==</code>, <code>!=</code>, <code>%in%</code>, etc.) as second argument.</p>
+<p>Specifying the name of the data frame as first argument is required for all functions presented in this list. However, there is a workaround to specifying the data frame’s name inside the functions: the pipe operator (<code>|&gt;</code> or <code>%&gt;%</code>).<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>The pipe operator allows to perform a sequence of several operations, that is, chain a sequence of calculations together. It is particularly useful when you are performing several operations on a data frame, and you do not want to save the output at each intermediate step. We will see below how to use the pipe operator with several operations, but for now I would like to introduce it with only one operation at a time.</p>
+<p>As you can see with the <code>filter()</code> function, the pipe operator is not compulsory. However, I recommend it so much (even to beginners) for its easy of use, convenience, code readability and popularity that from now on functions available in <code>{dplyr}</code> will be presented together with the pipe operator.</p>
+<p>So with the pipe operator, the code above becomes:</p>
+<pre class="r"><code># filter observations based on a quantitative variable
+dat |&gt;
+  filter(body_mass_g &gt; 4000)</code></pre>
+<pre><code>## # A tibble: 172 × 4
+##    species body_mass_g sex    year
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt; &lt;int&gt;
+##  1 Adelie         4675 male   2007
+##  2 Adelie         4250 &lt;NA&gt;   2007
+##  3 Adelie         4400 male   2007
+##  4 Adelie         4500 male   2007
+##  5 Adelie         4200 male   2007
+##  6 Adelie         4150 male   2007
+##  7 Adelie         4650 male   2007
+##  8 Adelie         4400 male   2007
+##  9 Adelie         4600 male   2007
+## 10 Adelie         4150 male   2007
+## # ℹ 162 more rows</code></pre>
+<pre class="r"><code># filter observations based on a qualitative variable
+dat |&gt;
+  filter(sex == &quot;female&quot;)</code></pre>
+<pre><code>## # A tibble: 165 × 4
+##    species body_mass_g sex     year
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+##  1 Adelie         3800 female  2007
+##  2 Adelie         3250 female  2007
+##  3 Adelie         3450 female  2007
+##  4 Adelie         3625 female  2007
+##  5 Adelie         3200 female  2007
+##  6 Adelie         3700 female  2007
+##  7 Adelie         3450 female  2007
+##  8 Adelie         3325 female  2007
+##  9 Adelie         3400 female  2007
+## 10 Adelie         3800 female  2007
+## # ℹ 155 more rows</code></pre>
+<pre class="r"><code># filter observations based on 2 cumulative conditions
+dat |&gt;
+  filter(body_mass_g &gt; 4000 &amp; sex == &quot;female&quot;)</code></pre>
+<pre><code>## # A tibble: 58 × 4
+##    species body_mass_g sex     year
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+##  1 Gentoo         4500 female  2007
+##  2 Gentoo         4450 female  2007
+##  3 Gentoo         4550 female  2007
+##  4 Gentoo         4800 female  2007
+##  5 Gentoo         4400 female  2007
+##  6 Gentoo         4650 female  2007
+##  7 Gentoo         4650 female  2007
+##  8 Gentoo         4200 female  2007
+##  9 Gentoo         4150 female  2007
+## 10 Gentoo         4800 female  2007
+## # ℹ 48 more rows</code></pre>
+<p>The pipe operator simply takes the results of one operation into the next operation below it, making the code extremely easy to write and read.</p>
+<p>This way, instead of specifying the data frame’s name as first argument in the <code>filter()</code> function (or any other function within the <code>{dplyr}</code> package), we simply specify the data frame’s name and then the desired function, combined together thanks to the pipe operator.</p>
+</div>
+</div>
+<div id="extract-observations" class="section level2">
+<h2>Extract observations</h2>
+<p>It is possible to extract observations based on:</p>
+<ul>
+<li>their positions, or</li>
+<li>their values.</li>
+</ul>
+<div id="based-on-their-positions" class="section level3">
+<h3>Based on their positions</h3>
+<p>Extracting observations based on their positions can be done with the <code>slice()</code> function:</p>
+<pre class="r"><code># extract rows 2, 5 and 37
+dat |&gt;
+  slice(c(2, 5, 37))</code></pre>
+<pre><code>## # A tibble: 3 × 4
+##   species body_mass_g sex     year
+##   &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+## 1 Adelie         3800 female  2007
+## 2 Adelie         3450 female  2007
+## 3 Adelie         3950 male    2007</code></pre>
+<p>Moreover, extracting the first or last rows can be done with <code>slice_head()</code> and <code>slice_tail()</code>:</p>
+<pre class="r"><code># extract first 3 rows
+dat |&gt;
+  slice_head(n = 3)</code></pre>
+<pre><code>## # A tibble: 3 × 4
+##   species body_mass_g sex     year
+##   &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+## 1 Adelie         3750 male    2007
+## 2 Adelie         3800 female  2007
+## 3 Adelie         3250 female  2007</code></pre>
+<pre class="r"><code># extract last 3 rows
+dat |&gt;
+  slice_tail(n = 3)</code></pre>
+<pre><code>## # A tibble: 3 × 4
+##   species   body_mass_g sex     year
+##   &lt;fct&gt;           &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+## 1 Chinstrap        3775 male    2009
+## 2 Chinstrap        4100 male    2009
+## 3 Chinstrap        3775 female  2009</code></pre>
+</div>
+<div id="based-on-their-values" class="section level3">
+<h3>Based on their values</h3>
+<p>To extract observations based on values of a variable, use:</p>
+<ul>
+<li><code>slice_min()</code> to select rows with the <strong>lowest</strong> values (with a defined proportion), and</li>
+<li><code>slice_max()</code> to select rows with the <strong>highest</strong> values (with a defined proportion).</li>
+</ul>
+<pre class="r"><code># extract observations with 25% lowest body mass
+dat |&gt;
+  slice_min(body_mass_g, prop = 0.25)</code></pre>
+<pre><code>## # A tibble: 89 × 4
+##    species   body_mass_g sex     year
+##    &lt;fct&gt;           &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+##  1 Chinstrap        2700 female  2008
+##  2 Adelie           2850 female  2008
+##  3 Adelie           2850 female  2008
+##  4 Adelie           2900 female  2008
+##  5 Adelie           2900 female  2008
+##  6 Adelie           2900 female  2009
+##  7 Chinstrap        2900 female  2007
+##  8 Adelie           2925 female  2009
+##  9 Adelie           2975 &lt;NA&gt;    2007
+## 10 Adelie           3000 female  2007
+## # ℹ 79 more rows</code></pre>
+<pre class="r"><code># extract observations with 25% highest body mass
+dat |&gt;
+  slice_max(body_mass_g, prop = 0.25)</code></pre>
+<pre><code>## # A tibble: 90 × 4
+##    species body_mass_g sex    year
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt; &lt;int&gt;
+##  1 Gentoo         6300 male   2007
+##  2 Gentoo         6050 male   2007
+##  3 Gentoo         6000 male   2008
+##  4 Gentoo         6000 male   2009
+##  5 Gentoo         5950 male   2008
+##  6 Gentoo         5950 male   2009
+##  7 Gentoo         5850 male   2007
+##  8 Gentoo         5850 male   2007
+##  9 Gentoo         5850 male   2009
+## 10 Gentoo         5800 male   2008
+## # ℹ 80 more rows</code></pre>
+</div>
+</div>
+<div id="sample-observations" class="section level2">
+<h2>Sample observations</h2>
+<p>Sampling observations can be done in two ways:</p>
+<ol style="list-style-type: decimal">
+<li>Random sample of a <strong>number</strong> of rows with <code>sample_n()</code></li>
+<li>Random sample of a <strong>fraction</strong> of rows with <code>sample_frac()</code></li>
+</ol>
+<pre class="r"><code># random sample of 3 rows
+dat |&gt;
+  sample_n(size = 3)</code></pre>
+<pre><code>## # A tibble: 3 × 4
+##   species   body_mass_g sex     year
+##   &lt;fct&gt;           &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+## 1 Adelie           3450 female  2007
+## 2 Chinstrap        3675 female  2009
+## 3 Gentoo           4500 female  2007</code></pre>
+<pre class="r"><code># random sample of half of the rows
+dat |&gt;
+  sample_frac(size = 1 / 2)</code></pre>
+<pre><code>## # A tibble: 172 × 4
+##    species   body_mass_g sex     year
+##    &lt;fct&gt;           &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+##  1 Adelie           4150 male    2008
+##  2 Gentoo           5800 male    2008
+##  3 Adelie           3650 male    2009
+##  4 Adelie           3500 male    2009
+##  5 Adelie           3450 female  2007
+##  6 Adelie           4300 male    2009
+##  7 Chinstrap        3400 female  2008
+##  8 Adelie           3950 male    2007
+##  9 Chinstrap        3325 female  2009
+## 10 Adelie           3950 male    2008
+## # ℹ 162 more rows</code></pre>
+<p>Note that, as with the <code>sample()</code> function within base R, <code>size</code> can be greater than the size of the data frame. In this case, some rows will be duplicated, and you will need to specify the argument <code>replace = TRUE</code>.</p>
+<p>Alternatively, it is possible to obtain a random sample of a number of rows or fraction or rows with <code>slice_sample()</code>. For this, use:</p>
+<ul>
+<li>the argument <code>n</code> to select a number of rows, or</li>
+<li>the argument <code>prop</code> to select a fraction of rows.</li>
+</ul>
+<pre class="r"><code># random sample of 3 rows
+dat |&gt;
+  slice_sample(n = 3)</code></pre>
+<pre><code>## # A tibble: 3 × 4
+##   species body_mass_g sex     year
+##   &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+## 1 Adelie         3200 female  2007
+## 2 Adelie         3800 female  2007
+## 3 Gentoo         4800 female  2007</code></pre>
+<pre class="r"><code># random sample of half of the rows
+dat |&gt;
+  slice_sample(prop = 1 / 2)</code></pre>
+<pre><code>## # A tibble: 172 × 4
+##    species body_mass_g sex     year
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+##  1 Adelie         3900 male    2009
+##  2 Adelie         3275 female  2009
+##  3 Gentoo         5050 male    2008
+##  4 Gentoo         4700 female  2009
+##  5 Gentoo         4600 female  2008
+##  6 Gentoo         4875 &lt;NA&gt;    2009
+##  7 Adelie         3700 &lt;NA&gt;    2007
+##  8 Gentoo         3950 female  2008
+##  9 Gentoo         4550 female  2007
+## 10 Adelie         3500 female  2008
+## # ℹ 162 more rows</code></pre>
+</div>
+<div id="sort-observations" class="section level2">
+<h2>Sort observations</h2>
+<p>Sorting observations can be done with the <code>arrange()</code> function:</p>
+<pre class="r"><code># sort observations based on body mass (ascending order)
+dat |&gt;
+  arrange(body_mass_g)</code></pre>
+<pre><code>## # A tibble: 344 × 4
+##    species   body_mass_g sex     year
+##    &lt;fct&gt;           &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+##  1 Chinstrap        2700 female  2008
+##  2 Adelie           2850 female  2008
+##  3 Adelie           2850 female  2008
+##  4 Adelie           2900 female  2008
+##  5 Adelie           2900 female  2008
+##  6 Adelie           2900 female  2009
+##  7 Chinstrap        2900 female  2007
+##  8 Adelie           2925 female  2009
+##  9 Adelie           2975 &lt;NA&gt;    2007
+## 10 Adelie           3000 female  2007
+## # ℹ 334 more rows</code></pre>
+<p>By default, <code>arrange()</code> uses the <strong>ascending</strong> order. To sort in <strong>descending</strong> order, use <code>desc()</code> inside <code>arrange()</code>:</p>
+<pre class="r"><code># sort observations based on body mass (descending order)
+dat |&gt;
+  arrange(desc(body_mass_g))</code></pre>
+<pre><code>## # A tibble: 344 × 4
+##    species body_mass_g sex    year
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt; &lt;int&gt;
+##  1 Gentoo         6300 male   2007
+##  2 Gentoo         6050 male   2007
+##  3 Gentoo         6000 male   2008
+##  4 Gentoo         6000 male   2009
+##  5 Gentoo         5950 male   2008
+##  6 Gentoo         5950 male   2009
+##  7 Gentoo         5850 male   2007
+##  8 Gentoo         5850 male   2007
+##  9 Gentoo         5850 male   2009
+## 10 Gentoo         5800 male   2008
+## # ℹ 334 more rows</code></pre>
+<p>As with <code>filter()</code>, <code>arrange()</code> can be used for several variables and works both on quantitative and qualitative variables:</p>
+<pre class="r"><code># sort observations based on two variables
+dat |&gt;
+  arrange(sex, body_mass_g)</code></pre>
+<pre><code>## # A tibble: 344 × 4
+##    species   body_mass_g sex     year
+##    &lt;fct&gt;           &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+##  1 Chinstrap        2700 female  2008
+##  2 Adelie           2850 female  2008
+##  3 Adelie           2850 female  2008
+##  4 Adelie           2900 female  2008
+##  5 Adelie           2900 female  2008
+##  6 Adelie           2900 female  2009
+##  7 Chinstrap        2900 female  2007
+##  8 Adelie           2925 female  2009
+##  9 Adelie           3000 female  2007
+## 10 Adelie           3000 female  2009
+## # ℹ 334 more rows</code></pre>
+<p>The code above sorts the observations first based on the sex (in alphabetical order) and then based on the body mass (in ascending order, so from lowest to highest).</p>
+<p>Note that if the qualitative variable is defined as an ordered <a href="/blog/data-types-in-r/#factor">factor</a>, the sorting is based on level order, not alphabetical order!</p>
+</div>
+<div id="select-variables" class="section level2">
+<h2>Select variables</h2>
+<p>Selecting variables can be done with the <code>select()</code> function, based on:</p>
+<ul>
+<li>the position of the variable(s), or</li>
+<li>the name(s) of the variable(s).</li>
+</ul>
+<pre class="r"><code># select variables by their positions
+dat |&gt;
+  select(c(2, 4))</code></pre>
+<pre><code>## # A tibble: 344 × 2
+##    body_mass_g  year
+##          &lt;int&gt; &lt;int&gt;
+##  1        3750  2007
+##  2        3800  2007
+##  3        3250  2007
+##  4          NA  2007
+##  5        3450  2007
+##  6        3650  2007
+##  7        3625  2007
+##  8        4675  2007
+##  9        3475  2007
+## 10        4250  2007
+## # ℹ 334 more rows</code></pre>
+<pre class="r"><code># select variables by their names
+dat |&gt;
+  select(body_mass_g, year)</code></pre>
+<pre><code>## # A tibble: 344 × 2
+##    body_mass_g  year
+##          &lt;int&gt; &lt;int&gt;
+##  1        3750  2007
+##  2        3800  2007
+##  3        3250  2007
+##  4          NA  2007
+##  5        3450  2007
+##  6        3650  2007
+##  7        3625  2007
+##  8        4675  2007
+##  9        3475  2007
+## 10        4250  2007
+## # ℹ 334 more rows</code></pre>
+<p>Note that it is also possible to remove variables. For this, use the <code>-</code> sign in front of their positions or names:</p>
+<pre class="r"><code># remove variables by their positions
+dat |&gt;
+  select(-c(2, 4))</code></pre>
+<pre><code>## # A tibble: 344 × 2
+##    species sex   
+##    &lt;fct&gt;   &lt;fct&gt; 
+##  1 Adelie  male  
+##  2 Adelie  female
+##  3 Adelie  female
+##  4 Adelie  &lt;NA&gt;  
+##  5 Adelie  female
+##  6 Adelie  male  
+##  7 Adelie  female
+##  8 Adelie  male  
+##  9 Adelie  &lt;NA&gt;  
+## 10 Adelie  &lt;NA&gt;  
+## # ℹ 334 more rows</code></pre>
+<pre class="r"><code># remove variables by their names
+dat |&gt;
+  select(-c(body_mass_g, year))</code></pre>
+<pre><code>## # A tibble: 344 × 2
+##    species sex   
+##    &lt;fct&gt;   &lt;fct&gt; 
+##  1 Adelie  male  
+##  2 Adelie  female
+##  3 Adelie  female
+##  4 Adelie  &lt;NA&gt;  
+##  5 Adelie  female
+##  6 Adelie  male  
+##  7 Adelie  female
+##  8 Adelie  male  
+##  9 Adelie  &lt;NA&gt;  
+## 10 Adelie  &lt;NA&gt;  
+## # ℹ 334 more rows</code></pre>
+<p>It is also possible to select variables with a sequence of names:</p>
+<pre class="r"><code># select all variables from species to sex
+dat |&gt;
+  select(species:sex)</code></pre>
+<pre><code>## # A tibble: 344 × 3
+##    species body_mass_g sex   
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt; 
+##  1 Adelie         3750 male  
+##  2 Adelie         3800 female
+##  3 Adelie         3250 female
+##  4 Adelie           NA &lt;NA&gt;  
+##  5 Adelie         3450 female
+##  6 Adelie         3650 male  
+##  7 Adelie         3625 female
+##  8 Adelie         4675 male  
+##  9 Adelie         3475 &lt;NA&gt;  
+## 10 Adelie         4250 &lt;NA&gt;  
+## # ℹ 334 more rows</code></pre>
+<p>Last but not least, <code>select()</code> can also be used as an easy way to rearrange columns in the desired order:</p>
+<pre class="r"><code># put sex as first column, then all the others
+dat |&gt;
+  select(sex, species:year)</code></pre>
+<pre><code>## # A tibble: 344 × 4
+##    sex    species body_mass_g  year
+##    &lt;fct&gt;  &lt;fct&gt;         &lt;int&gt; &lt;int&gt;
+##  1 male   Adelie         3750  2007
+##  2 female Adelie         3800  2007
+##  3 female Adelie         3250  2007
+##  4 &lt;NA&gt;   Adelie           NA  2007
+##  5 female Adelie         3450  2007
+##  6 male   Adelie         3650  2007
+##  7 female Adelie         3625  2007
+##  8 male   Adelie         4675  2007
+##  9 &lt;NA&gt;   Adelie         3475  2007
+## 10 &lt;NA&gt;   Adelie         4250  2007
+## # ℹ 334 more rows</code></pre>
+</div>
+<div id="rename-variables" class="section level2">
+<h2>Rename variables</h2>
+<p>To rename variables, use the <code>rename()</code> function:</p>
+<pre class="r"><code># rename variables
+dat |&gt;
+  rename(
+    body_mass = body_mass_g, # rename body_mass_g into body_mass
+    study_year = year # rename year into study_year
+  )</code></pre>
+<pre><code>## # A tibble: 344 × 4
+##    species body_mass sex    study_year
+##    &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;int&gt;
+##  1 Adelie       3750 male         2007
+##  2 Adelie       3800 female       2007
+##  3 Adelie       3250 female       2007
+##  4 Adelie         NA &lt;NA&gt;         2007
+##  5 Adelie       3450 female       2007
+##  6 Adelie       3650 male         2007
+##  7 Adelie       3625 female       2007
+##  8 Adelie       4675 male         2007
+##  9 Adelie       3475 &lt;NA&gt;         2007
+## 10 Adelie       4250 &lt;NA&gt;         2007
+## # ℹ 334 more rows</code></pre>
+<p>This might not be intuitive (at least it was not for me at the time of learning this package), so bear in mind that you always need to write first the new name and then the old name (separated with the <code>=</code> sign).</p>
+</div>
+<div id="create-or-modify-variables" class="section level2">
+<h2>Create or modify variables</h2>
+<p>You can create or modify certain variables of the data frame with <code>mutate()</code>, based on:</p>
+<ul>
+<li>another variable, or</li>
+<li>a vector of your choice.</li>
+</ul>
+<pre class="r"><code># create a new variable based on an existing one
+dat |&gt;
+  mutate(
+    body_mass_kg = body_mass_g / 1000
+  )</code></pre>
+<pre><code>## # A tibble: 344 × 5
+##    species body_mass_g sex     year body_mass_kg
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt;        &lt;dbl&gt;
+##  1 Adelie         3750 male    2007         3.75
+##  2 Adelie         3800 female  2007         3.8 
+##  3 Adelie         3250 female  2007         3.25
+##  4 Adelie           NA &lt;NA&gt;    2007        NA   
+##  5 Adelie         3450 female  2007         3.45
+##  6 Adelie         3650 male    2007         3.65
+##  7 Adelie         3625 female  2007         3.62
+##  8 Adelie         4675 male    2007         4.68
+##  9 Adelie         3475 &lt;NA&gt;    2007         3.48
+## 10 Adelie         4250 &lt;NA&gt;    2007         4.25
+## # ℹ 334 more rows</code></pre>
+<pre class="r"><code># create a new variable from a vector of your choice
+dat |&gt;
+  mutate(
+    ID = 1:nrow(dat)
+  )</code></pre>
+<pre><code>## # A tibble: 344 × 5
+##    species body_mass_g sex     year    ID
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt; &lt;int&gt;
+##  1 Adelie         3750 male    2007     1
+##  2 Adelie         3800 female  2007     2
+##  3 Adelie         3250 female  2007     3
+##  4 Adelie           NA &lt;NA&gt;    2007     4
+##  5 Adelie         3450 female  2007     5
+##  6 Adelie         3650 male    2007     6
+##  7 Adelie         3625 female  2007     7
+##  8 Adelie         4675 male    2007     8
+##  9 Adelie         3475 &lt;NA&gt;    2007     9
+## 10 Adelie         4250 &lt;NA&gt;    2007    10
+## # ℹ 334 more rows</code></pre>
+<p>Note that if you create a variable with a name which already exists in the data frame, the old variable will be erased and replaced by the new one.</p>
+<p>Like <code>rename()</code>, <code>mutate()</code> requires the argument to be written as <code>name = expression</code>, where <code>name</code> is name of the column created or modified and <code>expression</code> is the formula for calculating the values.</p>
+</div>
+<div id="summarize-observations" class="section level2">
+<h2>Summarize observations</h2>
+<p>Often, you will want to summarize the data with some <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a>. This can be done with the <code>summarize()</code> function, in addition to most functions used for descriptive statistics (<code>mean()</code>, <code>median()</code>, <code>min()</code>, <code>max()</code>, <code>sd()</code>, <code>var()</code>, etc.):</p>
+<pre class="r"><code># compute mean and sd of body mass
+dat |&gt;
+  summarize(
+    body_mass_mean = mean(body_mass_g, na.rm = TRUE),
+    body_mass_sd = sd(body_mass_g, na.rm = TRUE)
+  )</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##   body_mass_mean body_mass_sd
+##            &lt;dbl&gt;        &lt;dbl&gt;
+## 1          4202.         802.</code></pre>
+<p>Note that:</p>
+<ul>
+<li>The <code>na.rm = TRUE</code> argument is used to omit missing values in the computation of the summary statistics.</li>
+<li><code>summarize()</code> and <code>summarise()</code> give the exact same results.</li>
+</ul>
+</div>
+<div id="identify-distinct-values" class="section level2">
+<h2>Identify distinct values</h2>
+<p>Identifying distinct values of a variable can be done with <code>distinct()</code>:</p>
+<pre class="r"><code># find the distinct species
+dat |&gt;
+  distinct(species)</code></pre>
+<pre><code>## # A tibble: 3 × 1
+##   species  
+##   &lt;fct&gt;    
+## 1 Adelie   
+## 2 Gentoo   
+## 3 Chinstrap</code></pre>
+<p>Identifying distinct values is mostly done on qualitative or quantitative discrete variables, but it can be done on any type of variable and with several variables at the same time. If more than one variables is specified, it returns all the combinations of values of the variables.</p>
+<p>For instance, with species and study year:</p>
+<pre class="r"><code># combination of distinct species and year
+dat |&gt;
+  distinct(species, year)</code></pre>
+<pre><code>## # A tibble: 9 × 2
+##   species    year
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 Adelie     2007
+## 2 Adelie     2008
+## 3 Adelie     2009
+## 4 Gentoo     2007
+## 5 Gentoo     2008
+## 6 Gentoo     2009
+## 7 Chinstrap  2007
+## 8 Chinstrap  2008
+## 9 Chinstrap  2009</code></pre>
+</div>
+<div id="connected-operations" class="section level2">
+<h2>Connected operations</h2>
+<p>Another advantage of using the <code>{dplyr}</code> package is that several operations can be connected all at once, with great readability of the code. This can easily be done with the pipe operator (<code>|&gt;</code> or <code>%&gt;%</code>) introduced earlier.</p>
+<p>Until now, we have always seen the same structure: we call a data frame, and then we apply an operation on that data frame. From now on, we will see how to combine more operations into one single chain of operations.</p>
+<div id="group-by" class="section level3">
+<h3>Group by</h3>
+<p><code>group_by()</code> allows to modify the way the basic functions are performed. Instead of covering all the rows of the data frame, the operations will cover each of the groups of rows defined by the grouping command. In this way, aggregation operations, using <code>summarize()</code>, will produce statistics for each group rather than for all observations.</p>
+<p>For example, we might be interested in computing some descriptive statistics of a quantitative variable, for each level of a qualitative variable (so by group).</p>
+<p>In our case, suppose we would like to compute the mean and standard deviation of the body mass, but this time separately for each species:</p>
+<pre class="r"><code># compute mean and sd of body mass by species
+dat |&gt;
+  group_by(species) |&gt; # group by species
+  summarize(
+    mean = mean(body_mass_g, na.rm = TRUE), # compute mean
+    sd = sd(body_mass_g, na.rm = TRUE) # compute sd
+  )</code></pre>
+<pre><code>## # A tibble: 3 × 3
+##   species    mean    sd
+##   &lt;fct&gt;     &lt;dbl&gt; &lt;dbl&gt;
+## 1 Adelie    3701.  459.
+## 2 Chinstrap 3733.  384.
+## 3 Gentoo    5076.  504.</code></pre>
+<p>Applied to the example above, here is how the pipe operator works:</p>
+<ol style="list-style-type: decimal">
+<li>The first operation (<code>group_by()</code>) groups observations by species.</li>
+<li>Then the output of the first operation is used as the input for the second operation (<code>summarize()</code>): mean and standard deviation are computed on body mass.</li>
+</ol>
+<p>As a result, we have the mean and standard deviation of body mass by group. As you can imagine, all previous operations can be connected to match your needs.</p>
+<p>Also note that <code>group_by()</code> can be used for several grouping variables at the same time:</p>
+<pre class="r"><code># compute mean and sd of body mass by species and sex
+dat |&gt;
+  group_by(species, sex) |&gt; # group by species and sex
+  summarize(
+    mean = mean(body_mass_g, na.rm = TRUE), # compute mean
+    sd = sd(body_mass_g, na.rm = TRUE) # compute sd
+  )</code></pre>
+<pre><code>## # A tibble: 8 × 4
+## # Groups:   species [3]
+##   species   sex     mean    sd
+##   &lt;fct&gt;     &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1 Adelie    female 3369.  269.
+## 2 Adelie    male   4043.  347.
+## 3 Adelie    &lt;NA&gt;   3540   477.
+## 4 Chinstrap female 3527.  285.
+## 5 Chinstrap male   3939.  362.
+## 6 Gentoo    female 4680.  282.
+## 7 Gentoo    male   5485.  313.
+## 8 Gentoo    &lt;NA&gt;   4588.  338.</code></pre>
+<p>(Note that, as for all connected operations, the name of the data frame needs to be specified only in the first operation.)</p>
+</div>
+<div id="number-of-observations" class="section level3">
+<h3>Number of observations</h3>
+<p>Some operations can only be performed inside other operations.</p>
+<p>This is the case with the number of observations <code>n()</code>, which can only be used inside <code>summarize()</code>:</p>
+<pre class="r"><code># number of observations
+dat |&gt;
+  summarize(n_obs = n())</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   n_obs
+##   &lt;int&gt;
+## 1   344</code></pre>
+<p>To refer with the previous connected operation <code>group_by()</code>, we can compute the number of observations by group using the two operations <code>n()</code> and <code>group_by()</code> separated by the pipe operator:</p>
+<pre class="r"><code># number of observations by species
+dat |&gt;
+  group_by(species) |&gt;
+  summarize(n_obs = n())</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   species   n_obs
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 Adelie      152
+## 2 Chinstrap    68
+## 3 Gentoo      124</code></pre>
+<p>Note that <code>n()</code> accepts no parameters and is therefore always written with empty parentheses.</p>
+<p>Moreover, note also that the <code>count()</code> function is equivalent to <code>summarize(n = n())</code>:</p>
+<pre class="r"><code># number of observations
+dat |&gt;
+  count()</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##       n
+##   &lt;int&gt;
+## 1   344</code></pre>
+<pre class="r"><code># number of observations by species
+dat |&gt;
+  count(species)</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   species       n
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 Adelie      152
+## 2 Chinstrap    68
+## 3 Gentoo      124</code></pre>
+</div>
+<div id="number-of-distinct-values" class="section level3">
+<h3>Number of distinct values</h3>
+<p><code>n_distinct()</code>, which can also be used only inside <code>summarize()</code>, computes the number of different values/levels of a variable or combination of variables:</p>
+<pre class="r"><code># number of distinct species
+dat |&gt;
+  summarize(n_species = n_distinct(species))</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   n_species
+##       &lt;int&gt;
+## 1         3</code></pre>
+<pre class="r"><code># number of distinct species and year of study
+dat |&gt;
+  summarize(n_species_year = n_distinct(species, year))</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   n_species_year
+##            &lt;int&gt;
+## 1              9</code></pre>
+<p>Note that you do not have to specify a name for the output. In that case, the name of the operation will be used. For example:</p>
+<pre class="r"><code># number of distinct species
+dat |&gt;
+  summarize(n_distinct(species))</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   `n_distinct(species)`
+##                   &lt;int&gt;
+## 1                     3</code></pre>
+</div>
+<div id="first-last-or-nth-value" class="section level3">
+<h3>First, last or nth value</h3>
+<p>Also only available inside <code>summarize()</code>, the first, last or nth value can be found with the following commands:</p>
+<pre class="r"><code># first value of the variable sex
+dat |&gt;
+  summarize(first(sex))</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   `first(sex)`
+##   &lt;fct&gt;       
+## 1 male</code></pre>
+<pre class="r"><code># last value of the variable sex
+dat |&gt;
+  summarize(last(sex))</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   `last(sex)`
+##   &lt;fct&gt;      
+## 1 female</code></pre>
+<pre class="r"><code># 37th value of the variable sex
+dat |&gt;
+  summarize(nth(sex, n = 37))</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   `nth(sex, n = 37)`
+##   &lt;fct&gt;             
+## 1 male</code></pre>
+<p>Several interesting arguments exist within this function to deal with missing values. For the interested reader, see more information in the documentation of the function (run <code>?nth()</code>).</p>
+</div>
+<div id="if-else" class="section level3">
+<h3>If else</h3>
+<p>A very common data transformation is the well known “if else” technique. This technique is usually used to create, from an existing variable, another variable which can take <strong>two levels</strong>.</p>
+<p>Suppose that we want to create a new variable called <code>body_mass_cat</code>, which takes the value “High” when <code>body_mass_g</code> is equal or greater than a certain threshold, “Low” otherwise. This transformation can be performed with the combination of <code>mutate()</code> and <code>if_else()</code>:</p>
+<pre class="r"><code># if else
+dat |&gt;
+  mutate(
+    body_mass_cat = if_else(body_mass_g &gt;= 4000, # condition
+      &quot;High&quot;, # output if condition is true
+      &quot;Low&quot; # output if condition is false
+    )
+  )</code></pre>
+<pre><code>## # A tibble: 344 × 5
+##    species body_mass_g sex     year body_mass_cat
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;        
+##  1 Adelie         3750 male    2007 Low          
+##  2 Adelie         3800 female  2007 Low          
+##  3 Adelie         3250 female  2007 Low          
+##  4 Adelie           NA &lt;NA&gt;    2007 &lt;NA&gt;         
+##  5 Adelie         3450 female  2007 Low          
+##  6 Adelie         3650 male    2007 Low          
+##  7 Adelie         3625 female  2007 Low          
+##  8 Adelie         4675 male    2007 High         
+##  9 Adelie         3475 &lt;NA&gt;    2007 Low          
+## 10 Adelie         4250 &lt;NA&gt;    2007 High         
+## # ℹ 334 more rows</code></pre>
+<p>The <code>if_else()</code> function works with 3 arguments:</p>
+<ol style="list-style-type: decimal">
+<li>The condition (in our case: <code>body_mass_g &gt;= 4000</code>)</li>
+<li>The output value when the condition is true (<code>High</code> in our case).</li>
+<li>The output value when the conditions is false (<code>Low</code> in our case).</li>
+</ol>
+<p>As you can see from the table above, when body mass is missing, <code>if_else()</code> also returns a missing value, which is often a good thing to prevent observations being classified erroneously.</p>
+</div>
+<div id="case-when" class="section level3">
+<h3>Case when</h3>
+<p>If you want to categorize a variable into <strong>more than two levels</strong>, an if else is not the most appropriate tool. In these cases, a “case when” is more appropriate.</p>
+<p>For your information, when I learned R, I used to write nested if else functions, that is, a secondary if else inside a primary if else. Most of the time it worked (with very often a waste of time trying to debug my code), but it is very easy to make a mistake. And even if you managed to make it work, the code is not easy to read at all!</p>
+<p>So I highly recommend using this case when technique instead of several if else functions nested within each other.</p>
+<p>Suppose we want to classify body mass into 3 categories: low, medium and high. For this illustration, we arbitrarily decide that body mass is low when it is strictly lower than 3500, high when it is strictly higher than 4750 and medium otherwise.</p>
+<p>With nested if else functions, here is the code we would need to write:</p>
+<pre class="r"><code># nested if else
+dat |&gt;
+  mutate(
+    body_mass_cat = if_else(body_mass_g &lt; 3500, # first condition
+      &quot;Low&quot;, # output if first condition is true
+      if_else(body_mass_g &gt; 4750, # second condition when first condition is false
+        &quot;High&quot;, # output when second condition is true
+        &quot;Medium&quot; # output when second condition is false
+      )
+    )
+  )</code></pre>
+<pre><code>## # A tibble: 344 × 5
+##    species body_mass_g sex     year body_mass_cat
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;        
+##  1 Adelie         3750 male    2007 Medium       
+##  2 Adelie         3800 female  2007 Medium       
+##  3 Adelie         3250 female  2007 Low          
+##  4 Adelie           NA &lt;NA&gt;    2007 &lt;NA&gt;         
+##  5 Adelie         3450 female  2007 Low          
+##  6 Adelie         3650 male    2007 Medium       
+##  7 Adelie         3625 female  2007 Medium       
+##  8 Adelie         4675 male    2007 Medium       
+##  9 Adelie         3475 &lt;NA&gt;    2007 Low          
+## 10 Adelie         4250 &lt;NA&gt;    2007 Medium       
+## # ℹ 334 more rows</code></pre>
+<p>This code works as follows:</p>
+<ol style="list-style-type: decimal">
+<li>It evaluates the first condition <code>body_mass_g &lt; 3500</code>.</li>
+<li>If it is true, <code>body_mass_cat</code> is <code>Low</code>. On the contrary, if it is false, it evaluates the second condition <code>body_mass_g &gt; 4750</code>.</li>
+<li>If this second condition is true, <code>body_mass_cat</code> is <code>High</code>, otherwise it is <code>Medium</code>.</li>
+</ol>
+<p>As you can see from the results above, it works. However, you will concede that it is easy to make coding mistakes, and that the code is not easy to write nor to read.</p>
+<p>To improve this workflow, we now use the case when technique:</p>
+<pre class="r"><code># case when, without a default option
+dat |&gt;
+  mutate(
+    body_mass_cat = case_when(
+      body_mass_g &lt; 3500 ~ &quot;Low&quot;,
+      body_mass_g &gt;= 3500 &amp; body_mass_g &lt;= 4750 ~ &quot;Medium&quot;,
+      body_mass_g &gt; 4750 ~ &quot;High&quot;
+    )
+  )</code></pre>
+<pre><code>## # A tibble: 344 × 5
+##    species body_mass_g sex     year body_mass_cat
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;        
+##  1 Adelie         3750 male    2007 Medium       
+##  2 Adelie         3800 female  2007 Medium       
+##  3 Adelie         3250 female  2007 Low          
+##  4 Adelie           NA &lt;NA&gt;    2007 &lt;NA&gt;         
+##  5 Adelie         3450 female  2007 Low          
+##  6 Adelie         3650 male    2007 Medium       
+##  7 Adelie         3625 female  2007 Medium       
+##  8 Adelie         4675 male    2007 Medium       
+##  9 Adelie         3475 &lt;NA&gt;    2007 Low          
+## 10 Adelie         4250 &lt;NA&gt;    2007 Medium       
+## # ℹ 334 more rows</code></pre>
+<p>This workflow is much simpler to code and read!</p>
+<p>If there are no missing values in the variable(s) used for the condition(s), it can even be simplified to:</p>
+<pre class="r"><code># case when, with a default option
+dat |&gt;
+  mutate(
+    body_mass_cat = case_when(
+      body_mass_g &lt; 3500 ~ &quot;Low&quot;,
+      body_mass_g &gt; 4750 ~ &quot;High&quot;,
+      .default = &quot;Medium&quot; # default output
+    )
+  )</code></pre>
+<pre><code>## # A tibble: 344 × 5
+##    species body_mass_g sex     year body_mass_cat
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;        
+##  1 Adelie         3750 male    2007 Medium       
+##  2 Adelie         3800 female  2007 Medium       
+##  3 Adelie         3250 female  2007 Low          
+##  4 Adelie           NA &lt;NA&gt;    2007 Medium       
+##  5 Adelie         3450 female  2007 Low          
+##  6 Adelie         3650 male    2007 Medium       
+##  7 Adelie         3625 female  2007 Medium       
+##  8 Adelie         4675 male    2007 Medium       
+##  9 Adelie         3475 &lt;NA&gt;    2007 Low          
+## 10 Adelie         4250 &lt;NA&gt;    2007 Medium       
+## # ℹ 334 more rows</code></pre>
+<p>As you can see, a default output can be specified with <code>.default</code> for observations that do not match any of the conditions.</p>
+<p>However, be careful if there are missing values! Indeed, if there is at least one missing value (as in our case), the code above is not correct because observations with missing <code>body_mass_g</code> will be misclassified as <code>Medium</code>.</p>
+<p>Therefore, if you really want to specify a default output, I recommend using the code below which keeps missing values as <code>NA</code>:</p>
+<pre class="r"><code># case when, with a default option and missing values
+dat |&gt;
+  mutate(
+    body_mass_cat = case_when(
+      body_mass_g &lt; 3500 ~ &quot;Low&quot;,
+      body_mass_g &gt; 4750 ~ &quot;High&quot;,
+      is.na(body_mass_g) ~ NA, # keep missing values as NA
+      .default = &quot;Medium&quot; # default output
+    )
+  )</code></pre>
+<pre><code>## # A tibble: 344 × 5
+##    species body_mass_g sex     year body_mass_cat
+##    &lt;fct&gt;         &lt;int&gt; &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;        
+##  1 Adelie         3750 male    2007 Medium       
+##  2 Adelie         3800 female  2007 Medium       
+##  3 Adelie         3250 female  2007 Low          
+##  4 Adelie           NA &lt;NA&gt;    2007 &lt;NA&gt;         
+##  5 Adelie         3450 female  2007 Low          
+##  6 Adelie         3650 male    2007 Medium       
+##  7 Adelie         3625 female  2007 Medium       
+##  8 Adelie         4675 male    2007 Medium       
+##  9 Adelie         3475 &lt;NA&gt;    2007 Low          
+## 10 Adelie         4250 &lt;NA&gt;    2007 Medium       
+## # ℹ 334 more rows</code></pre>
+<p>I personally prefer to write all categories and not write a default option for improved code readability and robustness of my code, but it is more a personal opinion.</p>
+<p>In all cases, no matter if you used an if else or a case when, it is a good practice to check the variable you just created to make sure that you obtain the intended results.</p>
+</div>
+</div>
+</div>
+<div id="conclusion-and-other-resources" class="section level1">
+<h1>Conclusion and other resources</h1>
+<p>Thanks for reading.</p>
+<p>This article introduced and illustrated the most common data manipulation and data management tools in R, using the <code>{dplyr}</code> package. We also introduced the pipe operator, well known to users of modern R packages.</p>
+<p>The <code>{dplyr}</code> package offers many more functions for data manipulation (in particular to merge data frames with the family of <code>join()</code> functions). If you would like to learn more about this package, I recommend starting with the following resources:</p>
+<ul>
+<li><a href="https://dplyr.tidyverse.org/" target="_blank">dplyr.tidyverse.org</a></li>
+<li><a href="https://r4ds.hadley.nz/data-transform.html" target="_blank">Chapter “Data transformation”</a> in the book “R for Data Science”</li>
+<li><a href="https://github.com/rstudio/cheatsheets/blob/main/data-transformation.pdf" target="_blank">Cheatsheet</a></li>
+<li><a href="https://dplyr.tidyverse.org/articles/dplyr.html" target="_blank">Vignette</a></li>
+<li>For those who are used to base R, a <a href="https://cran.r-project.org/web/packages/dplyr/vignettes/base.html" target="_blank">vignette</a> comparing <code>{dplyr}</code> functions to their base R equivalents</li>
+</ul>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>The keyboard shortcut for the pipe operator is <code>ctrl + shift + m</code> (Windows) or <code>cmd + shift + m</code> (Mac). It will print <code>%&gt;%</code>, unless you specified to use the native pipe operator <code>|&gt;</code> in the settings of RStudio.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

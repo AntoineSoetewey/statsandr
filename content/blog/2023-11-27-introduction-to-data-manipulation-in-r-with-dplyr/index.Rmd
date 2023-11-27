@@ -1,0 +1,662 @@
+---
+title: Introduction to data manipulation in R with {dplyr}
+author: Antoine Soetewey
+date: '2023-11-27'
+slug: introduction-to-data-manipulation-in-r-with-dplyr
+categories: []
+tags:
+  - Basics
+  - R
+meta_img: blog/introduction-to-data-manipulation-in-r-with-dplyr/images/introduction-to-data-manipulation-in-r-with-dplyr.jpeg
+description: Learn to use the dplyr package in R which helps you to solve the most common data manipulation challenges such as filtering, summarizing or sorting observations
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
+)
+
+set.seed(42)
+```
+
+![](images/introduction-to-data-manipulation-in-r-with-dplyr.jpeg){width=100%}
+
+# Introduction
+
+In a previous post, we showed how to [manipulate data in R](/blog/data-manipulation-in-r/). In particular, we illustrated how to create and manipulate vectors, factors, lists and data frames. This served as an introduction to R and was aimed at beginners. Moreover, as long as it was possible, all manipulations were made in base R, that is, without having to load any package.
+
+In this post, we would like to show again how to manipulate data in R, but this time using the `{dplyr}` package.
+
+The `{dplyr}` package, developed by Hadley Wickham and colleagues at posit, provides a complete set of functions that help you solve the most common data manipulation challenges such as:
+
+- filtering observations based on their values
+- extracting observations based on their values or positions
+- sampling observations based on a specific number or fraction of rows
+- sorting observations based on one or several variables
+- selecting variables based on their names or positions
+- renaming variables
+- adding new variables based on existing ones
+- summarizing observations or variables to a single descriptive measure
+- performing any operation by group
+- categorizing observations into two or more groups
+- etc.
+
+More information about the package can be found at [dplyr.tidyverse.org](https://dplyr.tidyverse.org/){target="_blank"}.
+
+In this post, we will present the most common functions for data manipulation and data management using the `{dplyr}` package (illustrated on a data frame). This is however not an exhaustive list! It is likely that you will need other functions that the ones presented here. For the interested readers, see the end of this post for further resources.
+
+A question I am often asked is whether it is best to first learn data manipulation with base R and *then* with `{dplyr}`, or directly learn `{dplyr}`.
+
+Everyone may not agrees, but here is what I tend to answer. The interest in terms of efficiency and clarity/readability of the code that `{dplyr}` brings is obvious. So even when I give a [training](https://datanalyze.be/trainings/) targeted to statisticians, I present the `{dplyr}` package. However, I still do believe that learning data manipulation with base R is important for two reasons: 
+
+1. Everyone will, at some point, be confronted with code written in base R (either from collaboration with other R users, or from code found in textbooks or online).
+1. Through the feedback I receive from my students, I notice that `{dplyr}` is relatively easy to learn when you are familiar with base R (which is quite rewarding for those who struggled at the beginning).
+
+For these reasons, I tend to teach data manipulation with base R first and then slowly switch to `{dplyr}` (up to the point that for some advanced training courses, I hardly use base R at all by the end of the course). As a side note, this is the approach I follow for data visualization in R as well: I teach first how to plot data with base R, then I gradually teach them [how to use `{ggplot2}`](/blog/graphics-in-r-with-ggplot2/).
+
+With this approach, some students may have the impression that they wasted their time learning base R. At least, some may have this impression during the training. However, as soon as the training is done and they have to learn R by themselves or work on real projects, they are grateful of having learned both.
+
+I am curious to hear from other teachers regarding their approach, so feel free to share your opinion.
+
+# Data
+
+To present the different functions, we will use the data frame `penguins`, available within the `{palmerpenguins}` package:
+
+```{r}
+# install.packages("palmerpenguins")
+library(palmerpenguins)
+```
+
+Before going further, we rename the data frame as `dat`:
+
+```{r}
+dat <- penguins
+```
+
+I like to call data frames I am working on with a generic name such as `dat` for two reasons:
+
+1. Every time I need to write the name of the data frame, it is usually shorter to write `dat` than to write the name of the data frame (which is in this case `penguins`).
+1. If I need to do similar analyses or plots on different data frames, the code I wrote in the past can be reused with only a few modifications. With this very simple trick, most of the time I only have to edit the names of the variables, but the name of the data frame does not need to be changed (which saves me a lot of time).
+
+The data frame contains data for 344 penguins and 8 variables describing the species, the island, some measurements of the size of the bill, flipper and body mass, the sex and the study year. More information about the data frame can be found by running `?penguins` (after loading the `{palmerpenguins}` package).
+
+For this post, we will focus only on the variables `species`, `body_mass_g`, `sex` and `year`.
+
+```{r}
+#| echo: false
+
+library(dplyr)
+dat <- dat |>
+  select(species, body_mass_g, sex, year)
+```
+
+Before proceeding with the different data manipulation techniques, let's first inspect the data by displaying its structure, the first 6 rows and a summary of it:
+
+```{r}
+str(dat) # structure of the data
+head(dat) # display first 6 rows
+summary(dat) # summary
+```
+
+# {dplyr} package
+
+Without further ado, let's illustrate the different functions for data manipulation available in the `{dplyr}` package in the following sections.
+
+As for any package, we first need to install and load it before using it:
+
+```{r}
+# install.packages("dplyr")
+library(dplyr)
+```
+
+Note that all functions presented below requires tidy data, which means that:
+
+- each variable is in its own column,
+- each observation, or case, is in its own row, and
+- each value is in its own cell.
+
+![Rules of a tidy data frame: variables are columns, observations are rows, and values are cells. Source: R for Data Science (2e) by H. Wickham, M. Çetinkaya-Rundel and G. Grolemund.](images/tidy-data.png){width=100%}
+
+## Filter observations
+
+Filtering observations based on their values can be done with the `filter()` function. This function works on both [quantitative](/blog/variable-types-and-examples/#quantitative) and [qualitative](/blog/variable-types-and-examples/#qualitative) variables:
+
+```{r}
+# filter observations based on a quantitative variable
+filter(dat, body_mass_g > 4000)
+
+# filter observations based on a qualitative variable
+filter(dat, sex == "female")
+```
+
+You can combine several conditions with `&` (if the conditions must be cumulative) or `|` (if the conditions are alternatives), for instance:
+
+```{r}
+# filter observations based on 2 cumulative conditions
+filter(dat, body_mass_g > 4000 & sex == "female")
+```
+
+Notice that variable names do *not* have to be written inside single nor double quotation marks (`''` or `""`). This is the case for all functions presented below.
+
+### The pipe operator
+
+As you can see from the code above, the `filter()` functions requires the name of the data frame as first argument, then the condition (with the usual logical operators `>`, `<`, `>=`, `<=`, `==`, `!=`, `%in%`, etc.) as second argument.
+
+Specifying the name of the data frame as first argument is required for all functions presented in this list. However, there is a workaround to specifying the data frame's name inside the functions: the pipe operator (`|>` or `%>%`).^[The keyboard shortcut for the pipe operator is `ctrl + shift + m` (Windows) or `cmd + shift + m` (Mac). It will print `%>%`, unless you specified to use the native pipe operator `|>` in the settings of RStudio.]
+
+The pipe operator allows to perform a sequence of several operations, that is, chain a sequence of calculations together. It is particularly useful when you are performing several operations on a data frame, and you do not want to save the output at each intermediate step. We will see below how to use the pipe operator with several operations, but for now I would like to introduce it with only one operation at a time.
+
+As you can see with the `filter()` function, the pipe operator is not compulsory. However, I recommend it so much (even to beginners) for its easy of use, convenience, code readability and popularity that from now on functions available in `{dplyr}` will be presented together with the pipe operator.
+
+So with the pipe operator, the code above becomes:
+
+```{r}
+# filter observations based on a quantitative variable
+dat |>
+  filter(body_mass_g > 4000)
+
+# filter observations based on a qualitative variable
+dat |>
+  filter(sex == "female")
+
+# filter observations based on 2 cumulative conditions
+dat |>
+  filter(body_mass_g > 4000 & sex == "female")
+```
+
+The pipe operator simply takes the results of one operation into the next operation below it, making the code extremely easy to write and read.
+
+This way, instead of specifying the data frame's name as first argument in the `filter()` function (or any other function within the `{dplyr}` package), we simply specify the data frame's name and then the desired function, combined together thanks to the pipe operator.
+
+## Extract observations
+
+It is possible to extract observations based on:
+
+- their positions, or
+- their values.
+
+### Based on their positions
+
+Extracting observations based on their positions can be done with the `slice()` function:
+
+```{r}
+# extract rows 2, 5 and 37
+dat |>
+  slice(c(2, 5, 37))
+```
+
+Moreover, extracting the first or last rows can be done with `slice_head()` and `slice_tail()`:
+
+```{r}
+# extract first 3 rows
+dat |>
+  slice_head(n = 3)
+
+# extract last 3 rows
+dat |>
+  slice_tail(n = 3)
+```
+
+### Based on their values
+
+To extract observations based on values of a variable, use:
+
+- `slice_min()` to select rows with the **lowest** values (with a defined proportion), and
+- `slice_max()` to select rows with the **highest** values (with a defined proportion).
+
+```{r}
+# extract observations with 25% lowest body mass
+dat |>
+  slice_min(body_mass_g, prop = 0.25)
+
+# extract observations with 25% highest body mass
+dat |>
+  slice_max(body_mass_g, prop = 0.25)
+```
+
+## Sample observations
+
+Sampling observations can be done in two ways:
+
+1. Random sample of a **number** of rows with `sample_n()`
+1. Random sample of a **fraction** of rows with `sample_frac()`
+
+```{r}
+# random sample of 3 rows
+dat |>
+  sample_n(size = 3)
+
+# random sample of half of the rows
+dat |>
+  sample_frac(size = 1 / 2)
+```
+
+Note that, as with the `sample()` function within base R, `size` can be greater than the size of the data frame. In this case, some rows will be duplicated, and you will need to specify the argument `replace = TRUE`.
+
+Alternatively, it is possible to obtain a random sample of a number of rows or fraction or rows with `slice_sample()`. For this, use:
+
+- the argument `n` to select a number of rows, or
+- the argument `prop` to select a fraction of rows.
+
+```{r}
+# random sample of 3 rows
+dat |>
+  slice_sample(n = 3)
+
+# random sample of half of the rows
+dat |>
+  slice_sample(prop = 1 / 2)
+```
+
+## Sort observations
+
+Sorting observations can be done with the `arrange()` function:
+
+```{r}
+# sort observations based on body mass (ascending order)
+dat |>
+  arrange(body_mass_g)
+```
+
+By default, `arrange()` uses the **ascending** order. To sort in **descending** order, use `desc()` inside `arrange()`:
+
+```{r}
+# sort observations based on body mass (descending order)
+dat |>
+  arrange(desc(body_mass_g))
+```
+
+As with `filter()`, `arrange()` can be used for several variables and works both on quantitative and qualitative variables:
+
+```{r}
+# sort observations based on two variables
+dat |>
+  arrange(sex, body_mass_g)
+```
+
+The code above sorts the observations first based on the sex (in alphabetical order) and then based on the body mass (in ascending order, so from lowest to highest).
+
+Note that if the qualitative variable is defined as an ordered [factor](/blog/data-types-in-r/#factor), the sorting is based on level order, not alphabetical order!
+
+## Select variables
+
+Selecting variables can be done with the `select()` function, based on:
+
+- the position of the variable(s), or
+- the name(s) of the variable(s).
+
+```{r}
+# select variables by their positions
+dat |>
+  select(c(2, 4))
+
+# select variables by their names
+dat |>
+  select(body_mass_g, year)
+```
+
+Note that it is also possible to remove variables. For this, use the `-` sign in front of their positions or names:
+
+```{r}
+# remove variables by their positions
+dat |>
+  select(-c(2, 4))
+
+# remove variables by their names
+dat |>
+  select(-c(body_mass_g, year))
+```
+
+It is also possible to select variables with a sequence of names:
+
+```{r}
+# select all variables from species to sex
+dat |>
+  select(species:sex)
+```
+
+Last but not least, `select()` can also be used as an easy way to rearrange columns in the desired order:
+
+```{r}
+# put sex as first column, then all the others
+dat |>
+  select(sex, species:year)
+```
+
+## Rename variables
+
+To rename variables, use the `rename()` function:
+
+```{r}
+# rename variables
+dat |>
+  rename(
+    body_mass = body_mass_g, # rename body_mass_g into body_mass
+    study_year = year # rename year into study_year
+  )
+```
+
+This might not be intuitive (at least it was not for me at the time of learning this package), so bear in mind that you always need to write first the new name and then the old name (separated with the `=` sign).
+
+## Create or modify variables
+
+You can create or modify certain variables of the data frame with `mutate()`, based on:
+
+- another variable, or
+- a vector of your choice.
+
+```{r}
+# create a new variable based on an existing one
+dat |>
+  mutate(
+    body_mass_kg = body_mass_g / 1000
+  )
+
+# create a new variable from a vector of your choice
+dat |>
+  mutate(
+    ID = 1:nrow(dat)
+  )
+```
+
+Note that if you create a variable with a name which already exists in the data frame, the old variable will be erased and replaced by the new one.
+
+Like `rename()`, `mutate()` requires the argument to be written as `name = expression`, where `name` is name of the column created or modified and `expression` is the formula for calculating the values.
+
+## Summarize observations
+
+Often, you will want to summarize the data with some [descriptive statistics](/blog/descriptive-statistics-in-r/). This can be done with the `summarize()` function, in addition to most functions used for descriptive statistics (`mean()`, `median()`, `min()`, `max()`, `sd()`, `var()`, etc.):
+
+```{r}
+# compute mean and sd of body mass
+dat |>
+  summarize(
+    body_mass_mean = mean(body_mass_g, na.rm = TRUE),
+    body_mass_sd = sd(body_mass_g, na.rm = TRUE)
+  )
+```
+
+Note that:
+
+- The `na.rm = TRUE` argument is used to omit missing values in the computation of the summary statistics.
+- `summarize()` and `summarise()` give the exact same results.
+
+## Identify distinct values
+
+Identifying distinct values of a variable can be done with `distinct()`:
+
+```{r}
+# find the distinct species
+dat |>
+  distinct(species)
+```
+
+Identifying distinct values is mostly done on qualitative or quantitative discrete variables, but it can be done on any type of variable and with several variables at the same time. If more than one variables is specified, it returns all the combinations of values of the variables.
+
+For instance, with species and study year:
+
+```{r}
+# combination of distinct species and year
+dat |>
+  distinct(species, year)
+```
+
+## Connected operations
+
+Another advantage of using the `{dplyr}` package is that several operations can be connected all at once, with great readability of the code. This can easily be done with the pipe operator (`|>` or `%>%`) introduced earlier.
+
+Until now, we have always seen the same structure: we call a data frame, and then we apply an operation on that data frame. From now on, we will see how to combine more operations into one single chain of operations.
+
+### Group by
+
+`group_by()` allows to modify the way the basic functions are performed. Instead of covering all the rows of the data frame, the operations will cover each of the groups of rows defined by the grouping command. In this way, aggregation operations, using `summarize()`, will produce statistics for each group rather than for all observations.
+
+For example, we might be interested in computing some descriptive statistics of a quantitative variable, for each level of a qualitative variable (so by group).
+
+In our case, suppose we would like to compute the mean and standard deviation of the body mass, but this time separately for each species:
+
+```{r}
+# compute mean and sd of body mass by species
+dat |>
+  group_by(species) |> # group by species
+  summarize(
+    mean = mean(body_mass_g, na.rm = TRUE), # compute mean
+    sd = sd(body_mass_g, na.rm = TRUE) # compute sd
+  )
+```
+
+Applied to the example above, here is how the pipe operator works:
+
+1. The first operation (`group_by()`) groups observations by species.
+1. Then the output of the first operation is used as the input for the second operation (`summarize()`): mean and standard deviation are computed on body mass.
+
+As a result, we have the mean and standard deviation of body mass by group. As you can imagine, all previous operations can be connected to match your needs.
+
+Also note that `group_by()` can be used for several grouping variables at the same time:
+
+```{r}
+# compute mean and sd of body mass by species and sex
+dat |>
+  group_by(species, sex) |> # group by species and sex
+  summarize(
+    mean = mean(body_mass_g, na.rm = TRUE), # compute mean
+    sd = sd(body_mass_g, na.rm = TRUE) # compute sd
+  )
+```
+
+(Note that, as for all connected operations, the name of the data frame needs to be specified only in the first operation.)
+
+### Number of observations
+
+Some operations can only be performed inside other operations.
+
+This is the case with the number of observations `n()`, which can only be used inside `summarize()`:
+
+```{r}
+# number of observations
+dat |>
+  summarize(n_obs = n())
+```
+
+To refer with the previous connected operation `group_by()`, we can compute the number of observations by group using the two operations `n()` and `group_by()` separated by the pipe operator:
+
+```{r}
+# number of observations by species
+dat |>
+  group_by(species) |>
+  summarize(n_obs = n())
+```
+
+Note that `n()` accepts no parameters and is therefore always written with empty parentheses.
+
+Moreover, note also that the `count()` function is equivalent to `summarize(n = n())`:
+
+```{r}
+# number of observations
+dat |>
+  count()
+
+# number of observations by species
+dat |>
+  count(species)
+```
+
+### Number of distinct values
+
+`n_distinct()`, which can also be used only inside `summarize()`, computes the number of different values/levels of a variable or combination of variables:
+
+```{r}
+# number of distinct species
+dat |>
+  summarize(n_species = n_distinct(species))
+
+# number of distinct species and year of study
+dat |>
+  summarize(n_species_year = n_distinct(species, year))
+```
+
+Note that you do not have to specify a name for the output. In that case, the name of the operation will be used. For example:
+
+```{r}
+# number of distinct species
+dat |>
+  summarize(n_distinct(species))
+```
+
+### First, last or nth value
+
+Also only available inside `summarize()`, the first, last or nth value can be found with the following commands:
+
+```{r}
+# first value of the variable sex
+dat |>
+  summarize(first(sex))
+
+# last value of the variable sex
+dat |>
+  summarize(last(sex))
+
+# 37th value of the variable sex
+dat |>
+  summarize(nth(sex, n = 37))
+```
+
+Several interesting arguments exist within this function to deal with missing values. For the interested reader, see more information in the documentation of the function (run `?nth()`).
+
+### If else
+
+A very common data transformation is the well known "if else" technique. This technique is usually used to create, from an existing variable, another variable which can take **two levels**.
+
+Suppose that we want to create a new variable called `body_mass_cat`, which takes the value "High" when `body_mass_g` is equal or greater than a certain threshold, "Low" otherwise. This transformation can be performed with the combination of `mutate()` and `if_else()`:
+
+```{r}
+# if else
+dat |>
+  mutate(
+    body_mass_cat = if_else(body_mass_g >= 4000, # condition
+      "High", # output if condition is true
+      "Low" # output if condition is false
+    )
+  )
+```
+
+The `if_else()` function works with 3 arguments:
+
+1. The condition (in our case: `body_mass_g >= 4000`)
+1. The output value when the condition is true (`High` in our case).
+1. The output value when the conditions is false (`Low` in our case).
+
+As you can see from the table above, when body mass is missing, `if_else()` also returns a missing value, which is often a good thing to prevent observations being classified erroneously.
+
+### Case when
+
+If you want to categorize a variable into **more than two levels**, an if else is not the most appropriate tool. In these cases, a "case when" is more appropriate.
+
+For your information, when I learned R, I used to write nested if else functions, that is, a secondary if else inside a primary if else. Most of the time it worked (with very often a waste of time trying to debug my code), but it is very easy to make a mistake. And even if you managed to make it work, the code is not easy to read at all!
+
+So I highly recommend using this case when technique instead of several if else functions nested within each other.
+
+Suppose we want to classify body mass into 3 categories: low, medium and high. For this illustration, we arbitrarily decide that body mass is low when it is strictly lower than 3500, high when it is strictly higher than 4750 and medium otherwise.
+
+With nested if else functions, here is the code we would need to write:
+
+```{r}
+# nested if else
+dat |>
+  mutate(
+    body_mass_cat = if_else(body_mass_g < 3500, # first condition
+      "Low", # output if first condition is true
+      if_else(body_mass_g > 4750, # second condition when first condition is false
+        "High", # output when second condition is true
+        "Medium" # output when second condition is false
+      )
+    )
+  )
+```
+
+This code works as follows:
+
+1. It evaluates the first condition `body_mass_g < 3500`.
+1. If it is true, `body_mass_cat` is `Low`. On the contrary, if it is false, it evaluates the second condition `body_mass_g > 4750`.
+1. If this second condition is true, `body_mass_cat` is `High`, otherwise it is `Medium`.
+
+As you can see from the results above, it works. However, you will concede that it is easy to make coding mistakes, and that the code is not easy to write nor to read.
+
+To improve this workflow, we now use the case when technique:
+
+```{r}
+# case when, without a default option
+dat |>
+  mutate(
+    body_mass_cat = case_when(
+      body_mass_g < 3500 ~ "Low",
+      body_mass_g >= 3500 & body_mass_g <= 4750 ~ "Medium",
+      body_mass_g > 4750 ~ "High"
+    )
+  )
+```
+
+This workflow is much simpler to code and read!
+
+If there are no missing values in the variable(s) used for the condition(s), it can even be simplified to:
+
+```{r}
+# case when, with a default option
+dat |>
+  mutate(
+    body_mass_cat = case_when(
+      body_mass_g < 3500 ~ "Low",
+      body_mass_g > 4750 ~ "High",
+      .default = "Medium" # default output
+    )
+  )
+```
+
+As you can see, a default output can be specified with `.default` for observations that do not match any of the conditions.
+
+However, be careful if there are missing values! Indeed, if there is at least one missing value (as in our case), the code above is not correct because observations with missing `body_mass_g` will be misclassified as `Medium`.
+
+Therefore, if you really want to specify a default output, I recommend using the code below which keeps missing values as `NA`:
+
+```{r}
+# case when, with a default option and missing values
+dat |>
+  mutate(
+    body_mass_cat = case_when(
+      body_mass_g < 3500 ~ "Low",
+      body_mass_g > 4750 ~ "High",
+      is.na(body_mass_g) ~ NA, # keep missing values as NA
+      .default = "Medium" # default output
+    )
+  )
+```
+
+I personally prefer to write all categories and not write a default option for improved code readability and robustness of my code, but it is more a personal opinion.
+
+In all cases, no matter if you used an if else or a case when, it is a good practice to check the variable you just created to make sure that you obtain the intended results.
+ 
+# Conclusion and other resources
+
+Thanks for reading.
+
+This article introduced and illustrated the most common data manipulation and data management tools in R, using the `{dplyr}` package. We also introduced the pipe operator, well known to users of modern R packages.
+
+The `{dplyr}` package offers many more functions for data manipulation (in particular to merge data frames with the family of `join()` functions). If you would like to learn more about this package, I recommend starting with the following resources:
+ 
+- [dplyr.tidyverse.org](https://dplyr.tidyverse.org/){target="_blank"}
+- [Chapter "Data transformation"](https://r4ds.hadley.nz/data-transform.html){target="_blank"} in the book "R for Data Science"
+- [Cheatsheet](https://github.com/rstudio/cheatsheets/blob/main/data-transformation.pdf){target="_blank"}
+- [Vignette](https://dplyr.tidyverse.org/articles/dplyr.html){target="_blank"}
+- For those who are used to base R, a [vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/base.html){target="_blank"} comparing `{dplyr}` functions to their base R equivalents
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
