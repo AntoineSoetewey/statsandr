@@ -32,11 +32,13 @@ set.seed(42)
 
 # Introduction
 
-Not all data frames are as clean and tidy as you would expect. Therefore, after [importing your dataset into RStudio](/blog/how-to-import-an-excel-file-in-rstudio/), most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor.
+Not all data frames are as clean and tidy as you would expect. Therefore, after [importing your data frame into RStudio](/blog/how-to-import-an-excel-file-in-rstudio/), most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor.
 
 Data manipulation include a broad range of tools and techniques. We present here in details the manipulations that you will most likely need for your projects in R. Do not hesitate to let me know (as a comment at the end of this article for example) if you find other data manipulations essential so that I can add them.
 
 In this article we show the main functions to manipulate data in R. We first illustrate these functions on vectors, [factors](/blog/data-types-in-r/#factor) and lists. We then illustrate the main functions to manipulate data frames and dates/times in R.
+
+For those who are interested in going further, see also an introduction to [data manipulation in R with the `{dplyr}` package](/blog/introduction-to-data-manipulation-in-r-with-dplyr/).
 
 # Vectors
 
@@ -1074,13 +1076,17 @@ Be careful when removing observations with missing values, especially if missing
 
 ## Impute NAs
 
-Instead of removing observations with at least one NA, it is possible to impute them, that is, replace them by some values such as the median or the mode of the variable. This can be done easily with the command `impute()` from the package `imputeMissings`:
+Instead of removing observations with at least one NA, it is possible to impute them, that is, replace them by some values such as the median or the mode of the variable. This can be done easily with the command `impute()` from the package `Hmisc`:
 
 ```{r, message = FALSE}
-library(imputeMissings)
+library(Hmisc)
 
-dat_imputed <- impute(dat) # default method is median/mode
-dat_imputed
+# impute NA with default method (median/mode)
+variable1 <- impute(dat$variable1)
+
+# create data frame with imputed data
+dat_imputed <- data.frame(variable1,
+           variable2 = dat$variable2)
 ```
 
 When the median/mode method is used (the default), character vectors and factors are imputed with the mode. Numeric and integer vectors are imputed with the median. Again, use imputations carefully. Other packages offer more advanced imputation techniques. However, we keep it simple and straightforward for this article as advanced imputations is beyond the scope of introductory data manipulations in R.
@@ -1199,6 +1205,8 @@ Otherwise, Google is your best friend!
 
 Thanks for reading.
 
-I hope this article helped you to manipulate your data in RStudio. Now that you know [how to import a data frame into R](/blog/how-to-import-an-excel-file-in-rstudio/) and how to manipulate it, the next step would probably be to learn how to perform [descriptive statistics in R](/blog/descriptive-statistics-in-r/). If you are looking for more advanced statistical analyses using R, see all [articles about R](/tags/r/).
+I hope this article helped you to manipulate your data in RStudio. For those who are interested in going further, see also an introduction to [data manipulation in R with the `{dplyr}` package](/blog/introduction-to-data-manipulation-in-r-with-dplyr/).
+
+Now that you know [how to import a data frame into R](/blog/how-to-import-an-excel-file-in-rstudio/) and how to manipulate it, the next step would probably be to learn how to perform [descriptive statistics in R](/blog/descriptive-statistics-in-r/). If you are looking for more advanced statistical analyses using R, see all [articles about R](/tags/r/).
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.

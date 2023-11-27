@@ -96,9 +96,10 @@ output:
 <p><img src="/blog/data-manipulation-in-rstudio_files/0_voEJp2o-Z2k4-uUd.jpeg" style="width:100.0%" /></p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Not all data frames are as clean and tidy as you would expect. Therefore, after <a href="/blog/how-to-import-an-excel-file-in-rstudio/">importing your dataset into RStudio</a>, most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor.</p>
+<p>Not all data frames are as clean and tidy as you would expect. Therefore, after <a href="/blog/how-to-import-an-excel-file-in-rstudio/">importing your data frame into RStudio</a>, most of the time you will need to prepare it before performing any statistical analyses. Data manipulation can even sometimes take longer than the actual analyses when the quality of the data is poor.</p>
 <p>Data manipulation include a broad range of tools and techniques. We present here in details the manipulations that you will most likely need for your projects in R. Do not hesitate to let me know (as a comment at the end of this article for example) if you find other data manipulations essential so that I can add them.</p>
 <p>In this article we show the main functions to manipulate data in R. We first illustrate these functions on vectors, <a href="/blog/data-types-in-r/#factor">factors</a> and lists. We then illustrate the main functions to manipulate data frames and dates/times in R.</p>
+<p>For those who are interested in going further, see also an introduction to <a href="/blog/introduction-to-data-manipulation-in-r-with-dplyr/">data manipulation in R with the <code>{dplyr}</code> package</a>.</p>
 </div>
 <div id="vectors" class="section level1">
 <h1>Vectors</h1>
@@ -562,9 +563,9 @@ v</code></pre>
 <li><strong>lines</strong> correspond to <strong>observations</strong> and</li>
 <li>each <strong>value</strong> must have its own <strong>cell</strong></li>
 </ul>
-<div class="figure">
-<img src="/blog/how-to-import-an-excel-file-in-rstudio_files/structure-of-dataset.png" alt="" />
-<p class="caption">Structure of a data frame. Source: R for Data Science by Hadley Wickham &amp; Garrett Grolemund</p>
+<div class="float">
+<img src="/blog/how-to-import-an-excel-file-in-rstudio_files/structure-of-dataset.png" alt="Structure of a data frame. Source: R for Data Science by Hadley Wickham &amp; Garrett Grolemund" />
+<div class="figcaption">Structure of a data frame. Source: R for Data Science by Hadley Wickham &amp; Garrett Grolemund</div>
 </div>
 <p>In this article, we use the data frame <code>cars</code> to illustrate the main data manipulation techniques. Note that the data frame is installed by default in RStudio (so you do not need to import it) and I use the generic name <code>dat</code> as the name of the data frame throughout the article (see <a href="/blog/how-to-import-an-excel-file-in-rstudio/#user-friendly-way">here</a> why I always use a generic name instead of more specific names).</p>
 <p>Here is the whole data frame:</p>
@@ -978,7 +979,7 @@ head(dat)</code></pre>
 ## 5   big distance
 ## 6 small distance</code></pre>
 <pre class="r"><code>str(dat)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    50 obs. of  8 variables:
+<pre><code>## &#39;data.frame&#39;:	50 obs. of  8 variables:
 ##  $ speed      : num  4 4 7 7 8 9 10 10 10 11 ...
 ##  $ dist       : num  2 10 4 22 16 10 18 26 34 17 ...
 ##  $ speed_dist : num  8 40 28 154 128 90 180 260 340 187 ...
@@ -1249,16 +1250,16 @@ dat_complete</code></pre>
 </div>
 <div id="impute-nas" class="section level2">
 <h2>Impute NAs</h2>
-<p>Instead of removing observations with at least one NA, it is possible to impute them, that is, replace them by some values such as the median or the mode of the variable. This can be done easily with the command <code>impute()</code> from the package <code>imputeMissings</code>:</p>
-<pre class="r"><code>library(imputeMissings)
+<p>Instead of removing observations with at least one NA, it is possible to impute them, that is, replace them by some values such as the median or the mode of the variable. This can be done easily with the command <code>impute()</code> from the package <code>Hmisc</code>:</p>
+<pre class="r"><code>library(Hmisc)
 
-dat_imputed &lt;- impute(dat) # default method is median/mode
-dat_imputed</code></pre>
-<pre><code>##   variable1 variable2
-## 1         6         3
-## 2        12         7
-## 3         6         9
-## 4         3         1</code></pre>
+# impute NA with default method (median/mode)
+variable1 &lt;- impute(dat$variable1)
+
+# create data frame with imputed data
+dat_imputed &lt;- data.frame(variable1,
+  variable2 = dat$variable2
+)</code></pre>
 <p>When the median/mode method is used (the default), character vectors and factors are imputed with the mode. Numeric and integer vectors are imputed with the median. Again, use imputations carefully. Other packages offer more advanced imputation techniques. However, we keep it simple and straightforward for this article as advanced imputations is beyond the scope of introductory data manipulations in R.</p>
 </div>
 </div>
@@ -1271,11 +1272,11 @@ dat_imputed</code></pre>
 <pre class="r"><code>dat_scaled &lt;- scale(dat_imputed)
 
 head(dat_scaled)</code></pre>
-<pre><code>##       variable1  variable2
-## [1,] -0.1986799 -0.5477226
-## [2,]  1.3907590  0.5477226
-## [3,] -0.1986799  1.0954451
-## [4,] -0.9933993 -1.0954451</code></pre>
+<pre><code>##    variable1  variable2
+## 1 -0.1986799 -0.5477226
+## 2  1.3907590  0.5477226
+## 3 -0.1986799  1.0954451
+## 4 -0.9933993 -1.0954451</code></pre>
 </div>
 <div id="dates-and-times" class="section level1">
 <h1>Dates and times</h1>
@@ -1364,7 +1365,8 @@ write.xlsx(dat, file = &quot;dat.xlsx&quot;)</code></pre>
 <div id="conclusion" class="section level1">
 <h1>Conclusion</h1>
 <p>Thanks for reading.</p>
-<p>I hope this article helped you to manipulate your data in RStudio. Now that you know <a href="/blog/how-to-import-an-excel-file-in-rstudio/">how to import a data frame into R</a> and how to manipulate it, the next step would probably be to learn how to perform <a href="/blog/descriptive-statistics-in-r/">descriptive statistics in R</a>. If you are looking for more advanced statistical analyses using R, see all <a href="/tags/r/">articles about R</a>.</p>
+<p>I hope this article helped you to manipulate your data in RStudio. For those who are interested in going further, see also an introduction to <a href="/blog/introduction-to-data-manipulation-in-r-with-dplyr/">data manipulation in R with the <code>{dplyr}</code> package</a>.</p>
+<p>Now that you know <a href="/blog/how-to-import-an-excel-file-in-rstudio/">how to import a data frame into R</a> and how to manipulate it, the next step would probably be to learn how to perform <a href="/blog/descriptive-statistics-in-r/">descriptive statistics in R</a>. If you are looking for more advanced statistical analyses using R, see all <a href="/tags/r/">articles about R</a>.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
 <div class="footnotes footnotes-end-of-document">
