@@ -1,0 +1,332 @@
+---
+title: What is the probability that two persons have the same initials?
+author: Antoine Soetewey
+date: '2023-12-06'
+slug: what-is-the-probability-that-two-persons-have-the-same-initials
+categories: []
+tags:
+  - Probability
+  - Professional
+  - R
+meta_img: blog/what-is-the-probability-that-two-persons-have-the-same-initials/images/what-is-the-probability-that-two-persons-have-the-same-initials.jpeg
+description: Learn how to use simulations and for loops in R to answer a probability question such as What is the probability that two persons have the same initials?
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
+)
+
+set.seed(6)
+```
+
+![](images/what-is-the-probability-that-two-persons-have-the-same-initials.jpeg){width=100%}
+
+# Introduction
+
+Last week, I joined a team to work on a collaborative project. The team was already established for a few months, with several scientists working together on the project. For simplicity, they used to sign documents, mention colleagues in emails, etc. with their initials (the first letter of their first name followed by the first letter of their last name).
+
+A couple of days after joining the project, when I needed to sign my first document with my initials, we realized that another person in the team had the exact same initials than me.
+
+This was not really an issue, as we decided that I would write my initials backward, that is, "SA" instead of "AS", and the other person would keep signing with "AS" as usual.
+
+It could have stopped here. However, the idea to write a post about this rather trivial anecdote came to me when the team leader claimed, in the middle of a meeting: "That's very unfortunate that you two have the same initials! What are the chances of this happening to us?!". 
+
+We spent a couple of minutes trying to estimate this probability, which in the end were mostly based on our intuitions rather than on a formal calculation. This piqued my curiosity, and since the project requires the use of simulations, I thought that it would be nice to answer this question via simulations in R. 
+
+Furthermore, I thought that it would be a nice way to illustrate methods not often presented in my posts: for loops, replications and writing functions in R.
+
+# How likely is it?
+
+Before computing this probability, there are two things to note:
+
+1. Although the team leader was curious to know the probability that *two persons* have the same initials, we are actually more interested in the probability that *at least* two persons have the same initials (as the problem also occurs if more than two persons within a team have the same initials).
+1. The team consists of 8 people.
+
+In this post, we will show how to compute this probability:
+
+- in our context, that is, for a team of 8 persons, and
+- for completeness, for teams of all sizes from 2 to 100 persons.
+
+## For our team
+
+We start by creating a vector of size 8, corresponding to the initials of a team of 8 persons randomly sampled among all 26 letters of the Latin alphabet:
+
+```{r}
+# number of persons
+n_persons <- 8
+
+# create vector of initials
+initials <- replicate(
+  n = n_persons, # number of replications
+  paste0(sample(LETTERS, size = 1), sample(LETTERS, size = 1)) # sample letters
+)
+
+# display initials
+initials
+
+# are there duplicates?
+any(duplicated(initials))
+```
+
+As we can see, everyone has different initials in this simulated team of `r n_persons` persons, but this will not always be the case.
+
+To estimate, via simulations, how likely is that at least two persons have the same initials among the team, we need to replicate this vector of `r n_persons` sampled initials a large number of times (say 1,000 replications):^[You can always use a larger number of replications, but in our case the final result is similar with more replications, and the aim of the post is more to show the development than the final answer.]
+
+```{r}
+# number of replications
+reps <- 1000
+
+# create and save replications
+dat <- replicate(
+  n = reps, # number of replications
+  replicate(n_persons, paste0(sample(LETTERS, size = 1), sample(LETTERS, size = 1)))
+)
+
+# dimensions
+dim(dat)
+
+# display first 4 simulated teams
+dat[, 1:4]
+```
+
+The result is a matrix of `r n_persons` rows and `r reps` columns, where:
+
+- each rows corresponds to the sampled initials of a person, and
+- each column corresponds to one simulated team of `r n_persons` people.
+
+For better readability, we rename:
+
+- the row names as `M1` to ``r paste0("M", n_persons)``, corresponding to persons 1 to `r n_persons`, and
+- the column names as `T1` to ``r paste0("T", reps)``, corresponding to teams 1 to `r reps`.
+
+```{r}
+# rename rows
+rownames(dat) <- paste0("M", 1:n_persons)
+
+# rename columns
+colnames(dat) <- paste0("T", 1:reps)
+
+# display first 4 simulated teams
+dat[, 1:4]
+```
+
+We now need to compute, among the `r reps` teams simulated, how many of them have at least two persons with the same initials:
+
+```{r}
+# transform to data frame
+dat <- as.data.frame(dat)
+
+# save which teams have duplicates
+duplicates <- rep(NA, reps) # create empty vector
+for (i in 1:reps) { # for loop over i from 1 to 1,000
+  duplicates[i] <- any(duplicated(dat[, i])) # save results TRUE/FALSE in duplicates vector
+}
+
+# count how many teams have duplicates
+sum(duplicates)
+```
+
+Here, for each column of our data frame `dat` (from the first to the `r reps`th column), we ask whether there are duplicates or not. This is done repeatedly over all columns thanks to a for loop. For each column, the result is `TRUE` if there are duplicates, otherwise it is `FALSE`. The result of each iteration is saved in the `duplicates` vector. As `TRUE = 1` and `FALSE = 0` in R, we can then count how many columns (and thus teams) have duplicates by summing the number of `TRUE` in the `duplicates` vector.
+ 
+As we can see from the output above, among the `r reps` simulated teams, `r sum(duplicates)` of them have duplicates, that is, `r sum(duplicates)` of them have at least two persons with the same initials.
+
+Therefore, based on the simulations, we can expect the probability that at least two persons with the same initials in a team of `r n_persons` persons to be close to `r round(mean(duplicates) * 100, digits = 2)`%.
+
+This is a good starting point. Notice, however, that I wrote close to `r round(mean(duplicates) * 100, digits = 2)`% because this probability will vary each time it is computed via simulations.
+
+For instance, if we repeat the exact same process a second time:
+
+```{r}
+# create and save replications
+dat <- replicate(
+  n = reps, # number of replications
+  replicate(n_persons, paste0(sample(LETTERS, size = 1), sample(LETTERS, size = 1)))
+)
+
+# transform to data frame
+dat <- as.data.frame(dat)
+
+# save which teams have duplicates
+duplicates <- rep(NA, reps) # create empty vector
+for (i in 1:reps) { # for loop over i from 1 to 1,000
+  duplicates[i] <- any(duplicated(dat[, i])) # save results in the duplicates vector (as TRUE/FALSE)
+}
+
+# count how many teams have duplicates
+sum(duplicates)
+```
+
+We now find a probability of `r round(mean(duplicates) * 100, digits = 2)`%. This is not an error, but it is due to randomness when sampling initials.
+
+Luckily, we can make the computation of this probability more robust thanks to replications. Intuitively, it works as follows. We repeat the same computation multiple times, giving us a range of possible probabilities. This allows us to assess the uncertainty of our result, and understand how the probability might vary due to taking different random samples of initials.
+
+So the goal is to compute our probability multiple times (say 100 times), and see its distribution.
+
+To repeat the same computation multiple times, it is best to write a function in order to avoid copy pasting the same code over and over. So we first write a function (called `initials`) which computes the probability that at least two persons share the same initials among a team of $n$ people:
+
+```{r}
+initials <- function(n_persons, reps = 1000) {
+  # simulate data
+  dat <- as.data.frame(replicate(
+    reps,
+    replicate(n_persons, paste0(sample(LETTERS, size = 1), sample(LETTERS, size = 1)))
+  ))
+
+  # save which teams have duplicates
+  duplicates <- rep(NA, reps)
+  for (i in 1:reps) {
+    duplicates[i] <- any(duplicated(dat[, i]))
+  }
+
+  # proportion of teams with duplicates
+  return(mean(duplicates))
+}
+```
+
+A function in R requires to include:
+
+- the parameters inside `()`, and
+- the computation inside `{}`.
+
+We can then use our function to compute the probability that at least two persons share the same initials among a team of `r n_persons` people. And we combine it with the `replicate()` function to compute this probability 100 times.
+
+```{r}
+# compute and save probabilities
+probs <- replicate(100, initials(n_persons = 8))
+
+# display probabilities
+probs
+```
+
+Finally, we visualize the distribution of these 100 probabilities thanks to a histogram and a boxplot (with the [{ggplot2} package](/blog/graphics-in-r-with-ggplot2/)):
+
+```{r}
+# visualize distribution of the computed probabilities
+# build and save plots
+library(ggplot2)
+
+p1 <- ggplot(mapping = aes(x = probs)) +
+  geom_histogram(color = "black", fill = "steelblue", bins = 8) +
+  labs(
+    x = "Probabilities",
+    y = "Frequencies"
+  ) +
+  scale_x_continuous(labels = scales::percent) # format x-axis in %
+
+p2 <- ggplot(mapping = aes(x = probs)) +
+  geom_boxplot(color = "black", fill = "steelblue") +
+  labs(x = "Probabilities") +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  scale_x_continuous(labels = scales::percent) # format x-axis in %
+
+# combine plots
+library(patchwork)
+
+p1 + p2
+```
+
+These two plots show that the probability that at least two persons share the same initials among a team of `r n_persons` people is most likely between 3.5% and 4.5%.
+
+For the record, during the meeting at the root of all this thinking, most of us thought that it was much less likely. Indeed, I believe we were tempted to compute the probability that someone who joins the team has "AS" as initials. This is indeed much less likely, as the probability is only $\frac{1}{26} \times \frac{1}{26} \simeq 0.15\%$.
+
+However, this does not take into account the fact:
+
+- that the newcomer can have the same initials as any other person, and
+- that it is not only the newcomer who can have the same initials as another person (2 people already working in the team when the newcomer arrives could have the same initials as well).
+
+If you are puzzled by this finding, I recommend reading about the [birthday's paradox](https://en.wikipedia.org/wiki/Birthday_problem){target="_blank"}. The birthday's paradox states that the probability of two people sharing the same birthday becomes surprisingly high with a relatively small group of individuals. In practice, in a group of just 23 people, there is a greater than 50% chance that at least two individuals share the same birthday, illustrating our counterintuitive intuitions about the likelihood of such coincidences. This phenomenon arises due to the multitude of possible birthday pairs within the group, similar to the multitude of possible pairs if initials within a team.
+
+## For teams of different sizes
+
+We are now interested in computing this probability not just for a team of `r n_persons` persons, but for teams of different sizes. We can do this with the help of our function defined earlier.
+
+For the illustration, let's compute the probability that at least two persons have the same initials, for teams of 2 and up to 100 persons:
+
+```{r}
+# set lower and upper bounds of number of persons
+min_persons <- 2
+max_persons <- 100
+
+# create empty vector of probabilities
+probs <- rep(NA, length(min_persons:max_persons))
+
+# compute and save probabilities for teams of size 2 to 100
+for (i in min_persons:max_persons) {
+  probs[i] <- initials(n_persons = i)
+}
+
+# display probabilities
+probs
+```
+
+We are left with storing these probabilities together with the number of persons in the team in a data frame:
+
+```{r}
+# create data frame with saved probabilities and number of persons
+dat_plot <- data.frame(
+  n_persons = (min_persons - 1):max_persons,
+  prob = probs
+)
+
+# display first 6 rows
+head(dat_plot)
+```
+
+Of course, two people having the same initials in a team of 1 (if we can call this a team...) is impossible, so the probability is 0. We impute this probability in our data frame, in the first row:
+
+```{r}
+# set proba = 1 when n_person = 1
+dat_plot[1, 2] <- 0
+
+# display first 6 rows
+head(dat_plot)
+```
+
+Finally, we visualize these probabilities in function of the number of persons in the team:
+
+```{r}
+# visualize probabilities
+ggplot(dat_plot) +
+  aes(x = n_persons, y = probs) +
+  geom_line(linewidth = 1) +
+  labs(
+    x = "# of persons in the team",
+    y = "Probabilites of >= 2 persons with same initials"
+  ) +
+  scale_y_continuous(labels = scales::percent) # format y-axis in %
+```
+
+From the plot above, we see that the probability that at least two persons have the same initials reaches 50% when the team exceeds around 30 people.
+
+Moreover, notice that this probability becomes close to 100% when the team reaches around 75 people.
+
+# Conclusion
+
+The initial question, raised during a meeting, was "What is the probability that, among our team consisting of `r n_persons` persons, two have the same initials?".
+
+In this post, we showed how to compute this probability through simulations in R. Furthermore, we illustrated how for loops, replications and writing a function can be used in R to answer other probability problems.
+
+As a side note, it is important to keep in mind that in this post, we assumed the following:
+
+- All letters of the alphabet had the same probability of occurring (which is probably not the case in reality). This bias could be limited by specifying different weights when sampling initials.
+- We restricted ourselves to initials of two letters. Therefore, for compound names, only the first letter is considered.
+
+Last but not least, note that you will find slightly different results than mine, even if you use the exact same code. This is due to randomness. To replicate results as shown in this post, use `set.seed(6)`.
+
+Thanks for reading.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
