@@ -337,7 +337,7 @@ n_initials &lt;- 26^2
 # apply function
 have_same(n_initials, n_persons)</code></pre>
 <pre><code>## [1] 0.0407218</code></pre>
-<p>The probability that at least two persons have the same initials in a team of 8 is 4.07%. This is relatively close to the probability found with simulations.</p>
+<p>The probability that at least two persons have the same initials in a team of 8 is 4.07%. This is close to the probability found with simulations, and within the range of 3.5%–4.5%.</p>
 </div>
 <div id="for-teams-of-different-sizes-1" class="section level2">
 <h2>For teams of different sizes</h2>
@@ -363,7 +363,7 @@ head(dat_plot_theory)</code></pre>
 ## 4         4 0.008851688
 ## 5         5 0.014716471
 ## 6         6 0.022004071</code></pre>
-<p>Finally, we visualize the probabilities:</p>
+<p>Finally, we visualize these probabilities in function of the number of persons in the team:</p>
 <pre class="r"><code># visualize probabilities
 ggplot(dat_plot_theory) +
   aes(x = n_persons, y = probs) +
@@ -376,12 +376,12 @@ ggplot(dat_plot_theory) +
   scale_y_continuous(labels = scales::percent) # format y-axis in %</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>For an easier comparison, we plot probabilities found thanks to simulations and thanks to probability theory on the same plot:</p>
-<pre class="r"><code># combine the two data frames into one
+<pre class="r"><code># combine the two data frames into one and add the method as variable
 dat_plot_sim$Method &lt;- &quot;Simulations&quot;
 dat_plot_theory$Method &lt;- &quot;Theory&quot;
 dat_plot_all &lt;- rbind(dat_plot_sim, dat_plot_theory)
 
-# visualize probabilities
+# visualize probabilities on same plot
 ggplot(dat_plot_all) +
   aes(x = n_persons, y = prob, color = Method) +
   geom_line(linewidth = 1) +
@@ -398,11 +398,11 @@ ggplot(dat_plot_all) +
 <div id="conclusion" class="section level1">
 <h1>Conclusion</h1>
 <p>The initial question, raised during a meeting, was “What is the probability that, among our team consisting of 8 persons, two have the same initials?”.</p>
-<p>In this post, we showed how to compute this probability through simulations in R. Furthermore, we illustrated how for loops, replications and writing a function can be used in R to answer other probability problems.</p>
+<p>In this post, we first showed how to compute this probability through simulations in R. Secondly, we verified the veracity of the simulations thanks to probability theory. Furthermore, we illustrated how for loops, replications and writing a function can be used in R to answer a probability problem.</p>
 <p>As a side note, it is important to keep in mind that in this post, we assumed the following:</p>
 <ul>
-<li>All letters of the alphabet had the same probability of occurring, meaning that all pairs of initials were equally probable (which is probably not the case in reality). This bias could be limited by specifying different weights when sampling initials.</li>
-<li>We restricted ourselves to initials of two letters. Therefore, for compound names, only the first letter is considered.</li>
+<li>All letters of the alphabet had the same probability of occurring, meaning that all pairs of initials were equally probable. This is probably not the case in reality, as a first and last name starting both with X is not as probable as a first and last name starting respectively with M and K. This bias could be limited by specifying different weights when sampling initials.</li>
+<li>We restricted ourselves to two-letters initials. Therefore, for compound first or last names, only the first letter is considered. Middle names are also not taken into account.</li>
 </ul>
 <p>Last but not least, note that you will find slightly different results than mine, even if you use the exact same code. This is due to randomness. To replicate results as shown in this post, use <code>set.seed(6)</code>.</p>
 <p>Thanks for reading.</p>
