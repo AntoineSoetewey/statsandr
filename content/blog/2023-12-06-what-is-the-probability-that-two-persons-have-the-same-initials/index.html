@@ -44,21 +44,23 @@ output:
 <p>This was not really an issue, as we decided that I would write my initials backward, that is, “SA” instead of “AS”, and the other person would keep signing with “AS” as usual.</p>
 <p>It could have stopped here. However, the idea to write a post about this rather trivial anecdote came to me when the team leader claimed, in the middle of a meeting: “That’s very unfortunate that you two have the same initials! What are the chances of this happening to us?!”.</p>
 <p>We spent a couple of minutes trying to estimate this probability, which in the end were mostly based on our intuitions rather than on a formal calculation. This piqued my curiosity.</p>
-<p>Given that the project requires the use of simulations, I decided to focus on answering this question via simulations in R. That being said, we also verify results obtained through simulations with results using probability theory. This comparison will allow to assess the truthfulness of results obtained through simulations.</p>
+<p>Given that the project we are working on requires the use of simulations, I decided to focus on answering this question via simulations in R. That being said, as for most simulations, it is a good practice to verify these results. This is done using <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/">probability theory</a>. This comparison will allow to assess the truthfulness of results obtained through simulations.</p>
 <p>Furthermore, I thought that it would be a nice way to illustrate methods not often presented in my posts: for loops, replications and writing functions in R.</p>
 </div>
 <div id="how-likely-is-it" class="section level1">
 <h1>How likely is it?</h1>
-<p>Before computing this probability, there are two things to note:</p>
+<p>Before answering the question raised by the team leader, there are three things to note:</p>
 <ol style="list-style-type: decimal">
-<li>Although the team leader was curious to know the probability that <em>two persons</em> have the same initials, we are actually more interested in the probability that <em>at least</em> two persons have the same initials (as the problem also occurs if more than two persons within a team have the same initials).</li>
+<li>Although the team leader was curious to know the probability that <em>exactly two persons</em> have the same initials, we are actually more interested in the probability that <em>at least two persons</em> have the same initials (as the problem also occurs if more than two persons within a team have the same initials).</li>
 <li>The team consists of 8 people.</li>
+<li>We restrict ourselves to two-letters initials (the first letter being the first letter of the first name, the second letter being the first letter of the last name). This means that middle names are not taken into account, and only the first letter is considered for compound names.</li>
 </ol>
 <p>In this post, we will show how to compute this probability:</p>
 <ul>
 <li>in our context, that is, for a team of 8 persons, and</li>
 <li>for completeness, for teams of all sizes from 2 to 100 persons.</li>
 </ul>
+<p>As stated in the introduction, we will compute these probabilities first through simulations and then through probability theory.</p>
 <div id="for-our-team" class="section level2">
 <h2>For our team</h2>
 <p>We start by creating a vector of size 8, corresponding to the initials of a team of 8 persons randomly sampled among all 26 letters of the Latin alphabet:</p>
@@ -284,7 +286,8 @@ head(dat_plot_sim)</code></pre>
 ## 4         4 0.013
 ## 5         5 0.012
 ## 6         6 0.019</code></pre>
-<p>Of course, two people having the same initials in a team of 1 (if we can call this a team…) is impossible, so the probability is 0. We impute this probability in our data frame, in the first row:</p>
+<p>Of course, two people having the same initials in a team of 1 (if we can call this a team…) is impossible.</p>
+<p>An event which is impossible has a probability equal to 0. We thus impute this probability in our data frame, in the first row:</p>
 <pre class="r"><code># set proba = 1 when n_person = 1
 dat_plot_sim[1, 2] &lt;- 0
 
@@ -304,7 +307,8 @@ ggplot(dat_plot_sim) +
   geom_line(linewidth = 1) +
   labs(
     x = &quot;# of persons in the team&quot;,
-    y = &quot;Probabilites of &gt;= 2 persons with same initials&quot;
+    y = &quot;Probability&quot;,
+    title = &quot;What is the probability that at least 2 persons have the same initials?&quot;
   ) +
   scale_y_continuous(labels = scales::percent) # format y-axis in %</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;" /></p>
@@ -314,7 +318,7 @@ ggplot(dat_plot_sim) +
 </div>
 <div id="verification" class="section level1">
 <h1>Verification</h1>
-<p>For the sake of completeness, we now compare results obtained through simulations with results obtained from <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/">probability theory</a>.</p>
+<p>For the sake of completeness, we now compare results obtained through simulations with results obtained from probability theory.</p>
 <p>We first define the function that will be used to compare results found above:</p>
 <pre class="r"><code># define function
 have_same &lt;- function(s, n) {
@@ -366,7 +370,8 @@ ggplot(dat_plot_theory) +
   geom_line(linewidth = 1) +
   labs(
     x = &quot;# of persons in the team&quot;,
-    y = &quot;Probabilites of &gt;= 2 persons with same initials&quot;
+    y = &quot;Probability&quot;,
+    title = &quot;What is the probability that at least 2 persons have the same initials?&quot;
   ) +
   scale_y_continuous(labels = scales::percent) # format y-axis in %</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
@@ -382,7 +387,8 @@ ggplot(dat_plot_all) +
   geom_line(linewidth = 1) +
   labs(
     x = &quot;# of persons in the team&quot;,
-    y = &quot;Probabilites of &gt;= 2 persons with same initials&quot;
+    y = &quot;Probability&quot;,
+    title = &quot;What is the probability that at least 2 persons have the same initials?&quot;
   ) +
   scale_y_continuous(labels = scales::percent) # format y-axis in %</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
