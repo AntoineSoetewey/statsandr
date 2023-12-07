@@ -27,6 +27,11 @@ output:
 <li><a href="#for-our-team" id="toc-for-our-team">For our team</a></li>
 <li><a href="#for-teams-of-different-sizes" id="toc-for-teams-of-different-sizes">For teams of different sizes</a></li>
 </ul></li>
+<li><a href="#verification" id="toc-verification">Verification</a>
+<ul>
+<li><a href="#for-our-team-1" id="toc-for-our-team-1">For our team</a></li>
+<li><a href="#for-teams-of-different-sizes-1" id="toc-for-teams-of-different-sizes-1">For teams of different sizes</a></li>
+</ul></li>
 <li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
 </ul>
 </div>
@@ -39,7 +44,7 @@ output:
 <p>This was not really an issue, as we decided that I would write my initials backward, that is, “SA” instead of “AS”, and the other person would keep signing with “AS” as usual.</p>
 <p>It could have stopped here. However, the idea to write a post about this rather trivial anecdote came to me when the team leader claimed, in the middle of a meeting: “That’s very unfortunate that you two have the same initials! What are the chances of this happening to us?!”.</p>
 <p>We spent a couple of minutes trying to estimate this probability, which in the end were mostly based on our intuitions rather than on a formal calculation. This piqued my curiosity.</p>
-<p>This problem could be answered using <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/">probability theory</a>, but given that the project requires the use of simulations, I thought that it would be nice to answer this question via simulations in R.</p>
+<p>Given that the project requires the use of simulations, we focused on answering this question via simulations in R. That being said, we also verify results obtained through simulations with results obtained using probability theory.</p>
 <p>Furthermore, I thought that it would be a nice way to illustrate methods not often presented in my posts: for loops, replications and writing functions in R.</p>
 </div>
 <div id="how-likely-is-it" class="section level1">
@@ -54,6 +59,7 @@ output:
 <li>in our context, that is, for a team of 8 persons, and</li>
 <li>for completeness, for teams of all sizes from 2 to 100 persons.</li>
 </ul>
+<p>This will be done through simulations, but for the sake of completeness we will also verify our results with</p>
 <div id="for-our-team" class="section level2">
 <h2>For our team</h2>
 <p>We start by creating a vector of size 8, corresponding to the initials of a team of 8 persons randomly sampled among all 26 letters of the Latin alphabet:</p>
@@ -265,13 +271,13 @@ probs</code></pre>
 ##  [97] 0.999 1.000 1.000 0.999</code></pre>
 <p>We are left with storing these probabilities together with the number of persons in the team in a data frame:</p>
 <pre class="r"><code># create data frame with saved probabilities and number of persons
-dat_plot &lt;- data.frame(
+dat_plot_sim &lt;- data.frame(
   n_persons = (min_persons - 1):max_persons,
   prob = probs
 )
 
 # display first 6 rows
-head(dat_plot)</code></pre>
+head(dat_plot_sim)</code></pre>
 <pre><code>##   n_persons  prob
 ## 1         1    NA
 ## 2         2 0.001
@@ -281,10 +287,10 @@ head(dat_plot)</code></pre>
 ## 6         6 0.019</code></pre>
 <p>Of course, two people having the same initials in a team of 1 (if we can call this a team…) is impossible, so the probability is 0. We impute this probability in our data frame, in the first row:</p>
 <pre class="r"><code># set proba = 1 when n_person = 1
-dat_plot[1, 2] &lt;- 0
+dat_plot_sim[1, 2] &lt;- 0
 
 # display first 6 rows
-head(dat_plot)</code></pre>
+head(dat_plot_sim)</code></pre>
 <pre><code>##   n_persons  prob
 ## 1         1 0.000
 ## 2         2 0.001
@@ -294,7 +300,7 @@ head(dat_plot)</code></pre>
 ## 6         6 0.019</code></pre>
 <p>Finally, we visualize these probabilities in function of the number of persons in the team:</p>
 <pre class="r"><code># visualize probabilities
-ggplot(dat_plot) +
+ggplot(dat_plot_sim) +
   aes(x = n_persons, y = probs) +
   geom_line(linewidth = 1) +
   labs(
@@ -307,13 +313,90 @@ ggplot(dat_plot) +
 <p>Moreover, notice that this probability becomes close to 100% when the team reaches around 75 people.</p>
 </div>
 </div>
+<div id="verification" class="section level1">
+<h1>Verification</h1>
+<p>For the sake of completeness, we now compare results obtained through simulations with results obtained from <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/">probability theory</a>.</p>
+<p>We first define the function that will be used to compare results found above:</p>
+<pre class="r"><code># define function
+have_same &lt;- function(s, n) {
+  sample_space &lt;- s
+  probability &lt;- 1
+  for (i in 0:(n - 1)) {
+    probability &lt;- probability * (sample_space - i) / sample_space
+  }
+  1 - probability
+}</code></pre>
+<div id="for-our-team-1" class="section level2">
+<h2>For our team</h2>
+<pre class="r"><code># number of possible combinations of two-letter initials
+n_initials &lt;- 26^2
+
+# apply function
+have_same(n_initials, n_persons)</code></pre>
+<pre><code>## [1] 0.0407218</code></pre>
+<p>The probability that at least two persons have the same initials in a team of 8 is 4.07%. This is relatively close to the probability found with simulations.</p>
+</div>
+<div id="for-teams-of-different-sizes-1" class="section level2">
+<h2>For teams of different sizes</h2>
+<p>We now compute the probability for teams between 1 and 100 persons:</p>
+<pre class="r"><code># compute and save probabilities for teams between 1 and 100 persons
+probs &lt;- vector(length = max_persons)
+for (i in 1:max_persons) {
+  probs[i] &lt;- have_same(n_initials, i)
+}
+
+# create data frame with saved probabilities and number of persons
+dat_plot_theory &lt;- data.frame(
+  n_persons = (min_persons - 1):max_persons,
+  prob = probs
+)
+
+# display first 6 rows
+head(dat_plot_theory)</code></pre>
+<pre><code>##   n_persons        prob
+## 1         1 0.000000000
+## 2         2 0.001479290
+## 3         3 0.004433493
+## 4         4 0.008851688
+## 5         5 0.014716471
+## 6         6 0.022004071</code></pre>
+<p>Finally, we visualize the probabilities:</p>
+<pre class="r"><code># visualize probabilities
+ggplot(dat_plot_theory) +
+  aes(x = n_persons, y = probs) +
+  geom_line(linewidth = 1) +
+  labs(
+    x = &quot;# of persons in the team&quot;,
+    y = &quot;Probabilites of &gt;= 2 persons with same initials&quot;
+  ) +
+  scale_y_continuous(labels = scales::percent) # format y-axis in %</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>For an easier comparison, we plot probabilities found thanks to simulations and thanks to probability theory on the same plot:</p>
+<pre class="r"><code># combine the two data frames into one
+dat_plot_sim$Method &lt;- &quot;Simulations&quot;
+dat_plot_theory$Method &lt;- &quot;Theory&quot;
+dat_plot_all &lt;- rbind(dat_plot_sim, dat_plot_theory)
+
+# visualize probabilities
+ggplot(dat_plot_all) +
+  aes(x = n_persons, y = prob, color = Method) +
+  geom_line(linewidth = 1) +
+  labs(
+    x = &quot;# of persons in the team&quot;,
+    y = &quot;Probabilites of &gt;= 2 persons with same initials&quot;
+  ) +
+  scale_y_continuous(labels = scales::percent) # format y-axis in %</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The plot above shows that results using probability theory are relatively similar to results obtained through simulations, indicating that the simulations are trustworthy.</p>
+</div>
+</div>
 <div id="conclusion" class="section level1">
 <h1>Conclusion</h1>
 <p>The initial question, raised during a meeting, was “What is the probability that, among our team consisting of 8 persons, two have the same initials?”.</p>
 <p>In this post, we showed how to compute this probability through simulations in R. Furthermore, we illustrated how for loops, replications and writing a function can be used in R to answer other probability problems.</p>
 <p>As a side note, it is important to keep in mind that in this post, we assumed the following:</p>
 <ul>
-<li>All letters of the alphabet had the same probability of occurring (which is probably not the case in reality). This bias could be limited by specifying different weights when sampling initials.</li>
+<li>All letters of the alphabet had the same probability of occurring, meaning that all pairs of initials were equally probable (which is probably not the case in reality). This bias could be limited by specifying different weights when sampling initials.</li>
 <li>We restricted ourselves to initials of two letters. Therefore, for compound names, only the first letter is considered.</li>
 </ul>
 <p>Last but not least, note that you will find slightly different results than mine, even if you use the exact same code. This is due to randomness. To replicate results as shown in this post, use <code>set.seed(6)</code>.</p>
