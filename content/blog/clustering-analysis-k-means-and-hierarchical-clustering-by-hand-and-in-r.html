@@ -81,14 +81,17 @@ bibliography: bibliography.bib
 </div>
 
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r-statsandr.com.jpeg" style="width:100.0%" /></p>
+<p><br></p>
+<p><em>Note that this article is inspired from the lecture notes of Prof. Johan Segers and my personal notes as teaching assistant for his course entitled “Multivariate statistical analysis” given at UCLouvain.</em></p>
 <div id="what-is-clustering-analysis" class="section level1">
 <h1>What is clustering analysis?</h1>
 <p>Clustering analysis is a form of exploratory data analysis in which observations are divided into different groups that share common characteristics.</p>
 <p>The purpose of cluster analysis (also known as classification) is to construct groups (or classes or <em>clusters</em>) while ensuring the following property: <strong>within a group</strong> the observations must be as <strong>similar</strong> as possible (intracluster similarity), while observations belonging to <strong>different groups</strong> must be as <strong>different</strong> as possible (intercluster similarity).</p>
-<div class="figure">
-<img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/intercluster-intracluster-distance.png" style="width:100.0%" alt="" />
-<p class="caption">An illustration of intercluster and intracluster distance. Source: dinhanhthi.com</p>
+<div class="float">
+<img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/intercluster-intracluster-distance.png" style="width:100.0%" alt="An illustration of intercluster and intracluster distance. Source: dinhanhthi.com" />
+<div class="figcaption">An illustration of intercluster and intracluster distance. Source: dinhanhthi.com</div>
 </div>
+<p><br></p>
 <p>The two most common types of classification are:</p>
 <ol style="list-style-type: decimal">
 <li><em>k</em>-means clustering</li>
@@ -1029,7 +1032,7 @@ res.k &lt;- kmeans(X,
   algorithm = &quot;Lloyd&quot;
 )</code></pre>
 <p>Unlike in the previous application with the dataset <code>Eurojobs.csv</code> where the initial centers are randomly chosen by R, in this second application we want to specify which points are going to be the two initial centers. For this, we need to set <code>centers = X[c(5,6), ]</code> to indicate that that there are 2 centers, and that they are going to be the points 5 and 6 (see a reminder on <a href="/blog/data-manipulation-in-r/">how to subset a dataframe</a> if needed).</p>
-<p>The reason for adding the argument <code>algorithm = "Lloyd"</code> can be found in the usage of the R function <code>kmeans()</code>. In fact, there are several variants of the <em>k</em>-means algorithm. The default choice is the <span class="citation">Hartigan and Wong (<a href="#ref-jaaw28m" role="doc-biblioref">1979</a>)</span> version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of <span class="citation">Lloyd (<a href="#ref-lloyd1982least" role="doc-biblioref">1982</a>)</span>, we find the same solution in R and by hand. For more information, you can consult the documentation of the <code>kmeans()</code> function (via <code>?kmeans</code> or <code>help(kmeans)</code>) and read the articles mentioned.</p>
+<p>The reason for adding the argument <code>algorithm = "Lloyd"</code> can be found in the usage of the R function <code>kmeans()</code>. In fact, there are several variants of the <em>k</em>-means algorithm. The default choice is the <span class="citation">Hartigan and Wong (<a href="#ref-jaaw28m">1979</a>)</span> version, which is more sophisticated than the basic version detailed in the solution by hand. By using the original version of <span class="citation">Lloyd (<a href="#ref-lloyd1982least">1982</a>)</span>, we find the same solution in R and by hand. For more information, you can consult the documentation of the <code>kmeans()</code> function (via <code>?kmeans</code> or <code>help(kmeans)</code>) and read the articles mentioned.</p>
 <p>The solution in R is then found by extracting</p>
 <ul>
 <li>the partition with <code>$cluster</code>:</li>
@@ -1843,10 +1846,11 @@ hclust &lt;- hclust(dist(X), method = &quot;single&quot;)</code></pre>
 <div id="optimal-number-of-clusters-1" class="section level5">
 <h5>Optimal number of clusters</h5>
 <p>Remember that hierarchical clustering is used to determine the optimal number of clusters. This optimal number of clusters can be determined thanks to the dendrogram. For this, we usually look at the largest difference of heights:</p>
-<div class="figure">
-<img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/dendrogram-single-linkage.png" alt="" />
-<p class="caption">How to determine the number of clusters from a dendrogram? Take the largest difference of heights and count how many vertical lines you see</p>
+<div class="float">
+<img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/dendrogram-single-linkage.png" style="width:100.0%" alt="How to determine the number of clusters from a dendrogram? Take the largest difference of heights and count how many vertical lines you see" />
+<div class="figcaption">How to determine the number of clusters from a dendrogram? Take the largest difference of heights and count how many vertical lines you see</div>
 </div>
+<p><br></p>
 <p>The largest difference of heights in the dendrogram occurs before the final combination, that is, before the combination of the group 2 &amp; 3 &amp; 4 with the group 1 &amp; 5. To determine the optimal number of clusters, simply count how many vertical lines you see within this largest difference. In our case, the optimal number of clusters is thus 2.</p>
 <p>In R, we can even highlight these two clusters directly in the dendrogram with the <code>rect.hclust()</code> function:</p>
 <pre class="r"><code>plot(hclust)
@@ -1857,10 +1861,11 @@ rect.hclust(hclust,
 <p><img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/figure-html/unnamed-chunk-39-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Note that determining the optimal number of clusters via the dendrogram is not specific to the single linkage, it can be applied to other linkage methods too!</p>
 <p>Below another figure explaining how to determine the optimal number of clusters:</p>
-<div class="figure">
-<img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/optimal%20number%20of%20clusters%20hierarchical%20clustering.png" style="width:100.0%" alt="" />
-<p class="caption">How to determine the optimal numbers of cluster in hierarchical clustering? Source: Towards Data Science</p>
+<div class="float">
+<img src="/blog/clustering-analysis-k-means-and-hierarchical-clustering-by-hand-and-in-r_files/optimal%20number%20of%20clusters%20hierarchical%20clustering.png" style="width:100.0%" alt="How to determine the optimal numbers of cluster in hierarchical clustering? Source: Towards Data Science" />
+<div class="figcaption">How to determine the optimal numbers of cluster in hierarchical clustering? Source: Towards Data Science</div>
 </div>
+<p><br></p>
 <p>(See this <a href="/blog/files/Hierarchical-clustering-cheatsheet.pdf">hierarchical clustering cheatsheet</a> for more visualizations like this.)</p>
 <p>Finally, we could also determine the optimal number of cluster thanks to a barplot of the heights (stored in <code>$height</code> of the clustering output):</p>
 <pre class="r"><code>barplot(hclust$height,
