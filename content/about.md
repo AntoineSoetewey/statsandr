@@ -5,7 +5,7 @@ description: "Learn more about the author of the blog Stats and R---Antoine Soet
 menu: "main"
 ---
 
-My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a PhD candidate in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences. My [research](https://antoinesoetewey.com/research/) interests focus on [survival analysis](/blog/what-is-survival-analysis/) and bio-statistical procedures applied to cancer patients.
+My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a PhD researcher in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences. My [research](https://antoinesoetewey.com/research/) interests focus on [survival analysis](/blog/what-is-survival-analysis/) and bio-statistical procedures applied to cancer patients.
 
 In parallel with my doctoral thesis, I am [teaching](https://antoinesoetewey.com/teaching/) several courses in statistics and probability at bachelor and master’s level at UCLouvain and UNamur. I also provide trainings/workshops and consulting in data science, statistics and R programming as part of UCLouvain's technology platform for Statistical Methodology and Computing Service. See my [CV](https://antoinesoetewey.com/cv/) for a more detailed overview of my academic and professional background.
 
