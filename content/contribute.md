@@ -29,7 +29,7 @@ Before submitting your article, please read the following points:
 1. You are permitted to include a couple of links back to your site, within reason. These links should be included naturally within the writing and not come across as salesy. Moreover, included links should be related to the topic of your post and bring an added value to the readers. Therefore, links unrelated to the topic of the post will be removed, and **links promoting betting/casino sites, sexual content, drugs, violence, etc. will result in a direct rejection of your post.**
 1. It is your responsibility to ensure you have the permission to use all content, images, and videos you include in your articles. I might therefore remove images where the source is not clearly cited to avoid copyright violations. Pixabay.com and Unsplash.com are two popular websites that offer images that can be used freely for any purpose.
 1. You can edit and remove your article from the blog at any time, without any justification needed. Please note that I can also delete guest posts for any reason.
-1. This blog is written in R and deployed thanks to the `{blogdown}` package. Therefore, it is much easier for me to publish articles written in R Markdown (`.Rmd`) or Markdown (`.md`). However, if your article is in another format, feel free to submit it as well.
+1. This blog is written in R and deployed thanks to the `{blogdown}` package. Therefore, please write your post in R Markdown (`.Rmd`) or Markdown (`.md`). Posts written in another format (Word for instance) will not be considered.
 
 ## After publishing
 
