@@ -1,0 +1,3864 @@
+---
+title: Binary logistic regression in R
+author: Antoine Soetewey
+date: '2024-01-30'
+slug: binary-logistic-regression-in-r
+categories: []
+tags:
+  - Regression
+  - R
+  - Statistics
+meta_img: blog/binary-logistic-regression-in-r/images/binary-logistic-regression-in-r.jpeg
+description: Learn when and how to use a (univariate and multivariate) binary logistic regression in R. Learn also how to interpret, visualize and report results
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a>
+<ul>
+<li><a href="#linear-versus-logistic-regression" id="toc-linear-versus-logistic-regression">Linear versus logistic regression</a></li>
+<li><a href="#univariate-versus-multivariate-logistic-regression" id="toc-univariate-versus-multivariate-logistic-regression">Univariate versus multivariate logistic regression</a></li>
+</ul></li>
+<li><a href="#data" id="toc-data">Data</a></li>
+<li><a href="#binary-logistic-regression-in-r" id="toc-binary-logistic-regression-in-r">Binary logistic regression in R</a>
+<ul>
+<li><a href="#univariate-binary-logistic-regression" id="toc-univariate-binary-logistic-regression">Univariate binary logistic regression</a>
+<ul>
+<li><a href="#quantitative-independent-variable" id="toc-quantitative-independent-variable">Quantitative independent variable</a></li>
+<li><a href="#qualitative-independent-variable" id="toc-qualitative-independent-variable">Qualitative independent variable</a></li>
+</ul></li>
+<li><a href="#multivariate-binary-logistic-regression" id="toc-multivariate-binary-logistic-regression">Multivariate binary logistic regression</a></li>
+<li><a href="#interaction" id="toc-interaction">Interaction</a></li>
+<li><a href="#model-selection" id="toc-model-selection">Model selection</a></li>
+<li><a href="#quality-of-a-model" id="toc-quality-of-a-model">Quality of a model</a>
+<ul>
+<li><a href="#validity-of-the-predictions" id="toc-validity-of-the-predictions">Validity of the predictions</a>
+<ul>
+<li><a href="#accuracy" id="toc-accuracy">Accuracy</a></li>
+<li><a href="#sensitivity-and-specificity" id="toc-sensitivity-and-specificity">Sensitivity and specificity</a></li>
+</ul></li>
+<li><a href="#auc-and-roc-curve" id="toc-auc-and-roc-curve">AUC and ROC curve</a></li>
+</ul></li>
+<li><a href="#reporting-results" id="toc-reporting-results">Reporting results</a>
+<ul>
+<li><a href="#gtsummary-package" id="toc-gtsummary-package">{gtsummary} package</a></li>
+<li><a href="#finalfit-package" id="toc-finalfit-package">{finalfit} package</a></li>
+</ul></li>
+<li><a href="#conditions-of-application" id="toc-conditions-of-application">Conditions of application</a></li>
+</ul></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
+</ul>
+</div>
+
+<p><img src="images/binary-logistic-regression-in-r.jpeg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Regression is a common tool in statistics to test and quantify relationships between variables.</p>
+<p>The two most common regressions are linear and logistic regressions. A <strong>linear</strong> regression is used when the dependent variable is <strong>quantitative</strong>, whereas a <strong>logistic</strong> regression is used when the dependent variable is <strong>qualitative</strong>.</p>
+<p>Both linear and logistic regressions are divided into different types:</p>
+<ul>
+<li>Linear regression:
+<ul>
+<li><strong>Simple</strong> linear regression is used when the goal is to estimate the relationship between a dependent variable (also often called outcome or response variable) and <strong>only one</strong> independent variable (also often called explanatory variable, covariate or predictor).</li>
+<li><strong>Multiple</strong> linear regression is used when the goal is to estimate the relationship between a dependent variable and <strong>two or more</strong> independent variables.</li>
+</ul></li>
+<li>Logistic regression:
+<ul>
+<li><strong>Binary</strong> logistic regression is used when the goal is to estimate the relationship between a <strong>binary dependent variable</strong> (= two outcomes), and one or more independent variables.</li>
+<li><strong>Multinomial</strong> logistic regression is used when the goal is to estimate the relationship between a <strong>nominal dependent variable with three or more <em>unordered</em> outcomes</strong>, and one or more independent variables.</li>
+<li><strong>Ordinal</strong> logistic regression is used when the goal is to estimate the relationship between a <strong>nominal dependent variable with three or more <em>ordered</em> outcomes</strong>, and one or more independent variables.</li>
+</ul></li>
+</ul>
+<p>Note that there exists another type of regression; the Poisson regression. This type of regression is used when the goal is to estimate the relationship between a dependent variable which is in the form of count data (number of occurrences of an event of interest over a given period of time or space, e.g., <span class="math inline">\(0, 1, 2, \ldots\)</span>), and one or more independent variables.</p>
+<p>Logistic regressions and poisson regressions are both part of a broader type of model called <strong>generalized linear models</strong> (abbreviated as <strong>GLM</strong>). They are called like this because it is a tool which generalizes the classic linear model. It can be used in many situations, for example when analyzing a dependent variable which is not necessarily quantitative continuous or normally distributed.</p>
+<p>Linear regression and its application in R have already been presented in this <a href="/blog/multiple-linear-regression-made-simple/">post</a>. It is now time to present the logistic regression.</p>
+<p>Binary logistic regression being the most common and the easiest one to interpret among the different types of logistic regression, this post will focus only on the binary logistic regression. Other types of regression (multinomial &amp; ordinal logistic regressions, as well as Poisson regressions are left for future posts).</p>
+<p>In this post, we will first explain when a logistic regression is more appropriate than a linear regression. We will then show how to perform a binary logistic regression in R, and how to interpret and report results. We will also present some plots in order to visualize results. Finally, we will cover the topics of model selection, quality of fit and underlying assumptions of a binary logistic regression. We will try to keep this tutorial as applied as possible by focusing on the applications in R and the interpretations. Mathematical details will be as concise as possible.</p>
+<div id="linear-versus-logistic-regression" class="section level2">
+<h2>Linear versus logistic regression</h2>
+<p>We know that a linear regression is a convenient way to estimate the relationship between a <a href="/blog/variable-types-and-examples/#continuous">quantitative continuous</a> dependent variable, and one or more independent variables (of any type).</p>
+<p>For instance, suppose we would like to estimate the relationship between two quantitative variables, <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>. Using the ordinary least squares method (the most common estimator used in linear regression), we obtain the following regression line:</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Now suppose we are interested in estimating the impact of age on whether or not a patient has a certain disease. Age is considered as a quantitative continuous variable, while having the disease is binary (a patient is either ill or healthy).</p>
+<p>Visually, we could have something like this:</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>If we fit a regression line (using the ordinary least square method) to the points, we obtain the following plot:</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We see that the regression line goes below 0 and above 1 with respect to the <span class="math inline">\(y\)</span>-axis. Since the dependent variable <code>disease</code> cannot take values below 0 (= healthy) nor above 1 (= ill), it is obvious that a linear regression is not appropriate for these data!</p>
+<p>In addition to this limitation, the assumptions of normality and homoscedasticity, which are required in linear regression, are clearly not appropriate with these data since the dependent variable is binary and follows a Binomial distribution!. R will not stop you from performing a linear regression on binary data, but this will produce a model of little interest.</p>
+<p>This is where a logistic regression becomes handy as it takes into consideration these limitations.</p>
+<p>Applied to our example, here is how the points are fitted using a binary logistic regression:</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>It is clear that this model is more appropriate.</p>
+<p>The curve (known as a sigmoid) is obtained via a transformation of the predicted values. There are several possible choices for the link function, which aim is to constrain predicted values to be within the range of observed values.</p>
+<p>The most widely used in practice is the logit function, which relates the probability of occurrence of an event (bounded between 0 and 1) to the linear combination of independent variables. The logit function also turns out to be the canonical link function for a Bernoulli or Binomial distribution. This transformation ensures that no matter in which range the <span class="math inline">\(X\)</span> values are located, <span class="math inline">\(Y\)</span> will only take numbers between 0 and 1.</p>
+<p>One could say that the fitted values (= represented by the blue curve) taking values between 0 and 1 also does not seem to make sense since a patient can only be healthy or ill (and thus the dependent variable can only take the value 0 or 1, respectively). However, in a binary logistic regression it is not the outcome no disease/disease that is directly modeled, but the <em>likelihood</em> that a patient has the disease or not given his or her characteristics. This likelihood will be framed in terms of a <a href="/blog/the-9-concepts-and-formulas-in-probability-that-every-data-scientist-should-know/">probability</a> to observe or not the disease in a patient, which is indeed included between 0 and 1, or 0% and 100%.</p>
+<p>More generally, with a logistic regression we would like to <strong>model how the probability of success varies with the independent variables</strong> and determine whether or not these changes are statistically significant. We are actually going to model the logarithm of the odds, and the logistic regression model will be written as follows:</p>
+<p><span class="math display">\[\begin{align}
+\log(odds(success)) &amp;= logit(\pi) \\
+&amp;= \log\left(\frac{\pi}{1 - \pi}\right) \\
+&amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p
+\end{align}\]</span></p>
+<p>where <span class="math inline">\(\pi\)</span> <span class="math inline">\((0 \le \pi \le 1)\)</span> is the probability of an event happening (success) and denoted <span class="math inline">\(\pi = P(success)\)</span>. We find the values of <span class="math inline">\(\hat{\beta}_0\)</span>, <span class="math inline">\(\hat{\beta}_1\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\(\hat{\beta}_p\)</span>, which are used as estimates for <span class="math inline">\(\beta_0\)</span>, <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\(\beta_p\)</span>, using the maximum likelihood method. This method is one of several methods used in statistics to estimate parameters of a mathematical model. The goal of the estimator is to estimate the parameters <span class="math inline">\(\beta_0\)</span>, <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\(\beta_p\)</span> which maximize the log likelihood function. Different algorithms have been established over the years for this non-linear optimization, but this is beyond the scope of the post.</p>
+<p>Logistic regressions are very common in the medical field, for example to:</p>
+<ul>
+<li>estimate the risk factors associated with a disease or a harmful condition,</li>
+<li>predict the risk of developing a disease based on a patient’s characteristics, or</li>
+<li>determine the most important biological factors associated with a specific disease or condition.</li>
+</ul>
+<p>However, logistic regressions are used in many other domains, for instance in:</p>
+<ul>
+<li>banking sector: estimate a debtor’s creditworthiness based on his or her profile (income, assets, liabilities, etc.),</li>
+<li>marketing: estimate a customer’s propensity to buy a product or service based on his or her profile (age, sex, salary, previous purchases, etc.),</li>
+<li>sports: estimate the probability of a player winning against another player as a function of the characteristics of the two opponents,</li>
+<li>politics: answer the question “Would a citizen vote for our political party at the next elections?”</li>
+<li>etc.</li>
+</ul>
+</div>
+<div id="univariate-versus-multivariate-logistic-regression" class="section level2">
+<h2>Univariate versus multivariate logistic regression</h2>
+<p>Now that it is more clear when a binary logistic regression should be used, we show how to perform one in R. We start by presenting univariate binary logistic regressions, and then multivariate binary logistic regressions.</p>
+<p>Remember that in both cases, the dependent variable must be a qualitative variable with two outcomes (hence the name <em>binary</em> logistic regression). The difference between a univariate and multivariate binary logistic regression lies in the fact that:</p>
+<ul>
+<li>for a <strong>univariate</strong> binary logistic regression, there is only <strong>one independent variable</strong>, while</li>
+<li>for a <strong>multivariate</strong> binary logistic regression, there are <strong>two ore more independent variables</strong>.</li>
+</ul>
+<p>It is true that the term “univariate” may be confusing here because there are two variables in the model (i.e., one dependent variable and one independent variable), while in statistics univariate usually refers to only one variable at a time. However, it is called univariate binary logistic regression to indicate that only one independent variable is considered in the model, as opposed to multivariate binary logistic regression where several independent variables are considered in the model.</p>
+<p>To draw a parallel with linear regression:</p>
+<ul>
+<li>a univariate binary logistic regression is the equivalent of a simple linear regression, whereas</li>
+<li>a multivariate binary logistic regression is the equivalent of a multiple linear regression</li>
+</ul>
+<p>when the dependent variable is binary instead of quantitative continuous.</p>
+</div>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>For these illustrations, we use the “Heart Disease” dataset, available from the <code>{kmed}</code> R package. This data frame consists of 14 variables, of which only 5 of them are kept for this post:</p>
+<ol style="list-style-type: decimal">
+<li><code>age</code>: age in years</li>
+<li><code>sex</code>: sex (FALSE = female, TRUE = male)</li>
+<li><code>cp</code>: chest pain type (1 = typical angina, 2 = atypical angina, 3 = non-anginal pain, 4 = asymptomatic)</li>
+<li><code>thalach</code>: maximum heart rate achieved</li>
+<li><code>class</code>: diagnosis of heart disease (divided into 4 classes)</li>
+</ol>
+<pre class="r"><code># import and rename dataset
+library(kmed)
+dat &lt;- heart
+
+# select variables
+library(dplyr)
+dat &lt;- dat |&gt;
+  select(
+    age,
+    sex,
+    cp,
+    thalach,
+    class
+  )
+
+# print dataset&#39;s structure
+str(dat)</code></pre>
+<pre><code>## &#39;data.frame&#39;:	297 obs. of  5 variables:
+##  $ age    : num  63 67 67 37 41 56 62 57 63 53 ...
+##  $ sex    : logi  TRUE TRUE TRUE TRUE FALSE TRUE ...
+##  $ cp     : Factor w/ 4 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;: 1 4 4 3 2 2 4 4 4 4 ...
+##  $ thalach: num  150 108 129 187 172 178 160 163 147 155 ...
+##  $ class  : int  0 2 1 0 0 0 3 0 2 1 ...
+##  - attr(*, &quot;na.action&quot;)= &#39;omit&#39; Named int [1:6] 88 167 193 267 288 303
+##   ..- attr(*, &quot;names&quot;)= chr [1:6] &quot;88&quot; &quot;167&quot; &quot;193&quot; &quot;267&quot; ...</code></pre>
+<p>Note that the pipe operator <code>|&gt;</code> and the <code>{dplyr}</code> package is used to select variables. See <a href="/blog/introduction-to-data-manipulation-in-r-with-dplyr/">more data manipulation techniques</a> using this package if you are interested.</p>
+<p>For greater readability, we rename the variables <code>cp</code>, <code>thalach</code> and <code>class</code> with more informative names:</p>
+<pre class="r"><code># rename variables
+dat &lt;- dat |&gt;
+  rename(
+    chest_pain = cp,
+    max_heartrate = thalach,
+    heart_disease = class
+  )</code></pre>
+<p>We transform the variables <code>sex</code> and <code>chest_pain</code> into <a href="/blog/data-types-in-r/#factor">factor</a> and set the labels accordingly:</p>
+<pre class="r"><code># recode sex
+dat$sex &lt;- factor(dat$sex,
+  levels = c(FALSE, TRUE),
+  labels = c(&quot;female&quot;, &quot;male&quot;)
+)
+
+# recode chest_pain
+dat$chest_pain &lt;- factor(dat$chest_pain,
+  levels = 1:4,
+  labels = c(&quot;typical angina&quot;, &quot;atypical angina&quot;, &quot;non-anginal pain&quot;, &quot;asymptomatic&quot;)
+)</code></pre>
+<p>For a binary logistic regression in R, it is recommended that all the qualitative variables are transformed into factors.</p>
+<p>In our case, <code>heart_rate</code> (our dependent variable) is currently encoded as <a href="/blog/data-types-in-r/#integer">integer</a> with values ranging from 0 to 4. Therefore, we first classify it into 2 classes by setting 0 for 0 values and 1 for non-0 values, using the <code>ifelse()</code> function:</p>
+<pre class="r"><code># recode heart_disease into 2 classes
+dat$heart_disease &lt;- ifelse(dat$heart_disease == 0,
+  0,
+  1
+)</code></pre>
+<p>We then transform it into a factor and set the labels accordingly using the <code>factor()</code> function:</p>
+<pre class="r"><code># set labels for heart_disease
+dat$heart_disease &lt;- factor(dat$heart_disease,
+  levels = c(0, 1),
+  labels = c(&quot;no disease&quot;, &quot;disease&quot;)
+)</code></pre>
+<p>Keep in mind the order of the levels for your dependent variable, as it will have an impact on the interpretations. In R, the first level given by <code>levels()</code> is always taken as the reference level.</p>
+<p>In our case, the first level is the absence of the disease and the second level is the presence of the disease:</p>
+<pre class="r"><code>levels(dat$heart_disease)</code></pre>
+<pre><code>## [1] &quot;no disease&quot; &quot;disease&quot;</code></pre>
+<p>This means that when we will build the models, we will estimate the impact of the independent variable(s) on the <strong>presence</strong> of the disease (and not the absence!).</p>
+<p>This is the reason that, for dependent variables of the type no/yes, false/true, absence/presence of a condition, etc. it is recommended to set the level no, false, absence of the condition, etc. as the reference level. It is indeed usually easier to interpret the impact of an independent variable on the presence of a condition/disease than the opposite.</p>
+<p>If you want to switch the reference level, this can be done with the <code>relevel()</code> function.</p>
+<p>Here is a preview of the final data frame and some basic <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a>:</p>
+<pre class="r"><code># print first 6 observations
+head(dat)</code></pre>
+<pre><code>##   age    sex       chest_pain max_heartrate heart_disease
+## 1  63   male   typical angina           150    no disease
+## 2  67   male     asymptomatic           108       disease
+## 3  67   male     asymptomatic           129       disease
+## 4  37   male non-anginal pain           187    no disease
+## 5  41 female  atypical angina           172    no disease
+## 6  56   male  atypical angina           178    no disease</code></pre>
+<pre class="r"><code># basic descriptive statistics
+summary(dat)</code></pre>
+<pre><code>##       age            sex                 chest_pain  max_heartrate  
+##  Min.   :29.00   female: 96   typical angina  : 23   Min.   : 71.0  
+##  1st Qu.:48.00   male  :201   atypical angina : 49   1st Qu.:133.0  
+##  Median :56.00                non-anginal pain: 83   Median :153.0  
+##  Mean   :54.54                asymptomatic    :142   Mean   :149.6  
+##  3rd Qu.:61.00                                       3rd Qu.:166.0  
+##  Max.   :77.00                                       Max.   :202.0  
+##     heart_disease
+##  no disease:160  
+##  disease   :137  
+##                  
+##                  
+##                  
+## </code></pre>
+<p>The data frame is now ready to be analyzed further through univariate and multivariate binary logistic regressions.</p>
+</div>
+<div id="binary-logistic-regression-in-r" class="section level1">
+<h1>Binary logistic regression in R</h1>
+<div id="univariate-binary-logistic-regression" class="section level2">
+<h2>Univariate binary logistic regression</h2>
+<p>As mentioned above, we start with a univariate binary logistic regression, that is, a binary logistic regression with only one independent variable.</p>
+<p>In R, a binary logistic regression can be done with the <code>glm()</code> function and the <code>family = "binomial"</code> argument. Similar to linear regression, the formula used inside the function must be written as <code>dependent variable ~ independent variable</code> (in this order!).</p>
+<p>While the dependent variable must be categorical with two levels, the independent variable can be of any type. However, interpretations differ depending on whether the independent variable is qualitative or quantitative.</p>
+<p>For completeness, we illustrate this type of regression with both a quantitative and a qualitative independent variable, starting with a quantitative independent variable.</p>
+<div id="quantitative-independent-variable" class="section level3">
+<h3>Quantitative independent variable</h3>
+<p>Suppose we want to estimate the impact of a patient’s age on the presence of heart disease. In this case, <code>age</code> is our independent variable and <code>heart_disease</code> is our dependent variable:</p>
+<pre class="r"><code># save model
+m1 &lt;- glm(heart_disease ~ age,
+  data = dat,
+  family = &quot;binomial&quot;
+)</code></pre>
+<p>Results of the model is saved under the object <code>m1</code>. Again, similar to linear regression, results can be accessed thanks to the <code>summary()</code> function:</p>
+<pre class="r"><code># print results
+summary(m1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = heart_disease ~ age, family = &quot;binomial&quot;, data = dat)
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -3.05122    0.76862  -3.970  7.2e-05 ***
+## age          0.05291    0.01382   3.829 0.000128 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 409.95  on 296  degrees of freedom
+## Residual deviance: 394.25  on 295  degrees of freedom
+## AIC: 398.25
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<p>The most important results in this output are displayed in the table after <code>Coefficients</code>. The bottom part of the output summarizes the distribution of the deviance residuals. In a nutshell, deviance residuals measure how well the observations fit the model. The closer the residual to 0, the better the fit of the observation.</p>
+<p>Within the <code>Coefficients</code> table, we focus on the first and last columns (the other two columns correspond to the standard error and the test statistic, which are both used to compute the <span class="math inline">\(p\)</span>-value):</p>
+<ul>
+<li>the column <code>Estimate</code> corresponds to the coefficients <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span>, and</li>
+<li>the column <code>Pr(&gt;|z|)</code> corresponds to the <span class="math inline">\(p\)</span>-values.</li>
+</ul>
+<p>R performs a <a href="/blog/hypothesis-test-by-hand/">hypothesis test</a> for each coefficient, that is, <span class="math inline">\(H_0: \beta_j = 0\)</span> versus <span class="math inline">\(H_1: \beta_j \neq 0\)</span> for <span class="math inline">\(j = 0, 1\)</span> via the Wald test, and print the <span class="math inline">\(p\)</span>-values in the last column. We can thus compare these <span class="math inline">\(p\)</span>-values to the chosen significance level (usually <span class="math inline">\(\alpha = 0.05\)</span>) to conclude whether or not each of the coefficient is significantly different from 0. The lower the <span class="math inline">\(p\)</span>-value, the more evidence that the coefficient is different from 0. This is similar to linear regression.</p>
+<p>Coefficients are slightly harder to interpret in logistic regression than in linear regression because the relationship between dependent and independent variables is not linear.</p>
+<p>Let’s first interpret the coefficient of age, <span class="math inline">\(\hat{\beta}_1\)</span>, which is the most important coefficient of the two.</p>
+<p>First, since the <span class="math inline">\(p\)</span>-value of the test on the coefficient for age is &lt; 0.05, we conclude that it is significantly different from 0, which means that age is significantly associated with the presence of heart disease (at the 5% significance level). Note that if the test was not significant (i.e., the <span class="math inline">\(p\)</span>-value <span class="math inline">\(\ge \alpha\)</span>), we would refrain from interpreting the coefficient since it means that, based on the data at hand, we are unable to conclude that age is associated with the presence of heart disease in the population.</p>
+<p>Second, remember that:</p>
+<ul>
+<li>when <span class="math inline">\(\beta_1 = 0\)</span>, <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent,</li>
+<li>when <span class="math inline">\(\beta_1 &gt; 0\)</span>, the probability that <span class="math inline">\(Y = 1\)</span> <em>increases</em> with <span class="math inline">\(X\)</span>, and</li>
+<li>when <span class="math inline">\(\beta_1 &lt; 0\)</span>, the probability that <span class="math inline">\(Y = 1\)</span> <em>decreases</em> with <span class="math inline">\(X\)</span>.</li>
+</ul>
+<p>In our context, we have:</p>
+<ul>
+<li>when <span class="math inline">\(\hat{\beta}_1 = 0\)</span>, the probability of developing a heart disease is <em>independent</em> of the age,</li>
+<li>when <span class="math inline">\(\hat{\beta}_1 &gt; 0\)</span>, the probability of developing a heart disease <em>increases</em> with age, and</li>
+<li>when <span class="math inline">\(\hat{\beta}_1 &lt; 0\)</span>, the probability of developing a heart disease <em>decreases</em> with age.</li>
+</ul>
+<p>Here we have <span class="math inline">\(\hat{\beta}_1 =\)</span> 0.053 <span class="math inline">\(&gt; 0\)</span>, so we already know that the older the patient, the more likely he or she is to develop a heart disease. This makes sense.</p>
+<p>Now that we know the direction of the relationship, we would like to <strong>quantify</strong> this relationship. This is easily done thanks to odds ratios (OR). OR are found by taking the exponential of the coefficients. In R, the exponential is done thanks to the <code>exp()</code> function.</p>
+<p>OR can be interpreted as follows: the OR is the multiplicative change in the odds in favor of <span class="math inline">\(Y = 1\)</span> when <span class="math inline">\(X\)</span> increases by 1 unit.</p>
+<p>Applied to our context, we compute the OR for the age by computing <span class="math inline">\(\exp(\hat{\beta}_1) =\)</span> exp(0.053).</p>
+<p>Using R, this gives:</p>
+<pre class="r"><code># OR for age
+exp(coef(m1)[&quot;age&quot;])</code></pre>
+<pre><code>##      age 
+## 1.054331</code></pre>
+<p>Based on this result, we can say that an extra year of age increases the odds (that is, the chance) of developing a heart disease by a factor of 1.054.</p>
+<p>Therefore, the odds of developing a heart disease increases by (1.054 - 1) <span class="math inline">\(\times\)</span> 100 = 5.4% when a patient becomes one year older.</p>
+<p>To sum up:</p>
+<ul>
+<li>when the coefficient <span class="math inline">\(\hat{\beta}_1 = 0 \Rightarrow\)</span> OR <span class="math inline">\(= \exp(\hat{\beta}_1) = 1 \Rightarrow P(Y = 1)\)</span> is <em>independent</em> of <span class="math inline">\(X \Rightarrow\)</span> there is <em>no</em> relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>,</li>
+<li>when the coefficient <span class="math inline">\(\hat{\beta}_1 &gt; 0 \Rightarrow\)</span> OR <span class="math inline">\(= \exp(\hat{\beta}_1) &gt; 1 \Rightarrow P(Y = 1)\)</span> <em>increases</em> with <span class="math inline">\(X \Rightarrow\)</span> there is a <em>positive</em> relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, and</li>
+<li>when the coefficient <span class="math inline">\(\hat{\beta}_1 &lt; 0 \Rightarrow\)</span> OR <span class="math inline">\(= \exp(\hat{\beta}_1) &lt; 1 \Rightarrow P(Y = 1)\)</span> <em>decreases</em> with <span class="math inline">\(X \Rightarrow\)</span> there is a <em>negative</em> relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.</li>
+</ul>
+<p>We now interpret the intercept <span class="math inline">\(\hat{\beta}_0\)</span>.</p>
+<p>First, we look at the <span class="math inline">\(p\)</span>-value of the test on the intercept. This <span class="math inline">\(p\)</span>-value being &lt; 0.05, we conclude that the intercept is significantly different from 0 (at the 5% significance level).</p>
+<p>Second, similar to linear regression, in order to obtain an interpretation of the intercept, we need to find a situation in which the other coefficient, <span class="math inline">\(\beta_1\)</span>, vanishes.</p>
+<p>In our case, it happens when a patient is 0 year old. We may or may not need to interpret results in a such a situation, and in many situations the interpretation does not make sense, so it is more a hypothetical interpretation. However, again for completeness we show how to interpret the intercept. Note that it is also possible to center the numeric variable so that the intercept has a more meaningful interpretation. This, however, goes beyond the scope of the post.</p>
+<p>For a patient aged 0 year, the odds of developing a heart disease is <span class="math inline">\(\exp(\hat{\beta}_0) =\)</span> exp(-3.051) = 0.047. When interpreting an intercept, it often makes more sense to interpret it as the probability that <span class="math inline">\(Y = 1\)</span>, which can be computed as follows:</p>
+<p><span class="math display">\[\frac{\exp(\hat{\beta}_0)}{1 + \exp(\hat{\beta}_0)}.\]</span></p>
+<p>In our case, it corresponds to the probability that a patient of age 0 develops a heart disease, which is equal to:</p>
+<pre class="r"><code># prob(heart disease) for age = 0
+exp(coef(m1)[1]) / (1 + exp(coef(m1)[1]))</code></pre>
+<pre><code>## (Intercept) 
+##  0.04516478</code></pre>
+<p>This means that, if we trust our model, a newborn is expected to develops a heart disease with a probability of 4.52%.</p>
+<p>For your information, a confidence interval can be computed for any of the OR using the <code>confint()</code> function. For example, a 95% confidence interval for the OR for age:</p>
+<pre class="r"><code># 95% CI for the OR for age
+exp(confint(m1,
+  parm = &quot;age&quot;
+))</code></pre>
+<pre><code>##    2.5 %   97.5 % 
+## 1.026699 1.083987</code></pre>
+<p>Remember than when evaluating an OR, the null value is 1, not 0. An OR of 1 in this study would mean that there is no association between the age and the presence of heart disease. If the 95% confidence interval of the OR does not include 1, we conclude that there is a significant association between the age and the presence of heart disease. On the contrary, if it includes 1, we do not reject the hypothesis that there is no association between age and the presence of heart disease.</p>
+<p>In our case, the 95% CI does not include 1, so we conclude, at the 5% significance level, that there is a significant association between age and the presence of heart disease.</p>
+<p>You will notice that it is the same conclusion than with the <span class="math inline">\(p\)</span>-value. This is normal, it will always be the case:</p>
+<ul>
+<li>if the <span class="math inline">\(p\)</span>-value &lt; 0.05, 1 will not be included in the 95% CI, and</li>
+<li>if the <span class="math inline">\(p\)</span>-value <span class="math inline">\(\ge\)</span> 0.05, 1 will be included in the 95% CI.</li>
+</ul>
+<p>This means that you can choose whether you draw your conclusion about the association between the two variables based on the 95% CI or the <span class="math inline">\(p\)</span>-value.</p>
+<p>Estimating the relationship between variables is the main reason for building models. Another goal is to predict the dependent variable based on newly observed values of the independent variable(s). This can be done with the <code>predict()</code> function.</p>
+<p>Suppose we would like to predict the probability of developing a heart disease for a patient aged 30 years old:</p>
+<pre class="r"><code># predict probability to develop heart disease
+pred &lt;- predict(m1,
+  newdata = data.frame(age = c(30)),
+  type = &quot;response&quot;
+)
+
+# print prediction
+pred</code></pre>
+<pre><code>##         1 
+## 0.1878525</code></pre>
+<p>It is predicted that a 30-year-old patient has a 18.79% chance of developing a heart disease.</p>
+<p>Note that if you would like to construct a confidence interval for this prediction, it can be done by adding the <code>se = TRUE</code> argument in the <code>predict()</code> function:</p>
+<pre class="r"><code># predict probability to develop heart disease
+pred &lt;- predict(m1,
+  newdata = data.frame(age = c(30)),
+  type = &quot;response&quot;,
+  se = TRUE
+)
+
+# print prediction
+pred$fit</code></pre>
+<pre><code>##         1 
+## 0.1878525</code></pre>
+<pre class="r"><code># 95% confidence interval for the prediction
+lower &lt;- pred$fit - (qnorm(0.975) * pred$se.fit)
+upper &lt;- pred$fit + (qnorm(0.975) * pred$se.fit)
+c(lower, upper)</code></pre>
+<pre><code>##          1          1 
+## 0.07873357 0.29697138</code></pre>
+<p>If you are a frequent reader of the blog, you are probably know that I like visualizations. The <code>plot_model()</code> function available in the <code>{sjPlot}</code> R package does a good job of visualizing results of the model:</p>
+<pre class="r"><code># load package
+library(sjPlot)
+
+# plot
+plot_model(m1,
+  type = &quot;pred&quot;,
+  terms = &quot;age&quot;
+) +
+  labs(y = &quot;Prob(heart disease)&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>For those of you who are familiar with the <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code> package</a>, you will have noticed that the function accepts layers from the <code>{ggplot2}</code> package. Note also that this function works with other types of model (such as linear models).</p>
+<p>The above plot shows the probability of developing a heart disease in function of age, and confirms results found above:</p>
+<ul>
+<li>We see that the probability of developing a heart disease increases with age (which was expected given that the OR for the coefficient of age is &gt; 1),</li>
+<li>and we also see that the probability of developing a heart disease for a 30-year-old patient is slightly below 20%.</li>
+</ul>
+</div>
+<div id="qualitative-independent-variable" class="section level3">
+<h3>Qualitative independent variable</h3>
+<p>Suppose now that we are interested in estimating the relationship between the probability of developing a heart disease and the sex (which is a qualitative variable).</p>
+<p>Recall that when the independent variable was quantitative, <span class="math inline">\(\exp(\hat{\beta}_1)\)</span> was the multiplicative change in the odds in favor of <span class="math inline">\(Y = 1\)</span> as <span class="math inline">\(X\)</span> increases by 1 unit.</p>
+<p>With <span class="math inline">\(X\)</span> being the sex, the only unit increase possible is from 0 to 1 (or from 1 to 2 if sex is encoded as a factor), so we can write an interpretation in terms of female/male:</p>
+<ul>
+<li><span class="math inline">\(\exp(\hat{\beta}_1)\)</span> is the multiplicative change of the odds in favor of <span class="math inline">\(Y = 1\)</span> as a female becomes a male.</li>
+</ul>
+<p>Again, keep in mind what is the order of the level for the variable sex. In our case, the level female comes before the level male:</p>
+<pre class="r"><code># levels for sex
+levels(dat$sex)</code></pre>
+<pre><code>## [1] &quot;female&quot; &quot;male&quot;</code></pre>
+<p>So it is indeed the multiplicative change of the odds in favor of <span class="math inline">\(Y = 1\)</span> <strong>as a female becomes a male</strong>. If the level male came before the level female in our dataset, it would have been the opposite.</p>
+<p>You will concede that it is rather strange to interpret odds as a female becomes a male, or vice versa. Therefore, it is better to say:</p>
+<ul>
+<li><span class="math inline">\(\exp(\hat{\beta}_1)\)</span> is the multiplicative change of the odds in favor of <span class="math inline">\(Y = 1\)</span> for <strong>males versus females</strong>.</li>
+</ul>
+<p>In our case, we obtain the following results:</p>
+<pre class="r"><code># save model
+m2 &lt;- glm(heart_disease ~ sex,
+  data = dat,
+  family = &quot;binomial&quot;
+)
+
+# print results
+summary(m2)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = heart_disease ~ sex, family = &quot;binomial&quot;, data = dat)
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -1.0438     0.2326  -4.488 7.18e-06 ***
+## sexmale       1.2737     0.2725   4.674 2.95e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 409.95  on 296  degrees of freedom
+## Residual deviance: 386.12  on 295  degrees of freedom
+## AIC: 390.12
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="r"><code># OR for sex
+exp(coef(m2)[&quot;sexmale&quot;])</code></pre>
+<pre><code>##  sexmale 
+## 3.573933</code></pre>
+<p>which can be interpreted as follows:</p>
+<ul>
+<li>The <span class="math inline">\(p\)</span>-value of the test on the coefficient for sex is &lt; 0.05, so we conclude that the sex is significantly associated with the presence of heart disease (at the 5% significance level).</li>
+<li>Moreover, when looking at the coefficient for sex, <span class="math inline">\(\hat{\beta}_1 =\)</span> 1.274, we can say that:
+<ul>
+<li>For males, the odds of developing a heart disease is multiplied by a factor of exp(1.274) = 3.574 compared to females.</li>
+<li>In other words, the odds of developing a heart disease for males are 3.574 times the odds for females.</li>
+<li>This means that, the odds of developing a heart disease are (3.574 - 1) <span class="math inline">\(\times\)</span> 100 = 257.4% higher for males than for females.</li>
+</ul></li>
+</ul>
+<p>These results again make sense, as it known that men are more likely to have a heart disease than women.</p>
+<p>The interpretation of the intercept <span class="math inline">\(\hat{\beta}_0 =\)</span> -1.044 is similar than in the previous section in the sense that it gives the probability of developing a heart disease when the other coefficient, <span class="math inline">\(\beta_1\)</span>, is equal to 0.</p>
+<p>In our case, <span class="math inline">\(\beta_1 = 0\)</span> simply means that the patient is a female. Therefore, the probability of developing a heart disease for a woman is:</p>
+<pre class="r"><code># prob(disease) for sex = female
+exp(coef(m2)[1]) / (1 + exp(coef(m2)[1]))</code></pre>
+<pre><code>## (Intercept) 
+##   0.2604167</code></pre>
+<p>The avid reader will notice that a univariate binary logistic regression with a qualitative independent variable will lead to the same conclusion than a <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a>:</p>
+<pre class="r"><code>chisq.test(table(dat$heart_disease, dat$sex))</code></pre>
+<pre><code>## 
+## 	Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  table(dat$heart_disease, dat$sex)
+## X-squared = 21.852, df = 1, p-value = 2.946e-06</code></pre>
+<p>Based on this test, we reject the null hypothesis of independence between the two variables and we thus conclude that there is a significant association between the sex and the presence of heart disease (<span class="math inline">\(p\)</span>-value &lt; 0.001).</p>
+<p>The advantage of a univariate binary logistic regression over a Chi-square test of independence is that it not only tests whether or not there is a significant association between the two variables, but it also <strong>estimates the direction and strength of this relationship</strong>.</p>
+<p>As for a univariate logistic regression with a quantitative independent variable, predictions can also be made with the <code>predict()</code> function. Suppose we would like to predict the probability of developing a heart disease for a male:</p>
+<pre class="r"><code># predict probability to develop heart disease
+pred &lt;- predict(m2,
+  newdata = data.frame(sex = c(&quot;male&quot;)),
+  type = &quot;response&quot;
+)
+
+# print prediction
+pred</code></pre>
+<pre><code>##         1 
+## 0.5572139</code></pre>
+<p>Based on this model, it is predicted that a male patient has 55.72% chance of developing a heart disease.</p>
+<p>We can also visualize these results thanks to the <code>plot_model()</code> function:</p>
+<pre class="r"><code># plot
+plot_model(m2,
+  type = &quot;pred&quot;,
+  terms = &quot;sex&quot;
+) +
+  labs(y = &quot;Prob(heart disease)&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-25-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The points correspond to the predicted probabilities, and the bars correspond to their confidence intervals.</p>
+<p>The plot of the results in terms of probabilities confirms what was found above, that is:</p>
+<ul>
+<li>women are less likely to develop a heart disease than men,</li>
+<li>the probability that a woman develops a heart disease is expected to be slightly above 25%, and</li>
+<li>the probability that a man develops a heart disease is expected to be around 55%.</li>
+</ul>
+</div>
+</div>
+<div id="multivariate-binary-logistic-regression" class="section level2">
+<h2>Multivariate binary logistic regression</h2>
+<p>The interpretation of the coefficients in multivariate logistic regression is similar to the interpretation in univariate regression, except that this time it estimates the multiplicative change in the odds in favor of <span class="math inline">\(Y = 1\)</span> when <span class="math inline">\(X\)</span> increases by 1 unit, <strong>while the other independent variables remain unchanged</strong>.</p>
+<p>This is similar to multiple linear regression, where a coefficient gives the expected change of <span class="math inline">\(Y\)</span> for an increase of 1 unit of <span class="math inline">\(X\)</span>, while keeping all other variables constant.</p>
+<p>The two main advantages of using a multivariate logistic regression compared to a univariate logistic regression are to:</p>
+<ul>
+<li>consider the simultaneous (rather than isolated) effect of independent variables, and</li>
+<li>take into account potential confounding effects.</li>
+</ul>
+<p>For this illustration, suppose we would like to estimate the relationship between heart disease and all variables present in the data frame, that is, age, sex, chest pain type and maximum heart rate achieved:</p>
+<pre class="r"><code># save model
+m3 &lt;- glm(heart_disease ~ .,
+  data = dat,
+  family = &quot;binomial&quot;
+)
+
+# print results
+summary(m3)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = heart_disease ~ ., family = &quot;binomial&quot;, data = dat)
+## 
+## Coefficients:
+##                             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)                -0.060150   1.962091  -0.031 0.975544    
+## age                         0.042814   0.019009   2.252 0.024302 *  
+## sexmale                     1.686330   0.349352   4.827 1.39e-06 ***
+## chest_painatypical angina  -0.120481   0.641396  -0.188 0.851000    
+## chest_painnon-anginal pain -0.124331   0.571093  -0.218 0.827658    
+## chest_painasymptomatic      1.963723   0.548877   3.578 0.000347 ***
+## max_heartrate              -0.030326   0.007975  -3.802 0.000143 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 409.95  on 296  degrees of freedom
+## Residual deviance: 275.26  on 290  degrees of freedom
+## AIC: 289.26
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<p>Note that the formula <code>heart_disease ~ .</code> is a shortcut to include all variables present in the data frame in the model as independent variables, except <code>heart_disease</code>.</p>
+<p>Based on the <span class="math inline">\(p\)</span>-values displayed in the last column of the coefficients table, we conclude that, at the 5% significance level, age, sex and maximum heart rate achieved are all significantly associated with heart disease (<span class="math inline">\(p\)</span>-values &lt; 0.05).</p>
+<p>For the variables <code>age</code>, <code>sex</code> and <code>max_heartrate</code>, there is only one <span class="math inline">\(p\)</span>-value (the result of the test on the nullity of the coefficient).</p>
+<p>For the variable <code>chest_pain</code>, 3 <span class="math inline">\(p\)</span>-values are displayed. This is normal: similar to linear regression when a categorical variable with more than two levels is included in the model, one test is performed for each comparison between the reference level and the other levels.</p>
+<p>In our case, the reference level for the variable <code>chest_pain</code> is <code>typical angina</code> as it comes first:</p>
+<pre class="r"><code>levels(dat$chest_pain)</code></pre>
+<pre><code>## [1] &quot;typical angina&quot;   &quot;atypical angina&quot;  &quot;non-anginal pain&quot; &quot;asymptomatic&quot;</code></pre>
+<p>Therefore, a test is performed for the comparison between:</p>
+<ol style="list-style-type: decimal">
+<li><code>typical angina</code> and <code>atypical angina</code>,</li>
+<li><code>typical angina</code> and <code>non-anginal pain</code>, and</li>
+<li><code>typical angina</code> and <code>asymptomatic</code>.</li>
+</ol>
+<p>But here we are not interested in comparing levels of the variable chest pain, we would like to test the overall effect of chest pain on heart disease. For this, we are going to compare two models via a likelihood ratio test (LRT):</p>
+<ol style="list-style-type: decimal">
+<li>a model which includes all the variables of interest <strong>and</strong> the variable <code>chest_pain</code>, and</li>
+<li>the exact same model but which <strong>excludes</strong> the variable <code>chest_pain</code>.</li>
+</ol>
+<p>The first one is referred as the full or complete model, whereas the second one is referred as the reduced model.</p>
+<p>We compare these two models with the <code>anova()</code> function:</p>
+<pre class="r"><code># save reduced model
+m3_reduced &lt;- glm(heart_disease ~ age + sex + max_heartrate,
+  data = dat,
+  family = &quot;binomial&quot;
+)
+
+# compare reduced with full model
+anova(m3_reduced, m3,
+  test = &quot;LRT&quot;
+)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model 1: heart_disease ~ age + sex + max_heartrate
+## Model 2: heart_disease ~ age + sex + chest_pain + max_heartrate
+##   Resid. Df Resid. Dev Df Deviance  Pr(&gt;Chi)    
+## 1       293     325.12                          
+## 2       290     275.26  3    49.86 8.558e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Notice that the reduced model must come before the complete model in the <code>anova()</code> function. The null hypothesis of this test is that the two models are equivalent.</p>
+<p>At the 5% significance level (see the <span class="math inline">\(p\)</span>-value at the right of the R output), we reject the null hypothesis and we conclude that the complete model is significantly better than the reduced model at explaining the presence of heart disease. This means that chest pain is significantly associated with heart disease (which was expected since the comparison between <code>typical angina</code> and <code>asymptomatic</code> was found to be significant).</p>
+<p>A comparison of two models via the LRT will be shown again later, when discussing about interactions.</p>
+<p>Now that we have shown that all four independent variables were significantly associated with the presence of heart disease, we can interpret the coefficients in order to know the direction of the relationships and most importantly, quantify the strength of these relationships.</p>
+<p>Like univariate binary logistic regression, it is easier to interpret these relationships through OR. But this time, we also print the 95% CI of the OR in addition to the OR (rounded to 3 decimals) so that we can easily see which ones are significantly different from 1:</p>
+<pre class="r"><code># OR and 95% CI
+round(exp(cbind(OR = coef(m3), confint(m3))), 3)</code></pre>
+<pre><code>##                               OR 2.5 % 97.5 %
+## (Intercept)                0.942 0.020 44.353
+## age                        1.044 1.006  1.084
+## sexmale                    5.400 2.776 10.971
+## chest_painatypical angina  0.886 0.252  3.191
+## chest_painnon-anginal pain 0.883 0.293  2.814
+## chest_painasymptomatic     7.126 2.509 22.030
+## max_heartrate              0.970 0.955  0.985</code></pre>
+<p>From the OR and their 95% CI computed above, we conclude that:</p>
+<ul>
+<li>Age: the odds of having a heart disease are multiplied by a factor of 1.04 for each one-unit increase in age, all else being equal.</li>
+<li>Sex: the odds of developing a heart disease for males are 5.4 times the odds for females, all else being equal.</li>
+<li>Chest pain: the odds of developing a heart disease for people suffering from chest pain of the type “asymptomatic” are 7.13 times the odds for people suffering from chest pain of the type “typical angina”, all else being equal. We refrain from interpreting the other comparisons as they are not significant at the 5% significance level (1 is included in their 95% CI).</li>
+<li>Maximum heart rate achieved: the odds of having a heart disease are multiplied by a factor of 0.97 for each one-unit increase in maximum heart rate achieved, all else being equal.</li>
+<li>Intercept: we also refrain from interpreting the intercept as it is not significantly different from 0 at the 5% significance level (1 is included in the 95% CI).</li>
+</ul>
+<p>If you are interested in printing only the OR for which the <span class="math inline">\(p\)</span>-value of the coefficient is &lt; 0.05, here is the code:</p>
+<pre class="r"><code>exp(coef(m3))[coef(summary(m3))[, &quot;Pr(&gt;|z|)&quot;] &lt; 0.05]</code></pre>
+<pre><code>##                    age                sexmale chest_painasymptomatic 
+##              1.0437437              5.3996293              7.1258054 
+##          max_heartrate 
+##              0.9701289</code></pre>
+<p>Remember that we can always write the interpretations in terms of probabilities with the formula <span class="math inline">\((OR - 1) \times 100\)</span>, where OR corresponds to the odds ratio.</p>
+<p>For instance, for the maximum heart rate achieved, the OR = 0.97, so the interpretation becomes: the chance of developing a heart disease increases by (0.97 <span class="math inline">\(- 1) \times 100 =\)</span> -3% for each one-unit increase in maximum heart rate achieved, which is equivalent to say that the chance of developing a heart disease <em>decreases</em> by 3% for each one-unit increase in maximum heart rate achieved.</p>
+<p>For illustrative purposes, suppose now that we would like to predict the probability that a new patient develops a heart disease. Suppose that this patient is a 32-year-old woman, suffering from chest pain of the type non-anginal and she achieved a maximum heart rate of 150. The probability that she develops a heart disease is:</p>
+<pre class="r"><code># create data frame of new patient
+new_patient &lt;- data.frame(
+  age = 32,
+  sex = &quot;female&quot;,
+  chest_pain = &quot;non-anginal pain&quot;,
+  max_heartrate = 150
+)
+
+# predict probability to develop heart disease
+pred &lt;- predict(m3,
+  newdata = new_patient,
+  type = &quot;response&quot;
+)
+
+# print prediction
+pred</code></pre>
+<pre><code>##          1 
+## 0.03345948</code></pre>
+<p>If we trust our model, the probability that this new patient will develop a heart disease is predicted to be 3.35%.</p>
+<p>We can also visualize the results thanks to the <code>plot_model()</code> function, three effects at the same time:</p>
+<ol style="list-style-type: decimal">
+<li>effect of age, sex and chest pain type on the predicted probability of developing a heart disease, and</li>
+<li>effect of maximum heart rate achieved, sex and chest pain type on the predicted probability of developing a heart disease.</li>
+</ol>
+<pre class="r"><code># 1. age, sex and chest pain on prob of disease
+plot_model(m3,
+  type = &quot;pred&quot;,
+  terms = c(&quot;age&quot;, &quot;chest_pain&quot;, &quot;sex&quot;),
+  ci.lvl = NA # remove confidence bands
+) +
+  labs(y = &quot;Prob(heart disease)&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-32-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># 2. max heart rate, chest pain and sex on prob of disease
+plot_model(m3,
+  type = &quot;pred&quot;,
+  terms = c(&quot;max_heartrate&quot;, &quot;chest_pain&quot;, &quot;sex&quot;),
+  ci.lvl = NA # remove confidence bands
+) +
+  labs(y = &quot;Prob(heart disease)&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-32-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>For more clarity in the plots, confidence bands are removed thanks to <code>ci.lvl = NA</code>.</p>
+<p>These plots confirm results obtained above, that is:</p>
+<ul>
+<li>there is a <em>positive</em> relationship between age and the presence of heart disease,</li>
+<li>there is a <em>negative</em> relationship between maximum heart rate achieved and the presence of heart disease,</li>
+<li>the chance of developing a heart disease is higher for patients suffering from chest pain of the type asymptomatic and similar for the 3 other types of chest pain, and</li>
+<li>the chance of developing a heart disease is higher for males than for females.</li>
+</ul>
+</div>
+<div id="interaction" class="section level2">
+<h2>Interaction</h2>
+<p>In the previous sections, potential interaction effects were omitted.</p>
+<p>An interaction occurs when the relationship between an independent variable and the outcome variable depends on the value or the level taken by another independent variable. On the contrary, if the relationship between an independent variable and the dependent variable remains unchanged no matter the value taken by another independent variable, we cannot conclude that there is an interaction effect.</p>
+<p>In our case, there would be an interaction if for example the relationship between age and heart disease depends on the sex. There would be an interaction, for instance, if the relationship between age and heart disease was positive for females, and negative for males, or vice versa. Or if the relationship between age and heart disease was much stronger or much weaker for females than for males.</p>
+<p>Let’s see if there is an interaction between age and sex, and more importantly, whether or not this interaction is significant. For this, we need to build two models:</p>
+<ol style="list-style-type: decimal">
+<li>one model containing only the main effects, so without the interaction, and</li>
+<li>one model containing the main effects <strong>and</strong> the interaction.</li>
+</ol>
+<pre class="r"><code># save model without interaction
+m4 &lt;- glm(heart_disease ~ age + sex,
+  data = dat,
+  family = &quot;binomial&quot;
+)
+
+# save model with interaction
+m4_inter &lt;- glm(heart_disease ~ age * sex,
+  data = dat,
+  family = &quot;binomial&quot;
+)</code></pre>
+<p>We first assess the interaction visually via the <code>plot_model()</code> function:</p>
+<pre class="r"><code># plot
+plot_model(m4_inter,
+  type = &quot;pred&quot;,
+  terms = c(&quot;age&quot;, &quot;sex&quot;),
+  ci.lvl = NA # remove confidence bands
+) +
+  labs(y = &quot;Prob(heart disease)&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-34-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Since the two curves of the predicted probabilities are relatively similar and follow the same pattern, the relationship between age and the presence of heart disease does not seem to depend on the sex, indicating that there may indeed be no interaction. However, we would like to test it more formally via a statistical test.</p>
+<p>For this, we can compare the two models (the one without compared to the one with interaction) with a likelihood ratio test (LRT), using the <code>anova()</code> function:</p>
+<pre class="r"><code>anova(m4, m4_inter,
+  test = &quot;LRT&quot;
+)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model 1: heart_disease ~ age + sex
+## Model 2: heart_disease ~ age * sex
+##   Resid. Df Resid. Dev Df Deviance Pr(&gt;Chi)
+## 1       294     364.43                     
+## 2       293     364.23  1  0.20741   0.6488</code></pre>
+<p>Remember that it is always the reduced model as the first argument in the <code>anova()</code> function, and then the more complex model as the second argument.</p>
+<p>The test confirms what we supposed based on the plot: at the 5% significance level, we do not reject the null hypothesis that the two models are equivalent. Since the only difference between the two models is that an interaction term is added in the complete model, we do not reject the hypothesis that there is no interaction between the age and the sex (<span class="math inline">\(p\)</span>-value = 0.649).</p>
+<p>This conclusion could have also been obtained more simply with the <code>drop1()</code> function:</p>
+<pre class="r"><code>drop1(m4_inter,
+  test = &quot;LRT&quot;
+)</code></pre>
+<pre><code>## Single term deletions
+## 
+## Model:
+## heart_disease ~ age * sex
+##         Df Deviance    AIC     LRT Pr(&gt;Chi)
+## &lt;none&gt;       364.23 372.23                 
+## age:sex  1   364.43 370.43 0.20741   0.6488</code></pre>
+<p>As you can see, this gives the same <span class="math inline">\(p\)</span>-value of 0.649.</p>
+<p>In practice, a non-significant interaction is removed from the model before interpreting its results. In our case, only the main effects of age and sex would remain in the model.</p>
+<p>This leads us to model selection, or which variables should be included in our final model. This is discussed in the next section.</p>
+</div>
+<div id="model-selection" class="section level2">
+<h2>Model selection</h2>
+<p>In practice, we often have several models, corresponding to the different combinations of independent variables and their interactions. Finding the best model is not easy.</p>
+<p>In general, the best practice is to obtain a final model that is as parsimonious as possible, that is, with as few parameters as possible. A parsimonious model is easier to interpret and generalize, and also more powerful from a statistical point of view. On the other hand, it should not be too simple so that it still captures the variations or patterns in the data. In general, while more variables are often better than one, too many is often worse than a few.</p>
+<p>The two most common approaches to obtain a final model are the following:</p>
+<ol style="list-style-type: decimal">
+<li>Adjust the model by removing the main effects and their interactions which are not significant with respect to their <span class="math inline">\(p\)</span>-values, obtained by testing the nullity of the corresponding coefficients using a statistical test such as the likelihood ratio test or the Wald test. If there are several main effects or interactions which are not significant, interactions must be removed before removing any main effect. Moreover, it is recommended to remove interactions and independent variables one by one (starting with the one with the highest <span class="math inline">\(p\)</span>-value), as removing a variable or an interaction may make another variable or interaction that was initially non-significant significant.</li>
+<li>Adjust the model by using AIC (Akaike Information Criterion) or BIC (Bayesian Information Criterion). These procedures allow to select the best model (according to AIC or BIC) by finding an equilibrium between simplicity and complexity. These selection processes usually lead to a final model with as few parameters as possible, but which captures as much information in the data as possible. Note that only models with the same dependent variable can be compared using AIC or BIC. Models with different dependent variables cannot be compared using these criteria.</li>
+</ol>
+<p>The first method requires that:</p>
+<ul>
+<li>the underlying assumptions are valid,</li>
+<li>the sample size is sufficiently large, and</li>
+<li>the models are nested (i.e., the complete model includes at least all the variables included in the reduced model).</li>
+</ul>
+<p>Moreover, the second method can be used with widely used criteria when selecting variables, and more importantly, in a completely autonomous way in R.</p>
+<p>For this reason, the second method is recommended and more often used in practice.</p>
+<p>This second method, referred as the stepwise selection, is divided into 3 types:</p>
+<ol style="list-style-type: decimal">
+<li>backward selection: we start from the most complete model (containing all independent variables and usually also their interactions), and the interactions/main effects are deleted at each step until the model cannot be improved,</li>
+<li>forward selection: we start from the most basic model containing only the intercept, and the independent variables/interactions are added at each step until the model cannot be improved, or</li>
+<li>mixed selection: we apply both the backward <strong>and</strong> forward selection to determine the best model according to the desired criterion.</li>
+</ol>
+<p>We show how to select the best model according to AIC using the mixed stepwise selection, illustrated with all variables present in the data frame as independent variables and all possible second order interactions:</p>
+<pre class="r"><code># save initial model
+m5 &lt;- glm(heart_disease ~ (age + sex + chest_pain + max_heartrate)^2,
+  data = dat,
+  family = &quot;binomial&quot;
+)
+
+# select best model according to AIC using mixed selection
+m5_final &lt;- step(m5,
+  direction = &quot;both&quot;, # both = mixed selection
+  trace = FALSE # do not display intermediate steps
+)
+
+# display results of final model
+summary(m5_final)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = heart_disease ~ age + sex + chest_pain + max_heartrate + 
+##     age:max_heartrate, family = &quot;binomial&quot;, data = dat)
+## 
+## Coefficients:
+##                              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)                19.4386591  8.1904201   2.373 0.017628 *  
+## age                        -0.3050017  0.1414986  -2.156 0.031122 *  
+## sexmale                     1.7055353  0.3507149   4.863 1.16e-06 ***
+## chest_painatypical angina  -0.0086463  0.6547573  -0.013 0.989464    
+## chest_painnon-anginal pain -0.0590333  0.5844000  -0.101 0.919538    
+## chest_painasymptomatic      1.9724490  0.5649516   3.491 0.000481 ***
+## max_heartrate              -0.1605658  0.0540933  -2.968 0.002994 ** 
+## age:max_heartrate           0.0023314  0.0009433   2.471 0.013457 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 409.95  on 296  degrees of freedom
+## Residual deviance: 268.60  on 289  degrees of freedom
+## AIC: 284.6
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<p>According to the AIC (which is the default criterion when using the <code>step()</code> function), the best model is the one including:</p>
+<ul>
+<li><code>age</code>,</li>
+<li><code>sex</code>,</li>
+<li><code>chest_pain</code>,</li>
+<li><code>max_heartrate</code>, and</li>
+<li>the interaction between <code>age</code> and <code>max_heartrate</code>.</li>
+</ul>
+<p>For your information, you can also easily compare models manually using AIC or the pseudo-<span class="math inline">\(R^2\)</span> with the <code>tab_model()</code> function, also available in the <code>{sjPlot}</code> R package:</p>
+<pre class="r"><code>tab_model(m3, m4, m5_final,
+  show.ci = FALSE, # remove CI
+  show.aic = TRUE, # display AIC
+  p.style = &quot;numeric_stars&quot; # display p-values and stars
+)</code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+heart_disease
+</th>
+<th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+heart_disease
+</th>
+<th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+heart_disease
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Odds Ratios
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Odds Ratios
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Odds Ratios
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.94 <sup></sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.976
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.01 <sup>***</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+276759408.51 <sup>*</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+<strong>0.018</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+age
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.04 <sup>*</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.024</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.07 <sup>***</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.74 <sup>*</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+<strong>0.031</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+sex [male]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+5.40 <sup>***</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+4.47 <sup>***</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+5.50 <sup>***</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+chest pain [atypical<br>angina]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.89 <sup></sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.851
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.99 <sup></sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+0.989
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+chest pain [non-anginal<br>pain]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.88 <sup></sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.828
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.94 <sup></sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+0.920
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+chest pain [asymptomatic]
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+7.13 <sup>***</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+7.19 <sup>***</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+<strong>&lt;0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+max heartrate
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.97 <sup>***</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.85 <sup>**</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+<strong>0.003</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+age × max heartrate
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.00 <sup>*</sup>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+<strong>0.013</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2">
+297
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2">
+297
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2">
+297
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> Tjur
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+0.393
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+0.142
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+0.409
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+AIC
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+289.263
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+370.435
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+284.599
+</td>
+</tr>
+<tr>
+<td colspan="7" style="font-style:italic; border-top:double black; text-align:right;">
+<ul>
+<li>p&lt;0.05   ** p&lt;0.01   *** p&lt;0.001
+</td>
+</tr></li>
+</ul>
+</table>
+<p><br></p>
+<p>Pseudo-<span class="math inline">\(R^2\)</span> is a generalization of the coefficient of determination <span class="math inline">\(R^2\)</span> often used in linear regression to judge the quality of a model. Like the <span class="math inline">\(R^2\)</span> in linear regression, the pseudo-<span class="math inline">\(R^2\)</span> varies from 0 to 1, and can be interpreted as the percentage of the null deviance explained by the independent variable(s). The higher the pseudo-<span class="math inline">\(R^2\)</span> and the lower the AIC, the better the model.</p>
+<p>Note that there are several pseudo-<span class="math inline">\(R^2\)</span>, such as:</p>
+<ul>
+<li>Likelihood ratio <span class="math inline">\(R^2_{L}\)</span>,</li>
+<li>Cox and Snell <span class="math inline">\(R^2_{CS}\)</span>,</li>
+<li>Nagelkerke <span class="math inline">\(R^2_{N}\)</span>,</li>
+<li>McFadden <span class="math inline">\(R^2_{McF}\)</span>, and</li>
+<li>Tjur <span class="math inline">\(R^2_{T}\)</span>.</li>
+</ul>
+<p>The <code>tab_model()</code> function gives the Tjur <span class="math inline">\(R^2_{T}\)</span> by default.</p>
+<p>Based on the AIC and the Tjur <span class="math inline">\(R^2_{T}\)</span>, the last model is considered as the best one among the 3 considered.</p>
+<p>Note that, even though a model is deemed the best one among the ones you have considered (based on one or several criteria), it does not necessarily mean that it fits the data well. There are several methods to check the quality of a model and to check if it is appropriate for the data at hand. This is the topic of the next section.</p>
+</div>
+<div id="quality-of-a-model" class="section level2">
+<h2>Quality of a model</h2>
+<p>Usually, the goal of building a model is to be able to predict, as precisely as possible, the response variable for new data.</p>
+<p>In the next sections, we present some measures to judge the quality of a model, starting with the easiest and most intuitive one, followed by two widely used in the medical domain, and finally two other metrics common in the field of machine learning.</p>
+<div id="validity-of-the-predictions" class="section level3">
+<h3>Validity of the predictions</h3>
+<div id="accuracy" class="section level4">
+<h4>Accuracy</h4>
+<p>A good way to judge the accuracy of a model is to monitor its performance on new data and count how often it predicts the correct outcome.</p>
+<p>Unfortunately, when we have access to new data, we often do not know the real outcome and we cannot therefore check if the model does a good job in predicting the outcome. The trick is to:</p>
+<ol style="list-style-type: decimal">
+<li>train the model on the initial data frame,</li>
+<li>test the model on the exact same data (just like if it was a complete different data frame for which we do not know the outcome), and then</li>
+<li>compare the predictions made by the model to the real outcomes.</li>
+</ol>
+<p>To illustrate this process, we take the model built in the previous section and test it on the initial data frame.</p>
+<p>Moreover, suppose that if the probability for the patient to develop a heart disease is below 50%, we consider that the predicted outcome is the absence of the disease, otherwise the predicted outcome is the presence of the disease.</p>
+<pre class="r"><code># create a vector of predicted probabilities
+preds &lt;- predict(m5_final,
+  newdata = select(dat, -heart_disease), # remove real outcomes
+  type = &quot;response&quot;
+)
+
+# if probability &lt; threshold, patient is considered not to have the disease
+preds_outcome &lt;- ifelse(preds &lt; 0.5,
+  0,
+  1
+)
+
+# transform predictions into factor and set labels
+preds_outcome &lt;- factor(preds_outcome,
+  levels = c(0, 1),
+  labels = c(&quot;no disease&quot;, &quot;disease&quot;)
+)
+
+# compare observed vs. predicted outcome
+tab &lt;- table(dat$heart_disease, preds_outcome,
+  dnn = c(&quot;observed&quot;, &quot;predicted&quot;)
+)
+
+# print results
+tab</code></pre>
+<pre><code>##             predicted
+## observed     no disease disease
+##   no disease        132      28
+##   disease            33     104</code></pre>
+<p>From the contingency table of the predicted and observed outcomes, we see that the model:</p>
+<ul>
+<li>correctly predicted the absence of the disease for 132 patients,</li>
+<li>incorrectly predicted the presence of the disease for 28 patients,</li>
+<li>incorrectly predicted the absence of the disease for 33 patients, and</li>
+<li>correctly predicted the presence of the disease for 104 patients.</li>
+</ul>
+<p>The percentage of correct predictions, referred as the accuracy, is the sum of the correct predictions divided by the total number of predictions:</p>
+<pre class="r"><code>accuracy &lt;- sum(diag(tab)) / sum(tab)
+accuracy</code></pre>
+<pre><code>## [1] 0.7946128</code></pre>
+<p>This model has an accuracy of 79.5%.</p>
+<p>Although accuracy is the most intuitive and easiest way to measure a model’s predictive performance, it has some drawbacks, notably because we have to choose an <em>arbitrary</em> threshold beyond which we classify a new observation as 1 or 0. A more detailed discussion about this can be found on Frank Harrell’s <a href="https://hbiostat.org/blog/post/classification/index.html" target="_blank">blog</a>.</p>
+<p>In this illustration, we chose 50% as the threshold beyond which a patient was considered as having the disease. Nonetheless, we could have chosen another threshold and the results would have been different!</p>
+</div>
+<div id="sensitivity-and-specificity" class="section level4">
+<h4>Sensitivity and specificity</h4>
+<p>If you work in the medical field, or if your research is related to medical sciences, you have probably already heard about sensitivity and specificity.</p>
+<p>The <strong>sensitivity</strong> of a classifier, also referred as the recall, measures the ability of a classifier to detect the condition when the condition is present. In our case, it is the percentage of diseased people who are correctly identified as having the disease. Formally, we have:</p>
+<p><span class="math display">\[ Sensitivity = \frac{\text{True positives}}{\text{True positives} + \text{False negatives}},\]</span></p>
+<p>where true positives are people correctly diagnosed as ill and false negatives are people incorrectly diagnosed as healthy.</p>
+<p>The <strong>specificity</strong> of a classifier measures the ability of a classifier to correctly exclude the condition when the condition is absent. In our case, it is the percentage of healthy people who are correctly identified as not having the disease. Formally, we have:</p>
+<p><span class="math display">\[Specificity = \frac{\text{True negatives}}{\text{True negatives} + \text{False positives}},\]</span></p>
+<p>where true negatives are people correctly diagnosed as healthy and false positives are people incorrectly diagnosed as ill.</p>
+<p>In R, sensitivity and specificity can be computed as follows:</p>
+<pre class="r"><code># sensitivity
+sensitivity &lt;- tab[2, 2] / (tab[2, 2] + tab[2, 1])
+sensitivity</code></pre>
+<pre><code>## [1] 0.7591241</code></pre>
+<pre class="r"><code># specificity
+specificity &lt;- tab[1, 1] / (tab[1, 1] + tab[1, 2])
+specificity</code></pre>
+<pre><code>## [1] 0.825</code></pre>
+<p>With our model, we obtain:</p>
+<ul>
+<li>sensitivity = 75.9%, and</li>
+<li>specificity = 82.5%.</li>
+</ul>
+<p>The closer the sensitivity and the specificity are to 100%, the better the model.</p>
+</div>
+</div>
+<div id="auc-and-roc-curve" class="section level3">
+<h3>AUC and ROC curve</h3>
+<p>We have already seen that the better the quality of the model, the better the predictions.</p>
+<p>Another common and less arbitrary way to judge the quality of a model is by computing the AUC (Area Under the Curve) and plotting the ROC (Receiver Operating Characteristic) curve.</p>
+<p>This can be achieved easily thanks to the <code>{pROC}</code> package:</p>
+<pre class="r"><code># load package
+library(pROC)
+
+# save roc object
+res &lt;- roc(heart_disease ~ fitted(m5_final),
+  data = dat
+)
+
+# plot ROC curve
+ggroc(res, legacy.axes = TRUE)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-42-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># print AUC
+res$auc</code></pre>
+<pre><code>## Area under the curve: 0.87</code></pre>
+<p>As the <code>ggroc()</code> function works with layers from the <code>{ggplot2}</code> package, we can print the AUC directly in the title of the plot of the ROC curve:</p>
+<pre class="r"><code># plot ROC curve with AUC in title
+ggroc(res, legacy.axes = TRUE) +
+  labs(title = paste0(&quot;AUC = &quot;, round(res$auc, 2)))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-43-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>These two quality metrics can be interpreted as follows:</p>
+<ul>
+<li>in the plot, the closer the ROC curve is to the upper left-hand corner, the better the model, and</li>
+<li>the closer the AUC is to 1, the better the model.</li>
+</ul>
+<p>Based on the ROC curve and the AUC, we can say that this model is good to very good. This means that the model is appropriate for these data, and that it can be useful to predict whether or not a patient will develop a heart disease!</p>
+</div>
+</div>
+<div id="reporting-results" class="section level2">
+<h2>Reporting results</h2>
+<p>As we have seen before, odds ratios are useful when reporting results of binary logistic regressions.</p>
+<p>Computing these odds ratios together with the confidence intervals is not particularly difficult. However, presenting them in a table for a publication or a report can quickly become time consuming, in particular if you have many models and many independent variables.</p>
+<p>Luckily, there are two packages which saved me a lot of time and which I use almost every time I need to report results of a logistic regression.</p>
+<p>The first package, called <code>{gtsummary}</code> is useful to report results of one regression at a time. The second one is the <code>{finalfit}</code> package.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> This packages is more appropriate if you need to report results of several regressions at a time.</p>
+<div id="gtsummary-package" class="section level3">
+<h3>{gtsummary} package</h3>
+<p>Here is an example with one of the models built previously:</p>
+<pre class="r"><code># load package
+library(gtsummary)
+
+# print table of results
+tbl_regression(m5_final, exponentiate = TRUE)</code></pre>
+<div id="sdigyayxwb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#sdigyayxwb table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#sdigyayxwb thead, #sdigyayxwb tbody, #sdigyayxwb tfoot, #sdigyayxwb tr, #sdigyayxwb td, #sdigyayxwb th {
+  border-style: none;
+}
+
+#sdigyayxwb p {
+  margin: 0;
+  padding: 0;
+}
+
+#sdigyayxwb .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#sdigyayxwb .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#sdigyayxwb .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#sdigyayxwb .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#sdigyayxwb .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#sdigyayxwb .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#sdigyayxwb .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#sdigyayxwb .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#sdigyayxwb .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#sdigyayxwb .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#sdigyayxwb .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#sdigyayxwb .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#sdigyayxwb .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#sdigyayxwb .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#sdigyayxwb .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sdigyayxwb .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#sdigyayxwb .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#sdigyayxwb .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#sdigyayxwb .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sdigyayxwb .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#sdigyayxwb .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sdigyayxwb .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#sdigyayxwb .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sdigyayxwb .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#sdigyayxwb .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sdigyayxwb .gt_left {
+  text-align: left;
+}
+
+#sdigyayxwb .gt_center {
+  text-align: center;
+}
+
+#sdigyayxwb .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#sdigyayxwb .gt_font_normal {
+  font-weight: normal;
+}
+
+#sdigyayxwb .gt_font_bold {
+  font-weight: bold;
+}
+
+#sdigyayxwb .gt_font_italic {
+  font-style: italic;
+}
+
+#sdigyayxwb .gt_super {
+  font-size: 65%;
+}
+
+#sdigyayxwb .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#sdigyayxwb .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#sdigyayxwb .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#sdigyayxwb .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#sdigyayxwb .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#sdigyayxwb .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#sdigyayxwb .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;OR&lt;/strong&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><strong>OR</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;95% CI&lt;/strong&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><strong>95% CI</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;p-value&lt;/strong&gt;"><strong>p-value</strong></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left">age</td>
+<td headers="estimate" class="gt_row gt_center">0.74</td>
+<td headers="ci" class="gt_row gt_center">0.55, 0.96</td>
+<td headers="p.value" class="gt_row gt_center">0.031</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">sex</td>
+<td headers="estimate" class="gt_row gt_center"><br /></td>
+<td headers="ci" class="gt_row gt_center"><br /></td>
+<td headers="p.value" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    female</td>
+<td headers="estimate" class="gt_row gt_center">—</td>
+<td headers="ci" class="gt_row gt_center">—</td>
+<td headers="p.value" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    male</td>
+<td headers="estimate" class="gt_row gt_center">5.50</td>
+<td headers="ci" class="gt_row gt_center">2.82, 11.2</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">chest_pain</td>
+<td headers="estimate" class="gt_row gt_center"><br /></td>
+<td headers="ci" class="gt_row gt_center"><br /></td>
+<td headers="p.value" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    typical angina</td>
+<td headers="estimate" class="gt_row gt_center">—</td>
+<td headers="ci" class="gt_row gt_center">—</td>
+<td headers="p.value" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    atypical angina</td>
+<td headers="estimate" class="gt_row gt_center">0.99</td>
+<td headers="ci" class="gt_row gt_center">0.27, 3.65</td>
+<td headers="p.value" class="gt_row gt_center">>0.9</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    non-anginal pain</td>
+<td headers="estimate" class="gt_row gt_center">0.94</td>
+<td headers="ci" class="gt_row gt_center">0.30, 3.07</td>
+<td headers="p.value" class="gt_row gt_center">>0.9</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    asymptomatic</td>
+<td headers="estimate" class="gt_row gt_center">7.19</td>
+<td headers="ci" class="gt_row gt_center">2.44, 22.8</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">max_heartrate</td>
+<td headers="estimate" class="gt_row gt_center">0.85</td>
+<td headers="ci" class="gt_row gt_center">0.76, 0.94</td>
+<td headers="p.value" class="gt_row gt_center">0.003</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">age * max_heartrate</td>
+<td headers="estimate" class="gt_row gt_center">1.00</td>
+<td headers="ci" class="gt_row gt_center">1.00, 1.00</td>
+<td headers="p.value" class="gt_row gt_center">0.013</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="4"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> OR = Odds Ratio, CI = Confidence Interval</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+<p><br></p>
+<p>What I like with this package is its ease of use, and the fact that all results are nicely formatted in a table. This is a very good starting point when I need to create a table for a publication or a report, for one regression at a time.</p>
+<p>The second package becomes interesting when you need to report results for several models at once.</p>
+</div>
+<div id="finalfit-package" class="section level3">
+<h3>{finalfit} package</h3>
+<p>The <code>{finalfit}</code> package allows to report odds ratios, their confidence intervals and the <span class="math inline">\(p\)</span>-values in a very efficient way. Moreover, it is quite easy to do so for many regressions at the same time.</p>
+<p>Let me present the package by reporting results of:</p>
+<ul>
+<li>all univariate binary logistic regressions that are possible with the variables available in the data frame,</li>
+<li>a multivariate binary logistic regression that includes all variables available in the data frame, and</li>
+<li>a multivariate binary logistic regression that includes only some of the variables present in the data frame.</li>
+</ul>
+<p>We start with all the possible univariate binary logistic regressions:</p>
+<pre class="r"><code># load packages
+library(tidyverse)
+library(gt)
+library(finalfit)
+
+# set dependent and independent variables
+dependent &lt;- &quot;heart_disease&quot;
+independent &lt;- c(&quot;age&quot;, &quot;sex&quot;, &quot;chest_pain&quot;, &quot;max_heartrate&quot;)
+
+# save results of univariate logistic regressions
+glmuni &lt;- dat |&gt;
+  glmuni(dependent, independent) |&gt;
+  fit2df(
+    explanatory_name = &quot;Variables&quot;,
+    estimate_name = &quot;Crude OR&quot;,
+    estimate_suffix = &quot; (95% CI)&quot;
+  )
+
+# print results
+glmuni |&gt;
+  gt()</code></pre>
+<div id="ewvlblrgtf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ewvlblrgtf table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ewvlblrgtf thead, #ewvlblrgtf tbody, #ewvlblrgtf tfoot, #ewvlblrgtf tr, #ewvlblrgtf td, #ewvlblrgtf th {
+  border-style: none;
+}
+
+#ewvlblrgtf p {
+  margin: 0;
+  padding: 0;
+}
+
+#ewvlblrgtf .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ewvlblrgtf .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ewvlblrgtf .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ewvlblrgtf .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ewvlblrgtf .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ewvlblrgtf .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ewvlblrgtf .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ewvlblrgtf .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ewvlblrgtf .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#ewvlblrgtf .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ewvlblrgtf .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ewvlblrgtf .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ewvlblrgtf .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ewvlblrgtf .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ewvlblrgtf .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ewvlblrgtf .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ewvlblrgtf .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ewvlblrgtf .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#ewvlblrgtf .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ewvlblrgtf .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ewvlblrgtf .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ewvlblrgtf .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ewvlblrgtf .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ewvlblrgtf .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ewvlblrgtf .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ewvlblrgtf .gt_left {
+  text-align: left;
+}
+
+#ewvlblrgtf .gt_center {
+  text-align: center;
+}
+
+#ewvlblrgtf .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ewvlblrgtf .gt_font_normal {
+  font-weight: normal;
+}
+
+#ewvlblrgtf .gt_font_bold {
+  font-weight: bold;
+}
+
+#ewvlblrgtf .gt_font_italic {
+  font-style: italic;
+}
+
+#ewvlblrgtf .gt_super {
+  font-size: 65%;
+}
+
+#ewvlblrgtf .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#ewvlblrgtf .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ewvlblrgtf .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ewvlblrgtf .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ewvlblrgtf .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ewvlblrgtf .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ewvlblrgtf .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Variables">Variables</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Crude OR (95% CI)">Crude OR (95% CI)</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Variables" class="gt_row gt_left">age</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">1.05 (1.03-1.08, p&lt;0.001)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">sexmale</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">3.57 (2.12-6.18, p&lt;0.001)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">chest_painatypical angina</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">0.51 (0.16-1.66, p=0.255)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">chest_painnon-anginal pain</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">0.63 (0.23-1.86, p=0.384)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">chest_painasymptomatic</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">6.04 (2.39-16.76, p&lt;0.001)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">max_heartrate</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">0.96 (0.94-0.97, p&lt;0.001)</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p><br></p>
+<p>A few remarks regarding this code:</p>
+<ul>
+<li><code>glmuni()</code> is used because we want to run univariate GLM.</li>
+<li><code>explanatory_name = "Variables"</code> is used to rename the first column (by default it is “explanatory”).</li>
+<li><code>estimate_name = "Crude OR"</code> is used to rename the second column and inform the reader that we are in the univariate case. In the univariate case, OR are often called crude OR because they are not adjusted for the effects of the other independent variables.</li>
+<li><code>estimate_suffix = " (95% CI)"</code> is used to specify that it is the 95% confidence intervals which are inside the parentheses.</li>
+<li>The <code>gt()</code> layer at the end of the code is not compulsory. It is just to make the output appears in a nice table instead of the usual format of R outputs. See more information about the <code>{gt}</code> package in its <a href="https://gt.rstudio.com/" target="_blank">documentation</a>.</li>
+</ul>
+<p>Here is how to report results of a multivariate binary logistic regression which includes all variables:</p>
+<pre class="r"><code># save results of full model
+glmmulti_full &lt;- dat |&gt;
+  glmmulti(dependent, independent) |&gt;
+  fit2df(
+    explanatory_name = &quot;Variables&quot;,
+    estimate_name = &quot;Adjusted OR - full model&quot;,
+  )
+
+# print results
+glmmulti_full |&gt;
+  gt()</code></pre>
+<div id="vtrqkpqzfa" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#vtrqkpqzfa table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#vtrqkpqzfa thead, #vtrqkpqzfa tbody, #vtrqkpqzfa tfoot, #vtrqkpqzfa tr, #vtrqkpqzfa td, #vtrqkpqzfa th {
+  border-style: none;
+}
+
+#vtrqkpqzfa p {
+  margin: 0;
+  padding: 0;
+}
+
+#vtrqkpqzfa .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#vtrqkpqzfa .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#vtrqkpqzfa .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#vtrqkpqzfa .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#vtrqkpqzfa .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#vtrqkpqzfa .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#vtrqkpqzfa .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#vtrqkpqzfa .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#vtrqkpqzfa .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#vtrqkpqzfa .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#vtrqkpqzfa .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#vtrqkpqzfa .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#vtrqkpqzfa .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#vtrqkpqzfa .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#vtrqkpqzfa .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vtrqkpqzfa .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#vtrqkpqzfa .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#vtrqkpqzfa .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#vtrqkpqzfa .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vtrqkpqzfa .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#vtrqkpqzfa .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vtrqkpqzfa .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#vtrqkpqzfa .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vtrqkpqzfa .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#vtrqkpqzfa .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vtrqkpqzfa .gt_left {
+  text-align: left;
+}
+
+#vtrqkpqzfa .gt_center {
+  text-align: center;
+}
+
+#vtrqkpqzfa .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#vtrqkpqzfa .gt_font_normal {
+  font-weight: normal;
+}
+
+#vtrqkpqzfa .gt_font_bold {
+  font-weight: bold;
+}
+
+#vtrqkpqzfa .gt_font_italic {
+  font-style: italic;
+}
+
+#vtrqkpqzfa .gt_super {
+  font-size: 65%;
+}
+
+#vtrqkpqzfa .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#vtrqkpqzfa .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#vtrqkpqzfa .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#vtrqkpqzfa .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#vtrqkpqzfa .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#vtrqkpqzfa .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#vtrqkpqzfa .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Variables">Variables</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Adjusted OR - full model">Adjusted OR - full model</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Variables" class="gt_row gt_left">age</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">1.04 (1.01-1.08, p=0.024)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">sexmale</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">5.40 (2.78-10.97, p&lt;0.001)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">chest_painatypical angina</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">0.89 (0.25-3.19, p=0.851)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">chest_painnon-anginal pain</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">0.88 (0.29-2.81, p=0.828)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">chest_painasymptomatic</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">7.13 (2.51-22.03, p&lt;0.001)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">max_heartrate</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">0.97 (0.95-0.99, p&lt;0.001)</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p><br></p>
+<p>A few remarks regarding this code:</p>
+<ul>
+<li><code>glmmulti()</code> is used because we want to run multivariate GLM.</li>
+<li><code>estimate_name = "Adjusted OR - full model"</code> is used to remind the reader that we are in the multivariate case with all variables included. In the multivariate case, OR are often called adjusted OR because they are adjusted for the effects of the other independent variables.</li>
+</ul>
+<p>Here is how to report results of a multivariate binary logistic regression which includes only a selection of variables:</p>
+<pre class="r"><code># select the variables to be included in the final model
+independent_final &lt;- c(&quot;age&quot;, &quot;sex&quot;, &quot;chest_pain&quot;)
+
+# save results of final model
+glmmulti_final &lt;- dat |&gt;
+  glmmulti(dependent, independent_final) |&gt;
+  fit2df(
+    explanatory_name = &quot;Variables&quot;,
+    estimate_name = &quot;Adjusted OR - final model&quot;,
+    estimate_suffix = &quot; (95% CI)&quot;
+  )
+
+# print results
+glmmulti_final |&gt;
+  gt()</code></pre>
+<div id="klgxvctcfp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#klgxvctcfp table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#klgxvctcfp thead, #klgxvctcfp tbody, #klgxvctcfp tfoot, #klgxvctcfp tr, #klgxvctcfp td, #klgxvctcfp th {
+  border-style: none;
+}
+
+#klgxvctcfp p {
+  margin: 0;
+  padding: 0;
+}
+
+#klgxvctcfp .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#klgxvctcfp .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#klgxvctcfp .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#klgxvctcfp .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#klgxvctcfp .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#klgxvctcfp .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#klgxvctcfp .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#klgxvctcfp .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#klgxvctcfp .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#klgxvctcfp .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#klgxvctcfp .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#klgxvctcfp .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#klgxvctcfp .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#klgxvctcfp .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#klgxvctcfp .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#klgxvctcfp .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#klgxvctcfp .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#klgxvctcfp .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#klgxvctcfp .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#klgxvctcfp .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#klgxvctcfp .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#klgxvctcfp .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#klgxvctcfp .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#klgxvctcfp .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#klgxvctcfp .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#klgxvctcfp .gt_left {
+  text-align: left;
+}
+
+#klgxvctcfp .gt_center {
+  text-align: center;
+}
+
+#klgxvctcfp .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#klgxvctcfp .gt_font_normal {
+  font-weight: normal;
+}
+
+#klgxvctcfp .gt_font_bold {
+  font-weight: bold;
+}
+
+#klgxvctcfp .gt_font_italic {
+  font-style: italic;
+}
+
+#klgxvctcfp .gt_super {
+  font-size: 65%;
+}
+
+#klgxvctcfp .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#klgxvctcfp .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#klgxvctcfp .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#klgxvctcfp .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#klgxvctcfp .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#klgxvctcfp .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#klgxvctcfp .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Variables">Variables</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Adjusted OR - final model (95% CI)">Adjusted OR - final model (95% CI)</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Variables" class="gt_row gt_left">age</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">1.07 (1.03-1.11, p&lt;0.001)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">sexmale</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">5.52 (2.88-11.07, p&lt;0.001)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">chest_painatypical angina</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">0.82 (0.24-2.82, p=0.743)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">chest_painnon-anginal pain</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">0.93 (0.32-2.90, p=0.903)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">chest_painasymptomatic</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">9.48 (3.47-28.53, p&lt;0.001)</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p><br></p>
+<p>Note that you have to manually select the variables (the package will not choose for you unfortunately). The selection could be done preliminary thanks to a stepwise procedure for example.</p>
+<p>Now the most interesting part of this package:</p>
+<ul>
+<li>we can combine all these results together,</li>
+<li>in addition to some descriptive statistics for each level of the dependent variable!</li>
+</ul>
+<p>Here are all results combined together and displayed in a table:</p>
+<pre class="r"><code># save descriptive statistics
+summary &lt;- dat |&gt;
+  summary_factorlist(dependent, independent, fit_id = TRUE)
+
+# save results of regressions
+output &lt;- summary |&gt;
+  finalfit_merge(glmuni) |&gt;
+  finalfit_merge(glmmulti_full) |&gt;
+  finalfit_merge(glmmulti_final)
+
+# print all results
+output |&gt;
+  dplyr::select(-fit_id, -index) |&gt;
+  dplyr::rename(
+    Variables = label,
+    &quot; &quot; = levels
+  ) |&gt;
+  gt()</code></pre>
+<div id="szrjblstrk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#szrjblstrk table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#szrjblstrk thead, #szrjblstrk tbody, #szrjblstrk tfoot, #szrjblstrk tr, #szrjblstrk td, #szrjblstrk th {
+  border-style: none;
+}
+
+#szrjblstrk p {
+  margin: 0;
+  padding: 0;
+}
+
+#szrjblstrk .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#szrjblstrk .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#szrjblstrk .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#szrjblstrk .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#szrjblstrk .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#szrjblstrk .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#szrjblstrk .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#szrjblstrk .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#szrjblstrk .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#szrjblstrk .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#szrjblstrk .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#szrjblstrk .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#szrjblstrk .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#szrjblstrk .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#szrjblstrk .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#szrjblstrk .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#szrjblstrk .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#szrjblstrk .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#szrjblstrk .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#szrjblstrk .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#szrjblstrk .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#szrjblstrk .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#szrjblstrk .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#szrjblstrk .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#szrjblstrk .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#szrjblstrk .gt_left {
+  text-align: left;
+}
+
+#szrjblstrk .gt_center {
+  text-align: center;
+}
+
+#szrjblstrk .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#szrjblstrk .gt_font_normal {
+  font-weight: normal;
+}
+
+#szrjblstrk .gt_font_bold {
+  font-weight: bold;
+}
+
+#szrjblstrk .gt_font_italic {
+  font-style: italic;
+}
+
+#szrjblstrk .gt_super {
+  font-size: 65%;
+}
+
+#szrjblstrk .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#szrjblstrk .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#szrjblstrk .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#szrjblstrk .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#szrjblstrk .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#szrjblstrk .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#szrjblstrk .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Variables">Variables</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id=" "> </th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="no disease">no disease</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="disease">disease</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Crude OR (95% CI)">Crude OR (95% CI)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Adjusted OR - full model">Adjusted OR - full model</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Adjusted OR - final model (95% CI)">Adjusted OR - final model (95% CI)</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Variables" class="gt_row gt_left">age</td>
+<td headers="" class="gt_row gt_left">Mean (SD)</td>
+<td headers="no disease" class="gt_row gt_right">52.6 (9.6)</td>
+<td headers="disease" class="gt_row gt_right">56.8 (7.9)</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">1.05 (1.03-1.08, p&lt;0.001)</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">1.04 (1.01-1.08, p=0.024)</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">1.07 (1.03-1.11, p&lt;0.001)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">sex</td>
+<td headers="" class="gt_row gt_left">female</td>
+<td headers="no disease" class="gt_row gt_right">71 (44.4)</td>
+<td headers="disease" class="gt_row gt_right">25 (18.2)</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">-</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">-</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">-</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left"></td>
+<td headers="" class="gt_row gt_left">male</td>
+<td headers="no disease" class="gt_row gt_right">89 (55.6)</td>
+<td headers="disease" class="gt_row gt_right">112 (81.8)</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">3.57 (2.12-6.18, p&lt;0.001)</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">5.40 (2.78-10.97, p&lt;0.001)</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">5.52 (2.88-11.07, p&lt;0.001)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">chest_pain</td>
+<td headers="" class="gt_row gt_left">typical angina</td>
+<td headers="no disease" class="gt_row gt_right">16 (10.0)</td>
+<td headers="disease" class="gt_row gt_right">7 (5.1)</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">-</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">-</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">-</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left"></td>
+<td headers="" class="gt_row gt_left">atypical angina</td>
+<td headers="no disease" class="gt_row gt_right">40 (25.0)</td>
+<td headers="disease" class="gt_row gt_right">9 (6.6)</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">0.51 (0.16-1.66, p=0.255)</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">0.89 (0.25-3.19, p=0.851)</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">0.82 (0.24-2.82, p=0.743)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left"></td>
+<td headers="" class="gt_row gt_left">non-anginal pain</td>
+<td headers="no disease" class="gt_row gt_right">65 (40.6)</td>
+<td headers="disease" class="gt_row gt_right">18 (13.1)</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">0.63 (0.23-1.86, p=0.384)</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">0.88 (0.29-2.81, p=0.828)</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">0.93 (0.32-2.90, p=0.903)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left"></td>
+<td headers="" class="gt_row gt_left">asymptomatic</td>
+<td headers="no disease" class="gt_row gt_right">39 (24.4)</td>
+<td headers="disease" class="gt_row gt_right">103 (75.2)</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">6.04 (2.39-16.76, p&lt;0.001)</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">7.13 (2.51-22.03, p&lt;0.001)</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">9.48 (3.47-28.53, p&lt;0.001)</td></tr>
+    <tr><td headers="Variables" class="gt_row gt_left">max_heartrate</td>
+<td headers="" class="gt_row gt_left">Mean (SD)</td>
+<td headers="no disease" class="gt_row gt_right">158.6 (19.0)</td>
+<td headers="disease" class="gt_row gt_right">139.1 (22.7)</td>
+<td headers="Crude OR (95% CI)" class="gt_row gt_left">0.96 (0.94-0.97, p&lt;0.001)</td>
+<td headers="Adjusted OR - full model" class="gt_row gt_left">0.97 (0.95-0.99, p&lt;0.001)</td>
+<td headers="Adjusted OR - final model (95% CI)" class="gt_row gt_left">-</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p><br></p>
+<p>A few remarks regarding this code:</p>
+<ul>
+<li><code>summary_factorlist(dependent, independent, fit_id = TRUE)</code> is used to compute the descriptive statistics by group of the dependent variable.</li>
+<li><code>finalfit_merge()</code> is used to merge results together.</li>
+<li><code>dplyr::select(-fit_id, -index)</code> is used to remove unnecessary columns.</li>
+<li><code>dplyr::rename(Variables = label, " " = levels)</code> is used to renames some columns.</li>
+</ul>
+<p>And finally, a few remarks regarding the resulting table:</p>
+<ul>
+<li>The first column gives the name of the variables.</li>
+<li>The second column specifies:
+<ul>
+<li>for qualitative variables: the levels</li>
+<li>for quantitative variables: that it is the mean and the standard deviation (SD) which will be computed in the next two columns</li>
+</ul></li>
+<li>The third and fourth columns give the descriptive statistics for each level of the dependent variable:
+<ul>
+<li>for qualitative variables: the number of cases, and in parentheses the frequencies by column</li>
+<li>for quantitative variables: the mean, and in parentheses the standard deviation</li>
+</ul></li>
+<li>The last three columns give the OR, and in parentheses the 95% CI of the OR and the <span class="math inline">\(p\)</span>-value (for the univariate and the two multivariate models, respectively).</li>
+</ul>
+<p>For your convenience, here is the full code so you can copy paste it easily in case you want to reproduce the process:</p>
+<pre class="r"><code># load packages
+library(tidyverse)
+library(gt)
+library(finalfit)
+
+# set variables
+dependent &lt;- &quot;heart_disease&quot;
+independent &lt;- c(&quot;age&quot;, &quot;sex&quot;, &quot;chest_pain&quot;, &quot;max_heartrate&quot;)
+independent_final &lt;- c(&quot;age&quot;, &quot;sex&quot;, &quot;chest_pain&quot;)
+
+# descriptive statistics
+summary &lt;- dat |&gt;
+  summary_factorlist(dependent, independent, fit_id = TRUE)
+
+# save merged results
+output &lt;- summary |&gt;
+  finalfit_merge(glmuni) |&gt;
+  finalfit_merge(glmmulti_full) |&gt;
+  finalfit_merge(glmmulti_final)
+
+# print all results
+output |&gt;
+  dplyr::select(-fit_id, -index) |&gt;
+  dplyr::rename(
+    Variables = label,
+    &quot; &quot; = levels
+  ) |&gt;
+  gt()</code></pre>
+<p>Last but not least, the <code>or_plot()</code> function, also available from the <code>{finalfit}</code> package, is useful to visualize all odds ratio and their 95% confidence intervals:</p>
+<pre class="r"><code>dat |&gt; or_plot(dependent, independent,
+  table_text_size = 3.5 # reduce text size
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-50-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Here is how to read this plot:</p>
+<ul>
+<li>The squares represent the OR, and the whiskers their 95% CI.</li>
+<li>When the 95% CI crosses the vertical dashed line, it means that the OR is not significantly different from 1 (at the 5% significance level). In these cases, we cannot reject the hypothesis of no association with the dependent variable.</li>
+<li>When the 95% CI does not cross the vertical dashed line, it means that the OR is significantly different from 1. In these cases:
+<ul>
+<li>if the square is located to the right of the vertical dashed line, there is a positive relationship between the outcome and the independent variable (known as a risk factor), and</li>
+<li>if the square is located to the left of the vertical dashed line, there is a negative relationship between the outcome and the independent variable (known as a protective factor).</li>
+</ul></li>
+</ul>
+<p>The plot confirms what was obtained above:</p>
+<ul>
+<li>age is a risk factor for heart disease,</li>
+<li>maximum heart rate achieved is a protective factor for heart disease, and</li>
+<li>being a male and suffering from asymptomatic chest pain are both risk factors of heart disease.</li>
+</ul>
+<p>Be careful that sometimes the square is too big to see the whiskers of the 95% CI. This is the case for the variables <code>max_heartrate</code> and <code>age</code>. In these cases, it is better to check the significance of the OR thanks to their 95% CI or the <span class="math inline">\(p\)</span>-values printed in parentheses.</p>
+</div>
+</div>
+<div id="conditions-of-application" class="section level2">
+<h2>Conditions of application</h2>
+<p>Recall that a linear regression requires:</p>
+<ol style="list-style-type: decimal">
+<li>the dependent variable to be quantitative continuous</li>
+<li>linearity of the relationships between the dependent and independent variables,</li>
+<li>independence of the observations,</li>
+<li>normality of the residuals,</li>
+<li>homoscedasticity of the residuals,</li>
+<li>no extreme influential points (known as <a href="/blog/outliers-detection-in-r/">outliers</a>), and</li>
+<li>no multicollinearity (for multiple linear regression only)</li>
+</ol>
+<p>For results to be valid and interpretable, a binary logistic regression requires:</p>
+<ol style="list-style-type: decimal">
+<li>the dependent variable to be binary,</li>
+<li>independence of the observations: no repeated measurements or matched data, otherwise generalize linear mixed effect models (GLMM) should be used,</li>
+<li>linearity of continuous independent variables and the log-odds outcome: take age and heart disease as an example. If heart disease is more frequent or less frequent as age rises, the model will work well. However, if children and the elderly are at high risk of having a heart disease, but those in middle years are not, then the relationship is not linear, or not monotonic, meaning that the response does not only go in one direction,</li>
+<li>a sufficiently large sample size (for confidence intervals and hypothesis tests to be valid), and</li>
+<li>no multicollinearity: independent variables should not be highly correlated with each other, otherwise coefficients and OR can become unstable.</li>
+</ol>
+<p>Here is how to verify each of them:</p>
+<ol style="list-style-type: decimal">
+<li>this is obvious; check if the dependent variable has indeed only two levels,</li>
+<li>this is often not tested formally, but verified through the design of the experiment,</li>
+<li>quantitative independent variables should have a linear relationship between their log-odds and their observed values. A visual check is sufficient, see below with age, maximum heart rate achieved and model <code>m3</code> as example:</li>
+</ol>
+<pre class="r"><code># linearity to the log-odds?
+dat |&gt;
+  dplyr::select(age, max_heartrate) |&gt;
+  mutate(log_odds = predict(m3)) |&gt;
+  pivot_longer(-log_odds) |&gt;
+  ggplot(aes(log_odds, value)) +
+  geom_point() +
+  geom_smooth(method = &quot;lm&quot;) +
+  facet_wrap(~name)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-51-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<ol start="4" style="list-style-type: decimal">
+<li>in practice, it is recommended to have at least 10 times as many events as parameters in the model, and</li>
+<li>the variance inflation factors (VIF) is a well known measure of multicollinearity. It should be below 10 or 5, depending on the field of research. VIF can be computed with the <code>vif()</code> function, available in the <code>{car}</code> package:</li>
+</ol>
+<pre class="r"><code># load package
+library(car)
+
+# compute VIF for model m3
+vif(m3)</code></pre>
+<pre><code>##                   GVIF Df GVIF^(1/(2*Df))
+## age           1.205246  1        1.097837
+## sex           1.155071  1        1.074742
+## chest_pain    1.113010  3        1.018005
+## max_heartrate 1.143125  1        1.069170</code></pre>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Thanks for reading.</p>
+<p>In this relatively long and detailed post, we covered several important points about binary logistic regression. First, when to use such models and what is the difference with linear models, how to implement it in R, and how to interpret and report results. We ended by discussing about model selection, how to judge the quality of fit of a logistic regression, and its underlying assumptions.</p>
+<p>I now hope that (univariate and multivariate) binary logistic regressions in R no longer hold any secrets for you.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>Thanks to Claire from DellaData.fr for introducing me to this package.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

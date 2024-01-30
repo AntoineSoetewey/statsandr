@@ -7,7 +7,7 @@ categories: []
 tags:
   - R
   - Statistics
-  - Linear regression
+  - Regression
 meta_img: blog/multiple-linear-regression-made-simple/images/multiple-linear-regression.jpeg
 description: Learn how to run multiple and simple linear regression in R, how to interpret the results and how to verify the conditions of application
 output:
@@ -601,7 +601,7 @@ ggplot(dat, aes(x = disp, y = mpg)) +
 <li><span class="math inline">\(0 &lt; R^2 &lt; 1\)</span>: the model explains part of the variability</li>
 <li>the higher the <span class="math inline">\(R^2\)</span>, the better the model explains the dependent variable. As a rule of thumb, a <span class="math inline">\(R^2 &gt; 0.7\)</span> indicates a good fit of the model<a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a></li>
 </ul>
-<p>Note that in a simple linear regression model, the coefficient of determination is equal to the square of the <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation coefficient</a>:</p>
+<p>Note that in a simple linear regression model, the coefficient of determination is equal to the square of the Pearson <a href="/blog/correlation-coefficient-and-correlation-test-in-r/">correlation coefficient</a>:</p>
 <p><span class="math display">\[R^2 = corr(X, Y)^2\]</span></p>
 <p>Applied on our <code>model2</code> with miles/gallon as dependent variable, and weight, horsepower and displacement as independent variables, we have:</p>
 <pre class="r"><code>summary(model2)</code></pre>
@@ -754,13 +754,25 @@ model_parameters(model4, summary = TRUE)</code></pre>
 
 print_html(model_parameters(model4, summary = TRUE))</code></pre>
 <div id="yywrdylzvd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+<style>#yywrdylzvd table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#yywrdylzvd thead, #yywrdylzvd tbody, #yywrdylzvd tfoot, #yywrdylzvd tr, #yywrdylzvd td, #yywrdylzvd th {
+  border-style: none;
+}
+
+#yywrdylzvd p {
+  margin: 0;
+  padding: 0;
 }
 
 #yywrdylzvd .gt_table {
   display: table;
   border-collapse: collapse;
+  line-height: normal;
   margin-left: auto;
   margin-right: auto;
   color: #333333;
@@ -781,18 +793,6 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
   border-left-style: none;
   border-left-width: 2px;
   border-left-color: #D3D3D3;
-}
-
-#yywrdylzvd .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
 }
 
 #yywrdylzvd .gt_caption {
@@ -816,12 +816,24 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
   color: #333333;
   font-size: 85%;
   font-weight: initial;
-  padding-top: 0;
-  padding-bottom: 6px;
+  padding-top: 3px;
+  padding-bottom: 5px;
   padding-left: 5px;
   padding-right: 5px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
+}
+
+#yywrdylzvd .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
 }
 
 #yywrdylzvd .gt_bottom_border {
@@ -895,6 +907,10 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
   overflow-x: hidden;
   display: inline-block;
   width: 100%;
+}
+
+#yywrdylzvd .gt_spanner_row {
+  border-bottom-style: hidden;
 }
 
 #yywrdylzvd .gt_group_heading {
@@ -996,6 +1012,10 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
   border-top-width: 2px;
 }
 
+#yywrdylzvd .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
 #yywrdylzvd .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
@@ -1045,6 +1065,16 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
   border-top-color: #D3D3D3;
 }
 
+#yywrdylzvd .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
 #yywrdylzvd .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
@@ -1075,8 +1105,8 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
 #yywrdylzvd .gt_footnote {
   margin: 0px;
   font-size: 90%;
-  padding-left: 4px;
-  padding-right: 4px;
+  padding-top: 4px;
+  padding-bottom: 4px;
   padding-left: 5px;
   padding-right: 5px;
 }
@@ -1133,10 +1163,9 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
 }
 
 #yywrdylzvd .gt_footnote_marks {
-  font-style: italic;
-  font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
+  position: initial;
 }
 
 #yywrdylzvd .gt_asterisk {
@@ -1164,10 +1193,10 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
   text-indent: 25px;
 }
 </style>
-<table class="gt_table">
-  
-  <thead class="gt_col_headings">
-    <tr>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
       <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Parameter">Parameter</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Coefficient">Coefficient</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="SE">SE</th>
@@ -1218,7 +1247,7 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
 <pre class="r"><code>library(report)
 
 report(model4)[1]</code></pre>
-<pre><code>## [1] &quot;We fitted a linear model (estimated using OLS) to predict mpg with wt, qsec and am (formula: mpg ~ wt + qsec + am). The model explains a statistically significant and substantial proportion of variance (R2 = 0.85, F(3, 28) = 52.75, p &lt; .001, adj. R2 = 0.83). The model&#39;s intercept, corresponding to wt = 0, qsec = 0 and am = Automatic, is at 9.62 (95% CI [-4.64, 23.87], t(28) = 1.38, p = 0.178).\n\nStandardized parameters were obtained by fitting the model on a standardized version of the dataset. 95% Confidence Intervals (CIs) and p-values were computed using a Wald t-distribution approximation.&quot;</code></pre>
+<pre><code>## [1] &quot;We fitted a linear model (estimated using OLS) to predict mpg with wt, qsec and am (formula: mpg ~ wt + qsec + am). The model explains a statistically significant and substantial proportion of variance (R2 = 0.85, F(3, 28) = 52.75, p &lt; .001, adj. R2 = 0.83). The model&#39;s intercept, corresponding to wt = 0, qsec = 0 and am = Automatic, is at 9.62 (95% CI [-4.64, 23.87], t(28) = 1.38, p = 0.178). Within this model:\n\n  - The effect of wt is statistically significant and negative (beta = -3.92, 95% CI [-5.37, -2.46], t(28) = -5.51, p &lt; .001; Std. beta = -0.64, 95% CI [-0.87, -0.40])\n  - The effect of qsec is statistically significant and positive (beta = 1.23, 95% CI [0.63, 1.82], t(28) = 4.25, p &lt; .001; Std. beta = 0.36, 95% CI [0.19, 0.54])\n  - The effect of am [Manual] is statistically significant and positive (beta = 2.94, 95% CI [0.05, 5.83], t(28) = 2.08, p = 0.047; Std. beta = 0.49, 95% CI [7.59e-03, 0.97])\n\nStandardized parameters were obtained by fitting the model on a standardized version of the dataset. 95% Confidence Intervals (CIs) and p-values were computed using a Wald t-distribution approximation.&quot;</code></pre>
 <p>Note that the function also works for dataframes, <a href="/blog/what-statistical-test-should-i-do/">statistical tests</a> and other models.</p>
 </div>
 <div id="predictions" class="section level3">
