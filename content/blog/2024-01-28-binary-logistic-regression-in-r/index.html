@@ -62,18 +62,33 @@ output:
 <h1>Introduction</h1>
 <p>Regression is a common tool in statistics to test and quantify relationships between variables.</p>
 <p>The two most common regressions are linear and logistic regressions. A <strong>linear</strong> regression is used when the dependent variable is <strong>quantitative</strong>, whereas a <strong>logistic</strong> regression is used when the dependent variable is <strong>qualitative</strong>.</p>
-<p>Both linear and logistic regressions are divided into different types:</p>
+<p>Both linear and logistic regressions are divided into different types. Before detailing them, let’s first recap of which type a variable can be:</p>
+<ul>
+<li>A quantitative variable measures a quantity, the values it can take are numbers. It is divided into:
+<ul>
+<li>discrete: the values it can take are countable and have a finite number of possibilities (the values are often integers, for example the number of children), and</li>
+<li>continuous: the values it can take are not countable and have an infinite number of possibilities (the values are usually with decimals, or at least decimals are technically possible, for example the weight).</li>
+</ul></li>
+<li>A qualitative variable (also known as categorical) is not numerical and its values fit into categories. It is also divided into two types:
+<ul>
+<li>nominal: no ordering is possible or implied in the categories (for example the sex), and</li>
+<li>ordinal: an order is implied in the categories (for example the health status, such as poor/reasonable/good).</li>
+</ul></li>
+</ul>
+<p>A <strong>binary</strong> variable, also known as dichotomous, is a special case of qualitative nominal variable when there are <strong>only two categories</strong>.</p>
+<p>See more details and examples about <a href="/blog/variable-types-and-examples/">variable types</a> if needed.</p>
+<p>Now that the types of a variable is clear, let’s summarize the different types of regression:</p>
 <ul>
 <li>Linear regression:
 <ul>
-<li><strong>Simple</strong> linear regression is used when the goal is to estimate the relationship between a dependent variable (also often called outcome or response variable) and <strong>only one</strong> independent variable (also often called explanatory variable, covariate or predictor).</li>
-<li><strong>Multiple</strong> linear regression is used when the goal is to estimate the relationship between a dependent variable and <strong>two or more</strong> independent variables.</li>
+<li><strong>Simple</strong> linear regression is used when the goal is to estimate the relationship between a quantitative continuous dependent variable (also often called outcome or response variable) and <strong>only one</strong> independent variable (also often called explanatory variable, covariate or predictor) of any type.</li>
+<li><strong>Multiple</strong> linear regression is used when the goal is to estimate the relationship between a quantitative continuous dependent variable and <strong>two or more</strong> independent variables (again, of any type).</li>
 </ul></li>
 <li>Logistic regression:
 <ul>
-<li><strong>Binary</strong> logistic regression is used when the goal is to estimate the relationship between a <strong>binary dependent variable</strong> (= two outcomes), and one or more independent variables.</li>
-<li><strong>Multinomial</strong> logistic regression is used when the goal is to estimate the relationship between a <strong>nominal dependent variable with three or more <em>unordered</em> outcomes</strong>, and one or more independent variables.</li>
-<li><strong>Ordinal</strong> logistic regression is used when the goal is to estimate the relationship between a <strong>nominal dependent variable with three or more <em>ordered</em> outcomes</strong>, and one or more independent variables.</li>
+<li><strong>Binary</strong> logistic regression is used when the goal is to estimate the relationship between a <strong>binary dependent variable</strong> (= two outcomes), and one or more independent variables (of any type).</li>
+<li><strong>Multinomial</strong> logistic regression is used when the goal is to estimate the relationship between a <strong>nominal dependent variable with three or more <em>unordered</em> outcomes</strong>, and one or more independent variables (of any type).</li>
+<li><strong>Ordinal</strong> logistic regression is used when the goal is to estimate the relationship between an <strong>ordinal dependent variable with three or more <em>ordered</em> outcomes</strong>, and one or more independent variables (of any type).</li>
 </ul></li>
 </ul>
 <p>Note that there exists another type of regression; the Poisson regression. This type of regression is used when the goal is to estimate the relationship between a dependent variable which is in the form of count data (number of occurrences of an event of interest over a given period of time or space, e.g., <span class="math inline">\(0, 1, 2, \ldots\)</span>), and one or more independent variables.</p>
@@ -83,7 +98,7 @@ output:
 <p>In this post, we will first explain when a logistic regression is more appropriate than a linear regression. We will then show how to perform a binary logistic regression in R, and how to interpret and report results. We will also present some plots in order to visualize results. Finally, we will cover the topics of model selection, quality of fit and underlying assumptions of a binary logistic regression. We will try to keep this tutorial as applied as possible by focusing on the applications in R and the interpretations. Mathematical details will be as concise as possible.</p>
 <div id="linear-versus-logistic-regression" class="section level2">
 <h2>Linear versus logistic regression</h2>
-<p>We know that a linear regression is a convenient way to estimate the relationship between a <a href="/blog/variable-types-and-examples/#continuous">quantitative continuous</a> dependent variable, and one or more independent variables (of any type).</p>
+<p>We know that a linear regression is a convenient way to estimate the relationship between a quantitative continuous dependent variable, and one or more independent variables (of any type).</p>
 <p>For instance, suppose we would like to estimate the relationship between two quantitative variables, <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>. Using the ordinary least squares method (the most common estimator used in linear regression), we obtain the following regression line:</p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Now suppose we are interested in estimating the impact of age on whether or not a patient has a certain disease. Age is considered as a quantitative continuous variable, while having the disease is binary (a patient is either ill or healthy).</p>
