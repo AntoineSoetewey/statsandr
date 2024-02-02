@@ -36,6 +36,8 @@ set.seed(42)
 library(pander)
 library(knitr)
 library(rmarkdown)
+library(modelsummary)
+library(gt)
 ```
 
 ![](images/what-is-survival-analysis.jpeg){width=100%}
@@ -63,7 +65,7 @@ I will show in detail how to apply these techniques in R with concrete examples.
 
 In survival analysis, we are interested in a certain event and want to **analyze the time until the event happens**.
 
-While the event of interest is often death (in this case we study the time to death for patients having a specific disease) or recurrence (in this case we study the time to relapse of a certain disease), it is not limited to the fields of medicine and epidemiology.
+While the event of interest is often death (in this case we study the time to death for patients having a specific disease) or recurrence (in this case we study the time to relapse of a certain disease), it is not limited to the medical field or epidemiology.
 
 In fact, it can be used in many domains. For example, we may also analyze the time until:
 
@@ -227,7 +229,7 @@ dat <- data.frame(
   event = c(0, 1, 1, 1, 0, 1, 1, 1, 1, 0)
 )
 
-dat
+gt(dat)
 ```
 
 where:
@@ -259,10 +261,8 @@ tab <- data.frame(
 )
 
 names(tab) <- c("$j$", "$y_{(j)}$", "$d_{(j)}$", "$R_{(j)}$", "$1 - \\frac{d_{(j)}}{R_{(j)}}$")
-pander(tab)
+datasummary_df(tab, fmt = 0)
 ```
-
-<br>
 
 We fill columns one by one:
 
@@ -277,10 +277,8 @@ So the table becomes:
 ```{r, echo = FALSE}
 tab[, 2] <- sort(unique(subset(dat, event == 1)$time))
 
-pander(tab)
+datasummary_df(tab, fmt = 0)
 ```
-
-<br>
 
 - $d_{(j)}$ = the number of observations for each distinct event time. For this, the frequency for each distinct event time is useful:
 
@@ -293,10 +291,8 @@ The table becomes:
 ```{r, echo = FALSE}
 tab[, 3] <- table(subset(dat, event == 1)$time)
 
-pander(tab)
+datasummary_df(tab, fmt = 0)
 ```
-
-<br>
 
 - $R_{(j)}$ = the remaining number of individuals at risk. For this, the distribution of time (censored and not censored) is useful:
 
@@ -317,20 +313,16 @@ The table becomes:
 ```{r, echo = FALSE}
 tab[, 4] <- c(10, 7, 5, 4, 3)
 
-pander(tab)
+datasummary_df(tab, fmt = 0)
 ```
-
-<br>
 
 - $1 - \frac{d_{(j)}}{R_{(j)}}$ is straightforward, so the table becomes:
 
 ```{r, echo = FALSE}
 tab[, 5] <- round((1 - (tab[, 3] / tab[, 4])), 3)
 
-pander(tab)
+datasummary_df(tab)
 ```
-
-<br>
 
 The Kaplan-Meier estimator is:
 
@@ -350,10 +342,8 @@ So finally, we have the survival probabilities (rounded to 3 digits):
 tab[, 6] <- round(cumprod(tab[, 5]), 3)
 
 names(tab)[6] <- "$\\hat{S}_{KM}(t)$"
-pander(tab[, c(1, 5, 6)])
+datasummary_df(tab[, c(1, 5, 6)])
 ```
-
-<br>
 
 We can now represent graphically the Kaplan-Meier estimator:
 
