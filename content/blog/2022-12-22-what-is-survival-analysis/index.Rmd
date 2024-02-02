@@ -71,7 +71,7 @@ In fact, it can be used in many domains. For example, we may also analyze the ti
 
 * getting cured from a certain disease
 * finding a new job after a period of unemployment
-* being arrested again after being released from jail
+* being arrested again after having been released from jail
 * the first pregnancy
 * the failure of a mechanical system or a machine
 * a bank or a company goes bankrupt
@@ -81,24 +81,24 @@ In fact, it can be used in many domains. For example, we may also analyze the ti
 * an employee leaves the company
 * etc.
 
-As you can see, the event of interest does not necessarily have to be the death or a disease, but in all situations **we are interested in the time until a specific event occurs**.
+As you can see, the event of interest does not necessarily have to be the death or the occurrence of a disease, but in all situations **we are interested in analyzing the time until a specific event occurs**.
 
 # Why do we need special methods for survival analysis?
 
 Survival data, also referred as time-to-event data, requires a special set of statistical methods for three main reasons:
 
-* **Duration times** are **always positive**: the time until an event of interest takes place cannot be less than 0.
+* **Duration times** are **always positive**: the time until an event of interest occurs cannot be less than 0.
 * **Different measures** are of interest depending on the research question, context, etc. For instance, we could be interested in:
-  + The **probability** that a cancer patient survives longer than 5 years?
+  + The **probability** that a cancer patient survives longer than 5 years after diagnosis?
   + The typical **waiting time** for a cab to arrive after having called the taxi company?
-  + **How many**, out of 100 unemployed people, are expected to have a job again after 2 months?
+  + **How many**, out of 100 unemployed people, are expected to have a job again after 2 months of unemployment?
 * **Censoring** is almost always an issue:
   + Most of the time, the event occurred before the end of the study and the survival duration is known.
   + However, sometimes, the event is not yet observed at the end of the study. Suppose that we study the time until death of patients with breast cancer. Luckily, some patients will not die before the end of the study.
-  + Other times, another event takes place before the event of interest. For example, a cancer patient may die from a car accident.
+  + Other times, another event occurs before the event of interest which prevents it from ever happening. For example, a cancer patient may die from a car accident.
   + And even sometimes the patient withdraws from the study or moves to another country so we cannot observe her survival time (this is known as lost to follow up or drop out).
   + Censoring can be seen, in some sense, as a type of missing data.
-  + For these reasons, many "standard" [descriptive statistics](/blog/descriptive-statistics-in-r/), [hypothesis tests](/blog/hypothesis-test-by-hand/) and [regression models](/blog/multiple-linear-regression-made-simple/) are not appropriate for this kind of data. Specific statistical methods are required to take into account the fact that we miss the *exact* survival duration for some patients. We know that they survived a certain amount of time (until the end of the study or until the time of withdrawal), but we do not know their exact survival time.
+  + For these reasons, many "standard" statistical tools such as [descriptive statistics](/blog/descriptive-statistics-in-r/), [hypothesis tests](/blog/hypothesis-test-by-hand/) and [regression models](/blog/multiple-linear-regression-made-simple/) are not appropriate for this kind of data. Specific statistical methods are required to take into account the fact that the *exact* survival duration for some patients is missing. It is known that they survived a certain amount of time (until the end of the study or until the time of withdrawal), but their exact survival time is unknown.
   
 For your information, when the event is not yet observed at the end of the study (i.e., the survival duration is greater than the observed duration), this is referred as right-censoring. On the other hand, left-censoring occurs if a participant is entered into the study when the event of interest occurred prior to study entry but we do not know exactly when. Of course, we would like to analyze all available data, including information about censored patients.
 
@@ -125,7 +125,7 @@ $S(t)$ represents, for each time $t$, the probability that the time until the ev
 In the context of our examples mentioned above, it gives the probability that:
 
 - a randomly selected patient will survive beyond time $t$,
-- the cab takes more than $t$ minutes to arrive, or
+- a cab takes more than $t$ minutes to arrive, or
 - an unemployed person take more than $t$ months to find a new job.
 
 The survival function $S(t)$ is:
@@ -168,7 +168,7 @@ require("survival")
 plot(survfit(Surv(survival_times, rep(1, length(survival_times)))~1), xlab="Time", ylab="Survival probability", conf.int = FALSE)
 ```
 
-The curve shows the proportion of individuals (or experimental units) who, as time goes on, have not experienced an event. As time progresses, events occur, so the proportion who have not experienced the event decreases.
+The curve shows the proportion of individuals (or experimental units) who, as time goes on, have not experienced the event of interest. As time progresses, events occur, so the proportion who have not experienced the event decreases.
 
 ## Cumulative hazard function
 
@@ -216,7 +216,7 @@ The advantages of the Kaplan-Meier estimator are that:
 - it is a nonparametric estimator, so it constructs a survival curve from the data and no assumptions is made about the shape of the underlying distribution
 - it gives a graphical representation of the survival function(s), useful for illustrative purposes
 
-Note that an important assumption for the estimation to hold is that censoring is independent of the occurrence of events. We say that censoring is non-informative, that is, censored subjects have the same survival prospects as subjects that are not censored and continue to be followed.
+Note that an important assumption for the estimation to hold is that censoring is independent of the occurrence of events. We say that censoring is non-informative, that is, censored subjects have the same survival prospects as subjects who are not censored and who continue to be followed.
 
 ## By hand
 
