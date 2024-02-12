@@ -9,7 +9,7 @@ tags:
   - R
   - Statistics
 meta_img: blog/binary-logistic-regression-in-r/images/binary-logistic-regression-in-r.jpeg
-description: Learn when and how to use a (univariate and multivariate) binary logistic regression in R. Learn also how to interpret, visualize and report results
+description: Learn when and how to use a (univariable and multivariable) binary logistic regression in R. Learn also how to interpret, visualize and report results
 output:
   blogdown::html_page:
     toc: true
@@ -24,17 +24,17 @@ output:
 <li><a href="#introduction" id="toc-introduction">Introduction</a>
 <ul>
 <li><a href="#linear-versus-logistic-regression" id="toc-linear-versus-logistic-regression">Linear versus logistic regression</a></li>
-<li><a href="#univariate-versus-multivariate-logistic-regression" id="toc-univariate-versus-multivariate-logistic-regression">Univariate versus multivariate logistic regression</a></li>
+<li><a href="#univariable-versus-multivariable-logistic-regression" id="toc-univariable-versus-multivariable-logistic-regression">Univariable versus multivariable logistic regression</a></li>
 </ul></li>
 <li><a href="#data" id="toc-data">Data</a></li>
 <li><a href="#binary-logistic-regression-in-r" id="toc-binary-logistic-regression-in-r">Binary logistic regression in R</a>
 <ul>
-<li><a href="#univariate-binary-logistic-regression" id="toc-univariate-binary-logistic-regression">Univariate binary logistic regression</a>
+<li><a href="#univariable-binary-logistic-regression" id="toc-univariable-binary-logistic-regression">Univariable binary logistic regression</a>
 <ul>
 <li><a href="#quantitative-independent-variable" id="toc-quantitative-independent-variable">Quantitative independent variable</a></li>
 <li><a href="#qualitative-independent-variable" id="toc-qualitative-independent-variable">Qualitative independent variable</a></li>
 </ul></li>
-<li><a href="#multivariate-binary-logistic-regression" id="toc-multivariate-binary-logistic-regression">Multivariate binary logistic regression</a></li>
+<li><a href="#multivariable-binary-logistic-regression" id="toc-multivariable-binary-logistic-regression">Multivariable binary logistic regression</a></li>
 <li><a href="#interaction" id="toc-interaction">Interaction</a></li>
 <li><a href="#model-selection" id="toc-model-selection">Model selection</a></li>
 <li><a href="#quality-of-a-model" id="toc-quality-of-a-model">Quality of a model</a>
@@ -137,21 +137,22 @@ output:
 <li>etc.</li>
 </ul>
 </div>
-<div id="univariate-versus-multivariate-logistic-regression" class="section level2">
-<h2>Univariate versus multivariate logistic regression</h2>
-<p>Now that it is more clear when a binary logistic regression should be used, we show how to perform one in R. We start by presenting univariate binary logistic regressions, and then multivariate binary logistic regressions.</p>
-<p>Remember that in both cases, the dependent variable must be a qualitative variable with two outcomes (hence the name <em>binary</em> logistic regression). The difference between a univariate and multivariate binary logistic regression lies in the fact that:</p>
+<div id="univariable-versus-multivariable-logistic-regression" class="section level2">
+<h2>Univariable versus multivariable logistic regression</h2>
+<p>Now that it is more clear when a binary logistic regression should be used, we show how to perform one in R. We start by presenting univariable binary logistic regressions, and then multivariable binary logistic regressions.</p>
+<p>Remember that in both cases, the dependent variable must be a qualitative variable with two outcomes (hence the name <em>binary</em> logistic regression). The difference between a univariable and multivariable binary logistic regression lies in the fact that:</p>
 <ul>
-<li>for a <strong>univariate</strong> binary logistic regression, there is only <strong>one independent variable</strong>, while</li>
-<li>for a <strong>multivariate</strong> binary logistic regression, there are <strong>two ore more independent variables</strong>.</li>
+<li>for a <strong>univariable</strong> binary logistic regression, there is only <strong>one independent variable</strong>, while</li>
+<li>for a <strong>multivariable</strong> binary logistic regression, there are <strong>two ore more independent variables</strong>.</li>
 </ul>
-<p>It is true that the term “univariate” may be confusing here because there are two variables in the model (i.e., one dependent variable and one independent variable), while in statistics univariate usually refers to only one variable at a time. However, it is called univariate binary logistic regression to indicate that only one independent variable is considered in the model, as opposed to multivariate binary logistic regression where several independent variables are considered in the model.</p>
+<p>It is true that the term “univariable” may be confusing here because there are two variables in the model (i.e., one dependent variable and one independent variable). However, it is called univariable binary logistic regression to indicate that only one independent variable is considered in the model, as opposed to multivariable binary logistic regression where several independent variables are considered in the model.</p>
 <p>To draw a parallel with linear regression:</p>
 <ul>
-<li>a univariate binary logistic regression is the equivalent of a simple linear regression, whereas</li>
-<li>a multivariate binary logistic regression is the equivalent of a multiple linear regression</li>
+<li>a univariable binary logistic regression is the equivalent of a simple linear regression, whereas</li>
+<li>a multivariable binary logistic regression is the equivalent of a multiple linear regression</li>
 </ul>
 <p>when the dependent variable is binary instead of quantitative continuous.</p>
+<p>The terms univaria<em>ble</em>/multivaria<em>ble</em> should not be confused with univaria<em>te</em>/multivaria<em>te</em>. The number of dependent variables characterizes the model as univariate or multivariate; univariate refers to a model with only one dependent variable, while multivariate refers to a model that simultaneously predicts more than one dependent variables. Usually, the intent is to differentiate models based on the number of independent variables. This distinction is made thanks to the terms univariable and multivariable. Multivariable refers to a model relating multiple predictor variables to a dependent variable, whereas univariable refers to a model relating one single independent variable to a dependent variable.</p>
 </div>
 </div>
 <div id="data" class="section level1">
@@ -256,13 +257,13 @@ summary(dat)</code></pre>
 ##                  
 ##                  
 ## </code></pre>
-<p>The data frame is now ready to be analyzed further through univariate and multivariate binary logistic regressions.</p>
+<p>The data frame is now ready to be analyzed further through univariable and multivariable binary logistic regressions.</p>
 </div>
 <div id="binary-logistic-regression-in-r" class="section level1">
 <h1>Binary logistic regression in R</h1>
-<div id="univariate-binary-logistic-regression" class="section level2">
-<h2>Univariate binary logistic regression</h2>
-<p>As mentioned above, we start with a univariate binary logistic regression, that is, a binary logistic regression with only one independent variable.</p>
+<div id="univariable-binary-logistic-regression" class="section level2">
+<h2>Univariable binary logistic regression</h2>
+<p>As mentioned above, we start with a univariable binary logistic regression, that is, a binary logistic regression with only one independent variable.</p>
 <p>In R, a binary logistic regression can be done with the <code>glm()</code> function and the <code>family = "binomial"</code> argument. Similar to linear regression, the formula used inside the function must be written as <code>dependent variable ~ independent variable</code> (in this order!).</p>
 <p>While the dependent variable must be categorical with two levels, the independent variable can be of any type. However, interpretations differ depending on whether the independent variable is qualitative or quantitative.</p>
 <p>For completeness, we illustrate this type of regression with both a quantitative and a qualitative independent variable, starting with a quantitative independent variable.</p>
@@ -475,7 +476,7 @@ exp(coef(m2)[&quot;sexmale&quot;])</code></pre>
 exp(coef(m2)[1]) / (1 + exp(coef(m2)[1]))</code></pre>
 <pre><code>## (Intercept) 
 ##   0.2604167</code></pre>
-<p>The avid reader will notice that a univariate binary logistic regression with a qualitative independent variable will lead to the same conclusion than a <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a>:</p>
+<p>The avid reader will notice that a univariable binary logistic regression with a qualitative independent variable will lead to the same conclusion than a <a href="/blog/chi-square-test-of-independence-in-r/">Chi-square test of independence</a>:</p>
 <pre class="r"><code>chisq.test(table(dat$heart_disease, dat$sex))</code></pre>
 <pre><code>## 
 ## 	Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
@@ -483,8 +484,8 @@ exp(coef(m2)[1]) / (1 + exp(coef(m2)[1]))</code></pre>
 ## data:  table(dat$heart_disease, dat$sex)
 ## X-squared = 21.852, df = 1, p-value = 2.946e-06</code></pre>
 <p>Based on this test, we reject the null hypothesis of independence between the two variables and we thus conclude that there is a significant association between the sex and the presence of heart disease (<span class="math inline">\(p\)</span>-value &lt; 0.001).</p>
-<p>The advantage of a univariate binary logistic regression over a Chi-square test of independence is that it not only tests whether or not there is a significant association between the two variables, but it also <strong>estimates the direction and strength of this relationship</strong>.</p>
-<p>As for a univariate logistic regression with a quantitative independent variable, predictions can also be made with the <code>predict()</code> function. Suppose we would like to predict the probability of developing a heart disease for a male:</p>
+<p>The advantage of a univariable binary logistic regression over a Chi-square test of independence is that it not only tests whether or not there is a significant association between the two variables, but it also <strong>estimates the direction and strength of this relationship</strong>.</p>
+<p>As for a univariable logistic regression with a quantitative independent variable, predictions can also be made with the <code>predict()</code> function. Suppose we would like to predict the probability of developing a heart disease for a male:</p>
 <pre class="r"><code># predict probability to develop heart disease
 pred &lt;- predict(m2,
   newdata = data.frame(sex = c(&quot;male&quot;)),
@@ -513,11 +514,11 @@ plot_model(m2,
 </ul>
 </div>
 </div>
-<div id="multivariate-binary-logistic-regression" class="section level2">
-<h2>Multivariate binary logistic regression</h2>
-<p>The interpretation of the coefficients in multivariate logistic regression is similar to the interpretation in univariate regression, except that this time it estimates the multiplicative change in the odds in favor of <span class="math inline">\(Y = 1\)</span> when <span class="math inline">\(X\)</span> increases by 1 unit, <strong>while the other independent variables remain unchanged</strong>.</p>
+<div id="multivariable-binary-logistic-regression" class="section level2">
+<h2>Multivariable binary logistic regression</h2>
+<p>The interpretation of the coefficients in multivariable logistic regression is similar to the interpretation in univariable regression, except that this time it estimates the multiplicative change in the odds in favor of <span class="math inline">\(Y = 1\)</span> when <span class="math inline">\(X\)</span> increases by 1 unit, <strong>while the other independent variables remain unchanged</strong>.</p>
 <p>This is similar to multiple linear regression, where a coefficient gives the expected change of <span class="math inline">\(Y\)</span> for an increase of 1 unit of <span class="math inline">\(X\)</span>, while keeping all other variables constant.</p>
-<p>The main advantages of using a multivariate logistic regression compared to a univariate logistic regression are to:</p>
+<p>The main advantages of using a multivariable logistic regression compared to a univariable logistic regression are to:</p>
 <ul>
 <li>consider the simultaneous (rather than isolated) effect of independent variables,</li>
 <li>take into account potential confounding and/or interaction effects, and</li>
@@ -598,7 +599,7 @@ anova(m3_reduced, m3,
 <p>At the 5% significance level (see the <span class="math inline">\(p\)</span>-value at the right of the R output), we reject the null hypothesis and we conclude that the complete model is significantly better than the reduced model at explaining the presence of heart disease. This means that chest pain is significantly associated with heart disease (which was expected since the comparison between <code>typical angina</code> and <code>asymptomatic</code> was found to be significant).</p>
 <p>A comparison of two models via the LRT will be shown again later, when discussing about interactions.</p>
 <p>Now that we have shown that all four independent variables were significantly associated with the presence of heart disease, we can interpret the coefficients in order to know the direction of the relationships and most importantly, quantify the strength of these relationships.</p>
-<p>Like univariate binary logistic regression, it is easier to interpret these relationships through OR. But this time, we also print the 95% CI of the OR in addition to the OR (rounded to 3 decimals) so that we can easily see which ones are significantly different from 1:</p>
+<p>Like univariable binary logistic regression, it is easier to interpret these relationships through OR. But this time, we also print the 95% CI of the OR in addition to the OR (rounded to 3 decimals) so that we can easily see which ones are significantly different from 1:</p>
 <pre class="r"><code># OR and 95% CI
 round(exp(cbind(OR = coef(m3), confint(m3))), 3)</code></pre>
 <pre><code>##                               OR 2.5 % 97.5 %
@@ -817,13 +818,13 @@ summary(m5_final)</code></pre>
  
 </th>
 <th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
-heart_disease
+heart disease
 </th>
 <th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
-heart_disease
+heart disease
 </th>
 <th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
-heart_disease
+heart disease
 </th>
 </tr>
 <tr>
@@ -1731,11 +1732,11 @@ tbl_regression(m5_final, exponentiate = TRUE)</code></pre>
 <p>The <code>{finalfit}</code> package allows to report odds ratios, their confidence intervals and the <span class="math inline">\(p\)</span>-values in a very efficient way. Moreover, it is quite easy to do so for many regressions at the same time.</p>
 <p>Let me present the package by reporting results of:</p>
 <ul>
-<li>all univariate binary logistic regressions that are possible with the variables available in the data frame,</li>
-<li>a multivariate binary logistic regression that includes all variables available in the data frame, and</li>
-<li>a multivariate binary logistic regression that includes only some of the variables present in the data frame.</li>
+<li>all univariable binary logistic regressions that are possible with the variables available in the data frame,</li>
+<li>a multivariable binary logistic regression that includes all variables available in the data frame, and</li>
+<li>a multivariable binary logistic regression that includes only some of the variables present in the data frame.</li>
 </ul>
-<p>We start with all the possible univariate binary logistic regressions:</p>
+<p>We start with all the possible univariable binary logistic regressions:</p>
 <pre class="r"><code># load packages
 library(tidyverse)
 library(gt)
@@ -1745,7 +1746,7 @@ library(finalfit)
 dependent &lt;- &quot;heart_disease&quot;
 independent &lt;- c(&quot;age&quot;, &quot;sex&quot;, &quot;chest_pain&quot;, &quot;max_heartrate&quot;)
 
-# save results of univariate logistic regressions
+# save results of univariable logistic regressions
 glmuni &lt;- dat |&gt;
   glmuni(dependent, independent) |&gt;
   fit2df(
@@ -2226,13 +2227,13 @@ glmuni |&gt;
 <p><br></p>
 <p>A few remarks regarding this code:</p>
 <ul>
-<li><code>glmuni()</code> is used because we want to run univariate GLM.</li>
+<li><code>glmuni()</code> is used because we want to run univariable GLM.</li>
 <li><code>explanatory_name = "Variables"</code> is used to rename the first column (by default it is “explanatory”).</li>
-<li><code>estimate_name = "Crude OR"</code> is used to rename the second column and inform the reader that we are in the univariate case. In the univariate case, OR are often called crude OR because they are not adjusted for the effects of the other independent variables.</li>
+<li><code>estimate_name = "Crude OR"</code> is used to rename the second column and inform the reader that we are in the univariable case. In the univariable case, OR are often called crude OR because they are not adjusted for the effects of the other independent variables.</li>
 <li><code>estimate_suffix = " (95% CI)"</code> is used to specify that it is the 95% confidence intervals which are inside the parentheses.</li>
 <li>The <code>gt()</code> layer at the end of the code is not compulsory. It is just to make the output appears in a nice table instead of the usual format of R outputs. See more information about the <code>{gt}</code> package in its <a href="https://gt.rstudio.com/" target="_blank">documentation</a>.</li>
 </ul>
-<p>Here is how to report results of a multivariate binary logistic regression which includes all variables:</p>
+<p>Here is how to report results of a multivariable binary logistic regression which includes all variables:</p>
 <pre class="r"><code># save results of full model
 glmmulti_full &lt;- dat |&gt;
   glmmulti(dependent, independent) |&gt;
@@ -2713,10 +2714,10 @@ glmmulti_full |&gt;
 <p><br></p>
 <p>A few remarks regarding this code:</p>
 <ul>
-<li><code>glmmulti()</code> is used because we want to run multivariate GLM.</li>
-<li><code>estimate_name = "Adjusted OR - full model"</code> is used to remind the reader that we are in the multivariate case with all variables included. In the multivariate case, OR are often called adjusted OR because they are adjusted for the effects of the other independent variables.</li>
+<li><code>glmmulti()</code> is used because we want to run multivariable GLM.</li>
+<li><code>estimate_name = "Adjusted OR - full model"</code> is used to remind the reader that we are in the multivariable case with all variables included. In the multivariable case, OR are often called adjusted OR because they are adjusted for the effects of the other independent variables.</li>
 </ul>
-<p>Here is how to report results of a multivariate binary logistic regression which includes only a selection of variables:</p>
+<p>Here is how to report results of a multivariable binary logistic regression which includes only a selection of variables:</p>
 <pre class="r"><code># select the variables to be included in the final model
 independent_final &lt;- c(&quot;age&quot;, &quot;sex&quot;, &quot;chest_pain&quot;)
 
@@ -3758,7 +3759,7 @@ output |&gt;
 <li>for qualitative variables: the number of cases, and in parentheses the frequencies by column</li>
 <li>for quantitative variables: the mean, and in parentheses the standard deviation</li>
 </ul></li>
-<li>The last three columns give the OR, and in parentheses the 95% CI of the OR and the <span class="math inline">\(p\)</span>-value (for the univariate and the two multivariate models, respectively).</li>
+<li>The last three columns give the OR, and in parentheses the 95% CI of the OR and the <span class="math inline">\(p\)</span>-value (for the univariable and the two multivariable models, respectively).</li>
 </ul>
 <p>For your convenience, here is the full code so you can copy paste it easily in case you want to reproduce the process:</p>
 <pre class="r"><code># load packages
@@ -3859,7 +3860,7 @@ vif(m3)</code></pre>
 <h1>Conclusion</h1>
 <p>Thanks for reading.</p>
 <p>In this relatively long and detailed post, we covered several important points about binary logistic regression. First, when to use such models and what is the difference with linear models, how to implement it in R, and how to interpret and report results. We ended by discussing about model selection, how to judge the quality of fit of a logistic regression, and its underlying assumptions.</p>
-<p>I now hope that (univariate and multivariate) binary logistic regressions in R no longer hold any secrets for you.</p>
+<p>I now hope that (univariable and multivariable) binary logistic regressions in R no longer hold any secrets for you.</p>
 <p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
 </div>
 <div class="footnotes footnotes-end-of-document">
