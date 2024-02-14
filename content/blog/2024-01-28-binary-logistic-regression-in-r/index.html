@@ -3772,9 +3772,35 @@ dependent &lt;- &quot;heart_disease&quot;
 independent &lt;- c(&quot;age&quot;, &quot;sex&quot;, &quot;chest_pain&quot;, &quot;max_heartrate&quot;)
 independent_final &lt;- c(&quot;age&quot;, &quot;sex&quot;, &quot;chest_pain&quot;)
 
-# descriptive statistics
+# save descriptive statistics
 summary &lt;- dat |&gt;
   summary_factorlist(dependent, independent, fit_id = TRUE)
+
+# save results of univariable logistic regressions
+glmuni &lt;- dat |&gt;
+  glmuni(dependent, independent) |&gt;
+  fit2df(
+    explanatory_name = &quot;Variables&quot;,
+    estimate_name = &quot;Crude OR&quot;,
+    estimate_suffix = &quot; (95% CI)&quot;
+  )
+
+# save results of full model
+glmmulti_full &lt;- dat |&gt;
+  glmmulti(dependent, independent) |&gt;
+  fit2df(
+    explanatory_name = &quot;Variables&quot;,
+    estimate_name = &quot;Adjusted OR - full model&quot;,
+  )
+
+# save results of final model
+glmmulti_final &lt;- dat |&gt;
+  glmmulti(dependent, independent_final) |&gt;
+  fit2df(
+    explanatory_name = &quot;Variables&quot;,
+    estimate_name = &quot;Adjusted OR - final model&quot;,
+    estimate_suffix = &quot; (95% CI)&quot;
+  )
 
 # save merged results
 output &lt;- summary |&gt;

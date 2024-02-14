@@ -1224,9 +1224,35 @@ dependent <- "heart_disease"
 independent <- c("age", "sex", "chest_pain", "max_heartrate")
 independent_final <- c("age", "sex", "chest_pain")
 
-# descriptive statistics
+# save descriptive statistics
 summary <- dat |>
   summary_factorlist(dependent, independent, fit_id = TRUE)
+
+# save results of univariable logistic regressions
+glmuni <- dat |>
+  glmuni(dependent, independent) |>
+  fit2df(
+    explanatory_name = "Variables",
+    estimate_name = "Crude OR",
+    estimate_suffix = " (95% CI)"
+  )
+
+# save results of full model
+glmmulti_full <- dat |>
+  glmmulti(dependent, independent) |>
+  fit2df(
+    explanatory_name = "Variables",
+    estimate_name = "Adjusted OR - full model",
+  )
+
+# save results of final model
+glmmulti_final <- dat |>
+  glmmulti(dependent, independent_final) |>
+  fit2df(
+    explanatory_name = "Variables",
+    estimate_name = "Adjusted OR - final model",
+    estimate_suffix = " (95% CI)"
+  )
 
 # save merged results
 output <- summary |>
