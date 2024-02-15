@@ -165,7 +165,18 @@ random_survival_times = function(hazard_fn, n, max_time=10000){
 hazard_fn = function(t) 0.001 + t * 0.0001
 survival_times = random_survival_times(hazard_fn, 10000)
 require("survival")
-plot(survfit(Surv(survival_times, rep(1, length(survival_times)))~1), xlab="Time", ylab="Survival probability", conf.int = FALSE)
+
+fit <- survfit(Surv(survival_times, rep(1, length(survival_times)))~1)
+
+# plot(fit, xlab="Time", ylab="Survival probability", conf.int = FALSE)
+
+dat_plot <- data.frame(Time = fit$time,
+                       Surv = fit$surv)
+library(ggplot2)
+ggplot(dat_plot) +
+  aes(y = Surv, x = Time) +
+  geom_line() +
+  labs(y = "Survival probability")
 ```
 
 The curve shows the proportion of individuals (or experimental units) who, as time goes on, have not experienced the event of interest. As time progresses, events occur, so the proportion who have not experienced the event decreases.
