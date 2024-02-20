@@ -93,7 +93,7 @@ bibliography: bibliography.bib
 <h1>Why do we need special methods for survival analysis?</h1>
 <p>Survival data, also referred as time-to-event data, requires a special set of statistical methods for three main reasons:</p>
 <ul>
-<li><strong>Duration times</strong> are <strong>always positive</strong>: the time until an event of interest occurs cannot be less than 0.</li>
+<li><strong>Duration times</strong> are <strong>always positive</strong>: the time until an event of interest occurs cannot be less than 0. Moreover, the distribution of survival times is right-skewed.</li>
 <li><strong>Different measures</strong> are of interest depending on the research question, context, etc. For instance, we could be interested in:
 <ul>
 <li>The <strong>probability</strong> that a cancer patient survives longer than 5 years after diagnosis?</li>
@@ -102,15 +102,22 @@ bibliography: bibliography.bib
 </ul></li>
 <li><strong>Censoring</strong> is almost always an issue:
 <ul>
-<li>Most of the time, the event occurred before the end of the study and the survival duration is known.</li>
-<li>However, sometimes, the event is not yet observed at the end of the study. Suppose that we study the time until death of patients with breast cancer. Luckily, some patients will not die before the end of the study.</li>
-<li>Other times, another event occurs before the event of interest which prevents it from ever happening. For example, a cancer patient may die from a car accident.</li>
-<li>And even sometimes the patient withdraws from the study or moves to another country so we cannot observe her survival time (this is known as lost to follow up or drop out).</li>
+<li>When the event occurred before the end of the study, the survival time is known.</li>
+<li>However, sometimes, the event is not yet observed at the end of the study. Suppose that we study the time until death of patients with breast cancer. Luckily, some patients will not die before the end of the study.
+<!-- + Other times, another event occurs before the event of interest which prevents it from ever happening. For example, a cancer patient may die from a car accident. --></li>
+<li>It can also happen that the patient withdraws from the study or moves to another country (known as lost to follow up or drop out), or simply that the study ends while the patient is still alive.</li>
+<li>In all situations, his or her survival time cannot be observed because the event is not observed for the duration of the study.</li>
 <li>Censoring can be seen, in some sense, as a type of missing data.</li>
 <li>For these reasons, many “standard” statistical tools such as <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a>, <a href="/blog/hypothesis-test-by-hand/">hypothesis tests</a> and <a href="/blog/multiple-linear-regression-made-simple/">regression models</a> are not appropriate for this kind of data. Specific statistical methods are required to take into account the fact that the <em>exact</em> survival duration for some patients is missing. It is known that they survived a certain amount of time (until the end of the study or until the time of withdrawal), but their exact survival time is unknown.</li>
 </ul></li>
 </ul>
-<p>For your information, when the event is not yet observed at the end of the study (i.e., the survival duration is greater than the observed duration), this is referred as right-censoring. On the other hand, left-censoring occurs if a participant is entered into the study when the event of interest occurred prior to study entry but we do not know exactly when. Of course, we would like to analyze all available data, including information about censored patients.</p>
+<p>For your information, there are three types of censoring:</p>
+<ol style="list-style-type: decimal">
+<li>right-censoring (the most frequent),</li>
+<li>left-censoring (the least frequent) and</li>
+<li>interval-censoring.</li>
+</ol>
+<p>When the event is not yet observed at the end of the study (i.e., the survival time is greater than the observed duration), this is referred as right-censoring. Left-censoring occurs if a participant is entered into the study when the event of interest occurred prior to study entry but we do not know exactly when. Interval-censoring implies that the event occurred within a time interval (between two known dates, two visits, etc.); the exact moment of occurrence is not known. The goal is of course to analyze all available data, including information about censored patients.</p>
 <p>The goal of survival analysis is thus to model and describe time-to-event data in an appropriate way, taking the particularities of this type of data into account.</p>
 </div>
 <div id="common-functions-in-survival-analysis" class="section level1">
@@ -129,7 +136,7 @@ bibliography: bibliography.bib
 <p><span class="math inline">\(S(t)\)</span> represents, for each time <span class="math inline">\(t\)</span>, the probability that the time until the event is greater than this time <span class="math inline">\(t\)</span>. In other words, it models the probability that the event of interest happens <strong>after</strong> <span class="math inline">\(t\)</span>.</p>
 <p>In the context of our examples mentioned above, it gives the probability that:</p>
 <ul>
-<li>a randomly selected patient will survive beyond time <span class="math inline">\(t\)</span>,</li>
+<li>a randomly selected patient will survive beyond time <span class="math inline">\(t\)</span> or the proportion of patients still alive after time <span class="math inline">\(t\)</span>,</li>
 <li>a cab takes more than <span class="math inline">\(t\)</span> minutes to arrive, or</li>
 <li>an unemployed person take more than <span class="math inline">\(t\)</span> months to find a new job.</li>
 </ul>
@@ -137,7 +144,7 @@ bibliography: bibliography.bib
 <ul>
 <li>a decreasing function,</li>
 <li>taking values in <span class="math inline">\([0, 1]\)</span> (since it is a probability), and</li>
-<li>equal to 1 at <span class="math inline">\(t = 0\)</span> and 0 at <span class="math inline">\(t = \infty\)</span>.</li>
+<li>equal to 1 at <span class="math inline">\(t = 0\)</span> (i.e., <span class="math inline">\(S(0) = 1\)</span>) and 0 at <span class="math inline">\(t = \infty\)</span> (i.e., <span class="math inline">\(S(\infty) = 0\)</span>).</li>
 </ul>
 <p>Visually we have:</p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="100%" style="display: block; margin: auto;" /></p>
@@ -169,7 +176,7 @@ h(t) &amp;= \lim_{\Delta t \rightarrow 0} \frac{P(t \le T &lt; t + \Delta t | T 
 <li>positive function (not necessarily increasing or decreasing)</li>
 <li>the hazard function <span class="math inline">\(h(t)\)</span> can have many different shapes and is therefore a useful tool to summarize survival data</li>
 </ul>
-<p>In the example of cancer patients, <span class="math inline">\(h(t)\)</span> measures the instantaneous risk of dying right after time <span class="math inline">\(t\)</span> given the individual is alive at time <span class="math inline">\(t\)</span>.</p>
+<p>In the context of cancer research when death is the event of interest, <span class="math inline">\(h(t)\)</span> measures the instantaneous risk of dying right after time <span class="math inline">\(t\)</span> given the individual is alive at time <span class="math inline">\(t\)</span>.</p>
 <p>To link the hazard rate with the survival function; the survival curve represents the hazard rates. A steeper slope indicates a higher hazard rate because events happen more frequently, reducing the proportion of individuals who have not experienced the event at a faster rate. On the contrary, a gradual and flatter slope indicates a lower hazard rate because events occur less frequently, reducing the proportion of individuals who have not experiences the event at a slower rate.</p>
 <p>Note that, in contrast to the survival function which focuses on not having an event, the hazard function focuses on the event occurring.</p>
 </div>
@@ -183,7 +190,7 @@ h(t) &amp;= \lim_{\Delta t \rightarrow 0} \frac{P(t \le T &lt; t + \Delta t | T 
 <li>it is a nonparametric estimator, so it constructs a survival curve from the data and no assumptions is made about the shape of the underlying distribution</li>
 <li>it gives a graphical representation of the survival function(s), useful for illustrative purposes</li>
 </ul>
-<p>Note that an important assumption for the estimation to hold is that censoring is independent of the occurrence of events. We say that censoring is non-informative, that is, censored subjects have the same survival prospects as subjects who are not censored and who continue to be followed.</p>
+<p>The principle behind this estimator is that surviving beyond time <span class="math inline">\(t_i\)</span> implies surviving beyond time <span class="math inline">\(t_{i-1}\)</span> and surviving at time <span class="math inline">\(t_i\)</span>. Note that an important assumption for the estimation to hold is that censoring is independent of the occurrence of events. We say that censoring is non-informative, that is, censored subjects have the same survival prospects as subjects who are not censored and who continue to be followed.</p>
 <div id="by-hand" class="section level2">
 <h2>By hand</h2>
 <p>To understand how it works, let’s first estimate it by hand on the following dataset:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
@@ -1428,7 +1435,7 @@ ggsurvplot(fit,
 </ul>
 <div id="log-rank-test" class="section level2">
 <h2>Log-rank test</h2>
-<p>In this article, we focus on comparing survival between two groups using the <strong>log-rank test</strong> (also known as Mantel-Cox test).</p>
+<p>In this article, we focus on comparing survival between two groups using the <strong>log-rank test</strong> (also known as Mantel-Cox test). This test is the most common hypothesis test to compare survival between two groups.</p>
 <p>The intuition behind the test is that if the two groups have different hazard rates, the two survival curves (so their slopes) will differ. More precisely, the log-rank test compares the observed number of events in each group to what would be expected if the survival curves were identical (i.e., if the null hypothesis were true).</p>
 <p>Note that, as for the Kaplan-Meier estimator, the log-rank test is a nonparametric test, which makes no assumptions about the survival distributions.</p>
 <p>For this example, consider the following dataset:</p>
