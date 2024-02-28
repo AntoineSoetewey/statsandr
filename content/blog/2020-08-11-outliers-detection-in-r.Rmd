@@ -55,7 +55,7 @@ Removing or keeping outliers mostly depend on three factors:
 1. Whether the tests you are going to apply are robust to the presence of outliers or not. For instance, the slope of a simple [linear regression](/blog/multiple-linear-regression-made-simple/) may significantly varies with just one outlier, whereas non-parametric tests such as the [Wilcoxon test](/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/) are usually robust to outliers.
 1. How distant are the outliers from other observations? Some observations considered as outliers (according to the techniques presented below) are actually not really extreme compared to all other observations, while other potential outliers may be really distant from the rest of the observations.
 
-The dataset `mpg` from the `{ggplot2}` package will be used to illustrate the different approaches of outliers detection in R, and in particular we will focus on the variable `hwy` (highway miles per gallon).
+The dataset `mpg` from the `{ggplot2}` package will be used to illustrate the different approaches of outliers detection in R, and in particular we will focus on the variable `hwy` (highway miles per gallon). We will also use some simulated data for the presentation of the outlier tests.
 
 # Descriptive statistics
 
@@ -94,7 +94,8 @@ Using R base (with the number of bins corresponding to the square root of the nu
 hist(dat$hwy,
      xlab = "hwy",
      main = "Histogram of hwy",
-     breaks = sqrt(nrow(dat))) # set number of bins
+     breaks = sqrt(length(dat$hwy)) # set number of bins
+     )
 ```
 
 or using `ggplot2` (learn how to create plots with this package via the [`esquisse` addin](/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse) or via this [tutorial](/blog/graphics-in-r-with-ggplot2/)):
@@ -104,11 +105,12 @@ library(ggplot2)
 
 ggplot(dat) +
  aes(x = hwy) +
- geom_histogram(bins = 30L, fill = "#0c4c8a") +
+ geom_histogram(bins = round(sqrt(length(dat$hwy))), # set number of bins
+                fill = "steelblue", color = "black") +
  theme_minimal()
 ```
 
-From the histogram, there seems to be a couple of observations higher than all other observations (see the bar on the right side of the plot). 
+From the histograms, we see that there seems to be a couple of observations larger than all other observations (see the bars on the right side of the plot). 
 
 ## Boxplot
 
@@ -126,7 +128,7 @@ or using `ggplot2`:
 ```{r}
 ggplot(dat) +
  aes(x = "", y = hwy) +
- geom_boxplot(fill = "#0c4c8a") +
+ geom_boxplot(fill = "steelblue") +
  theme_minimal()
 ```
 
@@ -140,7 +142,11 @@ $$I = [q_{0.25} - 1.5 \cdot IQR; q_{0.75} + 1.5 \cdot IQR]$$
 
 Observations considered as potential outliers by the IQR criterion are displayed as points in the boxplot. Based on this criterion, there are 2 potential outliers (see the 2 points above the vertical line, at the top of the boxplot).
 
-Remember that it is not because an observation is considered as a potential outlier by the IQR criterion that you should remove it. Removing or keeping an outlier depends on (i) the context of your analysis, (ii) whether the tests you are going to perform on the dataset are robust to outliers or not, and (iii) how far is the outlier from other observations.
+Remember that it is not because an observation is considered as a potential outlier by the IQR criterion that you should remove it. Removing or keeping an outlier depends on:
+
+1. the context of your analysis,
+1. whether the tests you are going to perform on the dataset are robust to outliers or not, and
+1. how extreme is the outlier (so how far is the outlier from other observations).
 
 It is also possible to extract the values of the potential outliers based on the IQR criterion thanks to the `boxplot.stats()$out` function:
 
@@ -227,16 +233,16 @@ If your data come from a [normal distribution](/blog/do-my-data-follow-a-normal-
 
 $$z_i = \frac{x_i - \overline{X}}{s_X}$$
 
-where $\overline{X}$ is the mean of $X$ and $s_X$ is the standard deviation.
+where $\overline{X}$ is the mean and $s_X$ is the standard deviation of the random variable $X$.
 
 This is referred as scaling, which can be done with the `scale()` function in R.
 
 According to this method, any z-score:
 
-- below -2 or above 2 is considered as rare
-- below -3 or above 3 is considered as extremely rare
+- < -2 or > 2 is considered as rare
+- < -3 or > 3 is considered as extremely rare
 
-Others also use a z-score below -3.29 or above 3.29 to detect outliers. This value of 3.29 comes from the fact that 1 observation out of 1000 is out of this interval if the data follow a normal distribution.
+Other authors also use a z-score below -3.29 or above 3.29 to detect outliers. This value of 3.29 comes from the fact that 1 observation out of 1000 is out of this interval if the data follow a normal distribution.
 
 In our case:
 
@@ -288,7 +294,7 @@ According to the Hampel filter, there are 3 outliers for the `hwy` variable.
 
 # Statistical tests
 
-In this section, we present 3 more formal techniques to detect outliers:
+In this section, we present 3 [hypothesis tests](/blog/hypothesis-test-by-hand/) to detect outliers:
 
 1. Grubbs's test
 1. Dixon's test
@@ -296,7 +302,27 @@ In this section, we present 3 more formal techniques to detect outliers:
 
 These 3 statistical tests are part of more formal techniques of outliers detection as they all involve the computation of a test statistic that is compared to tabulated critical values (that are based on the sample size and the desired confidence level).
 
-Note that the 3 tests are appropriate only when the data (without any outliers) are **approximately normally distributed**. The normality assumption must thus be verified before applying these tests for outliers (see how to [test the normality assumption in R](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/)).
+Note that the 3 tests are appropriate only when the data, without any outliers, are **approximately normally distributed**. It is recommended to check normality visually, with a [QQ-plot](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#qq-plot) and/or a histogram for instance. Although it can also be checked with a formal test for normality (such as the [Shapiro-Wilk test](/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test) for example), the presence of one or more outliers may cause the normality test to reject normality when it is in fact a reasonable assumption for applying one of the 3 outlier tests mentioned above.
+
+We check the normality of our data thanks to a QQ-plot:
+
+```{r}
+library(car)
+qqPlot(dat$hwy)
+```
+
+Too many points deviate from the Henry's line, so based on the QQ-plot we conclude that our data do not follow a normal distribution. Therefore, we should not use one of the outlier test on these data.
+
+For the sake of completeness, here is an example of data that could be used with the three outlier tests, together with the QQ-plot of these data:
+
+```{r}
+dat_tests <- c(rnorm(50), 5)
+
+qqPlot(dat_tests)
+hist(dat_tests)
+```
+
+For the illustration of the three outlier tests in the next sections, we thus use the simulated data (`dat_tests`) instead of the data used so far (`dat$hwy`).
 
 ## Grubbs's test
 
@@ -325,37 +351,24 @@ To perform the Grubbs test in R, we use the `grubbs.test()` function from the `{
 ```{r}
 # install.packages("outliers")
 library(outliers)
-test <- grubbs.test(dat$hwy)
+
+# Grubbs test
+test <- grubbs.test(dat_tests)
 test
 ```
 
-The *p*-value is `r ifelse(test$p.value < 0.001, "< 0.001", round(test$p.value, 3))`. At the 5% significance level, we do not reject the hypothesis that the *highest* value `r max(dat$hwy)` is **not** an outlier.
+The *p*-value is `r ifelse(test$p.value < 0.001, "< 0.001", round(test$p.value, 3))`. At the 5% significance level, we reject the hypothesis that the *highest* value `r max(dat_tests)` is **not** an outlier. In other words, based on this test, we conclude that the highest value `r max(dat_tests)` is an outlier.
 
-By default, the test is performed on the highest value (as shown in the R output: `alternative hypothesis: highest value 44 is an outlier`). If you want to do the test for the lowest value, simply add the argument `opposite = TRUE` in the `grubbs.test()` function:
+By default, the test is performed on the highest value (as shown in the R output: `alternative hypothesis: highest value `r max(dat_tests)` is an outlier`). If you want to do the test for the lowest value, simply add the argument `opposite = TRUE` in the `grubbs.test()` function:
 
 ```{r}
-test <- grubbs.test(dat$hwy, opposite = TRUE)
+test <- grubbs.test(dat_tests, opposite = TRUE)
 test
 ```
 
-The R output indicates that the test is now performed on the lowest value (see `alternative hypothesis: lowest value 12 is an outlier`).
+The R output indicates that the test is now performed on the lowest value (see `alternative hypothesis: lowest value `r min(dat_tests)` is an outlier`).
 
-The *p*-value is `r ifelse(test$p.value < 0.001, "< 0.001", round(test$p.value, 3))`. At the 5% significance level, we do not reject the hypothesis that the *lowest* value `r min(dat$hwy)` is **not** an outlier.
-
-For the sake of illustration, we will now replace an observation with a more extreme value and perform the Grubbs test on this new dataset. Let's replace the $34^{th}$ row with a value of 212:
-
-```{r}
-dat[34, "hwy"] <- 212
-```
-
-And we now apply the Grubbs test to test whether the highest value is an outlier:
-
-```{r}
-test <- grubbs.test(dat$hwy)
-test
-```
-
-The *p*-value is `r ifelse(test$p.value < 0.001, "< 0.001", round(test$p.value, 3))`. At the 5% significance level, we conclude that the *highest* value `r max(dat$hwy)` is an outlier.
+The *p*-value is `r ifelse(test$p.value < 0.001, "< 0.001", round(test$p.value, 3))`. At the 5% significance level, we do not reject the hypothesis that the *lowest* value `r round(min(dat_tests), 2)` is **not** an outlier. In other words, we cannot conlude that the lowest value `r round(min(dat_tests), 2)` is an outlier.
 
 ## Dixon’s test
 
@@ -363,50 +376,55 @@ Similar to the Grubbs test, Dixon test is used to test whether a single low or h
 
 Note that Dixon test is most useful for small sample size (usually $n \le 25$).
 
-To perform the Dixon's test in R, we use the `dixon.test()` function from the `{outliers}` package. However, we [restrict our dataset](/blog/data-manipulation-in-r/#subset-a-data-frame) to the 20 first observations as the Dixon test can only be done on small sample size (R will throw an [error](/blog/top-10-errors-in-r/) and accepts only dataset of 3 to 30 observations):
+To perform the Dixon's test in R, we use the `dixon.test()` function from the `{outliers}` package.
+
+For this illustration, as the Dixon test can only be done on small samples, we take a [subset](/blog/data-manipulation-in-r/#subset-a-data-frame) of our simulated data which consists of the 20 first observations and the outlier. Note that R will throw an [error](/blog/top-10-errors-in-r/) and accepts only a dataset consisting of 3 to 30 observations for this test.
 
 ```{r}
-subdat <- dat[1:20, ]
-test <- dixon.test(subdat$hwy)
+# subset of simulated data
+subdat <- c(dat_tests[1:20], max(dat_tests))
+
+# Dixon test
+test <- dixon.test(subdat)
 test
 ```
 
-The results show that the lowest value `r min(subdat$hwy)` is an outlier (*p*-value = `r round(test$p.value, 3)`).
+Results of the Dixon test show that we cannot conclude that the highest value `r max(subdat)` is an outlier (*p*-value = `r round(test$p.value, 3)`).
 
-To test for the highest value, simply add the `opposite = TRUE` argument to the `dixon.test()` function:
+To test for the lowest value, simply add the `opposite = TRUE` argument to the `dixon.test()` function:
 
 ```{r}
-test <- dixon.test(subdat$hwy,
+test <- dixon.test(subdat,
                    opposite = TRUE)
 test
 ```
 
-The results show that the highest value `r max(subdat$hwy)` is **not** an outlier (*p*-value = `r round(test$p.value, 3)`).
+Results of the test show that we cannot conclude that the lowest value `r round(min(subdat), 2)` is an outlier (*p*-value = `r round(test$p.value, 3)`).
 
 It is a good practice to always check the results of the statistical test for outliers against the boxplot to make sure we tested **all** potential outliers:
 
 ```{r}
-out <- boxplot.stats(subdat$hwy)$out
-boxplot(subdat$hwy,
-        ylab = "hwy")
-mtext(paste("Outliers: ", paste(out, collapse = ", ")))
+out <- boxplot.stats(subdat)$out
+
+boxplot(subdat)
+mtext(paste("Outlier: ", paste(out, collapse = ", ")))
 ```
 
-From the boxplot, we see that we could also apply the Dixon test on the value 20 in addition to the value 15 done previously.
+From the boxplot, we see that the Dixon test has been applied to all potential outliers.
 
-This can be done by finding the row number of the minimum value, excluding this row number from the dataset and then finally apply the Dixon test on this new dataset:
+If you need to perform the test again without the highest or lowest value, this can be done by finding the row number of the maximum or minimum value, excluding this row number from the dataset and then finally apply the Dixon test on this new dataset. We illustrate the process as if we needed to perform the test again, but this time on the data excluding the highest value:
 
 ```{r}
-# find and exclude lowest value
-remove_ind <- which.min(subdat$hwy)
-subsubdat <- subdat[-remove_ind, ]
+# find and exclude highest value
+remove_ind <- which.max(subdat)
+subsubdat <- subdat[-remove_ind]
 
-# Dixon test on dataset without the minimum
-test <- dixon.test(subsubdat$hwy)
+# Dixon test on dataset without the maximum
+test <- dixon.test(subsubdat)
 test
 ```
 
-The results show that the second lowest value `r min(subsubdat$hwy)` is **not** an outlier (*p*-value = `r round(test$p.value, 3)`).
+Results show that we cannot conclude that the lowest value `r round(min(subsubdat), 2)` is an outlier (*p*-value = `r round(test$p.value, 3)`).
 
 ## Rosner's test
 
@@ -415,16 +433,18 @@ Rosner's test for outliers has the advantages that:
 1. it is used to **detect several outliers at once** (unlike Grubbs and Dixon test which must be performed iteratively to screen for multiple outliers), and
 1. it is designed to avoid the problem of masking, where an outlier that is close in value to another outlier can go undetected.
 
-Unlike Dixon test, note that Rosner test is most appropriate when the sample size is large ($n \ge 20$). We therefore use again the initial dataset `dat`, which includes `r nrow(dat)` observations.
+Unlike Dixon test, note that Rosner test is most appropriate when the sample size is large ($n \ge 20$). We therefore use again the similated dataset (i.e., `dat_tests`), which includes `r length(dat_tests)` observations.
 
-To perform the Rosner test we use the `rosnerTest()` function from the `{EnvStats}` package. This function requires at least 2 arguments: the data and the number of suspected outliers `k` (with `k = 3` as the default number of suspected outliers).
+To perform the Rosner test, we use the `rosnerTest()` function from the `{EnvStats}` package. This function requires at least 2 arguments: the data and the number of suspected outliers `k` (with `k = 3` as the default number of suspected outliers).
 
-For this example, we set the number of suspected outliers to be equal to 3, as suggested by the number of potential outliers outlined in the boxplot at the beginning of the article.^[In order to avoid flawed conclusions, it is important to pre-screen the data (graphically with a boxplot for example) to make the selection of the number of potential outliers as accurate as possible prior to running Rosner's test.]
+For this example, we set the number of suspected outliers to be equal to 1, as suggested by the number of potential outliers outlined in the boxplot.^[In order to avoid flawed conclusions, it is important to pre-screen the data (graphically with a boxplot for example) to make the selection of the number of potential outliers as accurate as possible prior to running Rosner's test.]
 
 ```{r}
 library(EnvStats)
-test <- rosnerTest(dat$hwy,
-           k = 3)
+
+# Rosner test
+test <- rosnerTest(dat_tests,
+           k = 1)
 test
 ```
 
@@ -434,7 +454,7 @@ The interesting results are provided in the `$all.stats` table:
 test$all.stats
 ```
 
-Based on the Rosner test, we see that there is only one outlier (see the `Outlier` column), and that it is the observation `r which.max(dat$hwy)` (see `Obs.Num`) with a value of `r max(dat$hwy)` (see `Value`).
+Based on the results of the Rosner test, we see that there is only one outlier (as the table contains 1 line), and that it is the observation `r which.max(dat_tests)` (see `Obs.Num`) with a value of `r max(dat_tests)` (see `Value`). This finding aligns with the Grubbs test presented above, which also detected the value `r max(dat_tests)` as an outlier.
 
 # Additional remarks
 
@@ -444,7 +464,9 @@ You will find many other methods to detect outliers:
 1. via the `lofactor()` function from the `{DMwR}` package: Local Outlier Factor (LOF) is an algorithm used to identify outliers by comparing the local density of a point with that of its neighbors,
 1. the `outlierTest()` from the `{car}` package gives the most extreme observation based on the given model and allows to test whether it is an outlier,
 1. in the `{OutlierDetection}` package, and
-1. with the `aq.plot()` function from the `{mvoutlier}` package (Thanks KTR for the suggestion.):
+1. with the `aq.plot()` function from the `{mvoutlier}` package (Thanks KTR for the suggestion.).
+
+We present these methods with the initial dataset `mpg`, using the `cyl` and `hwy` variables:
 
 ```{r}
 library(mvoutlier)
@@ -453,15 +475,15 @@ Y <- as.matrix(ggplot2::mpg[, c("cyl", "hwy")])
 res <- aq.plot(Y)
 ```
 
-Note also that some transformations may "naturally" eliminate outliers. The natural log or square root of a value reduces the variation caused by extreme values, so in some cases applying these transformations will eliminate the outliers.
+Note also that some transformations may "naturally" eliminate outliers. The natural log or square root of a value reduces the variation caused by extreme values, so in some cases applying these transformations will help in making potential outliers less extreme.
 
 # Conclusion
 
 Thanks for reading.
 
-I hope this article helped you to detect outliers in R via several [descriptive statistics](/blog/descriptive-statistics-in-r/) (including minimum, maximum, histogram, boxplot and percentiles) or thanks to more formal techniques of outliers detection (including Hampel filter, Grubbs, Dixon and Rosner test).
+I hope this article helped you to detect outliers in R via several descriptive statistics (including minimum, maximum, histogram, boxplot and percentiles) or thanks to more formal techniques of outliers detection (including Hampel filter, Grubbs, Dixon and Rosner tests).
 
-It is now your turn to verify them, and if they are correct, decide how to treat them (i.e., keeping, removing or imputing them) before conducting your analyses.
+It is now your turn to try to detect outliers in your data, and decide how to treat them (i.e., keeping, removing or imputing them) before conducting your analyses.
 
 As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
 
