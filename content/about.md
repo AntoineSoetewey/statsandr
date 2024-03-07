@@ -5,9 +5,9 @@ description: "Learn more about the author of the blog Stats and R---Antoine Soet
 menu: "main"
 ---
 
-My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a PhD researcher in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences. My [research](https://antoinesoetewey.com/research/) interests focus on [survival analysis](/blog/what-is-survival-analysis/) and bio-statistical procedures applied to cancer patients.
+My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a PhD researcher in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences. My research interests focus on survival analysis and bio-statistical procedures applied to cancer patients.
 
-In parallel with my doctoral thesis, I am [teaching](https://antoinesoetewey.com/teaching/) several courses in statistics and probability at bachelor and master’s level at UCLouvain and UNamur. I also provide trainings/workshops and consulting in data science, statistics and R programming as part of UCLouvain's technology platform for Statistical Methodology and Computing Service. See my [CV](https://antoinesoetewey.com/cv/) for a more detailed overview of my academic and professional background.
+In parallel with my doctoral thesis, I am teaching several courses in statistics and probability at bachelor and master’s level at UCLouvain and UNamur. I also provide trainings/workshops and consulting in data science, statistics and R programming as part of UCLouvain's technology platform for Statistical Methodology and Computing Service. See my [CV](https://antoinesoetewey.com/cv/) for a more detailed overview of my academic and professional background.
 
 Given my experience, I also support:
 
@@ -18,15 +18,15 @@ If you need help in statistics, data analysis or R, feel free to contact me ([he
 
 ## Blog - What?
 
-This blog is, as its name suggests, about [statistics](/tags/statistics/) and [R](/tags/r/). More specifically, it aims at helping academics and professionals working with data to grasp important statistical concepts using examples and plain English.
+This blog is, as its name suggests, about statistics and R. More specifically, it aims at helping academics and professionals working with data to grasp important statistical concepts using examples and plain English.
 
-When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R (and share the code). I also occasionally present some work related to data science & [data visualization](/tags/visualization/) using R, news about my [research](/tags/research/) and, to a smaller extent, my journey in the [blogging](/tags/blogging/) world.
+When possible, for all statistical concepts covered in this blog, I try to write an article on how to apply them in R (and share the code). I also occasionally present some work related to data science & data visualization using R, news about my research and, to a smaller extent, my journey in the blogging world.
 
 (For the interested reader, see [reviews](/tags/review/) of the blog---and some thoughts about the future plans. In these reviews, I track its performance in R by analyzing page views, sessions, users and engagement using the `{googleAnalyticsR}` package.)
 
 ## Why?
 
-[Stats and R](/) was launched in December 2019. Friends, family, colleagues and even some readers often ask why I started this blog.
+Stats and R was launched in December 2019. Friends, family, colleagues and even some readers often ask why I started this blog.
 
 I really enjoy learning new things. I learn (and I am still learning) a lot by teaching statistics to students from diverse backgrounds.
 

@@ -4,13 +4,13 @@ date: "2020-01-21"
 description: "See the different ways you can support this blog so I can continue to provide free content. Any help is greatly appreciated. Thanks in advance!"
 ---
 
-On this blog, I share my knowledge in the form of free articles and tutorials about [statistics](/tags/statistics/) and [R](/tags/r/). My goal with the blog is to help people to understand statistical concepts (through examples and in plain English), and to apply them in R. When possible, I also contribute to open source projects on GitHub.
+On this blog, I share my knowledge in the form of free articles and tutorials about statistics and R. My goal with the blog is to help people to understand statistical concepts (through examples and in plain English), and to apply them in R. When possible, I also contribute to open source projects on GitHub.
 
-All the [articles](/blog/), [Shiny apps](/tags/shiny/) and code are open source and available to everyone (code available directly in the articles or on [GitHub](https://github.com/AntoineSoetewey)). I also try to reply to all questions I receive from readers by emails or as comments.
+All the [articles](/blog/), Shiny apps and code are open source and available to everyone (code available directly in the articles or on [GitHub](https://github.com/AntoineSoetewey)). I also try to reply to all questions I receive from readers by emails or as comments.
 
 I work on the blog voluntarily in my spare time (when I am not too busy with my full-time job). Your support will help me to:
 
-* Cover the costs of hosting the blog and my [Shiny apps](/tags/shiny/), in order to keep its access **free** and with **no ads** at all!
+* Cover the costs of hosting the blog and my Shiny apps, in order to keep its access **free** and with **no ads** at all!
 * If your support becomes greater than the operating costs, it could also allow me to free up time and **invest more time to offer you better quality content more often**
 
 I love coding, writing and showing what I learned during this continuous process. I love even more to share it for free and I am trying my best to keep it this way. However, costs are getting higher and I would not say no to a little help from you.
