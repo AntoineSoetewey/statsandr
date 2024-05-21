@@ -147,13 +147,27 @@ out_ind</code></pre>
 ## 1 volkswagen   jetta        1.9  1999     4 manua… f        33    44 d     comp…
 ## 2 volkswagen   new beetle   1.9  1999     4 manua… f        35    44 d     subc…
 ## 3 volkswagen   new beetle   1.9  1999     4 auto(… f        29    41 d     subc…</code></pre>
+<p>Another method to display these specific rows is with the <code>identify_outliers()</code> function from the <code>{rstatix}</code> package:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<pre class="r"><code>library(rstatix)
+
+identify_outliers(
+  data = dat,
+  variable = &quot;hwy&quot;
+)</code></pre>
+<pre><code>## # A tibble: 3 × 13
+##   manufacturer model      displ  year   cyl trans  drv     cty   hwy fl    class
+##   &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;
+## 1 volkswagen   jetta        1.9  1999     4 manua… f        33    44 d     comp…
+## 2 volkswagen   new beetle   1.9  1999     4 manua… f        35    44 d     subc…
+## 3 volkswagen   new beetle   1.9  1999     4 auto(… f        29    41 d     subc…
+## # ℹ 2 more variables: is.outlier &lt;lgl&gt;, is.extreme &lt;lgl&gt;</code></pre>
 <p>It is also possible to print the values of the outliers directly on the boxplot with the <code>mtext()</code> function:</p>
 <pre class="r"><code>boxplot(dat$hwy,
   ylab = &quot;hwy&quot;,
   main = &quot;Boxplot of highway miles per gallon&quot;
 )
 mtext(paste(&quot;Outliers: &quot;, paste(out, collapse = &quot;, &quot;)))</code></pre>
-<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 <div id="percentiles" class="section level2">
 <h2>Percentiles</h2>
@@ -235,7 +249,7 @@ dat[outlier_ind, ]</code></pre>
 <pre class="r"><code>dat$z_hwy &lt;- scale(dat$hwy)
 
 hist(dat$z_hwy)</code></pre>
-<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>summary(dat$z_hwy)</code></pre>
 <pre><code>##        V1          
 ##  Min.   :-1.92122  
@@ -253,11 +267,11 @@ hist(dat$z_hwy)</code></pre>
 </div>
 <div id="hampel-filter" class="section level1">
 <h1>Hampel filter</h1>
-<p>Another method, known as Hampel filter, consists of considering as outliers the values outside the interval (<span class="math inline">\(I\)</span>) formed by the median, plus or minus 3 median absolute deviations (<span class="math inline">\(MAD\)</span>):<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<p>Another method, known as Hampel filter, consists of considering as outliers the values outside the interval (<span class="math inline">\(I\)</span>) formed by the median, plus or minus 3 median absolute deviations (<span class="math inline">\(MAD\)</span>):<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 <p><span class="math display">\[I = [median - 3 \cdot MAD; median + 3 \cdot MAD]\]</span></p>
 <p>where <span class="math inline">\(MAD\)</span> is the median absolute deviation and is defined as the median of the absolute deviations from the data’s median <span class="math inline">\(\tilde{X} = median(X)\)</span>:</p>
 <p><span class="math display">\[MAD = median(|X_i - \tilde{X}|)\]</span></p>
-<p>For this method we first set the interval limits thanks to the <code>median()</code> and <code>mad()</code> functions:<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<p>For this method we first set the interval limits thanks to the <code>median()</code> and <code>mad()</code> functions:<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
 <pre class="r"><code>lower_bound &lt;- median(dat$hwy) - 3 * mad(dat$hwy, constant = 1)
 lower_bound</code></pre>
 <pre><code>## [1] 9</code></pre>
@@ -283,17 +297,17 @@ outlier_ind</code></pre>
 <p>We check the normality of our data thanks to a QQ-plot:</p>
 <pre class="r"><code>library(car)
 qqPlot(dat$hwy)</code></pre>
-<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 213 222</code></pre>
 <p>Too many points deviate from the Henry’s line, so based on the QQ-plot we conclude that our data do not follow a normal distribution. Therefore, we should not use one of the outlier test on these data.</p>
 <p>For the sake of completeness, here is an example of data that could be used with the three outlier tests, together with the QQ-plot of these data:</p>
 <pre class="r"><code>dat_tests &lt;- c(rnorm(50), 5)
 
 qqPlot(dat_tests)</code></pre>
-<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>## [1] 51 18</code></pre>
 <pre class="r"><code>hist(dat_tests)</code></pre>
-<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-21-2.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-22-2.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>For the illustration of the three outlier tests in the next sections, we thus use the simulated data (<code>dat_tests</code>) instead of the data used so far (<code>dat$hwy</code>).</p>
 <div id="grubbss-test" class="section level2">
 <h2>Grubbs’s test</h2>
@@ -374,7 +388,7 @@ test</code></pre>
 
 boxplot(subdat)
 mtext(paste(&quot;Outlier: &quot;, paste(out, collapse = &quot;, &quot;)))</code></pre>
-<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-26-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-27-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>From the boxplot, we see that the Dixon test has been applied to all potential outliers.</p>
 <p>If you need to perform the test again without the highest or lowest value, this can be done by finding the row number of the maximum or minimum value, excluding this row number from the dataset and then finally apply the Dixon test on this new dataset. We illustrate the process as if we needed to perform the test again, but this time on the data excluding the highest value:</p>
 <pre class="r"><code># find and exclude highest value
@@ -401,7 +415,7 @@ test</code></pre>
 </ol>
 <p>Unlike Dixon test, note that Rosner test is most appropriate when the sample size is large (<span class="math inline">\(n \ge 20\)</span>). We therefore use again the similated dataset (i.e., <code>dat_tests</code>), which includes 51 observations.</p>
 <p>To perform the Rosner test, we use the <code>rosnerTest()</code> function from the <code>{EnvStats}</code> package. This function requires at least 2 arguments: the data and the number of suspected outliers <code>k</code> (with <code>k = 3</code> as the default number of suspected outliers).</p>
-<p>For this example, we set the number of suspected outliers to be equal to 1, as suggested by the number of potential outliers outlined in the boxplot.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
+<p>For this example, we set the number of suspected outliers to be equal to 1, as suggested by the number of potential outliers outlined in the boxplot.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
 <pre class="r"><code>library(EnvStats)
 
 # Rosner test
@@ -456,7 +470,7 @@ test</code></pre>
 
 Y &lt;- as.matrix(ggplot2::mpg[, c(&quot;cyl&quot;, &quot;hwy&quot;)])
 res &lt;- aq.plot(Y)</code></pre>
-<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-30-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-08-11-outliers-detection-in-r_files/figure-html/unnamed-chunk-31-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Note also that some transformations may “naturally” eliminate outliers. The natural log or square root of a value reduces the variation caused by extreme values, so in some cases applying these transformations will help in making potential outliers less extreme.</p>
 </div>
 <div id="conclusion" class="section level1">
@@ -480,8 +494,9 @@ Enderlein, G. 1987. <span>“Hawkins, DM: Identification of Outliers. Chapman an
 <ol>
 <li id="fn1"><p>Thanks Felix Kluxen for the valuable suggestion.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>Thanks to Victor for pointing out the <code>range()</code> function.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>The default is 3 (according to Pearson’s rule), but another value is also possible.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>The constant in the <code>mad()</code> function is 1.4826 by default, so it has to be set to 1 to find the median absolute deviation. See <code>help(mad)</code> for more details. Thanks to Elisei for pointing this out to me.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>In order to avoid flawed conclusions, it is important to pre-screen the data (graphically with a boxplot for example) to make the selection of the number of potential outliers as accurate as possible prior to running Rosner’s test.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Thanks to Marlenildo for pointing out the <code>identify_outliers()</code> function.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>The default is 3 (according to Pearson’s rule), but another value is also possible.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>The constant in the <code>mad()</code> function is 1.4826 by default, so it has to be set to 1 to find the median absolute deviation. See <code>help(mad)</code> for more details. Thanks to Elisei for pointing this out to me.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p>In order to avoid flawed conclusions, it is important to pre-screen the data (graphically with a boxplot for example) to make the selection of the number of potential outliers as accurate as possible prior to running Rosner’s test.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
