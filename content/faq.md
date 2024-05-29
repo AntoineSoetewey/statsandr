@@ -117,12 +117,14 @@ So if I am familiar with the topic you suggested and I have some free time, I wi
 
 ## 13. Would you do one-on-one teaching or consulting?
 
-Yes, I am open to one-on-one teaching or consulting to help:
+<!--Yes, I am open to one-on-one teaching or consulting to help:
 
 - **Students** and academics in their studies through the success of their exam or the statistical part of their thesis, thanks to tailor-made courses and personalized support in statistics and probability.
 - **Professionals** and companies in their research, data analysis and informed decision-making by bringing a statistical dimension to their projects, regardless of the sector, core business or size of the company.
 
-If you need help in statistics, data analysis, probability or R for your academic or work related projects, feel free to contact me ([here](https://easystat.be/contact-en/) if you are a student, and [here](https://datanalyze.be/#contact) if you are a professional)!
+If you need help in statistics, data analysis, probability or R for your academic or work related projects, feel free to contact me ([here](https://easystat.be/contact-en/) if you are a student, and [here](https://datanalyze.be/#contact) if you are a professional)!-->
+
+Not at the moment, but you can always [contact me](/contact/) with your request and I will transfer it to my colleagues who might be able to help you.
 
 ## 14. I have a question that is not mentioned here
 

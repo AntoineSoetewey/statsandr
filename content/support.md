@@ -36,9 +36,9 @@ You can also follow the blog on [Twitter](https://twitter.com/statsandr) or [sub
 
 Note that I am already very grateful for the community built with this blog and its related projects, and I am glad that it helped you in some ways.
 
-## Recommendations
+<!--## Recommendations
 
-If you know someone who needs a private lesson or needs help for their statistical analyses, feel free to refer her to [datanalyze.be](https://datanalyze.be/) or to give her my [contact details](/contact/) so the person can reach out to me.
+If you know someone who needs a private lesson or needs help for their statistical analyses, feel free to refer her to [datanalyze.be](https://datanalyze.be/) or to give her my [contact details](/contact/) so the person can reach out to me.-->
 
 **Thanks in advance for your support**, it is greatly appreciated and every contribution counts!
 
