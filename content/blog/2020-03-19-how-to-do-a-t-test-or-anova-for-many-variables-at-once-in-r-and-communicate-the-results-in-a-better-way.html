@@ -61,7 +61,7 @@ bibliography: bibliography.bib
 </ol>
 <p>This was feasible as long as there were only a couple of variables to test. Nonetheless, most students came to me asking to perform these kind of tests not on one or two variables, but on <strong>multiples</strong> variables. So when there were more than one variable to test, I quickly realized that I was wasting my time and that there must be a more efficient way to do the job.</p>
 <p><em><strong>Note</strong>: you must be very careful with the issue of <a href="/blog/anova-in-r/#issue-of-multiple-testing">multiple testing</a> (also referred as multiplicity) which can arise when you perform multiple tests. In short, when a large number of statistical tests are performed, some will have <span class="math inline">\(p\)</span>-values less than 0.05 purely by chance, even if all null hypotheses are in fact really true. This is known as multiplicity or multiple testing. You can tackle this problem by using the Bonferroni correction, among others. The Bonferroni correction is a simple method that allows many t-tests to be made while still assuring an overall confidence level is maintained. For this, instead of using the standard threshold of <span class="math inline">\(\alpha = 5\)</span>% for the significance level, you can use <span class="math inline">\(\alpha = \frac{0.05}{m}\)</span> where <span class="math inline">\(m\)</span> is the number of t-tests. For example, if you perform 20 t-tests with a desired <span class="math inline">\(\alpha = 0.05\)</span>, the Bonferroni correction implies that you would reject the null hypothesis for each individual test when the <span class="math inline">\(p\)</span>-value is smaller than <span class="math inline">\(\alpha = \frac{0.05}{20} = 0.0025\)</span>.</em></p>
-<p>Note also that there is no universally accepted approach for dealing with the problem of multiple comparisons. Usually, you should choose a <em>p</em>-value adjustment measure familiar to your audience or in your field of study. The Bonferroni correction is easy to implement. It is however not appropriate if you have a very large number of tests to perform (imagine you want to do 10,000 t-tests, a <em>p</em>-value would have to be less than <span class="math inline">\(\frac{0.05}{10000} = 0.000005\)</span> to be significant). A more powerful method is also to adjust the false discovery rate using the Benjamini-Hochberg or Holm procedure <span class="citation">(<a href="#ref-mcdonald2014multiple" role="doc-biblioref">McDonald 2014</a>)</span>.</p>
+<p>Note also that there is no universally accepted approach for dealing with the problem of multiple comparisons. Usually, you should choose a <em>p</em>-value adjustment measure familiar to your audience or in your field of study. The Bonferroni correction is easy to implement. It is however not appropriate if you have a very large number of tests to perform (imagine you want to do 10,000 t-tests, a <em>p</em>-value would have to be less than <span class="math inline">\(\frac{0.05}{10000} = 0.000005\)</span> to be significant). A more powerful method is also to adjust the false discovery rate using the Benjamini-Hochberg or Holm procedure <span class="citation">(<a href="#ref-mcdonald2014multiple">McDonald 2014</a>)</span>.</p>
 <p>Another option is to use a multivariate ANOVA (MANOVA), if your independent variable has more than two levels. This is particularly useful when your dependent variables are correlated. Correlation between the dependent variables provides MANOVA the following advantages:</p>
 <ul>
 <li><strong>Identify patterns between several dependent variables</strong>: The independent variables can influence the relationship between dependent variables instead of influencing a single dependent variable.</li>
@@ -90,7 +90,7 @@ for (i in 1:4) { # variables to compare are variables 1 to 4
 }</code></pre>
 <p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-1-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+## 	Welch Two Sample t-test
 ## 
 ## data:  dat[, i] by dat$Species
 ## t = -5.6292, df = 94.025, p-value = 1.866e-07
@@ -102,7 +102,7 @@ for (i in 1:4) { # variables to compare are variables 1 to 4
 ##                    5.936                    6.588</code></pre>
 <p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-1-2.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+## 	Welch Two Sample t-test
 ## 
 ## data:  dat[, i] by dat$Species
 ## t = -3.2058, df = 97.927, p-value = 0.001819
@@ -114,7 +114,7 @@ for (i in 1:4) { # variables to compare are variables 1 to 4
 ##                    2.770                    2.974</code></pre>
 <p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-1-3.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+## 	Welch Two Sample t-test
 ## 
 ## data:  dat[, i] by dat$Species
 ## t = -12.604, df = 95.57, p-value &lt; 2.2e-16
@@ -126,7 +126,7 @@ for (i in 1:4) { # variables to compare are variables 1 to 4
 ##                    4.260                    5.552</code></pre>
 <p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-1-4.png" width="100%" style="display: block; margin: auto;" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+## 	Welch Two Sample t-test
 ## 
 ## data:  dat[, i] by dat$Species
 ## t = -14.625, df = 89.043, p-value &lt; 2.2e-16
@@ -332,7 +332,7 @@ result</code></pre>
 ## 2  Sepal.Width   0.002 Reject H0 at 5%
 ## 3 Petal.Length  &lt;0.001 Reject H0 at 5%
 ## 4  Petal.Width  &lt;0.001 Reject H0 at 5%</code></pre>
-<p>And with the <span class="citation">Holm (<a href="#ref-holm1979simple" role="doc-biblioref">1979</a>)</span> adjustment method:</p>
+<p>And with the <span class="citation">Holm (<a href="#ref-holm1979simple">1979</a>)</span> adjustment method:</p>
 <pre class="r"><code>result &lt;- t_table(
   data = dat,
   c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;, &quot;Petal.Length&quot;, &quot;Petal.Width&quot;),
@@ -384,14 +384,7 @@ for (i in y) {
     )
   }
 }</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
-<pre><code>## [1] FALSE</code></pre>
-<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-2.png" width="100%" style="display: block; margin: auto;" /></p>
-<pre><code>## [1] FALSE</code></pre>
-<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-3.png" width="100%" style="display: block; margin: auto;" /></p>
-<pre><code>## [1] FALSE</code></pre>
-<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-4.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-2.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-3.png" width="100%" style="display: block; margin: auto;" /><img src="/blog/2020-03-19-how-to-do-a-t-test-or-anova-for-many-variables-at-once-in-r-and-communicate-the-results-in-a-better-way_files/figure-html/unnamed-chunk-7-4.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Like the improved routine for the t-test, I have noticed that students and non-expert professionals understand ANOVA results presented this way much more easily compared to the default R outputs.</p>
 <p>With one graph for each variable, it is easy to see that all species are different from each other in terms of all 4 variables.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <p>If you want to apply the same automated process to your data, you will need to modify the name of the grouping variable (<code>Species</code>), the names of the variables you want to test (<code>Sepal.Length</code>, etc.), whether you want to perform an <a href="/blog/anova-in-r/">ANOVA</a> (<code>anova</code>) or <a href="/blog/kruskal-wallis-test-nonparametric-version-anova/">Kruskal-Wallis test</a> (<code>kruskal.test</code>) and finally specify the comparisons for the <a href="/blog/anova-in-r/#post-hoc-test">post-hoc tests</a>.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
@@ -430,7 +423,7 @@ cGroupsWUI()</code></pre>
 </div>
 <div id="update-with-the-ggstatsplot-package" class="section level1">
 <h1>Update with the <code>{ggstatsplot}</code> package</h1>
-<p>Several months after having written this article, I finally found a way to plot and run analyses on several variables at once with the package <code>{ggstatsplot}</code> <span class="citation">(<a href="#ref-patil2021ggstatsplot" role="doc-biblioref">Patil 2021</a>)</span>. This was the main feature I was missing and which prevented me from using it more often.</p>
+<p>Several months after having written this article, I finally found a way to plot and run analyses on several variables at once with the package <code>{ggstatsplot}</code> <span class="citation">(<a href="#ref-patil2021ggstatsplot">Patil 2021</a>)</span>. This was the main feature I was missing and which prevented me from using it more often.</p>
 <p>Although I still find that too much statistical details are displayed (in particular for non experts), I still believe the <code>ggbetweenstats()</code> and <code>ggwithinstats()</code> functions are worth mentioning in this article. I actually now use those two functions almost as often as my previous routines because:</p>
 <ul>
 <li>I do not have to care about the number of groups to compare, the functions automatically choose the appropriate test according to the number of groups (ANOVA for 3 groups or more, and t-test for 2 groups)</li>
@@ -484,7 +477,8 @@ plotlist &lt;-
     .f = ifelse(paired, # automatically use ggwithinstats if paired samples, ggbetweenstats otherwise
       ggstatsplot::ggwithinstats,
       ggstatsplot::ggbetweenstats
-    )
+    ),
+    violin.args = list(width = 0, linewidth = 0) # remove violin plots and keep only boxplots
   )
 
 # print all plots together with statistical results
@@ -519,7 +513,8 @@ plotlist &lt;-
     .f = ifelse(paired, # automatically use ggwithinstats if paired samples, ggbetweenstats otherwise
       ggstatsplot::ggwithinstats,
       ggstatsplot::ggbetweenstats
-    )
+    ),
+    violin.args = list(width = 0, linewidth = 0) # remove violin plots and keep only boxplots
   )
 
 # print all plots together with statistical results
@@ -536,7 +531,7 @@ for (i in 1:length(plotlist)) {
 </ul>
 <p>Everything else is automated—the outputs show a graphical representation of what we are comparing, together with the details of the statistical analyses in the subtitle of the plot (the <span class="math inline">\(p\)</span>-value among others).</p>
 <p>Note that the code shown above is actually the same if I want to compare 2 groups or more than 2 groups. I wrote twice the same code (once for 2 groups and once again for 3 groups) for illustrative purposes only, but they are the same and should be treated as one for your projects.</p>
-<p>Feel free to discover the package and see how it works by yourself via this <a href="https://antoinesoetewey.shinyapps.io/ggstatsplotShiny/" target="_blank">Shiny app</a>.</p>
+<!-- Feel free to discover the package and see how it works by yourself via this [Shiny app](https://antoinesoetewey.shinyapps.io/ggstatsplotShiny/){target="_blank"}. -->
 <p>I must admit I am quite <strong>satisfied</strong> with this routine, now that:</p>
 <ul>
 <li>I can automate it on many variables at once and I do not need to write the variable names manually anymore,</li>
