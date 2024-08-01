@@ -1,0 +1,567 @@
+---
+title: EpiLPS for estimation of incubation times
+author: Antoine Soetewey
+date: '2024-08-01'
+slug: epilps-for-estimation-of-incubation-times
+categories: []
+tags:
+  - Guest post
+  - R
+  - Package
+  - Research
+  - Statistics
+meta_img: blog/epilps-for-estimation-of-incubation-times/images/epilps_incubation.png
+description: Guest post by Oswaldo Gressani presenting the paper Flexible Bayesian estimation of incubation times published in the American Journal of Epidemiology
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6  
+# draft: true
+# bibliography: bibliography.bib
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#motivation" id="toc-motivation">Motivation</a></li>
+<li><a href="#coarse-data" id="toc-coarse-data">Coarse data</a></li>
+<li><a href="#simulated-example" id="toc-simulated-example">Simulated example</a></li>
+<li><a href="#real-data-example" id="toc-real-data-example">Real data example</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+</ul>
+</div>
+
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
+<p>A group of researchers from the Data Science Institute (DSI) at Hasselt University developed a new statistical model to estimate the incubation period of a pathogenic organism based on coarse data. The incubation period of an infectious disease (defined as the time elapsed between infection and the manifestation of first symptoms) is of great importance as it permits to shed light on the epidemic potential of a disease and to optimize the length of quarantine periods to freeze transmission. The article <a href="https://doi.org/10.1093/aje/kwae192">(Gressani et al. 2024)</a> was recently published in the <em>American Journal of Epidemiology</em> with practical implementation of the methodology accessible through the <a href="/blog/paper-epilps-a-fast-and-flexible-bayesian-tool-for-estimation-of-the-time-varying-reproduction-number/">EpiLPS package</a> <a href="https://doi.org/10.1371/journal.pcbi.1010618">(Gressani et al. 2022)</a>.</p>
+</div>
+<div id="coarse-data" class="section level1">
+<h1>Coarse data</h1>
+<p>What makes estimation of incubation times so challenging in the first place? The devil lies in the data. True infection times are stealthy and rarely observed. In information-theoretic jargon this phenomenon is called “imperfect information’’ but statisticians prefer to call it censoring. To be more precise, infection times are interval censored, i.e. one part of the collected data contains exposure intervals <span class="math inline">\(\mathcal{E}=[t^{E_L},t^{E_R}]\)</span> reported by individuals that are part of the study, where <span class="math inline">\(t^{E_L}\)</span> and <span class="math inline">\(t^{E_R}\)</span> stand for the left and right bound, respectively, of the exposure window. The other part of the data contains symptom onset times <span class="math inline">\(t^{\mathcal{S}}\)</span>. This is a more easily accessible piece of information -people tend to remember the day when first symptoms appeared- and so the timing of symptom onset is assumed to be exactly observed. Subtracting the exposure bounds from the symptom onset time, one obtains the incubation interval <span class="math inline">\(\mathcal{I}=[t^{\mathcal{I}_L}, t^{\mathcal{I}_R}]\)</span> with lower bound <span class="math inline">\(t^{\mathcal{I}_L}=t^{\mathcal{S}}-t^{E_R}\)</span> and upper bound <span class="math inline">\(t^{\mathcal{I}_R}=t^{\mathcal{S}}-t^{E_L}\)</span>, characterizing the coarse data structure which will be the main model input.</p>
+</div>
+<div id="simulated-example" class="section level1">
+<h1>Simulated example</h1>
+<p>In EpiLPS, the <code>estimIncub()</code> routine is designed to compute an estimate of the incubation density based on the methodology of <a href="https://doi.org/10.1093/aje/kwae192">Gressani et al. (2024)</a>. Giving a detailed account of the methodology would be out of scope for this blog and the reader is redirected to the article for technicalities. In a nutshell, it is a Bayesian approach making use of (penalized) B-splines, Laplace approximations and Markov chain Monte Carlo (MCMC) methods to derive a semi-parametric estimate of the incubation density. An attractive feature of the <code>estimIncub()</code> routine for the end-user is the minimalistic input it requires to work, namely:</p>
+<ul>
+<li><code>x</code>: A data frame containing the lower and upper bound of the incubation interval.</li>
+<li><code>K</code>: An integer specifying the number of B-splines to smooth the incubation density.</li>
+<li><code>niter</code>: The number of MCMC samples required.</li>
+</ul>
+<p>In practice, only the data frame <code>x</code> is required as the remaining inputs are assigned default values. Computationally, the routine requires a small amount of resources as costly subroutines are coded in C++ and integrated in R via the Rcpp package. The structure of <code>x</code> is quite simple. It should be a data frame with two columns containing the left bound <span class="math inline">\(t^{\mathcal{I}_L}\)</span> of the incubation interval (in the first column) and the right bound <span class="math inline">\(t^{\mathcal{I}_R}\)</span>.</p>
+<p>Let’s start with a simple example where <code>x</code> is simulated based on a data generating mechanism assuming a known incubation distribution. This can be achieved with the <code>incubsim()</code> routine in EpiLPS. We choose <code>x</code> to be generated according to a Lognormal incubation distribution with a mean of 5.5 days and a standard deviation of 2.1 days following <a href="https://doi.org/10.1126/science.abb6936">Ferretti et al. (2020)</a>. Simulation of <span class="math inline">\(n=40\)</span> observations with an average exposure window of 2 days is implemented as follows:</p>
+<pre class="r"><code>set.seed(2024)
+simdat &lt;- incubsim(incubdist = &quot;LogNormal&quot;, n = 40, coarseness = 2)
+gt(head(simdat$Dobsincub, 5))</code></pre>
+<div id="kocanygkly" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#kocanygkly table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#kocanygkly thead, #kocanygkly tbody, #kocanygkly tfoot, #kocanygkly tr, #kocanygkly td, #kocanygkly th {
+  border-style: none;
+}
+
+#kocanygkly p {
+  margin: 0;
+  padding: 0;
+}
+
+#kocanygkly .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#kocanygkly .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#kocanygkly .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#kocanygkly .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#kocanygkly .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kocanygkly .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kocanygkly .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kocanygkly .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#kocanygkly .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#kocanygkly .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#kocanygkly .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#kocanygkly .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#kocanygkly .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#kocanygkly .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#kocanygkly .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kocanygkly .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#kocanygkly .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#kocanygkly .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#kocanygkly .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kocanygkly .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#kocanygkly .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#kocanygkly .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#kocanygkly .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kocanygkly .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#kocanygkly .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#kocanygkly .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kocanygkly .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kocanygkly .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#kocanygkly .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kocanygkly .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#kocanygkly .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kocanygkly .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kocanygkly .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kocanygkly .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kocanygkly .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kocanygkly .gt_left {
+  text-align: left;
+}
+
+#kocanygkly .gt_center {
+  text-align: center;
+}
+
+#kocanygkly .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#kocanygkly .gt_font_normal {
+  font-weight: normal;
+}
+
+#kocanygkly .gt_font_bold {
+  font-weight: bold;
+}
+
+#kocanygkly .gt_font_italic {
+  font-style: italic;
+}
+
+#kocanygkly .gt_super {
+  font-size: 65%;
+}
+
+#kocanygkly .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#kocanygkly .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#kocanygkly .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#kocanygkly .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#kocanygkly .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#kocanygkly .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#kocanygkly .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="tL">tL</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="tR">tR</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="tL" class="gt_row gt_right">3.724500</td>
+<td headers="tR" class="gt_row gt_right">5.510304</td></tr>
+    <tr><td headers="tL" class="gt_row gt_right">4.381377</td>
+<td headers="tR" class="gt_row gt_right">6.654224</td></tr>
+    <tr><td headers="tL" class="gt_row gt_right">4.588020</td>
+<td headers="tR" class="gt_row gt_right">5.483614</td></tr>
+    <tr><td headers="tL" class="gt_row gt_right">3.847835</td>
+<td headers="tR" class="gt_row gt_right">6.003948</td></tr>
+    <tr><td headers="tL" class="gt_row gt_right">3.522282</td>
+<td headers="tR" class="gt_row gt_right">5.033487</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p><br></p>
+<p>By typing <code>simdat$Dobsincub</code>, the user has access to the generated incubation intervals (expressed in days), corresponding here to a data frame with two columns and <span class="math inline">\(n=40\)</span> rows. This is the data frame that is injected in the <code>estimIncub()</code> routine:</p>
+<pre class="r"><code>fit &lt;- estimIncub(x = simdat$Dobsincub, verbose = TRUE)</code></pre>
+<pre><code>## ----------------------------------------------------------------
+## Time elapsed: 1.029 seconds.
+## Fitted density is Log-Normal with meanlog=1.617 and sdlog=0.317.
+## Mean incubation period (days): 5.298 with 95% CI: 5.086-5.615.
+## 95th percentile (days): 8.484 with 95% CI: 8.121-9.089.
+## ----------------------------------------------------------------</code></pre>
+<p>The output in the R console can easily be interpreted. It tells us that the model chooses a Lognormal density fit for the incubation period with a mean of 5.3 days (95% CI: 5.0-5.6 days). More detailed summary statistics are accessible by typing <code>fit$stats</code>, such as the posterior standard deviation and additional percentiles. What happens under the hood? Basically, the model computes a semi-parametric fit to the data and compares it with classic parametric fits (Lognormal, Weibull and Gamma) used for incubation modeling. The candidate with the lowest Bayesian information criterion (BIC) wins the game and is finally selected (here the Lognormal distribution). The incubation windows and the fitted incubation density can be obtained by typing:</p>
+<pre class="r"><code>grid.arrange(plot(fit, typ = &quot;incubwin&quot;), plot(fit, type = &quot;pdf&quot;), nrow = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/estimincubation-2-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><br></p>
+</div>
+<div id="real-data-example" class="section level1">
+<h1>Real data example</h1>
+<p>The flexible Bayesian methodology is illustrated on SARS-CoV-2 symptom onset and exposure window data extracted from cases in Vietnam. The dataset was analyzed in <a href="https://doi.org/10.1371/journal.pone.0243889">Bui et al. (2020)</a> and is publicly available on the GitHub repository provided in the article (<a href="https://github.com/longbui/Covid19IncubVN" class="uri">https://github.com/longbui/Covid19IncubVN</a>; last accessed July 17, 2024). The dataset contains information about <span class="math inline">\(n=19\)</span> cases identified from January 23, 2020 to April 13, 2020. After continuity corrections (required to change calendar dates into continuous time points), the left and right incubation bounds are given by:</p>
+<pre class="r"><code># Left incubation bound
+tL &lt;- c(0.504, 2.983, 5.343, 6.969, 6.990, 2.570, 6.870, 1.263, 0.693, 1.869, 1.151, 2.748, 1.209, 1.161, 4.982, 4.017, 2.170, 9.805, 1.659)
+
+# Right incubation bound
+tR &lt;- c(1.491, 7.762, 11.777, 12.821, 11.359, 8.551, 24.954, 4.144, 6.408, 7.083, 4.191, 10.326, 9.942, 7.254, 12.690, 10.825, 14.478, 16.592, 18.649)
+
+# Data set
+dataVietnam &lt;- data.frame(tL = tL, tR = tR)</code></pre>
+<p>The <code>estimIncub()</code> routine provides a Weibull fit with a mean incubation period of 6.7 days (95% CI: 5.8-7.4 days) and the standard deviation (extracted by typing <code>incubfit$stats</code>) is 3.3 days (95% CI: 3.0-3.8 days). A figure of the incubation windows and the fitted Weibull density (with 95% credible interval) is also provided.</p>
+<pre class="r"><code>set.seed(2024)
+incubfit &lt;- EpiLPS::estimIncub(x = dataVietnam, verbose = TRUE, tmax = 25)</code></pre>
+<pre><code>## ----------------------------------------------------------------
+## Time elapsed: 1.139 seconds.
+## Fitted density is Weibull with shape=2.142 and scale=7.521.
+## Mean incubation period (days): 6.661 with 95% CI: 5.753-7.375.
+## 95th percentile (days): 12.552 with 95% CI: 11.931-14.087.
+## ----------------------------------------------------------------</code></pre>
+<pre class="r"><code>grid.arrange(plot(incubfit, typ = &quot;incubwin&quot;), plot(incubfit, type = &quot;pdf&quot;), nrow = 1)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/RealData-3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><br></p>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<p>Gressani, O., Torneri, A., Hens, N. and Faes, C. (2024). Flexible Bayesian estimation of incubation times. <em>American Journal of Epidemiology</em> (Accepted manuscript). <a href="https://doi.org/10.1093/aje/kwae192" class="uri">https://doi.org/10.1093/aje/kwae192</a></p>
+<p>Gressani, O., Wallinga, J., Althaus, C. L., Hens, N. and Faes, C.
+(2022). EpiLPS: A fast and flexible Bayesian tool for estimation of the
+time-varying reproduction number. <em>PLoS Comput Biol</em> <strong>18</strong>(10):
+e1010618. <a href="https://doi.org/10.1371/journal.pcbi.1010618" class="uri">https://doi.org/10.1371/journal.pcbi.1010618</a></p>
+<p>Eddelbuettel, D. and Francois, R. (2011). Rcpp: Seamless R and C++ Integration. <em>Journal of Statistical Software</em>, <strong>40</strong>(8), 1–18. <a href="https://doi.org/10.18637/jss.v040.i08" class="uri">https://doi.org/10.18637/jss.v040.i08</a></p>
+<p>Ferretti, L. et al. (2020). Quantifying SARS-CoV-2 transmission suggests epidemic control with
+digital contact tracing. <em>Science</em> <strong>368</strong>, eabb6936. <a href="https://doi.org/10.1126/science.abb6936" class="uri">https://doi.org/10.1126/science.abb6936</a></p>
+<p>Bui LV, Nguyen HT, Levine H, Nguyen HN, Nguyen T-A, Nguyen TP, et al. (2020) Estimation of the incubation period of COVID-19 in Vietnam. <em>PLoS ONE</em> <strong>15</strong>(12): e0243889. <a href="https://doi.org/10.1371/journal.pone.0243889" class="uri">https://doi.org/10.1371/journal.pone.0243889</a></p>
+</div>
