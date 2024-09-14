@@ -14,7 +14,7 @@ Here is a summary of press mentions of the blog:
 ### Contact and social profiles
 
 * [Contact me](/contact/)
-* [Twitter](https://twitter.com/statsandr)
+* [X](https://x.com/statsandr)
 * [Medium](https://antoinesoetewey.medium.com/)
 * [LinkedIn](https://www.linkedin.com/in/antoinesoetewey/)
 * [GitHub](https://github.com/AntoineSoetewey)

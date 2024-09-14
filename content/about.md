@@ -5,9 +5,11 @@ description: "Learn more about the author of the blog Stats and R---Antoine Soet
 menu: "main"
 ---
 
-My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a PhD researcher in statistics at UCLouvain (Belgium) within the Institute of Statistics, Biostatistics and Actuarial Sciences. My research interests focus on survival analysis and bio-statistical procedures applied to cancer patients.
+My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a postdoctoral researcher in statistics at UCLouvain Saint-Louis Brussels and HEC Liège, where I contribute to the [Beamm](https://beamm.brussels/) project, which aims to develop a microsimulation model of the Belgian tax system. Before that, I obtained a PhD in statistics at UCLouvain, where my research focused on survival analysis and biostatistical methods applied to cancer patients.
 
-In parallel with my doctoral thesis, I am teaching several courses in statistics and probability at bachelor and master’s level at UCLouvain and UNamur. I also provide trainings/workshops and consulting in data science, statistics and R programming as part of UCLouvain's technology platform for Statistical Methodology and Computing Service. See my [CV](https://antoinesoetewey.com/cv/) for a more detailed overview of my academic and professional background.
+In parallel with my research, I teach statistics and probability at the undergraduate and master's levels as a visiting lecturer at UCLouvain and UNamur.
+
+See my [CV](https://antoinesoetewey.com/cv/) for a more detailed overview of my academic and professional background.
 
 <!--Given my experience, I also support:
 
@@ -51,7 +53,7 @@ Thanks in advance for reading. Feel free to [contact me](/contact/) if you have 
 
 You can also reach me out on:
 
-- [Twitter](https://twitter.com/statsandr)
+- [X](https://x.com/statsandr)
 - <a rel="me" href="https://fosstodon.org/@statsandr">Mastodon</a>
 - [Medium](https://antoinesoetewey.medium.com/)
 - [GitHub](https://github.com/AntoineSoetewey)
