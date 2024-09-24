@@ -5,7 +5,7 @@ description: "Learn more about the author of the blog Stats and R---Antoine Soet
 menu: "main"
 ---
 
-My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a postdoctoral researcher in statistics at UCLouvain Saint-Louis Brussels and HEC Liège, where I contribute to the [Beamm](https://beamm.brussels/) project, which aims to develop a microsimulation model of the Belgian tax system. Before that, I obtained a PhD in statistics at UCLouvain, where my research focused on survival analysis and biostatistical methods applied to cancer patients.
+My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a postdoctoral researcher in statistics at UCLouvain Saint-Louis Brussels and HEC Liège. Before that, I obtained a PhD in statistics at UCLouvain, where my research focused on survival analysis and biostatistical methods applied to cancer patients.
 
 In parallel with my research, I teach statistics and probability at the undergraduate and master's levels as a visiting lecturer at UCLouvain and UNamur.
 
