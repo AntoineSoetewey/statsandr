@@ -40,9 +40,9 @@ library(maps)
 ```{r, message = FALSE, echo = FALSE}
 dat <- iso3166
 dat <- rename(dat, "iso-a3" = a3)
-countries_visited <- c("AUS", "BEL", "CAN", "CZE", "DNK",
+countries_visited <- c("AUS", "AUT", "BEL", "CAN", "CZE", "DNK",
                        "FIN", "FRA", "DEU", "GRC", "HUN",
-                       "IRL", "ITA", "LVA", "LUX", "MCO",
+                       "IDN", "IRL", "ITA", "LVA", "LUX", "MCO",
                        "MMR", "NLD", "NZL", "NOR", "PRT",
                        "ROU", "SGP", "ESP", "SWE", "CHE",
                        "TWN", "THA", "GBR", "USA")
@@ -70,7 +70,7 @@ library(dplyr)
 library(maps)
 ```
 
-As usual, you need the packages to be installed on your machine before loading them with `library()`. You can install a package with the command `install.packages("name_of_package")`.
+As usual, you need the packages to be installed on your machine before loading them with `library()`. You can [install a package](/blog/an-efficient-way-to-install-and-load-r-packages/) with the command `install.packages("name_of_package")`.
 
 After having loaded the packages, we are going to use the dataset called `iso3166` from the `{maps}` package and rename it `dat`. Here are the first 6 rows of the dataset:
 
@@ -89,7 +89,7 @@ head(dat)
 We save the visited countries in a vector called `countries_visited`. To know the ISO codes of the countries you have visited, check the column `ISOname` in the dataset and extract the ISO codes from the column `iso-a3`:
 
 ```{r, eval = TRUE}
-countries_visited <- c("AUS", "BEL", "CAN", "CZE", "DNK", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", "LUX", "MCO", "MMR", "NLD", "NZL", "NOR", "PRT", "ROU", "SGP", "ESP", "SWE", "CHE", "TWN", "THA", "GBR", "USA")
+countries_visited <- c("AUS", "AUT", "BEL", "CAN", "CZE", "DNK", "FIN", "FRA", "DEU", "GRC", "HUN", "IDN", "IRL", "ITA", "LVA", "LUX", "MCO", "MMR", "NLD", "NZL", "NOR", "PRT", "ROU", "SGP", "ESP", "SWE", "CHE", "TWN", "THA", "GBR", "USA")
 ```
 
 We now create a new variable called `visited` which equals to 1 if you have visited the country and 0 otherwise:
@@ -116,19 +116,28 @@ hcmap(
   hc_title(text = "World map") # title
 ```
 
-Change the arguments to your needs and you are good to go. To go even further, you can also add a list including all your visited countries thanks to this code:
+Change the arguments to your needs and you are good to go.
+
+To go even further, you can also add a list including all visited countries thanks to this code:
 
 ```{r, eval = TRUE}
 dat <- subset(dat, dat$visited == 1)
-sort(dat$ISOname) # sort is to have the visited countries in alphabetical order
+sort(unique(dat$ISOname)) # sort to have the visited countries in alphabetical order
 ```
 
-And count the number of countries visited:
+I never went to Clipperton Island, so I'll remove it from the list:
+
+```{r}
+dat <- subset(dat, dat$ISOname != "Clipperton Island")
+sort(unique(dat$ISOname))
+```
+
+And finally, count the number of countries visited:
 
 ```{r}
 paste(
   "Total: ",
-  sum(dat$visited),
+  length(unique(dat$ISOname)),
   " countries."
 )
 ```
@@ -142,7 +151,7 @@ library(maps)
 
 dat <- iso3166
 dat <- rename(dat, "iso-a3" = a3)
-countries_visited <- c("AUS", "BEL", "CAN", "CZE", "DNK", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", "LUX", "MCO", "MMR", "NLD", "NZL", "NOR", "PRT", "ROU", "SGP", "ESP", "SWE", "CHE", "TWN", "THA", "GBR", "USA")
+countries_visited <- c("AUS", "AUT", "BEL", "CAN", "CZE", "DNK", "FIN", "FRA", "DEU", "GRC", "HUN", "IDN", "IRL", "ITA", "LVA", "LUX", "MCO", "MMR", "NLD", "NZL", "NOR", "PRT", "ROU", "SGP", "ESP", "SWE", "CHE", "TWN", "THA", "GBR", "USA")
 dat$visited <- ifelse(dat$`iso-a3` %in% countries_visited, 1, 0)
 
 hcmap(
@@ -158,12 +167,12 @@ hcmap(
   hc_legend("none") %>%
   hc_title(text = "World map") # title
 
-dat <- subset(dat, dat$visited == 1)
-sort(dat$ISOname) # sort is to have the visited countries in alphabetical order
+dat <- subset(dat, dat$visited == 1 & dat$ISOname != "Clipperton Island")
+sort(unique(dat$ISOname)) # sort to have the visited countries in alphabetical order
 
 paste(
   "Total: ",
-  sum(dat$visited),
+  length(unique(dat$ISOname)),
   " countries."
 )
 ```
