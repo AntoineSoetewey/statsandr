@@ -402,8 +402,8 @@ summary(model2)</code></pre>
 <p>Estimation of the parameters <span class="math inline">\(\beta_0, \dots, \beta_p\)</span> by the method of least squares is based on the same principle as that of simple linear regression, but applied to <span class="math inline">\(p\)</span> dimensions. It is thus no longer a question of finding the best line (the one which passes closest to the pairs of points (<span class="math inline">\(y_i, x_i\)</span>)), but finding the <span class="math inline">\(p\)</span>-dimensional plane which passes closest to the coordinate points (<span class="math inline">\(y_i, x_{i1}, \dots, x_{ip}\)</span>).</p>
 <p>This is done by <strong><em>minimizing</em> the sum of the squares of the deviations of the points on the plane</strong>:</p>
 <div class="float">
-<img src="images/multiple-linear-regression-plane.png" style="width:100.0%" alt="Source: Thaddeussegura" />
-<div class="figcaption">Source: Thaddeussegura</div>
+<img src="images/multiple-linear-regression-plane.png" style="width:100.0%" alt="Source: James, G., Witten, D., Hastie, T., &amp; Tibshirani, R. (2013)" />
+<div class="figcaption">Source: James, G., Witten, D., Hastie, T., &amp; Tibshirani, R. (2013)</div>
 </div>
 </div>
 <div id="interpretations-of-coefficients-widehatbeta-1" class="section level2">
@@ -747,7 +747,8 @@ model_parameters(model4, summary = TRUE)</code></pre>
 ## am [Manual] |        2.94 | 1.41 | [ 0.05,  5.83] |  2.08 | 0.047 
 ## 
 ## Model: mpg ~ wt + qsec + am (32 Observations)
-## Residual standard deviation: 2.459 (df = 28)
+## Sigma: 2.459 (df = 28)
+## RMSE : 2.300
 ## R2: 0.850; adjusted R2: 0.834</code></pre>
 <p>And if you are using <a href="/blog/getting-started-in-r-markdown/">R Markdown</a>, you can use the <code>print_html()</code> function to get a compact and yet comprehensive summary table in your HTML file:</p>
 <pre class="r"><code>library(gt)
@@ -1192,15 +1193,23 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
 #yywrdylzvd .gt_indent_5 {
   text-indent: 25px;
 }
+
+#yywrdylzvd .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#yywrdylzvd div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
 </style>
 <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
   <thead>
-    
     <tr class="gt_col_headings">
       <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Parameter">Parameter</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Coefficient">Coefficient</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="SE">SE</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="95% CI">95% CI</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="a95%-CI">95% CI</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="t(28)">t(28)</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="p">p</th>
     </tr>
@@ -1233,7 +1242,7 @@ print_html(model_parameters(model4, summary = TRUE))</code></pre>
   </tbody>
   <tfoot class="gt_sourcenotes">
     <tr>
-      <td class="gt_sourcenote" colspan="6">Model: mpg ~ wt + qsec + am (32 Observations)<br>Residual standard deviation: 2.459 (df = 28)<br>R2: 0.850; adjusted R2: 0.834</td>
+      <td class="gt_sourcenote" colspan="6">Model: mpg ~ wt + qsec + am (32 Observations)<br>Sigma: 2.459 (df = 28)<br>RMSE : 2.300<br>R2: 0.850; adjusted R2: 0.834</td>
     </tr>
   </tfoot>
   
@@ -1289,9 +1298,8 @@ predict(model4,
 <p>we use the <code>linearHypothesis()</code> function of the <code>{car}</code> package as follows:</p>
 <pre class="r"><code>library(car)
 linearHypothesis(model4, c(&quot;wt = 0&quot;, &quot;qsec = 0&quot;))</code></pre>
-<pre><code>## Linear hypothesis test
-## 
-## Hypothesis:
+<pre><code>## 
+## Linear hypothesis test:
 ## wt = 0
 ## qsec = 0
 ## 
@@ -1409,7 +1417,7 @@ summary(model6)</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-austin2015number" class="csl-entry">
 Austin, Peter C, and Ewout W Steyerberg. 2015. <span>“The Number of Subjects Per Variable Required in Linear Regression Analyses.”</span> <em>Journal of Clinical Epidemiology</em> 68 (6): 627–36.
 </div>
