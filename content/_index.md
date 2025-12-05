@@ -18,11 +18,8 @@ From time to time, I also present some work related to data science & data visua
 * [Subscribe](/subscribe/) to the newsletter to receive updates by email every time a new article is published
 * Follow the blog on [Twitter](https://twitter.com/statsandr)
 * Contribute by writing a [guest post](/contribute/) ([collaborations](/tags/collaboration/) are also welcome)
-* [Support](/support/) my work so I can keep providing free content on an ad-free blog
 * [Contact me](/contact/) if you have any questions
 
 <!--If you need help in data analysis or if you need a private lesson in statistics or R, feel free to contact me ([here](https://easystat.be/contact-en/) if you are a student, and [here](https://datanalyze.be/#contact) if you are a professional).-->
 
 <br>
-
----
