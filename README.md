@@ -38,13 +38,10 @@ Guest posts must follow the separate submission process described here:
 
 ## License
 
-Unless otherwise stated, the content of [statsandr.com](https://statsandr.com/)
-by [Antoine Soetewey](https://statsandr.com/about/) is licensed under a
-[Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/), encouraging reuse with proper attribution.
+Unless otherwise stated, the content of [statsandr.com](https://statsandr.com/) by [Antoine Soetewey](https://statsandr.com/about/) is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/), encouraging reuse with proper attribution.
 
 ---
 
 ## Deployment
 
-This site is built using [Hugo](https://gohugo.io/) and deployed via  
-[Netlify](https://www.netlify.com/).
+This site is built using [Hugo](https://gohugo.io/) and deployed via [Netlify](https://www.netlify.com/).
