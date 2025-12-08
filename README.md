@@ -30,8 +30,8 @@ Before contributing, please read:
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 - [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)
 
-Guest posts must follow the separate submission process described here:  
-👉 https://statsandr.com/contribute/
+Guest posts must follow the separate submission process described here:
+https://statsandr.com/contribute/
 
 ---
 
