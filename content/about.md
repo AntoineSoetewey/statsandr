@@ -5,7 +5,7 @@ description: "Learn more about the author of the blog Stats and R---Antoine Soet
 menu: "main"
 ---
 
-My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a postdoctoral researcher in statistics at HEC Liège and UCLouvain Saint-Louis Brussels. Before that, I obtained a PhD in statistics at UCLouvain, where my research focused on survival analysis and biostatistical methods applied to cancer patients.
+My name is [Antoine Soetewey](https://antoinesoetewey.com/). I am a postdoctoral researcher in data science and statistics at HEC Liège and UCLouvain Saint-Louis Brussels. Before that, I obtained a PhD in statistics at UCLouvain, where my research focused on survival analysis and biostatistical methods applied to cancer patients.
 
 In parallel with my research, I teach statistics and probability at the undergraduate and master's levels as a visiting lecturer at UCLouvain and UNamur.
 
