@@ -14,7 +14,9 @@ Here is a summary of press mentions of the blog:
 ### Contact and social profiles
 
 * [Contact me](/contact/)
-* [X](https://x.com/statsandr)
+* <a href="https://x.com/statsandr" rel="noopener">X</a>
+* [Bluesky](https://bsky.app/profile/statsandr.bsky.social)
+* [Fosstodon](https://fosstodon.org/@statsandr)
 * [Medium](https://antoinesoetewey.medium.com/)
 * [LinkedIn](https://www.linkedin.com/in/antoinesoetewey/)
 * [GitHub](https://github.com/AntoineSoetewey)

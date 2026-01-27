@@ -40,8 +40,10 @@ In addition to be published on this blog, all articles that are accepted will be
 
 and shared via:
 
-- my Twitter account ([@statsandr](https://twitter.com/statsandr))
-- my [newsletter](/subscribe/)
+- <a href="https://x.com/statsandr" rel="noopener">X</a>
+- [Bluesky](https://bsky.app/profile/statsandr.bsky.social)
+- [Fosstodon](https://fosstodon.org/@statsandr)
+- [Newsletter](/subscribe/)
 
 Once your post is published, I encourage you to **share it on the social networks** of your choice. Bear in mind that the more popular the guest post is, the more referral traffic your website will receive.
 

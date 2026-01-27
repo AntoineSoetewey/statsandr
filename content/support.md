@@ -32,7 +32,7 @@ If you cannot support my blog with money but you have found any of the content u
 
 ## Follow the blog
 
-You can also follow the blog on [Twitter](https://twitter.com/statsandr) or [subscribe](/subscribe/) to the newsletter to receive new posts by email.
+You can also follow the blog on <a href="https://x.com/statsandr" rel="noopener">X</a>, [Bluesky](https://bsky.app/profile/statsandr.bsky.social) and [Fosstodon](https://fosstodon.org/@statsandr), or [subscribe](/subscribe/) to the newsletter to receive new posts by email.
 
 Note that I am already very grateful for the community built with this blog and its related projects, and I am glad that it helped you in some ways.
 

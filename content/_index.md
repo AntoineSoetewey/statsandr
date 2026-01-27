@@ -16,7 +16,7 @@ From time to time, I also present some work related to data science & data visua
 * See [all articles](/blog/) or articles by [categories](/tags/)
 * Learn more [about me](/about/)
 * [Subscribe](/subscribe/) to the newsletter to receive updates by email every time a new article is published
-* Follow the blog on <a href="https://x.com/statsandr" rel="noopener">X</a>, [Bluesky](https://bsky.app/profile/statsandr.bsky.social), [Fosstodon](https://fosstodon.org/@statsandr) and [Medium](https://antoinesoetewey.medium.com/)
+* Follow the blog on <a href="https://x.com/statsandr" rel="noopener">X</a>, [Bluesky](https://bsky.app/profile/statsandr.bsky.social) and [Fosstodon](https://fosstodon.org/@statsandr)
 * Contribute by writing a [guest post](/contribute/) ([collaborations](/tags/collaboration/) are also welcome)
 * [Support](/support/) my work so I can keep providing free content on an ad-free blog
 * [Contact me](/contact/) if you have any questions
