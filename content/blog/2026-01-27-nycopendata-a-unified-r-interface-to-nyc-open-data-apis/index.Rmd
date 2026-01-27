@@ -1,0 +1,185 @@
+---
+title: 'nycOpenData: A unified R interface to NYC Open Data APIs'
+author: Antoine Soetewey
+date: '2026-01-27'
+slug: nycopendata-a-unified-r-interface-to-nyc-open-data-apis
+categories: []
+tags:
+  - Collaboration
+  - Guest post
+  - Package
+  - R
+  - Research
+meta_img: blog/nycopendata-a-unified-r-interface-to-nyc-open-data-apis/images/nycopendata-a-unified-r-interface-to-nyc-open-data-apis.jpg
+description: Discover nycOpenData, an R package offering tidy, reproducible access to NYC Open Data APIs for teaching, research, and civic data analysis.
+output:
+  blogdown::html_page:
+    toc: false
+    toc_depth: 6
+# draft: true
+# bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
+)
+
+set.seed(42)
+```
+
+![](images/nycopendata-a-unified-r-interface-to-nyc-open-data-apis.jpg){width=100%}
+
+*Guest post by Christian Martinez, developer of the nycOpenData package in R.*
+
+# nycOpenData: A unified R interface to NYC Open Data APIs
+
+I am pleased to announce the release of `nycOpenData`, an R package providing convenient, tidy access to dozens of datasets from the [New York City Open Data platform](https://opendata.cityofnewyork.us/).
+
+The package is designed as part of an open-science and reproducible-research effort, with the goal of lowering the friction between public data and statistical analysis—especially for teaching, exploratory research, and applied civic work.
+
+## Why nycOpenData?
+
+NYC Open Data hosts hundreds of datasets covering topics such as public safety, housing, transportation, education, health, and city services. While these datasets are publicly accessible through the Socrata API, working with them directly often requires:
+
+- knowing dataset identifiers,
+- manually constructing API queries,
+- handling pagination, timeouts, and rate limits,
+- and performing repetitive data-cleaning steps.
+
+These barriers can slow down exploratory analysis and make public data less accessible to students, researchers, and practitioners who primarily work in R.
+
+`nycOpenData` was built to remove these obstacles by providing a consistent, user-friendly interface that returns clean tibbles ready for analysis—without requiring users to interact directly with the API.
+
+## What does the package do?
+
+The package provides a growing collection of wrapper functions, each corresponding to a specific NYC Open Data dataset or dataset family. All functions follow a shared design pattern and support:
+
+- row limits,
+- optional filtering via named lists,
+- sorting,
+- and graceful handling of API errors and timeouts.
+
+Examples of currently supported domains include:
+
+- 311 service requests
+- Transportation and for-hire vehicles
+- Motor vehicle collisions
+- Department of Buildings permits and complaints
+- Education and school reporting
+- Juvenile justice and public safety
+- Street trees and environmental data
+- Permitted events (historical)
+
+A typical call looks like this:
+
+```{r}
+library(nycOpenData)
+
+nyc_311(
+  limit = 1000,
+  filters = list(borough = "BROOKLYN")
+)
+```
+
+The result is returned as a tidy tibble of the 1,000 most recent NYC 311 requests, making it immediately compatible with the tidyverse ecosystem for visualization, modeling, and reporting.
+
+### Mini analysis
+
+One of the strongest qualities this function has is its ability to filter based on multiple columns. Let's put everything together and get a dataset of the last *1,000* 311 requests from the New York Police Department in Brooklyn.
+
+```{r filter-brooklyn-nypd}
+# Creating the dataset
+brooklyn_nypd <- nyc_311(limit = 1000, filters = list(agency = "NYPD", borough = "BROOKLYN"))
+
+# Calling head of our new dataset
+head(brooklyn_nypd)
+
+# Quick check to make sure our filtering worked
+nrow(brooklyn_nypd)
+unique(brooklyn_nypd$agency)
+unique(brooklyn_nypd$borough)
+```
+
+We successfully created our dataset that contains the 1,000 most recent requests regarding the NYPD in the borough Brooklyn.
+
+Now that we have successfully pulled the data and have it in R, let's figure out what NYC residents in Brooklyn are complaining about to the NYPD.
+
+To do this, we will create a [bar graph](/blog/graphics-in-r-with-ggplot2/#barplot) of the complaint types.
+
+```{r complaint-type-graph, fig.alt="Bar chart showing the frequency of NYPD-related 311 complaint types in Brooklyn from the 1,000 most recent service requests.", fig.cap="Bar chart showing the frequency of NYPD-related 311 complaint types in Brooklyn from the 1,000 most recent service requests.", fig.height=5, fig.width=7}
+
+# Visualizing the distribution, ordered by frequency
+library(ggplot2)
+
+ggplot(brooklyn_nypd, aes(y = reorder(complaint_type, complaint_type, length))) +
+  geom_bar(fill = "steelblue") +
+  theme_minimal() +
+  labs(
+    title = "Most Recent NYPD 311 Complaints (Brooklyn)",
+    subtitle = "Top 1,000 service requests",
+    x = "Number of Complaints",
+    y = "Type of Complaint"
+  )
+```
+
+This graph shows us not only *which* complaints were made, but *how many* of each complaint were made.
+
+## Designed for reproducible workflows
+
+A core design principle of `nycOpenData` is reproducibility. Rather than downloading static CSV files that can change over time or be accidentally modified, analyses can explicitly document:
+
+- which dataset was used,
+- how many rows were requested,
+- which filters were applied,
+- and when the data were accessed.
+
+This makes the package particularly useful for:
+
+- reproducible research projects,
+- classroom assignments,
+- data journalism,
+- and exploratory civic analysis.
+
+The package is also designed to be API-polite, with configurable timeouts and safeguards that help prevent common failure modes when querying large public datasets.
+
+## Who is it for?
+
+`nycOpenData` is intended for a broad audience, including:
+
+- students learning statistics or data science using real-world data,
+- instructors teaching reproducible research or applied data analysis,
+- researchers conducting exploratory or descriptive analyses,
+- data journalists and civic technologists,
+- and anyone interested in working with NYC public data in R.
+
+The goal is not to abstract away the data itself, but to make access predictable, transparent, and easy to integrate into standard R workflows.
+
+## Availability
+
+The package is available on CRAN and can be installed using:
+
+```{r, eval = FALSE}
+install.packages("nycOpenData")
+```
+
+Development continues on GitHub, where new datasets and improvements are added regularly.
+
+## Acknowledgements
+
+This package was developed alongside teaching and applied research projects in reproducible data science, with inspiration from open-source contributors across the R community and the NYC Open Data program.
+
+Useful links
+
+- CRAN package: https://CRAN.R-project.org/package=nycOpenData
+- pkgdown site: https://martinezc1.github.io/nycOpenData/
+- GitHub repository: https://github.com/martinezc1/nycOpenData
+- NYC Open Data portal: https://opendata.cityofnewyork.us/
+
+As always, feedback, bug reports, and dataset requests are very welcome.
+
+Thanks for reading!

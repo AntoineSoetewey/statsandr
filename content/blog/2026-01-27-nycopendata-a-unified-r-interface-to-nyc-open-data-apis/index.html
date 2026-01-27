@@ -1,0 +1,195 @@
+---
+title: 'nycOpenData: A unified R interface to NYC Open Data APIs'
+author: Antoine Soetewey
+date: '2026-01-27'
+slug: nycopendata-a-unified-r-interface-to-nyc-open-data-apis
+categories: []
+tags:
+  - Collaboration
+  - Guest post
+  - Package
+  - R
+  - Research
+meta_img: blog/nycopendata-a-unified-r-interface-to-nyc-open-data-apis/images/nycopendata-a-unified-r-interface-to-nyc-open-data-apis.jpg
+description: Discover nycOpenData, an R package offering tidy, reproducible access to NYC Open Data APIs for teaching, research, and civic data analysis.
+output:
+  blogdown::html_page:
+    toc: false
+    toc_depth: 6
+# draft: true
+# bibliography: bibliography.bib
+---
+
+
+
+<p><img src="images/nycopendata-a-unified-r-interface-to-nyc-open-data-apis.jpg" style="width:100.0%" /></p>
+<p><em>Guest post by Christian Martinez, developer of the nycOpenData package in R.</em></p>
+<div id="nycopendata-a-unified-r-interface-to-nyc-open-data-apis" class="section level1">
+<h1>nycOpenData: A unified R interface to NYC Open Data APIs</h1>
+<p>I am pleased to announce the release of <code>nycOpenData</code>, an R package providing convenient, tidy access to dozens of datasets from the <a href="https://opendata.cityofnewyork.us/">New York City Open Data platform</a>.</p>
+<p>The package is designed as part of an open-science and reproducible-research effort, with the goal of lowering the friction between public data and statistical analysis—especially for teaching, exploratory research, and applied civic work.</p>
+<div id="why-nycopendata" class="section level2">
+<h2>Why nycOpenData?</h2>
+<p>NYC Open Data hosts hundreds of datasets covering topics such as public safety, housing, transportation, education, health, and city services. While these datasets are publicly accessible through the Socrata API, working with them directly often requires:</p>
+<ul>
+<li>knowing dataset identifiers,</li>
+<li>manually constructing API queries,</li>
+<li>handling pagination, timeouts, and rate limits,</li>
+<li>and performing repetitive data-cleaning steps.</li>
+</ul>
+<p>These barriers can slow down exploratory analysis and make public data less accessible to students, researchers, and practitioners who primarily work in R.</p>
+<p><code>nycOpenData</code> was built to remove these obstacles by providing a consistent, user-friendly interface that returns clean tibbles ready for analysis—without requiring users to interact directly with the API.</p>
+</div>
+<div id="what-does-the-package-do" class="section level2">
+<h2>What does the package do?</h2>
+<p>The package provides a growing collection of wrapper functions, each corresponding to a specific NYC Open Data dataset or dataset family. All functions follow a shared design pattern and support:</p>
+<ul>
+<li>row limits,</li>
+<li>optional filtering via named lists,</li>
+<li>sorting,</li>
+<li>and graceful handling of API errors and timeouts.</li>
+</ul>
+<p>Examples of currently supported domains include:</p>
+<ul>
+<li>311 service requests</li>
+<li>Transportation and for-hire vehicles</li>
+<li>Motor vehicle collisions</li>
+<li>Department of Buildings permits and complaints</li>
+<li>Education and school reporting</li>
+<li>Juvenile justice and public safety</li>
+<li>Street trees and environmental data</li>
+<li>Permitted events (historical)</li>
+</ul>
+<p>A typical call looks like this:</p>
+<pre class="r"><code>library(nycOpenData)
+
+nyc_311(
+  limit = 1000,
+  filters = list(borough = &quot;BROOKLYN&quot;)
+)</code></pre>
+<pre><code>## # A tibble: 1,000 × 40
+##    unique_key created_date          agency agency_name complaint_type descriptor
+##    &lt;chr&gt;      &lt;chr&gt;                 &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;          &lt;chr&gt;     
+##  1 67613985   2026-01-26T02:06:05.… NYPD   New York C… Noise - Resid… Banging/P…
+##  2 67609553   2026-01-26T02:02:09.… NYPD   New York C… Noise - Resid… Banging/P…
+##  3 67610990   2026-01-26T01:58:58.… NYPD   New York C… Illegal Parki… Blocked H…
+##  4 67615428   2026-01-26T01:56:49.… NYPD   New York C… Noise - Resid… Banging/P…
+##  5 67609568   2026-01-26T01:48:16.… NYPD   New York C… Noise - Resid… Loud Musi…
+##  6 67612476   2026-01-26T01:47:10.… NYPD   New York C… Noise - Resid… Loud Musi…
+##  7 67614152   2026-01-26T01:46:26.… DSNY   Department… Snow or Ice    Snow Trac…
+##  8 67614054   2026-01-26T01:44:50.… DSNY   Department… Dirty Conditi… Trash     
+##  9 67606570   2026-01-26T01:41:32.… NYPD   New York C… Noise - Resid… Banging/P…
+## 10 67610091   2026-01-26T01:35:51.… NYPD   New York C… Noise - Vehic… Car/Truck…
+## # ℹ 990 more rows
+## # ℹ 34 more variables: location_type &lt;chr&gt;, incident_zip &lt;chr&gt;,
+## #   incident_address &lt;chr&gt;, street_name &lt;chr&gt;, cross_street_1 &lt;chr&gt;,
+## #   cross_street_2 &lt;chr&gt;, intersection_street_1 &lt;chr&gt;,
+## #   intersection_street_2 &lt;chr&gt;, address_type &lt;chr&gt;, city &lt;chr&gt;,
+## #   landmark &lt;chr&gt;, status &lt;chr&gt;, community_board &lt;chr&gt;,
+## #   council_district &lt;chr&gt;, police_precinct &lt;chr&gt;, bbl &lt;chr&gt;, borough &lt;chr&gt;, …</code></pre>
+<p>The result is returned as a tidy tibble of the 1,000 most recent NYC 311 requests, making it immediately compatible with the tidyverse ecosystem for visualization, modeling, and reporting.</p>
+<div id="mini-analysis" class="section level3">
+<h3>Mini analysis</h3>
+<p>One of the strongest qualities this function has is its ability to filter based on multiple columns. Let’s put everything together and get a dataset of the last <em>1,000</em> 311 requests from the New York Police Department in Brooklyn.</p>
+<pre class="r"><code># Creating the dataset
+brooklyn_nypd &lt;- nyc_311(limit = 1000, filters = list(agency = &quot;NYPD&quot;, borough = &quot;BROOKLYN&quot;))
+
+# Calling head of our new dataset
+head(brooklyn_nypd)</code></pre>
+<pre><code>## # A tibble: 6 × 39
+##   unique_key created_date           agency agency_name complaint_type descriptor
+##   &lt;chr&gt;      &lt;chr&gt;                  &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;          &lt;chr&gt;     
+## 1 67613985   2026-01-26T02:06:05.0… NYPD   New York C… Noise - Resid… Banging/P…
+## 2 67609553   2026-01-26T02:02:09.0… NYPD   New York C… Noise - Resid… Banging/P…
+## 3 67610990   2026-01-26T01:58:58.0… NYPD   New York C… Illegal Parki… Blocked H…
+## 4 67615428   2026-01-26T01:56:49.0… NYPD   New York C… Noise - Resid… Banging/P…
+## 5 67609568   2026-01-26T01:48:16.0… NYPD   New York C… Noise - Resid… Loud Musi…
+## 6 67612476   2026-01-26T01:47:10.0… NYPD   New York C… Noise - Resid… Loud Musi…
+## # ℹ 33 more variables: location_type &lt;chr&gt;, incident_zip &lt;chr&gt;,
+## #   incident_address &lt;chr&gt;, street_name &lt;chr&gt;, cross_street_1 &lt;chr&gt;,
+## #   cross_street_2 &lt;chr&gt;, intersection_street_1 &lt;chr&gt;,
+## #   intersection_street_2 &lt;chr&gt;, address_type &lt;chr&gt;, city &lt;chr&gt;,
+## #   landmark &lt;chr&gt;, status &lt;chr&gt;, community_board &lt;chr&gt;,
+## #   council_district &lt;chr&gt;, police_precinct &lt;chr&gt;, bbl &lt;chr&gt;, borough &lt;chr&gt;,
+## #   x_coordinate_state_plane &lt;chr&gt;, y_coordinate_state_plane &lt;chr&gt;, …</code></pre>
+<pre class="r"><code># Quick check to make sure our filtering worked
+nrow(brooklyn_nypd)</code></pre>
+<pre><code>## [1] 1000</code></pre>
+<pre class="r"><code>unique(brooklyn_nypd$agency)</code></pre>
+<pre><code>## [1] &quot;NYPD&quot;</code></pre>
+<pre class="r"><code>unique(brooklyn_nypd$borough)</code></pre>
+<pre><code>## [1] &quot;BROOKLYN&quot;</code></pre>
+<p>We successfully created our dataset that contains the 1,000 most recent requests regarding the NYPD in the borough Brooklyn.</p>
+<p>Now that we have successfully pulled the data and have it in R, let’s figure out what NYC residents in Brooklyn are complaining about to the NYPD.</p>
+<p>To do this, we will create a <a href="/blog/graphics-in-r-with-ggplot2/#barplot">bar graph</a> of the complaint types.</p>
+<pre class="r"><code># Visualizing the distribution, ordered by frequency
+library(ggplot2)
+
+ggplot(brooklyn_nypd, aes(y = reorder(complaint_type, complaint_type, length))) +
+  geom_bar(fill = &quot;steelblue&quot;) +
+  theme_minimal() +
+  labs(
+    title = &quot;Most Recent NYPD 311 Complaints (Brooklyn)&quot;,
+    subtitle = &quot;Top 1,000 service requests&quot;,
+    x = &quot;Number of Complaints&quot;,
+    y = &quot;Type of Complaint&quot;
+  )</code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:complaint-type-graph"></span>
+<img src="{{< blogdown/postref >}}index_files/figure-html/complaint-type-graph-1.png" alt="Bar chart showing the frequency of NYPD-related 311 complaint types in Brooklyn from the 1,000 most recent service requests." width="100%" />
+<p class="caption">
+Figure 1: Bar chart showing the frequency of NYPD-related 311 complaint types in Brooklyn from the 1,000 most recent service requests.
+</p>
+</div>
+<p>This graph shows us not only <em>which</em> complaints were made, but <em>how many</em> of each complaint were made.</p>
+</div>
+</div>
+<div id="designed-for-reproducible-workflows" class="section level2">
+<h2>Designed for reproducible workflows</h2>
+<p>A core design principle of <code>nycOpenData</code> is reproducibility. Rather than downloading static CSV files that can change over time or be accidentally modified, analyses can explicitly document:</p>
+<ul>
+<li>which dataset was used,</li>
+<li>how many rows were requested,</li>
+<li>which filters were applied,</li>
+<li>and when the data were accessed.</li>
+</ul>
+<p>This makes the package particularly useful for:</p>
+<ul>
+<li>reproducible research projects,</li>
+<li>classroom assignments,</li>
+<li>data journalism,</li>
+<li>and exploratory civic analysis.</li>
+</ul>
+<p>The package is also designed to be API-polite, with configurable timeouts and safeguards that help prevent common failure modes when querying large public datasets.</p>
+</div>
+<div id="who-is-it-for" class="section level2">
+<h2>Who is it for?</h2>
+<p><code>nycOpenData</code> is intended for a broad audience, including:</p>
+<ul>
+<li>students learning statistics or data science using real-world data,</li>
+<li>instructors teaching reproducible research or applied data analysis,</li>
+<li>researchers conducting exploratory or descriptive analyses,</li>
+<li>data journalists and civic technologists,</li>
+<li>and anyone interested in working with NYC public data in R.</li>
+</ul>
+<p>The goal is not to abstract away the data itself, but to make access predictable, transparent, and easy to integrate into standard R workflows.</p>
+</div>
+<div id="availability" class="section level2">
+<h2>Availability</h2>
+<p>The package is available on CRAN and can be installed using:</p>
+<pre class="r"><code>install.packages(&quot;nycOpenData&quot;)</code></pre>
+<p>Development continues on GitHub, where new datasets and improvements are added regularly.</p>
+</div>
+<div id="acknowledgements" class="section level2">
+<h2>Acknowledgements</h2>
+<p>This package was developed alongside teaching and applied research projects in reproducible data science, with inspiration from open-source contributors across the R community and the NYC Open Data program.</p>
+<p>Useful links</p>
+<ul>
+<li>CRAN package: <a href="https://CRAN.R-project.org/package=nycOpenData" class="uri">https://CRAN.R-project.org/package=nycOpenData</a></li>
+<li>pkgdown site: <a href="https://martinezc1.github.io/nycOpenData/" class="uri">https://martinezc1.github.io/nycOpenData/</a></li>
+<li>GitHub repository: <a href="https://github.com/martinezc1/nycOpenData" class="uri">https://github.com/martinezc1/nycOpenData</a></li>
+<li>NYC Open Data portal: <a href="https://opendata.cityofnewyork.us/" class="uri">https://opendata.cityofnewyork.us/</a></li>
+</ul>
+<p>As always, feedback, bug reports, and dataset requests are very welcome.</p>
+<p>Thanks for reading!</p>
+</div>
+</div>
