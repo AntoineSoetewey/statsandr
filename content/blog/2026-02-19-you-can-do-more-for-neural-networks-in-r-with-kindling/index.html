@@ -1,0 +1,884 @@
+---
+title: You can do more for neural networks in R with {kindling}
+author: Antoine Soetewey
+date: '2026-02-19'
+slug: you-can-do-more-for-neural-networks-in-r-with-kindling
+categories: []
+tags:
+  - Collaboration
+  - Package
+  - R
+meta_img: blog/you-can-do-more-for-neural-networks-in-r-with-kindling/you-can-do-more-for-neural-networks-in-r-with-kindling.jpg
+description: A practical collaborative post on using {kindling} for neural networks in R, with reproducible workflows, realistic examples, and honest trade-offs.
+output:
+  blogdown::html_page:
+    toc: false
+    toc_depth: 6
+# draft: true
+# bibliography: bibliography.bib
+---
+
+
+
+<p><img src="images/you-can-do-more-for-neural-networks-in-r-with-kindling.jpg" style="width:100.0%" /></p>
+<p><em>This post has been written in collaboration with Joshua Marie.</em></p>
+<div id="why-this-post-matters" class="section level1">
+<h1>Why this post matters</h1>
+<p>Neural networks in R are no longer niche. Today, we can choose among:</p>
+<ul>
+<li><code>{nnet}</code> for classic, small-scale neural nets,</li>
+<li><code>{neuralnet}</code> another classic neural nets package besides <code>{nnet}</code>,</li>
+<li><code>{keras}</code> / <code>{keras3}</code> for the Keras API (typically with Python backends such as TensorFlow/JAX/Torch),</li>
+<li><code>{torch}</code> for native-R deep learning with explicit model and training control.</li>
+</ul>
+<p>So why discuss another package?</p>
+<p>In our experience, many day-to-day projects sit in the middle: we want more flexibility than a classical model, but less boilerplate than writing a full <code>{torch}</code> training loop. <code>{kindling}</code> is designed for that middle ground.</p>
+<p>In this article, we focus on what <code>{kindling}</code> does well, where it helps, and where it is still limited.</p>
+</div>
+<div id="what-problem-kindling-solves-and-what-it-does-not" class="section level1">
+<h1>What problem <code>{kindling}</code> solves (and what it does not)</h1>
+<p><code>{kindling}</code> is a higher-level interface built on top of <code>{torch}</code>. In practice, it reduces repetitive code for:</p>
+<ul>
+<li>defining common network architectures,</li>
+<li>training feedforward and recurrent models,</li>
+<li>integrating with <code>{tidymodels}</code> (<code>{parsnip}</code>, <code>{recipes}</code>, <code>{workflows}</code>, <code>{tune}</code>).</li>
+</ul>
+<p>It does <strong>not</strong> replace low-level <code>{torch}</code> for highly customized research code, and it does <strong>not</strong> make hardware setup disappear. You still need a working LibTorch installation and an environment that can use CPU/GPU properly.</p>
+<p>At the time of writing (CRAN version 0.2.0), core built-in architectures include FFNN/MLP and recurrent variants (RNN/LSTM/GRU).</p>
+</div>
+<div id="setup" class="section level1">
+<h1>Setup</h1>
+<p>Install this package in different ways:</p>
+<ol style="list-style-type: decimal">
+<li>Solely install <code>{kindling}</code> (as it installs the package dependencies internally)</li>
+</ol>
+<pre class="r"><code>install.packages(&quot;kindling&quot;)</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>You can install the package dependencies separately:</li>
+</ol>
+<pre class="r"><code>install.packages(c(
+  &quot;kindling&quot;,
+  # dependencies
+  &quot;torch&quot;, &quot;dplyr&quot;, &quot;rsample&quot;, &quot;recipes&quot;, &quot;yardstick&quot;,
+  &quot;workflows&quot;, &quot;parsnip&quot;, &quot;tibble&quot;, &quot;ggplot2&quot;, &quot;mlbench&quot;, &quot;vip&quot;
+))</code></pre>
+<p>Then load the packages in two ways:</p>
+<ol style="list-style-type: decimal">
+<li>Using <code>library()</code> traditionally:</li>
+</ol>
+<pre class="r"><code>library(kindling)
+library(torch)
+library(dplyr)
+library(rsample)
+library(recipes)
+library(yardstick)
+library(workflows)
+library(parsnip)
+library(tibble)
+library(ggplot2)
+library(mlbench)
+library(vip)</code></pre>
+<p>In this article, we use <code>library()</code> for clarity and copy-paste reproducibility.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>If you prefer a module-based and more explicit import style, use <code>box::use()</code> (read
+<a href="https://joshuamarie.github.io/modules-in-r/"><em>Box: Placing module system into R</em></a> for more details).</li>
+</ol>
+<p><em>Here’s the equivalent code as above:</em></p>
+<pre class="r"><code>box::use(
+kindling[...],
+dplyr[...],
+rsample[...],
+recipes[...],
+yardstick[...],
+workflows[...],
+parsnip[...],
+tibble[...],
+ggplot2[...],
+mlbench[...],
+vip[...]
+)</code></pre>
+<p><code>{kindling}</code> uses <code>{torch}</code> as backend, so LibTorch must be installed once:</p>
+<pre class="r"><code>if (!torch::torch_is_installed()) {
+  torch::install_torch()
+}</code></pre>
+</div>
+<div id="three-levels-of-interaction" class="section level1">
+<h1>Three levels of interaction</h1>
+<p><code>{kindling}</code> is useful because you can work at different abstraction levels. Here are three ways to interact with the package, ordered from lowest to highest level of abstraction:</p>
+<div id="generate-model-code-_generator" class="section level2">
+<h2>1) Generate model code (<code>*_generator()</code>)</h2>
+<p>If you want to inspect architecture code before training:</p>
+<pre class="r"><code>ffnn_generator(
+  nn_name = &quot;MyNet&quot;,
+  hd_neurons = c(64, 32, 16),
+  no_x = 10,
+  no_y = 1,
+  activations = act_funs(
+    relu,
+    &quot;softplus(beta = 0.5)&quot;,
+    selu
+  )
+)</code></pre>
+<pre><code>## torch::nn_module(&quot;MyNet&quot;, initialize = function () 
+## {
+##     self$fc1 = torch::nn_linear(10, 64, bias = TRUE)
+##     self$fc2 = torch::nn_linear(64, 32, bias = TRUE)
+##     self$fc3 = torch::nn_linear(32, 16, bias = TRUE)
+##     self$out = torch::nn_linear(16, 1, bias = TRUE)
+## }, forward = function (x) 
+## {
+##     x = self$fc1(x)
+##     x = torch::nnf_relu(x)
+##     x = self$fc2(x)
+##     x = torch::nnf_softplus(x, beta = 0.5)
+##     x = self$fc3(x)
+##     x = torch::nnf_selu(x)
+##     x = self$out(x)
+##     x
+## })</code></pre>
+<p><em>Technical note: To specify a parametric activation functions like <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.softplus.html">Softplus</a> under <code>act_funs()</code> function, set <code>softplus = args(beta = 0.5)</code> or <code>softplus[beta = 0.5]</code> (available in v0.3.x and later), not just in a stringly typed expression, e.g. <code>"softplus(beta = 0.5)"</code>.</em></p>
+<p>This returns an unevaluated <code>torch::nn_module</code> expression you can inspect or modify.</p>
+</div>
+<div id="direct-training" class="section level2">
+<h2>2) Direct Training</h2>
+<p>The functions available (for now) are <code>ffnn()</code> and <code>rnn()</code>. For many applied tasks, this is the fastest way to fit a network from a formula.</p>
+<pre class="r"><code>mini_direct &lt;- ffnn(
+  mpg ~ .,
+  data = mtcars,
+  hidden_neurons = 8,
+  activations = act_funs(relu),
+  epochs = 20,
+  verbose = FALSE
+)
+
+predict(mini_direct, newdata = head(mtcars, 3))</code></pre>
+<pre><code>## [1] 7.892841 7.838289 3.948107</code></pre>
+</div>
+<div id="ml-framework-integration-tidymodels-with-mlp_kindling-rnn_kindling" class="section level2">
+<h2>3) ML Framework Integration: <code>{tidymodels}</code> with <code>mlp_kindling()</code> / <code>rnn_kindling()</code></h2>
+<p><code>{kindling}</code> functions to directly train the said models also (currently) integrates with <code>{tidymodels}</code>. This level is ideal when we want recipes, workflows, resampling, and tuning.</p>
+<pre class="r"><code>mini_spec &lt;- mlp_kindling(
+  mode = &quot;regression&quot;,
+  hidden_neurons = 8,
+  activations = act_funs(relu), # or just &quot;relu&quot;
+  epochs = 20,
+  verbose = FALSE
+)
+
+mini_wf &lt;- workflow() |&gt;
+  add_formula(mpg ~ .) |&gt;
+  add_model(mini_spec)
+
+mini_fit &lt;- fit(mini_wf, data = mtcars)
+
+predict(mini_fit, new_data = head(mtcars, 3))</code></pre>
+<pre><code>## # A tibble: 3 × 1
+##   .pred
+##   &lt;dbl&gt;
+## 1  7.50
+## 2  7.55
+## 3  5.39</code></pre>
+<p>Now that we’ve covered the three levels of interaction, let’s see <code>{kindling}</code> in action with two “realistic” examples. We’ll demonstrate how to structure reproducible workflows, handle feature preprocessing, and evaluate results properly. Along the way, you’ll see which abstraction level works best for different scenarios.</p>
+</div>
+</div>
+<div id="example-1-iris-classification-with-reproducible-good-practice" class="section level1">
+<h1>Example 1: Iris classification with reproducible good practice</h1>
+<p>This first example uses direct training with <code>ffnn()</code>, but still follows practical steps:</p>
+<ul>
+<li>train/test split,</li>
+<li>feature scaling,</li>
+<li>validation split during training,</li>
+<li>regularization,</li>
+<li>out-of-sample evaluation.</li>
+</ul>
+<div id="data-preprocessing" class="section level2">
+<h2>Data Preprocessing</h2>
+<p><strong>Train/test split</strong> is performed to prevent evaluating only on training data.</p>
+<pre class="r"><code>data(iris)
+
+iris_split &lt;- initial_split(iris, prop = 0.8, strata = Species)
+iris_train &lt;- training(iris_split)
+iris_test &lt;- testing(iris_split)
+
+iris_recipe &lt;- recipe(Species ~ ., data = iris_train) |&gt;
+  step_normalize(all_predictors())
+iris_prep &lt;- prep(iris_recipe, training = iris_train)
+iris_train_processed &lt;- bake(iris_prep, new_data = NULL)
+iris_test_processed &lt;- bake(iris_prep, new_data = iris_test)</code></pre>
+</div>
+<div id="mlp-with-2-hidden-layers" class="section level2">
+<h2>MLP with 2 Hidden Layers</h2>
+<pre class="r"><code>set.seed(20260218)
+
+iris_mlp &lt;- ffnn(
+  Species ~ .,
+  data = iris_train_processed,
+  hidden_neurons = c(32, 16),
+  activations = act_funs(relu, &quot;softplus(beta = 0.5)&quot;),
+  loss = &quot;cross_entropy&quot;,
+  optimizer = &quot;adam&quot;,
+  learn_rate = 0.01,
+  penalty = 1e-4,
+  mixture = 0,
+  batch_size = 16,
+  epochs = 200,
+  validation_split = 0.2,
+  verbose = FALSE
+)
+
+iris_mlp</code></pre>
+<pre><code>## 
+## ======================= Feedforward Neural Networks (MLP) ======================
+## 
+## 
+## -- FFNN Model Summary ----------------------------------------------------------
+## 
+## 
+## -------------------------------------------------------------------------------------
+##   NN Model Type           :             FFNN    n_predictors :                    4
+##   Number of Epochs        :              200    n_response   :                    3
+##   Hidden Layer Units      :           32, 16    reg.         :   [λ = 1e-04, α = 0]
+##   Number of Hidden Layers :                2    Device       :                  mps
+##   Pred. Type              :   classification                 :                     
+## -------------------------------------------------------------------------------------
+## 
+## 
+## 
+## -- Activation function ---------------------------------------------------------
+## 
+## 
+##                -------------------------------------------------
+##                  1st Layer {32}    :                      relu
+##                  2nd Layer {16}    :      softplus(beta = 0.5)
+##                  Output Activation :   No act function applied
+##                -------------------------------------------------</code></pre>
+<pre class="r"><code>iris_pred &lt;- predict(iris_mlp, newdata = iris_test_processed, type = &quot;response&quot;)
+
+iris_eval &lt;- tibble(
+  truth = iris_test_processed$Species,
+  .pred_class = iris_pred
+)
+
+metrics(iris_eval, truth = truth, estimate = .pred_class)</code></pre>
+<pre><code>## # A tibble: 2 × 3
+##   .metric  .estimator .estimate
+##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+## 1 accuracy multiclass     0.967
+## 2 kap      multiclass     0.95</code></pre>
+<pre class="r"><code>conf_mat(iris_eval, truth = truth, estimate = .pred_class)</code></pre>
+<pre><code>##             Truth
+## Prediction   setosa versicolor virginica
+##   setosa         10          0         0
+##   versicolor      0          9         0
+##   virginica       0          1        10</code></pre>
+<div id="why-these-choices" class="section level3">
+<h3>Why these choices?</h3>
+<p>Here’s the brief explanation on how we set up the models from <code>{kindling}</code>:</p>
+<ul>
+<li><p><strong>Architecture (<code>c(32, 16)</code>)</strong>: The architecture has 2 layers with 32 units for the 1st layer and 16 for the 2nd layer. It is enough capacity for Iris, but still simple.</p></li>
+<li><p><strong>Activations</strong>: The architecture has 2 hidden layers, each layer is specified with different activation functions.</p>
+<ol style="list-style-type: decimal">
+<li><code>relu</code>: Also called Rectified Linear Unit (ReLU); the most stable default for hidden layers.</li>
+<li><code>softplus</code>: Similar to ReLU but much <em>smoother</em> in approximation; beta is adjusted to <code>0.5</code>.</li>
+</ol></li>
+<li><p><strong>Scaling</strong>: crucial because neural networks are sensitive to predictor scale.</p></li>
+<li><p><strong>Regularization (<code>penalty</code> and <code>mixture</code>)</strong>: helps reduce overfitting even on small data. <code>mixture</code> is set to 0, which means the optimization is performed with L2 regularization.</p></li>
+<li><p><strong>Validation split</strong>: monitors generalization during training.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="example-2-a-more-realistic-tabular-benchmark-sonar" class="section level1">
+<h1>Example 2: A more realistic tabular benchmark (Sonar)</h1>
+<p>Iris is useful for teaching, but sometimes considered (too) easy. The Sonar dataset (60 numeric predictors, binary outcome) is a better stress test for tabular classification.</p>
+<pre class="r"><code>data(&quot;Sonar&quot;, package = &quot;mlbench&quot;)
+
+sonar &lt;- Sonar |&gt;
+  mutate(Class = factor(Class))
+
+sonar_split &lt;- initial_split(sonar, prop = 0.8, strata = Class)
+sonar_train &lt;- training(sonar_split)
+sonar_test &lt;- testing(sonar_split)</code></pre>
+<p>Now fit through <code>{tidymodels}</code> so preprocessing and modeling stay in one pipeline:</p>
+<pre class="r"><code>sonar_rec &lt;- recipe(Class ~ ., data = sonar_train) |&gt;
+  step_normalize(all_predictors())
+
+sonar_spec &lt;- mlp_kindling(
+  mode = &quot;classification&quot;,
+  hidden_neurons = c(64, 32),
+  activations = act_funs(relu, relu),
+  optimizer = &quot;adam&quot;,
+  learn_rate = 0.001,
+  penalty = 1e-4,
+  mixture = 0,
+  batch_size = 16,
+  epochs = 250,
+  validation_split = 0.2,
+  verbose = FALSE
+)
+
+sonar_wf &lt;- workflow() |&gt;
+  add_recipe(sonar_rec) |&gt;
+  add_model(sonar_spec)
+
+set.seed(20260218)
+sonar_fit &lt;- fit(sonar_wf, data = sonar_train)</code></pre>
+<pre class="r"><code>sonar_pred &lt;- augment(sonar_fit, new_data = sonar_test)
+
+metrics(sonar_pred, truth = Class, estimate = .pred_class)</code></pre>
+<pre><code>## # A tibble: 2 × 3
+##   .metric  .estimator .estimate
+##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+## 1 accuracy binary         0.837
+## 2 kap      binary         0.672</code></pre>
+<p>In practice, this setup is often a strong baseline for tabular binary classification before trying larger architectures.</p>
+</div>
+<div id="about-early-stopping-and-callbacks" class="section level1">
+<h1>About early stopping and callbacks</h1>
+<p>If you come from Keras/TensorFlow, you may be used to callback objects (early stopping, learning-rate schedules, etc.).</p>
+<p>With <code>{kindling}</code> 0.2.0, practical overfitting control is usually handled through:</p>
+<ul>
+<li><code>validation_split</code>,</li>
+<li>regularization (<code>penalty</code>, <code>mixture</code>),</li>
+<li>tuning model size and training length (<code>epochs</code>),</li>
+<li>proper resampling with <code>{tidymodels}</code>.</li>
+</ul>
+<p>In other words, we can approximate early-stopping behavior by selecting <code>epochs</code> via validation/resampling, even without a callback-heavy workflow.</p>
+</div>
+<div id="supported-architectures-current-scope" class="section level1">
+<h1>Supported architectures (current scope)</h1>
+<div id="guekwttyav" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#guekwttyav table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#guekwttyav thead, #guekwttyav tbody, #guekwttyav tfoot, #guekwttyav tr, #guekwttyav td, #guekwttyav th {
+  border-style: none;
+}
+
+#guekwttyav p {
+  margin: 0;
+  padding: 0;
+}
+
+#guekwttyav .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: 100%;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#guekwttyav .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#guekwttyav .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#guekwttyav .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#guekwttyav .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#guekwttyav .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#guekwttyav .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#guekwttyav .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#guekwttyav .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#guekwttyav .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#guekwttyav .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#guekwttyav .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#guekwttyav .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#guekwttyav .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#guekwttyav .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#guekwttyav .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#guekwttyav .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#guekwttyav .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#guekwttyav .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#guekwttyav .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#guekwttyav .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#guekwttyav .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#guekwttyav .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#guekwttyav .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#guekwttyav .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#guekwttyav .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#guekwttyav .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#guekwttyav .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#guekwttyav .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#guekwttyav .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#guekwttyav .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#guekwttyav .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#guekwttyav .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#guekwttyav .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#guekwttyav .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#guekwttyav .gt_left {
+  text-align: left;
+}
+
+#guekwttyav .gt_center {
+  text-align: center;
+}
+
+#guekwttyav .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#guekwttyav .gt_font_normal {
+  font-weight: normal;
+}
+
+#guekwttyav .gt_font_bold {
+  font-weight: bold;
+}
+
+#guekwttyav .gt_font_italic {
+  font-style: italic;
+}
+
+#guekwttyav .gt_super {
+  font-size: 65%;
+}
+
+#guekwttyav .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#guekwttyav .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#guekwttyav .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#guekwttyav .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#guekwttyav .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#guekwttyav .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#guekwttyav .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#guekwttyav .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#guekwttyav div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Architecture">Architecture</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Main-function(s)">Main function(s)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Typical-use">Typical use</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Architecture" class="gt_row gt_left">Feedforward (MLP/FFNN)</td>
+<td headers="Main function(s)" class="gt_row gt_left" style="font-family: monospace;">ffnn(), mlp_kindling()</td>
+<td headers="Typical use" class="gt_row gt_left">Tabular regression/classification</td></tr>
+    <tr><td headers="Architecture" class="gt_row gt_left">RNN</td>
+<td headers="Main function(s)" class="gt_row gt_left" style="font-family: monospace;">rnn_kindling(rnn_type = "rnn")</td>
+<td headers="Typical use" class="gt_row gt_left">Sequential patterns</td></tr>
+    <tr><td headers="Architecture" class="gt_row gt_left">LSTM</td>
+<td headers="Main function(s)" class="gt_row gt_left" style="font-family: monospace;">rnn_kindling(rnn_type = "lstm")</td>
+<td headers="Typical use" class="gt_row gt_left">Longer-range sequence dependencies</td></tr>
+    <tr><td headers="Architecture" class="gt_row gt_left">GRU</td>
+<td headers="Main function(s)" class="gt_row gt_left" style="font-family: monospace;">rnn_kindling(rnn_type = "gru")</td>
+<td headers="Typical use" class="gt_row gt_left">Sequence modeling with fewer parameters</td></tr>
+  </tbody>
+  
+</table>
+</div>
+</div>
+<div id="variable-importance-ffnn" class="section level1">
+<h1>Variable importance (FFNN)</h1>
+<p>Interpretability for neural networks is imperfect, but <code>{kindling}</code> integrates established approaches for FFNN models.</p>
+<pre class="r"><code># For FFNN fits:
+garson(iris_mlp, bar_plot = FALSE)</code></pre>
+<pre><code>##        x_names y_names  rel_imp
+## 1 Petal.Length       y 33.86896
+## 2  Petal.Width       y 25.88985
+## 3 Sepal.Length       y 22.05507
+## 4  Sepal.Width       y 18.18611</code></pre>
+<pre class="r"><code>olden(iris_mlp, bar_plot = FALSE)</code></pre>
+<pre><code>##        x_names y_names    rel_imp
+## 1 Petal.Length       y -1.1569239
+## 2  Petal.Width       y -0.8354390
+## 3  Sepal.Width       y  0.3079235
+## 4 Sepal.Length       y -0.2721871</code></pre>
+<pre class="r"><code># Via vip (Olden/Garson methods supported by kindling S3 methods)
+vi(iris_mlp, type = &quot;olden&quot;) |&gt;
+  vip()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/varimp-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<p>We recommend using these as directional diagnostics, not as causal evidence.</p>
+</div>
+<div id="when-kindling-is-a-good-fit" class="section level1">
+<h1>When <code>{kindling}</code> is a good fit</h1>
+<p><code>{kindling}</code> is a practical choice when our projects:</p>
+<ul>
+<li>work mostly in R and want to stay inside <code>{tidymodels}</code>,</li>
+<li>need neural nets for tabular or moderate sequence tasks,</li>
+<li>want less boilerplate than raw <code>{torch}</code> but still meaningful control.</li>
+</ul>
+<p>It may be less ideal when our projects need:</p>
+<ul>
+<li>custom research architectures and training loops,</li>
+<li>mature callback ecosystems similar to high-level Keras workflows,</li>
+<li>highly optimized distributed production pipelines.</li>
+</ul>
+</div>
+<div id="limitations-to-keep-in-mind" class="section level1">
+<h1>Limitations to keep in mind</h1>
+<ul>
+<li><strong>Hardware setup still matters</strong>: GPU usage depends on a correct <code>{torch}</code>/LibTorch installation and supported hardware.</li>
+<li><strong>Ecosystem maturity</strong>: this is a young package; interfaces can evolve.</li>
+<li><strong>Debugging depth</strong>: for deeply custom debugging, low-level <code>{torch}</code> remains the reference path.</li>
+<li><strong>Model class assumptions</strong>: recurrent models are for sequence-structured data; using them on plain tabular data is usually not appropriate.</li>
+</ul>
+</div>
+<div id="takeaways" class="section level1">
+<h1>Takeaways</h1>
+<p><code>{kindling}</code> is not about replacing <code>{torch}</code> or <code>{keras3}</code>. It is about reducing friction for common deep-learning workflows in R.</p>
+<p>For many applied projects, a robust pattern is:</p>
+<ol style="list-style-type: decimal">
+<li>preprocess with <code>{recipes}</code>,</li>
+<li>start with a modest MLP architecture,</li>
+<li>use validation split + regularization,</li>
+<li>evaluate on held-out test data,</li>
+<li>tune only after you have a strong baseline.</li>
+</ol>
+<p>If this matches your workflow, <code>{kindling}</code> is worth trying.</p>
+<p>As always, if you have any question related to the topic covered in this post, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
