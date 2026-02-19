@@ -48,7 +48,7 @@ output:
 </div>
 <div id="setup" class="section level1">
 <h1>Setup</h1>
-<p>Install this package in different ways:</p>
+<p>Install this package in two different ways:</p>
 <ol style="list-style-type: decimal">
 <li>Solely install <code>{kindling}</code> (as it installs the package dependencies internally)</li>
 </ol>
@@ -152,7 +152,7 @@ vip[...]
 )
 
 predict(mini_direct, newdata = head(mtcars, 3))</code></pre>
-<pre><code>## [1] 7.892841 7.838289 3.948107</code></pre>
+<pre><code>## [1] 14.90800 14.96446 11.53609</code></pre>
 </div>
 <div id="ml-framework-integration-tidymodels-with-mlp_kindling-rnn_kindling" class="section level2">
 <h2>3) ML Framework Integration: <code>{tidymodels}</code> with <code>mlp_kindling()</code> / <code>rnn_kindling()</code></h2>
@@ -175,9 +175,9 @@ predict(mini_fit, new_data = head(mtcars, 3))</code></pre>
 <pre><code>## # A tibble: 3 × 1
 ##   .pred
 ##   &lt;dbl&gt;
-## 1  7.50
-## 2  7.55
-## 3  5.39</code></pre>
+## 1 -4.59
+## 2 -4.59
+## 3 -2.86</code></pre>
 <p>Now that we’ve covered the three levels of interaction, let’s see <code>{kindling}</code> in action with two “realistic” examples. We’ll demonstrate how to structure reproducible workflows, handle feature preprocessing, and evaluate results properly. Along the way, you’ll see which abstraction level works best for different scenarios.</p>
 </div>
 </div>
@@ -263,14 +263,14 @@ metrics(iris_eval, truth = truth, estimate = .pred_class)</code></pre>
 <pre><code>## # A tibble: 2 × 3
 ##   .metric  .estimator .estimate
 ##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-## 1 accuracy multiclass     0.967
-## 2 kap      multiclass     0.95</code></pre>
+## 1 accuracy multiclass     0.933
+## 2 kap      multiclass     0.9</code></pre>
 <pre class="r"><code>conf_mat(iris_eval, truth = truth, estimate = .pred_class)</code></pre>
 <pre><code>##             Truth
 ## Prediction   setosa versicolor virginica
 ##   setosa         10          0         0
-##   versicolor      0          9         0
-##   virginica       0          1        10</code></pre>
+##   versicolor      0          9         1
+##   virginica       0          1         9</code></pre>
 <div id="why-these-choices" class="section level3">
 <h3>Why these choices?</h3>
 <p>Here’s the brief explanation on how we set up the models from <code>{kindling}</code>:</p>
@@ -329,8 +329,8 @@ metrics(sonar_pred, truth = Class, estimate = .pred_class)</code></pre>
 <pre><code>## # A tibble: 2 × 3
 ##   .metric  .estimator .estimate
 ##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-## 1 accuracy binary         0.837
-## 2 kap      binary         0.672</code></pre>
+## 1 accuracy binary         0.884
+## 2 kap      binary         0.766</code></pre>
 <p>In practice, this setup is often a strong baseline for tabular binary classification before trying larger architectures.</p>
 </div>
 <div id="about-early-stopping-and-callbacks" class="section level1">
@@ -821,6 +821,7 @@ metrics(sonar_pred, truth = Class, estimate = .pred_class)</code></pre>
   
 </table>
 </div>
+<p><br></p>
 </div>
 <div id="variable-importance-ffnn" class="section level1">
 <h1>Variable importance (FFNN)</h1>
@@ -828,16 +829,16 @@ metrics(sonar_pred, truth = Class, estimate = .pred_class)</code></pre>
 <pre class="r"><code># For FFNN fits:
 garson(iris_mlp, bar_plot = FALSE)</code></pre>
 <pre><code>##        x_names y_names  rel_imp
-## 1 Petal.Length       y 33.86896
-## 2  Petal.Width       y 25.88985
-## 3 Sepal.Length       y 22.05507
-## 4  Sepal.Width       y 18.18611</code></pre>
+## 1 Petal.Length       y 30.85867
+## 2  Petal.Width       y 25.52935
+## 3  Sepal.Width       y 24.55541
+## 4 Sepal.Length       y 19.05658</code></pre>
 <pre class="r"><code>olden(iris_mlp, bar_plot = FALSE)</code></pre>
 <pre><code>##        x_names y_names    rel_imp
-## 1 Petal.Length       y -1.1569239
-## 2  Petal.Width       y -0.8354390
-## 3  Sepal.Width       y  0.3079235
-## 4 Sepal.Length       y -0.2721871</code></pre>
+## 1 Petal.Length       y  0.5383305
+## 2  Sepal.Width       y  0.4492567
+## 3 Sepal.Length       y -0.3675011
+## 4  Petal.Width       y  0.1205999</code></pre>
 <pre class="r"><code># Via vip (Olden/Garson methods supported by kindling S3 methods)
 vi(iris_mlp, type = &quot;olden&quot;) |&gt;
   vip()</code></pre>
