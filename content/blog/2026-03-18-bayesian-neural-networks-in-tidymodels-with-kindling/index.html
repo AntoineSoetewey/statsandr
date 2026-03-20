@@ -1,0 +1,215 @@
+---
+title: Bayesian Neural Networks in {tidymodels} with {kindling}
+author: Antoine Soetewey
+date: '2026-03-20'
+slug: bayesian-neural-networks-in-tidymodels-with-kindling
+categories: []
+tags:
+  - Collaboration
+  - Package
+  - R
+meta_img: blog/bayesian-neural-networks-in-tidymodels-with-kindling/images/bayesian-neural-networks-in-tidymodels-with-kindling.jpg
+description: Showcasing the versatility of the `{kindling}` R package.
+output:
+  blogdown::html_page:
+    toc: false
+    toc_depth: 6
+# draft: true
+bibliography: bibliography.bib
+---
+
+
+
+<p><img src="images/bayesian-neural-networks-in-tidymodels-with-kindling.jpg" style="width:100.0%" /></p>
+<p><em>This post was written in collaboration with Joshua Marie.</em></p>
+<div id="what-are-bayesian-neural-networks" class="section level1">
+<h1>What Are Bayesian Neural Networks?</h1>
+<p>Standard neural networks learn fixed weights during training and produce a single point estimate for each input — with no sense of how confident the model is. <strong>Bayesian Neural Networks (BNNs)</strong> replace those fixed weights with <em>probability distributions</em> <span class="citation">(<a href="#ref-neal2012bayesian">Neal 2012</a>)</span>. Instead of learning a single value per weight, the network learns a mean and a variance, and samples from that distribution at every forward pass.</p>
+<p>Formally, a BNN places a prior <span class="math inline">\(p(\mathbf{w})\)</span> over the weights and updates it with observed data <span class="math inline">\(\mathcal{D}\)</span> via Bayes’ theorem:</p>
+<p><span class="math display">\[p(\mathbf{w} \mid \mathcal{D}) = \frac{p(\mathcal{D} \mid \mathbf{w})\, p(\mathbf{w})}{p(\mathcal{D})}\]</span></p>
+<p>For large and deep networks, the posterior <span class="math inline">\(p(\mathbf{w} \mid \mathcal{D})\)</span> is intractable. BNNs typically use <em>variational inference</em> to approximate it with a tractable distribution <span class="math inline">\(q_\phi(\mathbf{w})\)</span> by minimising the KL divergence between the two <span class="citation">(<a href="#ref-blundell2015weight">Blundell et al. 2015</a>)</span>.</p>
+<div id="from-point-estimates-to-distributions" class="section level2">
+<h2>From point estimates to distributions</h2>
+<p>A standard linear layer computes <span class="math inline">\(\mathbf{y} = \mathbf{W}\mathbf{x} + \mathbf{b}\)</span>, where <span class="math inline">\(\mathbf{W}\)</span> and <span class="math inline">\(\mathbf{b}\)</span> are fixed. In a Bayesian linear layer, they are random variables. We place a Gaussian prior over the weights:</p>
+<p><span class="math display">\[\mathbf{W} \sim \mathcal{N}(\mu_{\text{prior}},\ \sigma_{\text{prior}}^2)\]</span></p>
+<p>and during training we learn a <strong>variational posterior</strong>:</p>
+<p><span class="math display">\[q(\mathbf{W}) = \mathcal{N}(\mu_W,\ \sigma_W^2)\]</span></p>
+<p>Each weight therefore has two learnable scalars: a mean <span class="math inline">\(\mu_W\)</span> and a log-standard-deviation <span class="math inline">\(\log \sigma_W\)</span>.</p>
+</div>
+<div id="the-reparameterisation-trick" class="section level2">
+<h2>The reparameterisation trick</h2>
+<p>Sampling directly from <span class="math inline">\(q(\mathbf{W})\)</span> is not differentiable with respect to <span class="math inline">\(\mu_W\)</span> and <span class="math inline">\(\sigma_W\)</span>. We resolve this with the <strong>reparameterisation trick</strong> <span class="citation">(<a href="#ref-kingma2013auto">Kingma and Welling 2013</a>)</span>:</p>
+<p><span class="math display">\[\mathbf{W} = \mu_W + \sigma_W \odot \varepsilon, \quad \varepsilon \sim \mathcal{N}(\mathbf{0}, \mathbf{I})\]</span></p>
+<p>We store <span class="math inline">\(\log \sigma_W\)</span> (not <span class="math inline">\(\sigma_W\)</span> directly) to ensure positivity during unconstrained optimisation:</p>
+<p><span class="math display">\[\sigma_W = \exp(\texttt{weight}_{\log\sigma})\]</span></p>
+<p>This yields the sampled weight used in the forward pass:</p>
+<p><span class="math display">\[\mathbf{W}_{\text{sample}} = \mu_W + \exp(\texttt{weight}_{\log\sigma}) \odot \varepsilon_W\]</span></p>
+<p>and similarly for the bias:</p>
+<p><span class="math display">\[\mathbf{b}_{\text{sample}} = \mu_b + \exp(\texttt{bias}_{\log\sigma}) \odot \varepsilon_b\]</span></p>
+</div>
+</div>
+<div id="is-it-possible" class="section level1">
+<h1>Is it possible?</h1>
+<p>At the moment, <code>{tidymodels}</code> offers limited APIs for neural network architectures, mostly around standard MLPs. A few packages make <code>{torch}</code> easier to use at a higher level:</p>
+<ol style="list-style-type: decimal">
+<li><code>{brulee}</code> bridges <code>{torch}</code> with <code>{tidymodels}</code>. It is ergonomic, but currently focused on MLPs for tabular data.</li>
+<li><code>{cito}</code> does not integrate with <code>{tidymodels}</code> and leans more toward statistical applications.</li>
+<li>The <code>{torch}</code> team maintains <code>{luz}</code>.</li>
+<li><code>{tabnet}</code> integrates with <code>{tidymodels}</code>, but is dedicated to the TabNet architecture.</li>
+</ol>
+<p><code>{kindling}</code> does not replace these packages. However, it helps close some of these gaps by supporting custom architectures with flexible depth. As a result, custom neural network architectures, including BNNs, can be used within <code>{tidymodels}</code> workflows. For a broader overview of what <code>{kindling}</code> enables in R, see this <a href="https://statsandr.com/blog/you-can-do-more-for-neural-networks-in-r-with-kindling/">earlier post</a>.</p>
+</div>
+<div id="setup" class="section level1">
+<h1>Setup</h1>
+<p>On March 3, 2026, <code>{kindling}</code> v0.3.0 was released on <a href="https://cran.r-project.org/package=kindling">CRAN</a>. Remember that <code>utils::install.packages()</code> in R always installs the latest version.</p>
+<pre class="r"><code>install.packages(&quot;kindling&quot;)</code></pre>
+<p>If you want the development version, you can retrieve the package by installing it from GitHub:</p>
+<pre class="r"><code>pak::pak(&quot;joshuamarie/kindling&quot;)</code></pre>
+<p>I recommend using <code>{pak}</code>: it is fast and very good at resolving package dependencies across environments, including system libraries and <code>{renv}</code>-managed projects.</p>
+<p>Before using <code>{kindling}</code>, install LibTorch — the C++ backend shared by PyTorch and the <code>{torch}</code> R package <span class="citation">(<a href="#ref-falbel2023torch">Falbel and Luraschi 2023</a>)</span>:</p>
+<pre class="r"><code>torch::install_torch()</code></pre>
+</div>
+<div id="loading-namespace" class="section level1">
+<h1>Loading namespace</h1>
+<p>When teaching R, I recommend using <code>box::use()</code> and qualifying the names you import. Create a <code>bnn</code> folder in your project root, then clone this repository to use BNNs in R (this module is adapted from <code>torchbnn</code> <span class="citation">(<a href="#ref-kim2020torchbnn">Kim 2020</a>)</span>): <a href="https://github.com/joshuamarie/RTorchBNN" class="uri">https://github.com/joshuamarie/RTorchBNN</a>.</p>
+<p>You can run a specific command:</p>
+<pre class="bash"><code>git clone --branch main https://github.com/joshuamarie/RTorchBNN bnn</code></pre>
+<p>Then, load the following:</p>
+<pre class="r"><code>box::use(
+  bnn = . / bnn,
+  kindling[train_nnsnip, nn_arch, act_funs],
+  parsnip[fit, augment],
+  yardstick[metrics]
+)</code></pre>
+<p>Then register the models in <code>{parsnip}</code> with:</p>
+<pre class="r"><code>loadNamespace(&quot;kindling&quot;)</code></pre>
+</div>
+<div id="the-train_nnsnip-interface" class="section level1">
+<h1>The <code>train_nnsnip()</code> Interface</h1>
+<p>In <code>{kindling}</code> v0.3.0, <code>train_nnsnip()</code> was introduced as a <code>{parsnip}</code>-compatible model specification that bridges the generalized neural network trainer with the <code>{tidymodels}</code> ecosystem. Unlike <code>mlp_kindling()</code>, which is specific to feedforward networks, <code>train_nnsnip()</code> is architecture-agnostic: you describe the layer topology via <code>nn_arch()</code>, allowing BNN-style or other custom layer types to slot in without changing the training logic.</p>
+</div>
+<div id="classification-iris" class="section level1">
+<h1>Classification: Iris</h1>
+<p>We train a Bayesian Neural Network model to predict species in the <code>iris</code> dataset via <code>train_nnsnip()</code>, by configuring <code>arch</code> with <code>nn_arch()</code>. Inside <code>nn_arch()</code>, set <code>nn_layer</code> to <code>bnn$BayesLinear</code> instead of the default linear layer, then define the arguments for each layer with <code>layer_arg_fn</code>.</p>
+<pre class="r"><code>nn_model &lt;-
+  train_nnsnip(
+    mode = &quot;classification&quot;,
+    arch = nn_arch(
+      nn_layer = bnn$BayesLinear,
+      out_nn_layer = torch::nn_linear,
+      layer_arg_fn = ~ if (.is_output) {
+        list(.in, .out)
+      } else {
+        list(
+          in_features = .in,
+          out_features = .out,
+          prior_mu = 0,
+          prior_sigma = 0.1
+        )
+      }
+    ),
+    hidden_neurons = c(64, 32),
+    activations = act_funs(relu, elu),
+    loss = &quot;cross_entropy&quot;,
+    epochs = 50,
+    verbose = TRUE,
+    learn_rate = 1e-3,
+    optimizer_args = list(weight_decay = 0.01)
+  ) |&gt;
+  fit(Species ~ ., data = iris)
+
+nn_model |&gt;
+  augment(new_data = iris) |&gt;
+  metrics(truth = Species, estimate = .pred_class)</code></pre>
+<pre><code>## # A tibble: 2 × 3
+##   .metric  .estimator .estimate
+##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+## 1 accuracy multiclass     0.667
+## 2 kap      multiclass     0.5</code></pre>
+<p>Averaging predictions over multiple forward passes gives both a point estimate and a measure of predictive spread — all within a standard <code>{tidymodels}</code> pipeline.</p>
+</div>
+<div id="the-drawbacks" class="section level1">
+<h1>The drawbacks</h1>
+<p>For now, there is no built-in option to update the loss dynamically during training. To use a custom objective such as the <strong>Evidence Lower Bound</strong> (ELBO), you currently need to define it manually and retrain with that loss.</p>
+<div id="updating-the-model" class="section level2">
+<h2>Updating the model</h2>
+<p>That said, you can still apply a custom loss by setting the <code>loss</code> parameter to a <code>torch</code> function, for example <code>torch::nnf_mse_loss()</code>. If you want to train the model with an ELBO-style loss, do the following:</p>
+<pre class="r"><code>make_elbo_loss &lt;- function(bnn_model, n_obs, kl_weight = 1.0) {
+  box::use(
+    torch[nnf_cross_entropy, torch_tensor]
+  )
+
+  function(input, target) {
+    ce &lt;- nnf_cross_entropy(input, target)
+    device &lt;- input$device
+    kl_val &lt;- torch_tensor(0.0, device = device, requires_grad = FALSE)
+    for (m in bnn_model$modules) {
+      if (inherits(m, &quot;BayesLinear&quot;) &amp;&amp; !is.null(m$kl)) {
+        kl_val &lt;- kl_val + m$kl
+      }
+    }
+
+    ce + kl_weight * kl_val / n_obs
+  }
+}
+
+elbo_loss &lt;- make_elbo_loss(nn_model$fit$model, n_obs = nrow(iris), kl_weight = 1.0)
+
+nn_model2 &lt;-
+  train_nnsnip(
+    mode = &quot;classification&quot;,
+    arch = nn_arch(
+      nn_layer = bnn$BayesLinear,
+      out_nn_layer = torch::nn_linear,
+      layer_arg_fn = ~ if (.is_output) {
+        list(.in, .out)
+      } else {
+        list(
+          in_features = .in,
+          out_features = .out,
+          prior_mu = 0,
+          prior_sigma = 0.1
+        )
+      }
+    ),
+    hidden_neurons = c(64, 32),
+    activations = act_funs(relu, elu),
+    loss = elbo_loss,
+    epochs = 50,
+    verbose = TRUE,
+    learn_rate = 1e-3,
+    optimizer_args = list(weight_decay = 0.01)
+  ) |&gt;
+  fit(Species ~ ., data = iris)
+
+nn_model2 |&gt;
+  augment(new_data = iris) |&gt;
+  metrics(truth = Species, estimate = .pred_class)</code></pre>
+<pre><code>## # A tibble: 2 × 3
+##   .metric  .estimator .estimate
+##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+## 1 accuracy multiclass     0.847
+## 2 kap      multiclass     0.77</code></pre>
+<p>As always, if you have any question related to the topic covered in this post, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-blundell2015weight" class="csl-entry">
+Blundell, Charles, Julien Cornebise, Koray Kavukcuoglu, and Daan Wierstra. 2015. <span>“Weight Uncertainty in Neural Network.”</span> <em>International Conference on Machine Learning</em>, 1613–22.
+</div>
+<div id="ref-falbel2023torch" class="csl-entry">
+Falbel, Daniel, and Javier Luraschi. 2023. <em>Torch: Tensors and Neural Networks with GPU Acceleration</em>. <a href="https://github.com/mlverse/torch">https://github.com/mlverse/torch</a>.
+</div>
+<div id="ref-kim2020torchbnn" class="csl-entry">
+Kim, Harry. 2020. <em>Bayesian Neural Network for PyTorch [Torchbnn]</em>. <a href="https://github.com/Harry24k/bayesian-neural-network-pytorch">https://github.com/Harry24k/bayesian-neural-network-pytorch</a>.
+</div>
+<div id="ref-kingma2013auto" class="csl-entry">
+Kingma, Diederik P, and Max Welling. 2013. <span>“Auto-Encoding Variational Bayes.”</span> <em>arXiv Preprint arXiv:1312.6114</em>.
+</div>
+<div id="ref-neal2012bayesian" class="csl-entry">
+Neal, Radford M. 2012. <em>Bayesian Learning for Neural Networks</em>. Vol. 118. Springer Science &amp; Business Media.
+</div>
+</div>
+</div>
