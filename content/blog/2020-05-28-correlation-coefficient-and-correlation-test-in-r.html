@@ -139,13 +139,13 @@ round(cor(dat),
 </ol>
 <p>Regarding the direction of the relationship: On the one hand, a <strong>negative correlation</strong> implies that the two variables under consideration vary in <strong>opposite directions</strong>, that is, if a variable increases the other decreases and vice versa. On the other hand, a <strong>positive correlation</strong> implies that the two variables under consideration vary in the <strong>same direction</strong>, i.e., if a variable increases the other one increases and if one decreases the other one decreases as well.</p>
 <p>Regarding the strength of the relationship: The <strong>more extreme</strong> the correlation coefficient (the closer to -1 or 1), the <strong>stronger the relationship</strong>. This also means that a <strong>correlation close to 0</strong> indicates that the two variables are <strong>independent</strong>, that is, as one variable increases, there is no tendency in the other variable to either decrease or increase.</p>
-<p>As an illustration, the Pearson correlation between horsepower (<code>hp</code>) and miles per gallon (<code>mpg</code>) found above is -0.78, meaning that the 2 variables vary in opposite direction. This makes sense, cars with more horsepower tend to consume more fuel (and thus have a lower millage par gallon). On the contrary, from the correlation matrix we see that the correlation between miles per gallon (<code>mpg</code>) and the time to drive 1/4 of a mile (<code>qsec</code>) is 0.42, meaning that fast cars (low <code>qsec</code>) tend to have a worse millage per gallon (low <code>mpg</code>). This again make sense as fast cars tend to consume more fuel.</p>
+<p>As an illustration, the Pearson correlation between horsepower (<code>hp</code>) and miles per gallon (<code>mpg</code>) found above is -0.78, meaning that the 2 variables vary in opposite direction. This makes sense, cars with more horsepower tend to consume more fuel (and thus have a lower mileage per gallon). On the contrary, from the correlation matrix we see that the correlation between miles per gallon (<code>mpg</code>) and the time to drive 1/4 of a mile (<code>qsec</code>) is 0.42, meaning that fast cars (low <code>qsec</code>) tend to have a worse mileage per gallon (low <code>mpg</code>). This again makes sense as fast cars tend to consume more fuel.</p>
 <p>Note that it is a good practice to visualize the type of the relationship between the two variables <em>before</em> interpreting the correlation coefficients. The reason is that the correlation coefficient could be biased due to an <a href="/blog/outliers-detection-in-r/">outlier</a> or due to the type of link between the two variables.</p>
 <p>For instance, see the two Pearson correlation coefficients (denoted by <code>R</code> in the following plots) when the outlier is excluded and included:</p>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-6-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-6-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
 <p>The Pearson correlation coefficient changes drastically due to a single point, and thus the interpretation. It goes from a negative correlation coefficient, indicating a negative relationship between the 2 variables, to a positive coefficient, indicating a positive relationship. We would have missed this insight if we had not visualized the data in a scatterplot (see how to draw a scatterplot in this <a href="/blog/correlation-coefficient-and-correlation-test-in-r/#visualizations">section</a>).</p>
 <p>A correlation coefficient may also miss a non-linear link between two variables:</p>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-7-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
 <p>The Pearson correlation coefficient is equal to 0, indicating no relationship between the two variables, because it measures the <strong>linear</strong> relationship and it is clear from the plot that the link is non-linear.</p>
 <p>So to recap, it is a good practice to visualize the data via a scatterplot before interpreting a correlation coefficient (it does not tell the whole story) and see how the correlation coefficient changes when using the parametric (Pearson) or nonparametric version (Spearman or Kendall’s tau-b).</p>
 </div>
@@ -163,10 +163,10 @@ ggplot(dat) +
   aes(x = hp, y = mpg) +
   geom_point(colour = &quot;#0c4c8a&quot;) +
   theme_minimal()</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-8-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
 <p>If you are unfamiliar with the <a href="/blog/graphics-in-r-with-ggplot2/"><code>{ggplot2}</code> package</a>, you can draw the scatterplot using the <code>plot()</code> function from R base graphics:</p>
 <pre class="r"><code>plot(dat$hp, dat$mpg)</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-9-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
 <p>or use the <a href="/blog/rstudio-addins-or-how-to-make-your-coding-life-easier/#esquisse">esquisse addin</a> to easily draw plots using the <code>{ggplot2}</code> package.</p>
 </div>
 <div id="scatterplots-for-several-pairs-of-variables" class="section level2">
@@ -175,7 +175,7 @@ ggplot(dat) +
 <p>For this illustration, we focus only on miles per gallon (<code>mpg</code>), horsepower (<code>hp</code>) and weight (<code>wt</code>):</p>
 <pre class="r"><code># multiple scatterplots
 pairs(dat[, c(&quot;mpg&quot;, &quot;hp&quot;, &quot;wt&quot;)])</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-10-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
 <p>The figure indicates that weight (<code>wt</code>) and horsepower (<code>hp</code>) are positively correlated, whereas miles per gallon (<code>mpg</code>) seems to be negatively correlated with horsepower (<code>hp</code>) and weight (<code>wt</code>).</p>
 </div>
 <div id="another-simple-correlation-matrix" class="section level2">
@@ -188,7 +188,7 @@ corrplot(cor(dat),
   method = &quot;number&quot;,
   type = &quot;upper&quot; # show only upper side
 )</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-11-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="correlation-test" class="section level1">
@@ -271,7 +271,7 @@ ggscatterstats(
   bf.message = FALSE,
   marginal = FALSE # remove histograms
 )</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-15-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
 <p>Based on the result of the test, we conclude that there is a negative correlation between the weight and the number of miles per gallon (<span class="math inline">\(r = - 0.87\)</span>, <span class="math inline">\(p\)</span>-value &lt; 0.001).</p>
 <p>If you need to do it for many pairs of variables, I recommend using the the <code>correlation</code> function from the <a href="https://easystats.github.io/correlation/" target="_blank">easystats <code>{correlation}</code> package</a>.</p>
 <p>This function allows to combine correlation coefficients and correlation tests for <em>several pairs</em> of variables, all in a single table (thanks to <a href="https://github.com/AntoineSoetewey/statsandr/issues/8" target="_blank">krzysiektr</a> for pointing it out to me):</p>
@@ -383,7 +383,7 @@ corrplot2(
   type = &quot;upper&quot;,
   tl.srt = 75
 )</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-17-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-17-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
 <p>The correlogram shows correlation coefficients for all pairs of variables (with more intense colors for more extreme correlations), and correlations not significantly different from 0 are represented by a white box.</p>
 <p>To learn more about this plot and the code used, I invite you to read the article entitled “<a href="/blog/correlogram-in-r-how-to-highlight-the-most-correlated-variables-in-a-dataset/">Correlogram in R: how to highlight the most correlated variables in a dataset</a>”.</p>
 <p>For those of you who are still not completely satisfied, I recently found two alternatives—one with the <code>ggpairs()</code> function from the <code>{GGally}</code> package and one with the <code>ggcormat()</code> function from the <code>{ggstatsplot}</code> package.</p>
@@ -391,7 +391,7 @@ corrplot2(
 <pre class="r"><code>library(GGally)
 
 ggpairs(dat[, c(&quot;mpg&quot;, &quot;hp&quot;, &quot;wt&quot;)])</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-18-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
 <p>The plot above combines correlation coefficients, correlation tests (via the asterisks next to the coefficients<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>) and scatterplots for all possible pairs of variables present in a dataset.</p>
 <pre class="r"><code>library(ggstatsplot)
 
@@ -400,7 +400,7 @@ ggcorrmat(
   type = &quot;parametric&quot;, # parametric for Pearson, nonparametric for Spearman&#39;s correlation
   colors = c(&quot;darkred&quot;, &quot;white&quot;, &quot;steelblue&quot;) # change default colors
 )</code></pre>
-<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p><img src="/blog/2020-05-28-correlation-coefficient-and-correlation-test-in-r_files/figure-html/unnamed-chunk-19-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
 <p>The plot above also shows the correlation coefficients and if any, the non-significant correlations (by default at the 5% significance level with the Holm adjustment method) are shown by a big cross on the correlation coefficients.</p>
 <p>The advantage of these two alternatives compared to the first one is that it is directly available within a package, so you do not need to run the code of the function first in order to draw the correlogram.</p>
 </div>
@@ -409,16 +409,16 @@ ggcorrmat(
 <h1>Correlation does not imply causation</h1>
 <p>I am pretty sure you have already heard the statement “Correlation does not imply causation” in statistics. An article about correlation would not be complete without discussing about causation.</p>
 <p>A non-zero correlation between two variables does not necessarily mean that there is a cause and effect relationship between these two variables!</p>
-<p>Indeed, a significant correlation between two variables means that changes in one variable are associated (positively or negatively) with changes in the other variable. Nonetheless, a significant correlation <em>does not</em> indicates that variations in one variable <em>cause</em> the variations in the other variable.</p>
+<p>Indeed, a significant correlation between two variables means that changes in one variable are associated (positively or negatively) with changes in the other variable. Nonetheless, a significant correlation <em>does not</em> indicate that variations in one variable <em>cause</em> the variations in the other variable.</p>
 <p>A non-zero correlation between X and Y can appear in several cases:</p>
 <ul>
 <li>X causes Y</li>
 <li>Y causes X</li>
-<li>a third variable cause X and Y</li>
+<li>a third variable causes X and Y</li>
 <li>a combination of these three reasons</li>
 </ul>
 <p>Sometimes it is quite clear that there is a causal relationship between two variables. Take for example the correlation between the price of a consumer product such as milk and its consumption. It is quite obvious that there is a causal link between the two: if the price of milk increases, it is expected that its consumption will decrease.</p>
-<p>However, this causal link is not always present even if the correlation is significant. <span class="citation">Maurage, Heeren, and Pesenti (<a href="#ref-maurage2013does">2013</a>)</span> showed that, although there is a positive and significant correlation between chocolate consumption and the number of Nobel laureates, this correlation comes from the fact that a third variable, Gross Domestic Product (GDP), causes chocolate consumption and the number of Nobel laureates. They found that countries with higher GDP tend to have a higher level of chocolate consumption and scientific research (leading to more Nobel laureates).</p>
+<p>However, this causal link is not always present even if the correlation is significant. <span class="citation">Maurage et al. (<a href="#ref-maurage2013does">2013</a>)</span> showed that, although there is a positive and significant correlation between chocolate consumption and the number of Nobel laureates, this correlation comes from the fact that a third variable, Gross Domestic Product (GDP), causes chocolate consumption and the number of Nobel laureates. They found that countries with higher GDP tend to have a higher level of chocolate consumption and scientific research (leading to more Nobel laureates).</p>
 <p>This example shows that one must be very cautious when interpreting correlations and avoid over-interpreting a correlation as a causal relationship.</p>
 </div>
 <div id="conclusion" class="section level1">
