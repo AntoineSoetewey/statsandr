@@ -60,7 +60,7 @@ The two groups to be compared are either:
 
 There are actually two versions of the Wilcoxon test:
 
-1. The **Mann-Withney-Wilcoxon** test (also referred as Wilcoxon rank sum test or Mann-Whitney U test) is performed when the samples are **independent** (so this test is the non-parametric equivalent to the Student's t-test for independent samples).
+1. The **Mann-Whitney-Wilcoxon** test (also referred as Wilcoxon rank sum test or Mann-Whitney U test) is performed when the samples are **independent** (so this test is the non-parametric equivalent to the Student's t-test for independent samples).
 1. The **Wilcoxon signed-rank** test (also sometimes referred as Wilcoxon test for paired samples) is performed when the samples are **paired/dependent** (so this test is the non-parametric equivalent to the Student's t-test for paired samples).
 
 Luckily, those two tests can be done in R with the same function: `wilcox.test()`. They are presented in the following sections.
@@ -179,11 +179,13 @@ In this example, it is clear that the two samples are not independent since the 
 * $H_0$: grades before and after the semester are equal
 * $H_1$: grades before and after the semester are different
 
-The R code for this test is similar than for independent samples, except that we add the `paired = TRUE` argument to the `wilcox.test()` function to take into consideration the dependency between the 2 samples:
+We add the `paired = TRUE` argument to the `wilcox.test()` function to take into consideration the dependency between the 2 samples:
 
 ```{r}
-test <- wilcox.test(dat2$Grade ~ dat2$Time,
-                    paired = TRUE)
+before <- dat2$Grade[dat2$Time == "Before"]
+after <- dat2$Grade[dat2$Time == "After"]
+test <- wilcox.test(before, after, paired = TRUE)
+
 test
 ```
 
