@@ -140,7 +140,7 @@ paired <- FALSE # if paired make sure that in the dataframe you have first all i
 # Edit at your own risk
 for (i in y) {
   for (j in x) {
-    ifelse(paired == TRUE,
+    if (paired == TRUE) {
       p <- ggpaired(dat,
         x = colnames(dat[j]), y = colnames(dat[i]),
         color = colnames(dat[j]), line.color = "gray", line.size = 0.4,
@@ -149,7 +149,8 @@ for (i in y) {
         xlab = colnames(dat[j]),
         ylab = colnames(dat[i]),
         add = "jitter"
-      ),
+      )
+    } else {
       p <- ggboxplot(dat,
         x = colnames(dat[j]), y = colnames(dat[i]),
         color = colnames(dat[j]),
@@ -157,7 +158,7 @@ for (i in y) {
         legend = "none",
         add = "jitter"
       )
-    )
+    }
     #  Add p-value
     print(p + stat_compare_means(aes(label = paste0(after_stat(method), ", p-value = ", after_stat(p.format))),
       method = method,
@@ -191,7 +192,6 @@ If you would like to use another *p*-value adjustment method, you can use the `p
 raw_pvalue <- numeric(length = length(1:4))
 for (i in (1:4)) {
   raw_pvalue[i] <- t.test(dat[, i] ~ dat$Species,
-    paired = FALSE,
     alternative = "two.sided"
   )$p.value
 }
@@ -286,13 +286,14 @@ t_table <- function(data, dvs, iv,
   out <- cbind(variable = dvs, out)
   names(out) <- gsub("[^0-9A-Za-z_]", "", names(out))
 
-  out$p_value <- ifelse(out$p_value < 0.001,
-    "<0.001",
-    round(p.adjust(out$p_value, p_adj), 3)
-  )
+  out$p_value <- p.adjust(out$p_value, p_adj)
   out$conclusion <- ifelse(out$p_value < alpha,
     paste0("Reject H0 at ", alpha * 100, "%"),
     paste0("Do not reject H0 at ", alpha * 100, "%")
+  )
+  out$p_value <- ifelse(out$p_value < 0.001,
+    "<0.001",
+    round(out$p_value, 3)
   )
 
   return(out)
