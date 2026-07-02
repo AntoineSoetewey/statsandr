@@ -6,7 +6,7 @@ menu: "main"
 meta_img: contribute_files/submit-article-blog-statsandr.com.jpg
 ---
 
-Stats and R welcomes guest posts that provides unique insight into statistics and R.
+Stats and R welcomes guest posts that provide unique insight into statistics and R.
 
 ## How can you contribute?
 
