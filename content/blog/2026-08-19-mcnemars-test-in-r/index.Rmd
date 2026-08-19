@@ -10,7 +10,7 @@ tags:
   - R
   - Statistics
 meta_img: blog/mcnemars-test-in-r/images/mcnemars-test-in-r.jpg
-description: Learn how to do the McNemar's test in R.
+description: Discover how to perform the McNemar's test in R to compare two related proportions, understand its assumptions, and interpret the results.
 output:
   blogdown::html_page:
     toc: false
@@ -33,4 +33,201 @@ set.seed(42)
 
 ![](images/mcnemars-test-in-r.jpg){width=100%}
 
+# Introduction
 
+In a previous article, we showed how to perform the [Chi-square test of independence in R](/blog/chi-square-test-of-independence-in-r/) in order to test whether two qualitative variables are related. As mentioned in that article (and in the one showing how to do the [Chi-square test of independence by hand](/blog/chi-square-test-of-independence-by-hand/)), this test requires that observations are **independent**. When observations are dependent, that is, when the two measurements are collected on the *same* subjects (paired samples), the McNemar's or Cochran's Q tests should be used instead.
+
+This article is dedicated to the first one: the **McNemar's test**. It is used to compare two related (paired) proportions measured on a [qualitative variable](/blog/variable-types-and-examples/#qualitative) with only two possible levels. In practice, it is mostly used when the same subjects are measured twice (typically before and after an intervention), or when two raters or two conditions are applied to the same subjects.
+
+In a way, the McNemar's test is to two paired proportions what the [paired Student's t-test](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/) is to two paired means: in both cases we take advantage of the fact that the two measurements belong to the same individuals, the difference being that here the variable of interest is binary instead of quantitative.
+
+Note also that the McNemar's test is limited to exactly two related measurements. If you have more than two (for example, the same question asked at three different time points), the appropriate extension is the Cochran's Q test, of which the McNemar's test is the special case for two measurements. If you are unsure about which test is appropriate for your own data, see this [overview of the most common statistical tests](/blog/what-statistical-test-should-i-do/).
+
+In the remaining of the article, we present the data used for the illustration, the aim, hypotheses and assumptions of the test, and finally how to perform it in R and how to interpret its results.
+
+# Data
+
+A dataset with a paired binary structure is not so easy to find among the datasets shipped with R, so we simulate our own data for this article.
+
+Suppose that we ask 200 randomly selected citizens whether they are in favor of a new policy in their city (answer "Yes" or "No"), that we then have them watch a public debate on this policy, and that we ask them exactly the same question again right after the debate:
+
+```{r}
+# number of respondents
+n <- 200
+
+# opinion before the debate
+before <- sample(c("Yes", "No"),
+  size = n,
+  replace = TRUE,
+  prob = c(0.4, 0.6)
+)
+
+# opinion after the debate (respondents who were in favor
+# tend to keep their opinion, while those who were against
+# are more likely to change their mind)
+after <- ifelse(before == "Yes",
+  sample(c("Yes", "No"), size = n, replace = TRUE, prob = c(0.9, 0.1)),
+  sample(c("Yes", "No"), size = n, replace = TRUE, prob = c(0.4, 0.6))
+)
+
+# dataset
+dat <- data.frame(
+  respondent = 1:n,
+  before = factor(before, levels = c("Yes", "No")),
+  after = factor(after, levels = c("Yes", "No"))
+)
+
+head(dat)
+```
+
+(Note that a seed has been set in the background with `set.seed(42)`, so the simulated data and all results below are reproducible.)
+
+Each row corresponds to one respondent and contains two measurements of the same binary variable: the opinion before and the opinion after the debate. The two samples are thus paired, since the two answers on a given row belong to the same person.
+
+As always, it is a good practice to start with some [descriptive statistics](/blog/descriptive-statistics-in-r/). Here, the proportion of respondents in favor of the policy at each of the two time points:
+
+```{r}
+# install.packages("dplyr")
+library(dplyr)
+
+dat %>%
+  summarise(
+    prop_before = mean(before == "Yes"),
+    prop_after = mean(after == "Yes")
+  )
+```
+
+In our sample, the proportion of respondents in favor of the policy went from `r round(mean(dat$before == "Yes") * 100, 1)`% before the debate to `r round(mean(dat$after == "Yes") * 100, 1)`% after the debate.
+
+These two proportions are computed on the same people, so comparing them as if they came from two independent groups would ignore the pairing. What matters for the McNemar's test is the way each respondent moved (or did not move) from one answer to the other, and this information is contained in the 2 $\times$ 2 contingency table of the paired answers:
+
+```{r}
+tab <- table(dat$before, dat$after,
+  dnn = c("Before", "After")
+)
+
+tab
+```
+
+This table must be read pair by pair, and not cell by cell as we usually do:
+
+* the two cells on the diagonal are the **concordant pairs**: `r tab[1, 1]` respondents answered "Yes" twice and `r tab[2, 2]` answered "No" twice, so these `r tab[1, 1] + tab[2, 2]` respondents did not change their mind,
+* the two cells outside the diagonal are the **discordant pairs**: `r tab[1, 2]` respondents were in favor before the debate but against after, while `r tab[2, 1]` were against before but in favor after.
+
+Only the discordant pairs carry information about a change of opinion (a respondent who gave twice the same answer tells us nothing about the effect of the debate), and this is precisely what the McNemar's test is built on.
+
+The same information can be visualized with a simple barplot of the paired counts:
+
+```{r}
+# install.packages("ggplot2")
+library(ggplot2)
+
+ggplot(dat) +
+  aes(x = before, fill = after) +
+  geom_bar(position = "dodge") +
+  labs(
+    x = "Opinion before the debate",
+    y = "Number of respondents",
+    fill = "Opinion after the debate"
+  )
+```
+
+From the table and the plot, we see that the changes of opinion do not balance out: many more respondents switched from "No" to "Yes" than the opposite. The question is now whether this imbalance is large enough to be declared significant, or whether it could reasonably be explained by chance alone (that is, by sampling fluctuations).
+
+# McNemar's test
+
+## Aim and hypotheses
+
+The McNemar's test is used to compare two related proportions, so it allows to determine whether the proportion of subjects belonging to a given category changed between two dependent measurements.
+
+The null and alternative hypotheses of the McNemar's test are:
+
+* $H_0$: the two related proportions are equal (marginal homogeneity, that is, there is no systematic change between the two measurements)
+* $H_1$: the two related proportions are different (there is a significant change between the two measurements)
+
+Since concordant pairs bring no information about a change, the test is based only on the two discordant cells. Denoting by $b$ the number of subjects who answered "Yes" then "No", and by $c$ the number of subjects who answered "No" then "Yes", the hypotheses can equivalently be written as:
+
+* $H_0: p_b = p_c$
+* $H_1: p_b \ne p_c$
+
+where $p_b$ and $p_c$ are the probabilities of the two possible types of change. Under the null hypothesis, a change in one direction is as likely as a change in the other direction, so the test statistic
+
+$$\chi^2 = \frac{(b - c)^2}{b + c}$$
+
+follows a Chi-square distribution with 1 degree of freedom. By default, R applies a continuity correction (see more on this below), which replaces the numerator by $(|b - c| - 1)^2$.
+
+In the context of our example, the McNemar's test helps us to answer the following question: "Did the public debate significantly change the proportion of citizens in favor of the new policy?".
+
+Rejecting $H_0$ would mean that the proportion of citizens in favor of the policy is significantly different before and after the debate, so that the changes of opinion observed in our sample are unlikely to be due to chance only. On the contrary, not rejecting $H_0$ would mean that we do not have enough evidence to conclude that opinions changed: the switches observed in the two directions would then be compatible with random fluctuations.
+
+Note that, as for many tests, the McNemar's test does not indicate the *direction* of the change. The direction must be read from the contingency table or from the marginal proportions computed in the previous section.
+
+## Assumptions
+
+For the results of the McNemar's test to be valid, the following assumptions must be met:
+
+1. **Paired measurements on a binary variable.** The two measurements must be collected on the same subjects, or on matched pairs (twins, or patients matched on age and sex for instance), and the variable of interest must be qualitative with exactly two levels ("Yes"/"No", success/failure, present/absent, etc.). If the two samples are independent instead of paired, use the [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/).
+1. **Data organized in a 2 $\times$ 2 contingency table of the paired outcomes.** Each subject contributes to one and only one cell of the table, so the sum of the four cells equals the number of subjects (`r sum(tab)` in our case), and not twice this number.
+1. **Pairs are independent of each other.** Within a pair, the two measurements are of course dependent, and this is precisely the reason why we use this test. Between pairs, however, independence is required: one subject's answers must not influence another subject's answers. As for many statistical tests, this assumption is usually verified based on the design of the experiment rather than via a formal test. A random and representative [sample](/blog/what-is-the-difference-between-population-and-sample/) of the [population](/blog/what-is-the-difference-between-population-and-sample/) of interest is generally sufficient. In our example, respondents have been selected at random and answered the question individually, so we consider this assumption as met.
+1. **Enough discordant pairs.** The $p$-value returned by `mcnemar.test()` is based on a Chi-square approximation, which is reliable only if the number of discordant pairs is large enough. A common rule of thumb is that $b + c$ should be at least 25. In our sample, $b + c$ = `r tab[1, 2] + tab[2, 1]`, so the approximation can be used safely.
+
+When the number of discordant pairs is small, it is preferable to use the exact version of the test, which is based on a binomial distribution instead of the Chi-square approximation. It boils down to testing whether, among the discordant pairs, changes in one direction are as frequent as changes in the other direction, so it can be performed in base R with the `binom.test()` function:
+
+```{r}
+# exact version of the McNemar's test
+binom.test(tab[1, 2], tab[1, 2] + tab[2, 1], p = 0.5)
+```
+
+Note that the `{exact2x2}` package also provides a dedicated `mcnemar.exact()` function, which returns the same $p$-value together with a confidence interval for the odds ratio.
+
+## In R
+
+The McNemar's test can be performed in R with the `mcnemar.test()` function, applied on the contingency table of the paired outcomes:
+
+```{r}
+mcnemar.test(tab)
+```
+
+The test can also be applied directly on the two variables, without building the contingency table first (results are of course identical):
+
+```{r}
+mcnemar.test(dat$before, dat$after)
+```
+
+The output shows:
+
+* the title of the test, together with the mention that a continuity correction has been applied,
+* the data which have been used,
+* the test statistic (`McNemar's chi-squared`),
+* the degrees of freedom (always equal to 1 for a 2 $\times$ 2 table) and
+* the $p$-value.
+
+As mentioned above, R applies a continuity correction by default. This correction makes the test slightly more conservative (that is, it gives a larger $p$-value), and it can be removed thanks to the `correct = FALSE` argument:
+
+```{r}
+mcnemar.test(tab, correct = FALSE)
+```
+
+With `r tab[1, 2] + tab[2, 1]` discordant pairs, both versions lead to the same conclusion. The correction really matters only when the number of discordant pairs is small, and in that case the exact version presented in the previous section is a better option anyway.
+
+It is the $p$-value which is of interest to conclude the test. If you are not familiar with $p$-values, I invite you to read this [section](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha).
+
+## Interpretations
+
+Based on the McNemar's test, we reject the null hypothesis and we conclude that the proportion of citizens in favor of the new policy is significantly different before and after the debate ($p$-value < 0.001).
+
+$\Rightarrow$ In our context, rejecting the null hypothesis means that the debate is associated with a significant change of opinion. Looking at the direction of this change, the proportion of citizens in favor of the policy increased from `r round(mean(dat$before == "Yes") * 100, 1)`% before the debate to `r round(mean(dat$after == "Yes") * 100, 1)`% after the debate.
+
+(*For the sake of illustration*, if the $p$-value had been larger than the significance level $\alpha = 0.05$: we could not have rejected the null hypothesis, so we could not have concluded that the proportion of citizens in favor of the policy was different before and after the debate.)
+
+Contrary to the tests comparing three groups or more, no post-hoc test is required after a significant McNemar's test: only two related measurements are compared, so a significant result already tells us which two proportions differ. Post-hoc comparisons become relevant again with more than two related measurements, in which case you should turn to the Cochran's Q test.
+
+# Summary
+
+In this article, we reviewed the aim and the hypotheses of the McNemar's test, which is used to compare two related proportions measured on the same subjects, together with its underlying assumptions (paired measurements on a binary variable, independence between pairs and a sufficient number of discordant pairs). We then showed how to perform it in R with the `mcnemar.test()` function, applied either on the 2 $\times$ 2 contingency table of the paired answers or directly on the two variables, and how to interpret its results by comparing the $p$-value with the significance level $\alpha$. Remember that it is the special case of the Cochran's Q test for exactly two related measurements, and that with independent samples the [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/) should be preferred.
+
+Thanks for reading.
+
+I hope this article helped you to understand the McNemar's test and how to perform it in R.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
