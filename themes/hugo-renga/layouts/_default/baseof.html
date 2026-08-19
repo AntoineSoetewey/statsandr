@@ -2,6 +2,7 @@
 <html lang="{{ .Site.LanguageCode }}">
 
 <head>
+    {{ $metaimg := printf "%s%s" .Site.BaseURL (replace (.Params.meta_img | default .Site.Params.og_image | default .Site.Params.logofile) " " "%20") }}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{ block "title" . }}{{ if .IsHome }} {{ .Site.Title }} {{ else }} {{ .Title }} - {{ .Site.Title }} {{ end }}{{ end }}</title>
@@ -14,7 +15,7 @@
     <meta property="og:type" content="article" />
     <meta property="og:url" content="{{ .Permalink }}" />
     <meta property="og:title" content="{{ if .Title }}{{ .Title }}{{ else }}{{ .Site.Title }}{{ end }}" />
-    <meta property="og:image" content="{{ .Site.BaseURL }}{{ .Params.meta_img | default .Site.Params.og_image | default .Site.Params.logofile }}" />
+    <meta property="og:image" content="{{ $metaimg }}" />
     <meta property="og:description" content="{{ .Description | default .Site.Params.description }}" />
 
     <meta name="twitter:card" content="{{ .Params.cardtype | default "summary_large_image" }}" />
@@ -24,7 +25,7 @@
     {{ end }}
     <meta name="twitter:title" content="{{ .Title | default .Site.Title }}" />
     <meta name="twitter:description" content="{{ .Description | default .Site.Params.description }}" />
-    <meta name="twitter:image" content="{{ .Site.BaseURL }}{{ .Params.meta_img | default .Site.Params.og_image | default .Site.Params.logofile }}" />
+    <meta name="twitter:image" content="{{ $metaimg }}" />
 
     <link rel="canonical" href="{{ .Permalink }}">
 
@@ -43,8 +44,8 @@
     <link rel="shortcut icon"
         href="{{ if .Site.Params.faviconfile }}{{ .Site.Params.faviconfile | absURL }}{{ else }}{{ .Site.BaseURL }}img/favicon.ico{{ end }}">
 
-    {{ if .Site.RSSLink }}
-        <link href="{{ .Site.RSSLink }}" rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" />
+    {{ with .OutputFormats.Get "RSS" }}
+        <link href="{{ .Permalink }}" rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}" />
     {{ end }}
 </head>
 

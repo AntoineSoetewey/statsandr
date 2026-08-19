@@ -7,7 +7,7 @@ description: See the contact details for Antoine Soetewey of the blog Stats and 
 
 Here is a summary of press mentions of the blog:
 
-* How can we predict the evolution of COVID 19 in Belgium? (UCLouvain: in [English](https://uclouvain.be/fr/instituts-recherche/lidam/actualites/how-can-we-predict-the-evolution-of-covid-19-in-belgium.html) & in [French](https://uclouvain.be/fr/decouvrir/comment-peut-on-prevoir-l-evolution-du-covid-19-en-belgique%26nbsp%3B.html))
+* How can we predict the evolution of COVID 19 in Belgium? ([UCLouvain](https://uclouvain.be/en/research-institutes/lidam/isba/news/modeling-the-evolution-of-the-covid-19-virus-in-belgium))
 * Evolution of COVID-19 hospital admissions in Belgium ([LN24](https://www.facebook.com/watch/live/?v=1173890509637511))
 
 ### Contact and social profiles
