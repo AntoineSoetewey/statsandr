@@ -1,0 +1,261 @@
+---
+title: Cochran's Q test in R, or the extension of McNemar's test for more than two
+  groups
+author: Antoine Soetewey
+date: '2026-08-26'
+slug: cochrans-q-test-in-r
+categories: []
+tags:
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: blog/cochrans-q-test-in-r/images/cochrans-q-test-in-r.jpg
+description: Learn how to perform Cochran's Q test in R to compare three or more related proportions, check its assumptions, and interpret the results with post-hoc tests.
+output:
+  blogdown::html_page:
+    toc: false
+    toc_depth: 6
+# draft: true
+# bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
+)
+
+set.seed(42)
+```
+
+![](images/cochrans-q-test-in-r.jpg){width=100%}
+
+# Introduction
+
+In previous articles, we showed how to test whether two [qualitative variables](/blog/variable-types-and-examples/#qualitative) are related thanks to the [Chi-square test of independence in R](/blog/chi-square-test-of-independence-in-r/) (and how to compute it [by hand](/blog/chi-square-test-of-independence-by-hand/)). Both articles insist on one important limitation: this test requires **independent** observations. If you have dependent observations (paired samples), that is, if the measurements have been collected on the *same* subjects, the McNemar's or Cochran's Q tests should be used instead, the Cochran's Q test being an extension of the McNemar's test when we have more than two related measures.
+
+The case of exactly two related measurements has already been covered in the article about the [McNemar's test in R](/blog/mcnemars-test-in-r/). The present article is dedicated to its generalization: the **Cochran's Q test**, used to compare three or more related proportions, that is, the same binary outcome measured on the same subjects under $k \geq 3$ conditions or time points.
+
+It can therefore be seen as the dependent-samples counterpart of the Chi-square test of independence for a binary outcome: instead of comparing several *independent* groups, it compares several *repeated* measurements collected on the same individuals. It also follows the same logic as the other tests comparing three groups or more presented on this blog, such as the [Kruskal-Wallis test](/blog/kruskal-wallis-test-nonparametric-version-anova/) (used for a quantitative variable and independent samples): a first test tells us whether at least one group differs from the others, and post-hoc tests, together with an adjustment of the $p$-values for multiple comparisons, then tell us which groups actually differ. If you are unsure about which test is appropriate for your own data, see this [overview of the most common statistical tests](/blog/what-statistical-test-should-i-do/).
+
+In the remaining of the article, we present the data, the aim, the hypotheses and the assumptions of the test, and finally how to perform it in R, how to complement it with post-hoc tests and how to interpret the results.
+
+# Data
+
+As already mentioned in the article about the McNemar's test, a dataset with a repeated binary structure is not so easy to find among the datasets shipped with R, so we simulate our own data.
+
+Suppose that we ask 200 randomly selected citizens whether they are in favor of a new policy in their city (answer "Yes" or "No"), and that we ask them exactly the same question at three different points in time:
+
+1. **before** a public debate on this policy,
+1. right **after** this debate, and
+1. one month later (**follow_up**), in order to see whether the effect of the debate persists over time.
+
+```{r}
+# number of respondents
+n <- 200
+
+# opinion before the debate
+before <- sample(c("Yes", "No"),
+  size = n,
+  replace = TRUE,
+  prob = c(0.4, 0.6)
+)
+
+# opinion right after the debate (respondents who were in favor
+# tend to keep their opinion, while those who were against
+# are more likely to change their mind)
+after <- ifelse(before == "Yes",
+  sample(c("Yes", "No"), size = n, replace = TRUE, prob = c(0.9, 0.1)),
+  sample(c("Yes", "No"), size = n, replace = TRUE, prob = c(0.4, 0.6))
+)
+
+# opinion one month later (some of the respondents
+# convinced by the debate go back to their initial opinion)
+follow_up <- ifelse(after == "Yes",
+  sample(c("Yes", "No"), size = n, replace = TRUE, prob = c(0.85, 0.15)),
+  sample(c("Yes", "No"), size = n, replace = TRUE, prob = c(0.1, 0.9))
+)
+
+# dataset
+dat <- data.frame(
+  respondent = factor(1:n),
+  before = factor(before, levels = c("No", "Yes")),
+  after = factor(after, levels = c("No", "Yes")),
+  follow_up = factor(follow_up, levels = c("No", "Yes"))
+)
+
+head(dat)
+```
+
+(Note that a seed has been set in the background with `set.seed(42)`, so the simulated data and all the results presented below are reproducible.)
+
+The data are stored in the **wide format**: one row per respondent, and one column per measurement. This is exactly the structure the Cochran's Q test is designed for, with each respondent playing the role of a *block* inside which the three answers are related.
+
+As always, it is a good practice to start with some [descriptive statistics](/blog/descriptive-statistics-in-r/), here the proportion of respondents in favor of the policy at each of the three points in time:
+
+```{r}
+# install.packages("dplyr")
+library(dplyr)
+
+dat %>%
+  summarise(across(before:follow_up, ~ mean(.x == "Yes")))
+```
+
+These proportions are easier to compare on a plot:
+
+```{r}
+# install.packages("ggplot2")
+library(ggplot2)
+
+# install.packages("tidyr")
+library(tidyr)
+
+# from the wide format to the long format
+dat_long <- dat %>%
+  pivot_longer(
+    cols = c(before, after, follow_up),
+    names_to = "time",
+    values_to = "opinion"
+  ) %>%
+  mutate(time = factor(time, levels = c("before", "after", "follow_up")))
+
+dat_long %>%
+  group_by(time) %>%
+  summarise(prop_yes = mean(opinion == "Yes")) %>%
+  ggplot() +
+  aes(x = time, y = prop_yes) +
+  geom_col(fill = "steelblue") +
+  labs(
+    x = "Moment of the survey",
+    y = "Proportion in favor of the policy"
+  )
+```
+
+In our [sample](/blog/what-is-the-difference-between-population-and-sample/), the proportion of citizens in favor of the policy increased from `r round(mean(dat$before == "Yes") * 100, 1)`% before the debate to `r round(mean(dat$after == "Yes") * 100, 1)`% right after it, and then decreased to `r round(mean(dat$follow_up == "Yes") * 100, 1)`% one month later. The question is whether these differences are large enough to be generalized to the [population](/blog/what-is-the-difference-between-population-and-sample/), or whether they could be explained by sampling fluctuations alone.
+
+Note that the three proportions are computed on the same people, so comparing them as if they came from three independent groups would ignore the fact that the measurements are repeated. Taking this dependency into account is precisely the purpose of the Cochran's Q test. Note also that, in the code above, we created a long format version of the dataset (`dat_long`), with one row per respondent *and* per measurement, since this is the format expected by the functions used in the rest of the article:
+
+```{r}
+head(dat_long)
+```
+
+# Cochran's Q test
+
+## Aim and hypotheses
+
+The Cochran's Q test is used to compare $k \geq 3$ related proportions, so it allows to determine whether the proportion of subjects belonging to a given category (the "successes") changes across several dependent measurements.
+
+The null and alternative hypotheses of the Cochran's Q test are:
+
+* $H_0$: the proportion of successes is the same in all $k$ related conditions, that is, $p_1 = p_2 = \dots = p_k$
+* $H_1$: at least one condition is different from the others in terms of proportion of successes
+
+Be careful that, as for the [ANOVA](/blog/anova-in-r/) or the [Kruskal-Wallis test](/blog/kruskal-wallis-test-nonparametric-version-anova/), the alternative hypothesis is ***not*** that all conditions are different from each other. The opposite of all proportions being equal ($H_0$) is that *at least* one proportion is different from the others ($H_1$). So if the null hypothesis is rejected, we only know that at least one condition differs, and post-hoc tests (covered later in this article) must be performed to know which ones actually differ.
+
+In the context of our example, the Cochran's Q test helps us to answer the following question: "Is the proportion of citizens in favor of the new policy the same before the debate, right after the debate and one month later?".
+
+For the interested reader, denoting by $G_j$ the number of successes in condition $j$, by $\bar{G}$ the mean of the $G_j$ and by $L_i$ the number of successes for subject $i$, the test statistic is:
+
+$$Q = \frac{k(k-1) \sum_{j=1}^{k} \left( G_j - \bar{G} \right)^2}{k \sum_{i=1}^{n} L_i - \sum_{i=1}^{n} L_i^2}$$
+
+Under the null hypothesis, $Q$ approximately follows a Chi-square distribution with $k - 1$ degrees of freedom. Notice that the numerator compares the number of successes between the conditions, while a subject who gives the same answer in all conditions contributes nothing to the denominator, exactly like the concordant pairs which bring no information in the McNemar's test.
+
+## Assumptions
+
+For the results of the Cochran's Q test to be valid, the following assumptions must be met:
+
+1. **One binary dependent variable, measured $k \geq 3$ times on the same subjects.** The variable of interest must be [qualitative](/blog/variable-types-and-examples/#qualitative) with exactly two levels ("Yes"/"No", success/failure, present/absent, etc.), and the $k$ measurements must be collected on the same subjects (or on matched blocks of subjects), so we are in a within-subjects design. If the $k$ samples are independent instead of related, the [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/) should be used instead.
+1. **Subjects (blocks) are independent of each other.** *Within* a subject, the $k$ answers are of course dependent, and this is exactly what the test accounts for. *Between* subjects, however, independence is required: the answers of one respondent must not influence those of another respondent. As for many statistical tests, this assumption is verified based on the design of the experiment rather than via a formal test, and a random sample of respondents answering individually is generally sufficient, which is the case in our example.
+1. **A large enough sample.** The $p$-value of the test is based on a Chi-square approximation, which is reliable only if the sample is reasonably large. A common rule of thumb is that the number of subjects multiplied by the number of conditions ($n \times k$) should be at least 24, which is largely the case here since $n \times k =$ `r nrow(dat) * 3`. For smaller samples, exact or permutation versions of the test are preferable (they are available, among others, in the `{coin}` package).
+1. **The link with the McNemar's test.** Last but not least, the Cochran's Q test reduces mathematically to the [McNemar's test](/blog/mcnemars-test-in-r/) when $k = 2$. This is the reason why the McNemar's test is used for exactly two related measurements, and the Cochran's Q test for more than two. This equivalence is illustrated on our data in the next section.
+
+## In R
+
+Base R has no built-in function for the Cochran's Q test, but the `cochran_qtest()` function from the `{rstatix}` package does the job. It expects the data in the long format, and a formula of the form `outcome ~ condition | subject`:
+
+```{r}
+# install.packages("rstatix")
+library(rstatix)
+
+dat_long %>%
+  cochran_qtest(opinion ~ time | respondent)
+```
+
+The output shows:
+
+* the variable of interest (`.y.`),
+* the number of subjects (`n`),
+* the value of the test statistic $Q$ (`statistic`),
+* the degrees of freedom (`df`), equal to $k - 1 = 2$ in our case since we compare 3 measurements,
+* the $p$-value (`p`) and
+* the name of the test which has been performed (`method`).
+
+Note that the `CochranQTest()` function from the `{DescTools}` package is an alternative to perform this test.
+
+As mentioned in the previous section, the Cochran's Q test reduces to the McNemar's test when only two related measurements are compared. This is easily verified on our data by keeping only the first two points in time:
+
+```{r}
+# Cochran's Q test on the first 2 measurements only
+dat_long %>%
+  filter(time %in% c("before", "after")) %>%
+  mutate(time = droplevels(time)) %>%
+  cochran_qtest(opinion ~ time | respondent)
+
+# McNemar's test on the same 2 measurements
+mcnemar.test(table(dat$before, dat$after),
+  correct = FALSE
+)
+```
+
+The two test statistics (and the two $p$-values) are identical.^[The continuity correction must be removed with `correct = FALSE` for the equality to hold, since the Cochran's Q test does not apply such a correction.]
+
+It is the $p$-value which is of interest to conclude the test. If you are not familiar with $p$-values, I invite you to read this [section](/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha).
+
+## Interpretations
+
+Based on the Cochran's Q test, we reject the null hypothesis at the significance level $\alpha = 0.05$ and we conclude that the proportion of citizens in favor of the new policy is not the same at the three points in time ($p$-value < 0.001).
+
+(*For the sake of illustration*, if the $p$-value had been larger than the significance level $\alpha = 0.05$: we could not have rejected the null hypothesis, so we could not have concluded that the proportion of citizens in favor of the policy changed over time.)
+
+Note also that the test does not indicate the direction of the change, which must be read from the proportions and the plot presented in the section about the data.
+
+# Post-hoc tests
+
+We have just showed that the proportion of citizens in favor of the policy is not stable over time. Nonetheless, here comes the limitation of the test: it does not say which measurement(s) differ(s) from the others.
+
+To know this, we need post-hoc tests (in Latin, "after this", so after obtaining significant results for the Cochran's Q test), also referred as multiple pairwise-comparison tests. The logic is the same as the one presented for the [Kruskal-Wallis test](/blog/kruskal-wallis-test-nonparametric-version-anova/#post-hoc-tests): we compare the groups two by two, and we adjust the $p$-values because performing several tests on the same data increases the risk of finding a significant difference by chance alone.
+
+Here, the natural post-hoc test is simply the [McNemar's test](/blog/mcnemars-test-in-r/) applied to each pair of measurements. The post-hoc step is thus literally a repeated application of the test presented in the article dedicated to the McNemar's test, which makes sense given that the Cochran's Q test is nothing more than its extension to more than two related measurements.
+
+With 3 measurements, there are 3 pairs to compare. This is done with the `pairwise_mcnemar_test()` function of the `{rstatix}` package, with the Holm method to adjust the $p$-values:^[The Holm adjustment is less conservative than the Bonferroni one, which is the default in this function. See `?p.adjust` for the other available methods.]
+
+```{r}
+dat_long %>%
+  pairwise_mcnemar_test(opinion ~ time | respondent,
+    p.adjust.method = "holm"
+  )
+```
+
+It is the `p.adj` column (the $p$-values adjusted for multiple comparisons) which is of interest, and not the `p` column (the *un*adjusted $p$-values). These adjusted $p$-values must be compared to the desired significance level (usually 5%).
+
+Based on the output, we conclude that:
+
+* the proportion of citizens in favor of the policy differs significantly between before and right after the debate ($p$-value < 0.001),
+* it differs significantly between right after the debate and one month later ($p$-value = 0.028), and
+* it does not differ significantly between before the debate and one month later ($p$-value = 0.069).
+
+Combined with the proportions computed earlier, these post-hoc tests give a much more precise picture than the Cochran's Q test alone: the debate significantly increased the support for the policy in the short run (from `r round(mean(dat$before == "Yes") * 100, 1)`% to `r round(mean(dat$after == "Yes") * 100, 1)`%), but this increase did not last. One month later, the support had significantly decreased compared to the level observed right after the debate, and it was back to a level no longer significantly different from the initial one.
+
+# Summary
+
+In this article, we reviewed the aim, the hypotheses and the assumptions of the Cochran's Q test, used to compare three or more related proportions. We then showed how to perform it in R with the `cochran_qtest()` function of the `{rstatix}` package, how to interpret its results by comparing the $p$-value with the significance level $\alpha$, and, since a significant result only indicates that at least one measurement differs from the others, how to identify which ones thanks to pairwise McNemar's tests with adjusted $p$-values. Remember, last but not least, that the [McNemar's test](/blog/mcnemars-test-in-r/) is the special case of the Cochran's Q test for exactly two related measurements, and that with independent samples the [Chi-square test of independence](/blog/chi-square-test-of-independence-in-r/) should be preferred.
+
+Thanks for reading.
+
+I hope this article helped you to understand the Cochran's Q test and how to perform it in R.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
