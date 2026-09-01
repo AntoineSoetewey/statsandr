@@ -12,13 +12,41 @@ meta_img: blog/you-can-do-more-for-neural-networks-in-r-with-kindling/images/you
 description: A practical collaborative post on using {kindling} for neural networks in R, with reproducible workflows, realistic examples, and honest trade-offs.
 output:
   blogdown::html_page:
-    toc: false
+    toc: true
     toc_depth: 6
 # draft: true
 # bibliography: bibliography.bib
 ---
 
 
+<div id="TOC">
+<ul>
+<li><a href="#why-this-post-matters" id="toc-why-this-post-matters">Why this post matters</a></li>
+<li><a href="#what-problem-kindling-solves-and-what-it-does-not" id="toc-what-problem-kindling-solves-and-what-it-does-not">What problem <code>{kindling}</code> solves (and what it does not)</a></li>
+<li><a href="#setup" id="toc-setup">Setup</a></li>
+<li><a href="#three-levels-of-interaction" id="toc-three-levels-of-interaction">Three levels of interaction</a>
+<ul>
+<li><a href="#generate-model-code-_generator" id="toc-generate-model-code-_generator">1) Generate model code (<code>*_generator()</code>)</a></li>
+<li><a href="#direct-training" id="toc-direct-training">2) Direct Training</a></li>
+<li><a href="#ml-framework-integration-tidymodels-with-mlp_kindling-rnn_kindling" id="toc-ml-framework-integration-tidymodels-with-mlp_kindling-rnn_kindling">3) ML Framework Integration: <code>{tidymodels}</code> with <code>mlp_kindling()</code> / <code>rnn_kindling()</code></a></li>
+</ul></li>
+<li><a href="#example-1-iris-classification-with-reproducible-good-practice" id="toc-example-1-iris-classification-with-reproducible-good-practice">Example 1: Iris classification with reproducible good practice</a>
+<ul>
+<li><a href="#data-preprocessing" id="toc-data-preprocessing">Data Preprocessing</a></li>
+<li><a href="#mlp-with-2-hidden-layers" id="toc-mlp-with-2-hidden-layers">MLP with 2 Hidden Layers</a>
+<ul>
+<li><a href="#why-these-choices" id="toc-why-these-choices">Why these choices?</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#example-2-a-more-realistic-tabular-benchmark-sonar" id="toc-example-2-a-more-realistic-tabular-benchmark-sonar">Example 2: A more realistic tabular benchmark (Sonar)</a></li>
+<li><a href="#about-early-stopping-and-callbacks" id="toc-about-early-stopping-and-callbacks">About early stopping and callbacks</a></li>
+<li><a href="#supported-architectures-current-scope" id="toc-supported-architectures-current-scope">Supported architectures (current scope)</a></li>
+<li><a href="#variable-importance-ffnn" id="toc-variable-importance-ffnn">Variable importance (FFNN)</a></li>
+<li><a href="#when-kindling-is-a-good-fit" id="toc-when-kindling-is-a-good-fit">When <code>{kindling}</code> is a good fit</a></li>
+<li><a href="#limitations-to-keep-in-mind" id="toc-limitations-to-keep-in-mind">Limitations to keep in mind</a></li>
+<li><a href="#takeaways" id="toc-takeaways">Takeaways</a></li>
+</ul>
+</div>
 
 <p><img src="images/you-can-do-more-for-neural-networks-in-r-with-kindling.jpg" style="width:100.0%" /></p>
 <div id="why-this-post-matters" class="section level1">
@@ -151,7 +179,7 @@ vip[...]
 )
 
 predict(mini_direct, newdata = head(mtcars, 3))</code></pre>
-<pre><code>## [1] -0.01706841 -0.04320815 -0.71570069</code></pre>
+<pre><code>## [1] 7.887171 7.877418 6.773977</code></pre>
 </div>
 <div id="ml-framework-integration-tidymodels-with-mlp_kindling-rnn_kindling" class="section level2">
 <h2>3) ML Framework Integration: <code>{tidymodels}</code> with <code>mlp_kindling()</code> / <code>rnn_kindling()</code></h2>
@@ -174,9 +202,9 @@ predict(mini_fit, new_data = head(mtcars, 3))</code></pre>
 <pre><code>## # A tibble: 3 × 1
 ##   .pred
 ##   &lt;dbl&gt;
-## 1  9.28
-## 2  9.31
-## 3  5.63</code></pre>
+## 1  9.68
+## 2  9.70
+## 3  7.70</code></pre>
 <p>Now that we’ve covered the three levels of interaction, let’s see <code>{kindling}</code> in action with two “realistic” examples. We’ll demonstrate how to structure reproducible workflows, handle feature preprocessing, and evaluate results properly. Along the way, you’ll see which abstraction level works best for different scenarios.</p>
 </div>
 </div>
@@ -828,16 +856,16 @@ metrics(sonar_pred, truth = Class, estimate = .pred_class)</code></pre>
 <pre class="r"><code># For FFNN fits:
 garson(iris_mlp, bar_plot = FALSE)</code></pre>
 <pre><code>##        x_names y_names  rel_imp
-## 1 Petal.Length       y 34.31493
-## 2  Sepal.Width       y 24.68379
-## 3  Petal.Width       y 22.43818
-## 4 Sepal.Length       y 18.56311</code></pre>
+## 1 Petal.Length       y 36.29246
+## 2  Sepal.Width       y 23.15108
+## 3  Petal.Width       y 21.63324
+## 4 Sepal.Length       y 18.92322</code></pre>
 <pre class="r"><code>olden(iris_mlp, bar_plot = FALSE)</code></pre>
 <pre><code>##        x_names y_names    rel_imp
-## 1 Petal.Length       y -5.1100721
-## 2  Petal.Width       y -2.9793542
-## 3  Sepal.Width       y  0.8302629
-## 4 Sepal.Length       y -0.1882139</code></pre>
+## 1 Petal.Length       y -2.8066132
+## 2  Petal.Width       y -2.1824838
+## 3  Sepal.Width       y  1.2130474
+## 4 Sepal.Length       y -0.7235911</code></pre>
 <pre class="r"><code># Via vip (Olden/Garson methods supported by kindling S3 methods)
 vi(iris_mlp, type = &quot;olden&quot;) |&gt;
   vip()</code></pre>
