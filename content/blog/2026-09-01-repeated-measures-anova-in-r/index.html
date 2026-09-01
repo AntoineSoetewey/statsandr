@@ -10,15 +10,381 @@ tags:
   - R
   - Statistics
 meta_img: blog/repeated-measures-anova-in-r/images/repeated-measures-anova-in-r.jpg
-description: Learn how to perform a repeated measures ANOVA in R.
+description: Learn how to perform a repeated measures ANOVA in R, check the sphericity assumption, and complement the test with post-hoc comparisons
 output:
   blogdown::html_page:
     toc: false
     toc_depth: 6
 # draft: true
-# bibliography: bibliography.bib
+bibliography: bibliography.bib
 ---
 
 
 
 <p><img src="images/repeated-measures-anova-in-r.jpg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In a previous article, we presented the <a href="/blog/anova-in-r/">one-way ANOVA</a>, the <a href="/blog/what-statistical-test-should-i-do/">statistical test</a> used to compare a <a href="/blog/variable-types-and-examples/#quantitative">quantitative variable</a> between three groups or more. One of its assumptions was stated very explicitly in that article: the observations must be <strong>independent</strong>, both within and between the groups. It was also mentioned that if observations between samples are dependent (for example, if three measurements have been collected on the <em>same</em> individuals, as it is often the case in medical studies when a metric is measured (i) before, (ii) during and (iii) after a treatment), the <strong>repeated measures ANOVA</strong> should be preferred. The present article is dedicated to that test.</p>
+<p>The repeated measures ANOVA compares the means of a quantitative variable measured <strong>several times on the same subjects</strong>, that is, under <span class="math inline">\(k \geq 3\)</span> related conditions or at <span class="math inline">\(k \geq 3\)</span> different points in time. The aim is exactly the same as the aim of the one-way ANOVA (testing whether the means are equal across the <span class="math inline">\(k\)</span> conditions), but the design is different: instead of <span class="math inline">\(k\)</span> independent groups formed by different subjects, we have a single group of subjects who go through all the conditions. The factor whose levels are the conditions is then called a <strong>within-subjects factor</strong>, as opposed to the between-subjects factor of the one-way ANOVA.</p>
+<p>The relationship between the two tests mirrors the relationship between the two versions of the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test</a>:</p>
+<table>
+<colgroup>
+<col width="21%" />
+<col width="42%" />
+<col width="36%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Independent samples</strong></th>
+<th><strong>Related samples</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>2 groups</strong></td>
+<td>Student’s t-test for independent samples</td>
+<td>Student’s t-test for paired samples</td>
+</tr>
+<tr class="even">
+<td><strong>3 groups or more</strong></td>
+<td><a href="/blog/anova-in-r/">One-way ANOVA</a></td>
+<td>Repeated measures ANOVA</td>
+</tr>
+</tbody>
+</table>
+<p>In other words, the repeated measures ANOVA is to the paired Student’s t-test what the one-way ANOVA is to the Student’s t-test for independent samples: the generalization of the same logic to three groups or more. This is also why the repeated measures ANOVA appears in the list of related methods presented in the article about the <a href="/blog/two-way-anova-in-r/">two-way ANOVA</a>, next to the mixed ANOVA (used when a between-subjects factor <em>and</em> a within-subjects factor are present at the same time).</p>
+<p>Taking the repeated structure of the data into account is not a detail, and it is beneficial for two reasons:</p>
+<ol style="list-style-type: decimal">
+<li>Analyzing repeated measurements as if they came from independent groups violates the independence assumption of the one-way ANOVA, so the results of that test could simply not be trusted.</li>
+<li>Since each subject serves as its own control, the variability between subjects (the fact that some patients are, in general, more sensitive to pain than others, for instance) is isolated and removed from the error term. The test is therefore usually <strong>more powerful</strong> than a one-way ANOVA run on the same number of measurements.</li>
+</ol>
+<p>The price to pay for this gain is an additional assumption, called <strong>sphericity</strong>, which does not exist in the independent-groups case and which is discussed in detail in this article.</p>
+<p>In the remaining of the post, we present the data, the aim, the hypotheses and the assumptions of the test, and we finally show how to perform it in R, how to complement it with post-hoc tests and how to interpret the results.</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>Datasets with a genuinely repeated structure are not so common among the datasets shipped with R, so we simulate our own data. This has the additional advantage that we know exactly how the data have been generated.</p>
+<p>Suppose that a treatment against chronic pain is administered to 30 randomly selected patients, and that the intensity of the pain is measured on each patient on a scale from 0 (no pain at all) to 100 (unbearable pain) at three different moments:</p>
+<ol style="list-style-type: decimal">
+<li><strong>before</strong> the treatment,</li>
+<li><strong>during</strong> the treatment, and</li>
+<li>one month <strong>after</strong> the end of the treatment, in order to see whether the benefit of the treatment persists over time.</li>
+</ol>
+<pre class="r"><code># number of patients
+n &lt;- 30
+
+# each patient has its own baseline level of pain
+patient_effect &lt;- rnorm(n, mean = 0, sd = 8)
+
+# pain score at the 3 moments
+before &lt;- 70 + patient_effect + rnorm(n, mean = 0, sd = 6)
+during &lt;- 63 + patient_effect + rnorm(n, mean = 0, sd = 6)
+after &lt;- 61.5 + patient_effect + rnorm(n, mean = 0, sd = 6)
+
+# dataset in the long format
+dat &lt;- data.frame(
+  patient = factor(rep(1:n, times = 3)),
+  time = factor(rep(c(&quot;before&quot;, &quot;during&quot;, &quot;after&quot;), each = n),
+    levels = c(&quot;before&quot;, &quot;during&quot;, &quot;after&quot;)
+  ),
+  pain = round(c(before, during, after), 1)
+)
+
+str(dat)</code></pre>
+<pre><code>## &#39;data.frame&#39;:	90 obs. of  3 variables:
+##  $ patient: Factor w/ 30 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 1 2 3 4 5 6 7 8 9 10 ...
+##  $ time   : Factor w/ 3 levels &quot;before&quot;,&quot;during&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ pain   : num  83.7 69.7 79.1 71.4 76.3 58.8 77.4 64.1 71.7 69.7 ...</code></pre>
+<pre class="r"><code>head(dat)</code></pre>
+<pre><code>##   patient   time pain
+## 1       1 before 83.7
+## 2       2 before 69.7
+## 3       3 before 79.1
+## 4       4 before 71.4
+## 5       5 before 76.3
+## 6       6 before 58.8</code></pre>
+<p>(Note that a seed has been set in the background with <code>set.seed(42)</code>, so the simulated data and all the results presented below are reproducible.)</p>
+<p>Two points are worth being highlighted in the code above:</p>
+<ul>
+<li>The term <code>patient_effect</code> is added to the three measurements of the same patient. This is what creates the <strong>dependency</strong> between the three scores of a given patient: a patient with a high baseline level of pain tends to have a high score at all three moments.</li>
+<li>The data are stored in the <strong>long format</strong>, with one row per patient <em>and</em> per measurement, and three variables: the identifier of the subject (<code>patient</code>), the within-subjects factor (<code>time</code>) and the quantitative variable of interest (<code>pain</code>). This is the format expected by the functions used in the rest of the article. If your data are in the wide format (one row per subject and one column per condition), they can be reshaped with the <code>pivot_longer()</code> function of the <code>{tidyr}</code> package.</li>
+</ul>
+<p>As always, it is a good practice to start with some <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a>, here the <a href="/blog/descriptive-statistics-in-r/#mean">mean</a> and the <a href="/blog/descriptive-statistics-in-r/#standard-deviation-and-variance">standard deviation</a> of the pain score at each of the three moments:</p>
+<pre class="r"><code># install.packages(&quot;dplyr&quot;)
+library(dplyr)
+
+dat %&gt;%
+  group_by(time) %&gt;%
+  summarise(
+    n = n(),
+    mean = mean(pain),
+    sd = sd(pain)
+  )</code></pre>
+<pre><code>## # A tibble: 3 × 4
+##   time       n  mean    sd
+##   &lt;fct&gt;  &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 before    30  69.8  10.7
+## 2 during    30  64.7  10.5
+## 3 after     30  61.9  11.5</code></pre>
+<p>The <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplots</a> below give a first visual comparison of the three moments:</p>
+<pre class="r"><code># install.packages(&quot;ggplot2&quot;)
+library(ggplot2)
+
+ggplot(dat) +
+  aes(x = time, y = pain) +
+  geom_boxplot() +
+  labs(
+    x = &quot;Moment of the measurement&quot;,
+    y = &quot;Pain score&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<p>Boxplots are, however, not entirely satisfactory here because they completely hide the repeated structure of the data. A plot which is much better suited to repeated measurements is the so-called spaghetti plot, where the successive scores of each patient are joined by a line (the thick blue line represents the mean at each moment):</p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = time, y = pain, group = patient) +
+  geom_line(alpha = 0.3) +
+  geom_point(alpha = 0.3) +
+  stat_summary(aes(group = 1),
+    fun = mean, geom = &quot;line&quot;,
+    linewidth = 1.2, color = &quot;steelblue&quot;
+  ) +
+  stat_summary(aes(group = 1),
+    fun = mean, geom = &quot;point&quot;,
+    size = 3, color = &quot;steelblue&quot;
+  ) +
+  labs(
+    x = &quot;Moment of the measurement&quot;,
+    y = &quot;Pain score&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<p>In our <a href="/blog/what-is-the-difference-between-population-and-sample/">sample</a>, the mean pain score decreased from 69.8 before the treatment to 64.7 during the treatment, and to 61.9 one month after it. The spaghetti plot also shows that most (but not all) patients follow this downward trend, and that the general level of pain varies a lot from one patient to another, which is precisely the between-subjects variability that the repeated measures ANOVA is able to set aside.</p>
+<p>The question is now whether these differences are large enough to be generalized to the <a href="/blog/what-is-the-difference-between-population-and-sample/">population</a>, or whether they could be explained by sampling fluctuations alone. This is where the repeated measures ANOVA comes into play.</p>
+</div>
+<div id="aim-and-hypotheses" class="section level1">
+<h1>Aim and hypotheses</h1>
+<p>As explained in the introduction, the repeated measures ANOVA is used to compare the means of a quantitative variable measured on the same subjects under <span class="math inline">\(k \geq 3\)</span> related conditions or at <span class="math inline">\(k \geq 3\)</span> points in time.</p>
+<p>The null and alternative hypotheses of the test are:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: the population means are equal in all <span class="math inline">\(k\)</span> related conditions, that is, <span class="math inline">\(\mu_1 = \mu_2 = \dots = \mu_k\)</span></li>
+<li><span class="math inline">\(H_1\)</span>: <em>at least</em> one condition is different from the others in terms of mean</li>
+</ul>
+<p>Be careful that, exactly as for the <a href="/blog/anova-in-r/">one-way ANOVA</a> or the <a href="/blog/kruskal-wallis-test-nonparametric-version-anova/">Kruskal-Wallis test</a>, the alternative hypothesis is <strong><em>not</em></strong> that all means are different from each other. The opposite of “all means are equal” (<span class="math inline">\(H_0\)</span>) is “<em>at least</em> one mean is different from the others” (<span class="math inline">\(H_1\)</span>). So if the null hypothesis is rejected, we only know that at least one moment differs from the others, and post-hoc tests (covered later in this article) must be performed in order to know which ones actually differ.</p>
+<p>In the context of our example, the repeated measures ANOVA helps us to answer the following question: “Is the mean pain score the same before, during and after the treatment?”. With the notations of our dataset, the hypotheses become:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: <span class="math inline">\(\mu_{before} = \mu_{during} = \mu_{after}\)</span></li>
+<li><span class="math inline">\(H_1\)</span>: at least one of the three moments differs from the others in terms of mean pain score</li>
+</ul>
+<p>Note that, as its name suggests, the test still works by comparing variances: the variability observed between the conditions is compared to the residual variability, but this time <em>after</em> having removed the variability due to the subjects themselves. This is the reason why the error term of a repeated measures ANOVA is smaller than the error term of a one-way ANOVA computed on the same data, and why the test is generally more powerful.</p>
+</div>
+<div id="assumptions" class="section level1">
+<h1>Assumptions</h1>
+<p>As for many statistical tests, some assumptions must be met for the results to be valid.</p>
+<div id="variable-type-and-design" class="section level2">
+<h2>Variable type and design</h2>
+<p>The repeated measures ANOVA requires one <a href="/blog/variable-types-and-examples/#continuous">quantitative continuous</a> dependent variable, measured on the same subjects under <span class="math inline">\(k \geq 3\)</span> levels of a <a href="/blog/variable-types-and-examples/#qualitative">qualitative</a> within-subjects factor (the conditions or the points in time). Ideally, all subjects are measured under all conditions, since subjects with a missing measurement are simply dropped from the analysis.</p>
+<p>In our example, the dependent variable is the pain score (quantitative continuous) and the within-subjects factor is the moment of the measurement, with 3 levels (before, during and after the treatment), all measured on the same 30 patients. This assumption is thus met.</p>
+<p>Note that if only 2 related measurements were available, the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">Student’s t-test for paired samples</a> would be used instead, and if the <span class="math inline">\(k\)</span> samples were independent, the <a href="/blog/anova-in-r/">one-way ANOVA</a> would be the appropriate test.</p>
+</div>
+<div id="independence-between-subjects" class="section level2">
+<h2>Independence between subjects</h2>
+<p>Independence is required <strong>between</strong> subjects, but not within them. This point is often a source of confusion, so it is worth insisting on it: the <span class="math inline">\(k\)</span> measurements of a given patient are of course dependent (this is the whole point of the design, and it is exactly what the test accounts for), but the measurements of one patient must not influence the measurements of another patient.</p>
+<p>As for many tests, this assumption is verified based on the design of the experiment and on the good control of the experimental conditions rather than via a formal test. Here, patients have been selected at random and treated individually, so we consider this assumption to be met.</p>
+</div>
+<div id="normality" class="section level2">
+<h2>Normality</h2>
+<p>For small samples, the residuals of the model (equivalently, the differences between the conditions) should follow approximately a <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normal distribution</a>. As for the one-way ANOVA, this requirement becomes much less critical when the number of subjects is large, thanks to the central limit theorem: with a large enough sample, the sampling distribution of the means is well approximated by a normal distribution even if the data themselves are not normally distributed.</p>
+<p>With only 30 patients, we are in a borderline situation, so it is safer to check normality. The residuals of interest are those obtained <em>after</em> having removed both the effect of the moment and the effect of the patient, so they can be computed from a <a href="/blog/multiple-linear-regression-made-simple/">linear model</a> including these two factors:</p>
+<pre class="r"><code># residuals of the model, taking the patient effect into account
+res_lm &lt;- lm(pain ~ time + patient, data = dat)</code></pre>
+<p>Normality can then be assessed visually via a <a href="/blog/descriptive-statistics-in-r/#histogram">histogram</a> and a <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a>:</p>
+<pre class="r"><code>par(mfrow = c(1, 2)) # combine plots
+
+hist(residuals(res_lm),
+  main = &quot;Histogram of the residuals&quot;,
+  xlab = &quot;Residuals&quot;
+)
+
+# install.packages(&quot;car&quot;)
+library(car)
+
+qqPlot(residuals(res_lm),
+  id = FALSE # remove point identification
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<p>The histogram is roughly symmetric around zero and the points of the QQ-plot are close to the straight line and all inside the confidence bands, so the normality assumption seems reasonable.</p>
+<p>If you prefer a formal <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/#normality-test">normality test</a>, the Shapiro-Wilk test can be applied on the same residuals:</p>
+<pre class="r"><code>shapiro.test(residuals(res_lm))</code></pre>
+<pre><code>## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(res_lm)
+## W = 0.98388, p-value = 0.331</code></pre>
+<p>The <span class="math inline">\(p\)</span>-value being larger than the usual significance level of 0.05, we do not reject the hypothesis that the residuals follow a normal distribution, which confirms the visual approach.</p>
+<p>If, even after a transformation of the data, normality was clearly not satisfied, the nonparametric alternative to the repeated measures ANOVA should be used: the Friedman test, which compares the conditions based on ranks instead of means and which requires neither normality nor sphericity.</p>
+</div>
+<div id="sphericity" class="section level2">
+<h2>Sphericity</h2>
+<p>Sphericity is the assumption which distinguishes the repeated measures ANOVA from the one-way ANOVA, and it deserves more than one line.</p>
+<p>In the independent-groups case, we require <strong>homogeneity of the variances</strong>: the variance of the dependent variable must be the same in all groups. In the repeated measures case, this condition is replaced by a condition on the <strong>differences</strong> between the conditions:</p>
+<blockquote>
+<p>Sphericity holds when the variances of the differences between all possible pairs of related conditions are equal in the population.</p>
+</blockquote>
+<p>With <span class="math inline">\(k\)</span> conditions, there are <span class="math inline">\(\frac{k(k-1)}{2}\)</span> possible pairs, so with our 3 moments there are 3 differences to consider: during minus before, after minus before, and after minus during. Sphericity requires the three corresponding variances to be (approximately) equal. On our data, these variances can be computed directly:</p>
+<pre class="r"><code># install.packages(&quot;tidyr&quot;)
+library(tidyr)
+
+# from the long format to the wide format
+dat_wide &lt;- dat %&gt;%
+  pivot_wider(names_from = time, values_from = pain)
+
+c(
+  &quot;during - before&quot; = var(dat_wide$during - dat_wide$before),
+  &quot;after - before&quot; = var(dat_wide$after - dat_wide$before),
+  &quot;after - during&quot; = var(dat_wide$after - dat_wide$during)
+)</code></pre>
+<pre><code>## during - before  after - before  after - during 
+##        77.21154        67.05289        69.24033</code></pre>
+<p>The three variances are of a comparable magnitude, which is a first good sign.</p>
+<p>Why does this matter? Because the <span class="math inline">\(F\)</span> statistic of a repeated measures ANOVA follows a Fisher distribution with the usual degrees of freedom <strong>only if</strong> sphericity holds. When it does not, the test becomes too liberal: the reported <span class="math inline">\(p\)</span>-values are too small, and the risk of concluding that the conditions differ when they actually do not is larger than the announced significance level. Note also that sphericity is automatically satisfied when <span class="math inline">\(k = 2\)</span> (there is then only one difference, so there is nothing to compare), which is another way of seeing why it never shows up in the context of a paired Student’s t-test.</p>
+<p>Sphericity is formally tested with <strong>Mauchly’s test</strong>, whose hypotheses are:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: sphericity holds (the variances of the differences are equal)</li>
+<li><span class="math inline">\(H_1\)</span>: sphericity is violated (at least two of these variances are different)</li>
+</ul>
+<p>If the <span class="math inline">\(p\)</span>-value of Mauchly’s test is larger than the significance level, we do not reject sphericity and the usual (uncorrected) results of the ANOVA can be interpreted. If it is smaller, sphericity is rejected and a <strong>correction</strong> must be applied.</p>
+<p>The two most common corrections are the <strong>Greenhouse-Geisser</strong> and the <strong>Huynh-Feldt</strong> corrections. Both work in the same way: they estimate a quantity <span class="math inline">\(\varepsilon\)</span> which measures how far the data are from sphericity, and they multiply the degrees of freedom of the <span class="math inline">\(F\)</span> test by this <span class="math inline">\(\varepsilon\)</span>. This estimate lies between <span class="math inline">\(\frac{1}{k-1}\)</span> and 1, the value 1 corresponding to perfect sphericity. Since the degrees of freedom are reduced, the corrected test is more conservative and the corrected <span class="math inline">\(p\)</span>-value is larger than the uncorrected one. The <span class="math inline">\(F\)</span> statistic itself is unchanged, only the reference distribution is adjusted. The Greenhouse-Geisser correction tends to underestimate <span class="math inline">\(\varepsilon\)</span> (so it is the more conservative of the two), while the Huynh-Feldt correction is less conservative and can even return a value above 1, in which case it is set back to 1. A common rule of thumb is to prefer the Greenhouse-Geisser correction when the estimated <span class="math inline">\(\varepsilon\)</span> is below 0.75, and the Huynh-Feldt correction when it is above 0.75 <span class="citation">(<a href="#ref-girden1992anova">Girden 1992</a>)</span>.</p>
+<p>Two practical remarks:</p>
+<ul>
+<li>Mauchly’s test is known to be sensitive to the sample size (it lacks power with few subjects and detects negligible departures with many) and to deviations from normality. For this reason, many authors recommend reporting the corrected results by default, whatever the conclusion of Mauchly’s test.</li>
+<li>If sphericity is severely violated, alternatives to the corrections exist: a multivariate approach (MANOVA), a linear mixed model, or the nonparametric Friedman test. The MANOVA approach is attractive here because it works directly with the covariance structure of the difference variables and makes no sphericity assumption at all, so it sidesteps the problem entirely rather than correcting for it.</li>
+</ul>
+<p>Fortunately, we do not need to compute any of this by hand: as shown in the next section, the function used to perform the test in R reports Mauchly’s test and both corrections along with the ANOVA table.</p>
+</div>
+<div id="outliers" class="section level2">
+<h2>Outliers</h2>
+<p>Finally, there should be no significant <a href="/blog/outliers-detection-in-r/">outliers</a> in any of the conditions, since the test is based on means and means are sensitive to extreme values. The boxplots drawn in the section about the data show one point outside the whiskers for the measurement taken during the treatment, but it is not an extreme value, so we consider that this assumption is met.</p>
+</div>
+</div>
+<div id="repeated-measures-anova-in-r" class="section level1">
+<h1>Repeated measures ANOVA in R</h1>
+<div id="with-the-rstatix-package" class="section level2">
+<h2>With the {rstatix} package</h2>
+<p>Several functions can be used to perform a repeated measures ANOVA in R. The most convenient one is <code>anova_test()</code> from the <code>{rstatix}</code> package, because it reports Mauchly’s test for sphericity and the two sphericity corrections together with the ANOVA table.</p>
+<p>The function expects the data in the long format, the name of the dependent variable (<code>dv</code>), the name of the column identifying the subjects (<code>wid</code>) and the name of the within-subjects factor (<code>within</code>):</p>
+<pre class="r"><code># install.packages(&quot;rstatix&quot;)
+library(rstatix)
+
+res_aov &lt;- anova_test(
+  data = dat,
+  dv = pain,
+  wid = patient,
+  within = time
+)
+
+res_aov</code></pre>
+<pre><code>## ANOVA Table (type III tests)
+## 
+## $ANOVA
+##   Effect DFn DFd      F        p p&lt;.05   ges
+## 1   time   2  58 13.464 1.57e-05     * 0.085
+## 
+## $`Mauchly&#39;s Test for Sphericity`
+##   Effect     W   p p&lt;.05
+## 1   time 0.992 0.9      
+## 
+## $`Sphericity Corrections`
+##   Effect   GGe      DF[GG]    p[GG] p[GG]&lt;.05   HFe      DF[HF]    p[HF]
+## 1   time 0.993 1.99, 57.57 1.67e-05         * 1.065 2.13, 61.78 1.57e-05
+##   p[HF]&lt;.05
+## 1         *</code></pre>
+<p>The output consists of three tables:</p>
+<ol style="list-style-type: decimal">
+<li>The <strong>ANOVA table</strong>, with the effect being tested (<code>Effect</code>), the degrees of freedom of the numerator and of the denominator (<code>DFn</code> and <code>DFd</code>), the value of the <span class="math inline">\(F\)</span> statistic (<code>F</code>), the <span class="math inline">\(p\)</span>-value (<code>p</code>) and the generalized eta squared (<code>ges</code>), an effect size which indicates the proportion of variability explained by the within-subjects factor.</li>
+<li><strong>Mauchly’s test for sphericity</strong>, with the value of the statistic (<code>W</code>) and its <span class="math inline">\(p\)</span>-value (<code>p</code>).</li>
+<li>The <strong>sphericity corrections</strong>, with the Greenhouse-Geisser estimate of <span class="math inline">\(\varepsilon\)</span> (<code>GGe</code>), the corrected degrees of freedom (<code>DF[GG]</code>) and the corrected <span class="math inline">\(p\)</span>-value (<code>p[GG]</code>), and the same three quantities for the Huynh-Feldt correction (<code>HFe</code>, <code>DF[HF]</code> and <code>p[HF]</code>).</li>
+</ol>
+<p>The corrected ANOVA table can also be printed on its own, for instance with the Greenhouse-Geisser correction:</p>
+<pre class="r"><code>get_anova_table(res_aov, correction = &quot;GG&quot;)</code></pre>
+<pre><code>## ANOVA Table (type III tests)
+## 
+##   Effect  DFn   DFd      F        p p&lt;.05   ges
+## 1   time 1.99 57.57 13.464 1.67e-05     * 0.085</code></pre>
+</div>
+<div id="with-base-r" class="section level2">
+<h2>With base R</h2>
+<p>If you prefer not to rely on an additional package, the classic way to run a repeated measures ANOVA in base R is with the <code>aov()</code> function and an <code>Error()</code> term specifying that the within-subjects factor is nested inside the subjects:</p>
+<pre class="r"><code>summary(aov(pain ~ time + Error(patient / time),
+  data = dat
+))</code></pre>
+<pre><code>## 
+## Error: patient
+##           Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Residuals 29   8265     285               
+## 
+## Error: patient:time
+##           Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## time       2  958.2   479.1   13.46 1.57e-05 ***
+## Residuals 58 2063.9    35.6                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The line of interest is the one starting with <code>time</code>, in the <code>Error: patient:time</code> stratum. The <span class="math inline">\(F\)</span> statistic and the <span class="math inline">\(p\)</span>-value are identical to the ones obtained with <code>anova_test()</code>, which is reassuring. The first stratum (<code>Error: patient</code>) simply isolates the variability between patients, that is, the variability which the repeated measures design allows to remove from the error term.</p>
+<p>The drawback of this approach is that it provides neither Mauchly’s test nor the sphericity corrections, so it should only be used when you have another way to check the sphericity assumption. This is the reason why we recommend <code>anova_test()</code>.</p>
+</div>
+<div id="interpretations" class="section level2">
+<h2>Interpretations</h2>
+<p>Let us start with the sphericity assumption. The <span class="math inline">\(p\)</span>-value of Mauchly’s test is 0.9, which is far above the significance level <span class="math inline">\(\alpha = 0.05\)</span>, so we do not reject the null hypothesis of sphericity. This is confirmed by the estimated <span class="math inline">\(\varepsilon\)</span> of the Greenhouse-Geisser correction (0.993), which is very close to 1. Sphericity being satisfied, we can interpret the <strong>uncorrected</strong> results of the ANOVA. (For information, the conclusion would have been exactly the same with the corrected <span class="math inline">\(p\)</span>-values, since all three <span class="math inline">\(p\)</span>-values are far below 0.05.)</p>
+<p>Coming now to the test itself: the <span class="math inline">\(p\)</span>-value is smaller than the significance level <span class="math inline">\(\alpha = 0.05\)</span>, so we reject the null hypothesis and we conclude that the mean pain score is <strong>not</strong> the same at the three moments (<span class="math inline">\(F(2, 58) = 13.46\)</span>, <span class="math inline">\(p\)</span>-value &lt; 0.001).</p>
+<p>(<em>For the sake of illustration</em>, if the <span class="math inline">\(p\)</span>-value had been larger than 0.05: we could not have rejected the null hypothesis, so we could not have concluded that the pain score changed between the three moments.)</p>
+<p>If you are not familiar with <span class="math inline">\(p\)</span>-values and significance levels, I invite you to read this <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha">section</a>.</p>
+<p>Note that, as any ANOVA, the test does not tell us <em>which</em> moments differ, nor in which direction. The direction must be read from the descriptive statistics and the plots, and the comparisons two by two require post-hoc tests.</p>
+</div>
+</div>
+<div id="post-hoc-tests" class="section level1">
+<h1>Post-hoc tests</h1>
+<p>We have just shown that at least one moment differs from the others, but we still do not know which one(s). To answer this question, we need post-hoc tests (in Latin, “after this”, so after having obtained significant results for the ANOVA), also referred as multiple pairwise-comparison tests.</p>
+<p>The logic is the same as the one presented for the <a href="/blog/anova-in-r/#post-hoc-test">one-way ANOVA</a>: we compare the conditions two by two, and we adjust the <span class="math inline">\(p\)</span>-values because performing several tests on the same data increases the risk of finding a significant difference by chance alone. With 3 moments, there are 3 pairs to compare, and the probability of observing at least one significant result purely by chance would already be <span class="math inline">\(1 - (1 - 0.05)^3 = 14.3\%\)</span> without any adjustment.</p>
+<p>The only difference with the one-way ANOVA is that the comparisons must take the pairing into account: instead of the Tukey HSD test (which compares independent groups), we perform <strong>paired</strong> Student’s t-tests on each pair of moments, together with an adjustment of the <span class="math inline">\(p\)</span>-values for multiple comparisons. This is done with the <code>pairwise_t_test()</code> function of the <code>{rstatix}</code> package, with the arguments <code>paired = TRUE</code> and the Holm adjustment method:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<pre class="r"><code>dat %&gt;%
+  pairwise_t_test(pain ~ time,
+    paired = TRUE,
+    p.adjust.method = &quot;holm&quot;
+  )</code></pre>
+<pre><code>## # A tibble: 3 × 10
+##   .y.   group1 group2    n1    n2 statistic    df         p   p.adj p.adj.signif
+## * &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;int&gt; &lt;int&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;       
+## 1 pain  before during    30    30      3.19    29 0.00343   6.86e-3 **          
+## 2 pain  before after     30    30      5.27    29 0.0000120 3.61e-5 ****        
+## 3 pain  during after     30    30      1.82    29 0.0793    7.93e-2 ns</code></pre>
+<p>(Be careful that, with <code>paired = TRUE</code>, this function pairs the observations according to their order in the dataset, so the subjects must appear in the same order in each condition, which is the case here.)</p>
+<p>It is the <code>p.adj</code> column (the <span class="math inline">\(p\)</span>-values adjusted for multiple comparisons) which is of interest, and not the <code>p</code> column (the <em>un</em>adjusted <span class="math inline">\(p\)</span>-values). These adjusted <span class="math inline">\(p\)</span>-values must be compared to the desired significance level, here 5%.</p>
+<p>Based on the output, we conclude that:</p>
+<ul>
+<li>the mean pain score differs significantly between before and during the treatment (adjusted <span class="math inline">\(p\)</span>-value = 0.007),</li>
+<li>it differs significantly between before the treatment and one month after it (adjusted <span class="math inline">\(p\)</span>-value &lt; 0.001), and</li>
+<li>it does not differ significantly between during the treatment and one month after it (adjusted <span class="math inline">\(p\)</span>-value = 0.079).</li>
+</ul>
+<p>Combined with the descriptive statistics computed earlier, these post-hoc tests give a much more precise picture than the ANOVA alone: the treatment is associated with a significant decrease of the pain score (from 69.8 to 64.7 on average), and this benefit is still visible one month after the end of the treatment (61.9 on average, still significantly below the initial level). The additional decrease observed between the measurement during the treatment and the measurement one month later is, on the other hand, too small to be considered as significant.</p>
+<p>Note that if the normality assumption had not been satisfied, the post-hoc tests would have been pairwise Wilcoxon signed-rank tests (<code>pairwise_wilcox_test()</code> with <code>paired = TRUE</code>) instead of paired t-tests, following a Friedman test instead of a repeated measures ANOVA.</p>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>In this article, we reviewed the aim, the hypotheses and the assumptions of the repeated measures ANOVA, the extension of the <a href="/blog/anova-in-r/">one-way ANOVA</a> to related samples, used when the same subjects are measured on a quantitative variable under three conditions or more. Beyond the usual requirements of independence between subjects and normality of the residuals, this test relies on the <strong>sphericity</strong> assumption (the variances of the differences between all pairs of conditions must be equal), which is tested with Mauchly’s test and, if violated, dealt with by applying the Greenhouse-Geisser or the Huynh-Feldt correction to the degrees of freedom.</p>
+<p>In practice, the test is easily performed in R with the <code>anova_test()</code> function of the <code>{rstatix}</code> package, which reports the ANOVA table, Mauchly’s test and both corrections at once. As for any ANOVA, a significant result only indicates that at least one condition differs from the others, so it must be followed by post-hoc tests, here pairwise paired t-tests with adjusted <span class="math inline">\(p\)</span>-values. If normality or sphericity cannot be assumed, remember that the Friedman test is the nonparametric alternative, and that with independent samples the <a href="/blog/anova-in-r/">one-way ANOVA</a> or the <a href="/blog/kruskal-wallis-test-nonparametric-version-anova/">Kruskal-Wallis test</a> should be preferred. See also this <a href="/blog/what-statistical-test-should-i-do/">overview of the most common statistical tests</a> if you hesitate between several methods.</p>
+<p>Thanks for reading.</p>
+<p>I hope this article helped you to understand the repeated measures ANOVA and how to perform it in R.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-girden1992anova" class="csl-entry">
+Girden, Ellen R. 1992. <em>ANOVA: Repeated Measures</em>. Sage.
+</div>
+</div>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>The Holm adjustment is less conservative than the Bonferroni one, while still controlling the same global error rate. See <code>?p.adjust</code> for the other available methods.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
