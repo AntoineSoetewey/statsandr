@@ -220,6 +220,45 @@ author {
     background: #fff;
 }
 
+/* Post footer blocks: bibliography, footnotes and related articles.
+   None of them is covered by the margin rule above (the bibliography and the
+   related articles are <div>s, the footnote <ol> nests a <p> that is indented a
+   second time), so they are aligned here on the left edge of the body text. */
+
+.content .markdown .csl-bib-body, .content .markdown .footnotes, .content .related {
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+}
+
+/* The 1.5rem is carried by .footnotes itself, so the list resets its own margin
+   and turns its padding into a gutter that holds the marker. The native marker
+   is right-aligned against the text, so its left edge would move with the number
+   of digits: it is replaced by a counter laid out from the left of that gutter. */
+
+.content .markdown .footnotes > ol {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 2.5rem;
+    list-style: none;
+    counter-reset: footnote;
+}
+
+.content .markdown .footnotes > ol > li {
+    position: relative;
+    counter-increment: footnote;
+}
+
+.content .markdown .footnotes > ol > li::before {
+    content: counter(footnote) ".";
+    position: absolute;
+    left: -2.5rem;
+}
+
+.content .markdown .footnotes p {
+    margin-left: 0;
+    margin-right: 0;
+}
+
 .content .groupby {
     list-style: none;
     color: #333333;
@@ -315,6 +354,10 @@ author {
     }
     .content .markdown table {
         max-width: 100%;
+    }
+    .content .markdown .csl-bib-body, .content .markdown .footnotes, .content .related {
+        margin-left: 0;
+        margin-right: 0;
     }
 }
 
