@@ -265,7 +265,7 @@ To find out, we need post-hoc tests (in Latin, "after this", so after a signific
 - the Nemenyi test
 - the Conover test
 
-Unlike pairwise Wilcoxon tests, which only use the two conditions being compared, the Nemenyi and Conover tests compare the rank sums of the Friedman test itself, computed on all conditions at once. This makes it more consistent with the omnibus test, but it also has a drawback: the conclusion for a given pair of conditions can change depending on which other conditions are included in the study. For this reason, some authors, such as @benavoli2016should, recommend pairwise Wilcoxon signed-rank tests instead. In practice, both approaches are widely used, and they often lead to the same conclusions, as in our example below.
+Unlike pairwise Wilcoxon tests, which only use the two conditions being compared, the Nemenyi and Conover tests compare the rank sums of the Friedman test itself, computed on all conditions at once. This makes them more consistent with the omnibus test, but it also has a drawback: the conclusion for a given pair of conditions can change depending on which other conditions are included in the study. For this reason, some authors, such as @benavoli2016should, recommend pairwise Wilcoxon signed-rank tests instead. In practice, both approaches are widely used, and they often lead to the same conclusions, as in our example below.
 
 ## Pairwise Wilcoxon signed-rank tests
 
@@ -315,7 +315,7 @@ These *p*-values (based on the studentized range distribution, which already acc
 
 ## Conover test
 
-Like the Nemenyi test, the Conover test compares the rank sums of the Friedman test, but it relies on a Student's *t* distribution with an error term estimated from the ranks, which generally makes it more powerful than the Nemenyi test. It is available in the same package, with the `frdAllPairsConoverTest()` function. By default, the *p*-values are adjusted with the single-step method, but other adjustments can be chosen with the `p.adjust.method` argument. For consistency with the pairwise Wilcoxon tests, we use the Holm method. Note that, unlike `frdAllPairsNemenyiTest()`, this function does not accept a formula, so the response, the conditions and the subjects are passed as separate vectors:
+Like the Nemenyi test, the Conover test compares the rank sums of the Friedman test, but it relies on a Student's *t* distribution with an error term estimated from the ranks, which generally makes it more powerful than the Nemenyi test. It is available in the same package, with the `frdAllPairsConoverTest()` function. By default, this function uses a single-step adjustment based on the studentized range distribution (as for the Nemenyi test), but other adjustments can be chosen with the `p.adjust.method` argument, in which case the *p*-values are computed from the *t* distribution and then adjusted. For consistency with the pairwise Wilcoxon tests, we use the Holm method. Note that, unlike `frdAllPairsNemenyiTest()`, this function does not accept a formula, so the response, the conditions and the subjects are passed as separate vectors:
 
 ```{r}
 frdAllPairsConoverTest(
@@ -327,6 +327,8 @@ frdAllPairsConoverTest(
 ```
 
 These adjusted *p*-values lead to the same conclusions: the pain score before the treatment differs significantly from the pain score during and one month after the treatment, while the pain scores during and after the treatment do not differ significantly.
+
+Note that you may also come across this test under the name **Durbin-Conover test**, for instance in the `{ggstatsplot}` package used in the next section. The Durbin test is a generalization of the Friedman test to designs in which each subject is measured under only some of the conditions (the so-called balanced incomplete block designs), and the Durbin-Conover test is its post-hoc test. When all subjects are measured under all conditions, as in our example, the Durbin test reduces to the Friedman test and the Durbin-Conover test reduces to the Conover test: despite the different names, the computations are exactly the same (the `durbinAllPairsTest()` function of the `{PMCMRplus}` package would give the same results as above).
 
 # Combination of statistical results and plot
 
@@ -347,7 +349,7 @@ ggwithinstats(
 )
 ```
 
-The results of the Friedman test are shown in the subtitle (the *p*-value is after `p =`), the boxplots and violin plots show the distribution at each moment, and the post-hoc tests are displayed between each pair of moments. Note that `ggwithinstats()` uses the Durbin-Conover test (with the Holm adjustment) rather than pairwise Wilcoxon tests, so its adjusted *p*-values differ from ours, but the conclusions are the same.
+The results of the Friedman test are shown in the subtitle (the *p*-value is after `p =`), the boxplots and violin plots show the distribution at each moment, and the post-hoc tests are displayed between each pair of moments. For these post-hoc tests, `ggwithinstats()` uses the Durbin-Conover test with the Holm adjustment which, as explained above, is the Conover test under another name. The adjusted *p*-values displayed on the plot are therefore exactly those obtained with `frdAllPairsConoverTest()` in the previous section.
 
 # Summary
 
