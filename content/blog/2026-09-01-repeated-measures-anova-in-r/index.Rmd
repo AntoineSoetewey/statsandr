@@ -229,7 +229,7 @@ shapiro.test(residuals(res_lm))
 
 The $p$-value being larger than the usual significance level of 0.05, we do not reject the hypothesis that the residuals follow a normal distribution, which confirms the visual approach.
 
-If, even after a transformation of the data, normality was clearly not satisfied, the nonparametric alternative to the repeated measures ANOVA should be used: the Friedman test, which compares the conditions based on ranks instead of means and which requires neither normality nor sphericity.
+If, even after a transformation of the data, normality was clearly not satisfied, the nonparametric alternative to the repeated measures ANOVA should be used: the [Friedman test](/blog/friedman-test-nonparametric-version-repeated-measures-anova/), which compares the conditions based on ranks instead of means and which requires neither normality nor sphericity.
 
 ## Sphericity
 
@@ -272,7 +272,7 @@ The two most common corrections are the **Greenhouse-Geisser** and the **Huynh-F
 Two practical remarks:
 
 * Mauchly's test is known to be sensitive to the sample size (it lacks power with few subjects and detects negligible departures with many) and to deviations from normality. For this reason, many authors recommend reporting the corrected results by default, whatever the conclusion of Mauchly's test.
-* If sphericity is severely violated, alternatives to the corrections exist: a multivariate approach (MANOVA), a linear mixed model, or the nonparametric Friedman test. The MANOVA approach is attractive here because it works directly with the covariance structure of the difference variables and makes no sphericity assumption at all, so it sidesteps the problem entirely rather than correcting for it.
+* If sphericity is severely violated, alternatives to the corrections exist: a multivariate approach (MANOVA), a linear mixed model, or the nonparametric [Friedman test](/blog/friedman-test-nonparametric-version-repeated-measures-anova/). The MANOVA approach is attractive here because it works directly with the covariance structure of the difference variables and makes no sphericity assumption at all, so it sidesteps the problem entirely rather than correcting for it.
 
 Fortunately, we do not need to compute any of this by hand: as shown in the next section, the function used to perform the test in R reports Mauchly's test and both corrections along with the ANOVA table.
 
@@ -368,13 +368,13 @@ Based on the output, we conclude that:
 
 Combined with the descriptive statistics computed earlier, these post-hoc tests give a much more precise picture than the ANOVA alone: the treatment is associated with a significant decrease of the pain score (from `r round(mean(dat$pain[dat$time == "before"]), 1)` to `r round(mean(dat$pain[dat$time == "during"]), 1)` on average), and this benefit is still visible one month after the end of the treatment (`r round(mean(dat$pain[dat$time == "after"]), 1)` on average, still significantly below the initial level). The additional decrease observed between the measurement during the treatment and the measurement one month later is, on the other hand, too small to be considered as significant.
 
-Note that if the normality assumption had not been satisfied, the post-hoc tests would have been pairwise Wilcoxon signed-rank tests (`pairwise_wilcox_test()` with `paired = TRUE`) instead of paired t-tests, following a Friedman test instead of a repeated measures ANOVA.
+Note that if the normality assumption had not been satisfied, the post-hoc tests would have been pairwise Wilcoxon signed-rank tests (`pairwise_wilcox_test()` with `paired = TRUE`) instead of paired t-tests, following a [Friedman test](/blog/friedman-test-nonparametric-version-repeated-measures-anova/) instead of a repeated measures ANOVA.
 
 # Summary
 
 In this article, we reviewed the aim, the hypotheses and the assumptions of the repeated measures ANOVA, the extension of the [one-way ANOVA](/blog/anova-in-r/) to related samples, used when the same subjects are measured on a quantitative variable under three conditions or more. Beyond the usual requirements of independence between subjects and normality of the residuals, this test relies on the **sphericity** assumption (the variances of the differences between all pairs of conditions must be equal), which is tested with Mauchly's test and, if violated, dealt with by applying the Greenhouse-Geisser or the Huynh-Feldt correction to the degrees of freedom.
 
-In practice, the test is easily performed in R with the `anova_test()` function of the `{rstatix}` package, which reports the ANOVA table, Mauchly's test and both corrections at once. As for any ANOVA, a significant result only indicates that at least one condition differs from the others, so it must be followed by post-hoc tests, here pairwise paired t-tests with adjusted $p$-values. If normality or sphericity cannot be assumed, remember that the Friedman test is the nonparametric alternative, and that with independent samples the [one-way ANOVA](/blog/anova-in-r/) or the [Kruskal-Wallis test](/blog/kruskal-wallis-test-nonparametric-version-anova/) should be preferred. See also this [overview of the most common statistical tests](/blog/what-statistical-test-should-i-do/) if you hesitate between several methods.
+In practice, the test is easily performed in R with the `anova_test()` function of the `{rstatix}` package, which reports the ANOVA table, Mauchly's test and both corrections at once. As for any ANOVA, a significant result only indicates that at least one condition differs from the others, so it must be followed by post-hoc tests, here pairwise paired t-tests with adjusted $p$-values. If normality or sphericity cannot be assumed, remember that the [Friedman test](/blog/friedman-test-nonparametric-version-repeated-measures-anova/) is the nonparametric alternative, and that with independent samples the [one-way ANOVA](/blog/anova-in-r/) or the [Kruskal-Wallis test](/blog/kruskal-wallis-test-nonparametric-version-anova/) should be preferred. See also this [overview of the most common statistical tests](/blog/what-statistical-test-should-i-do/) if you hesitate between several methods.
 
 Thanks for reading.
 
