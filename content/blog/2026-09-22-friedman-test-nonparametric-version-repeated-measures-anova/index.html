@@ -1,0 +1,404 @@
+---
+title: Friedman test in R, or the nonparametric version of the repeated measures ANOVA
+author: Antoine Soetewey
+date: '2026-09-22'
+slug: friedman-test-nonparametric-version-repeated-measures-anova
+categories: []
+tags:
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: blog/friedman-test-nonparametric-version-repeated-measures-anova/images/friedman-test-nonparametric-version-repeated-measures-anova.jpg
+description: Learn how to perform the Friedman test in R, the nonparametric alternative to the repeated measures ANOVA for comparing 3+ related groups.
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+# draft: true
+bibliography: bibliography.bib
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#data" id="toc-data">Data</a></li>
+<li><a href="#friedman-test" id="toc-friedman-test">Friedman test</a>
+<ul>
+<li><a href="#aim-and-hypotheses" id="toc-aim-and-hypotheses">Aim and hypotheses</a></li>
+<li><a href="#assumptions" id="toc-assumptions">Assumptions</a></li>
+<li><a href="#in-r" id="toc-in-r">In R</a>
+<ul>
+<li><a href="#with-base-r" id="toc-with-base-r">With base R</a></li>
+<li><a href="#with-the-rstatix-package" id="toc-with-the-rstatix-package">With the {rstatix} package</a></li>
+</ul></li>
+<li><a href="#interpretations" id="toc-interpretations">Interpretations</a></li>
+</ul></li>
+<li><a href="#post-hoc-tests" id="toc-post-hoc-tests">Post-hoc tests</a>
+<ul>
+<li><a href="#pairwise-wilcoxon-signed-rank-tests" id="toc-pairwise-wilcoxon-signed-rank-tests">Pairwise Wilcoxon signed-rank tests</a></li>
+<li><a href="#nemenyi-test" id="toc-nemenyi-test">Nemenyi test</a></li>
+<li><a href="#conover-test" id="toc-conover-test">Conover test</a></li>
+</ul></li>
+<li><a href="#combination-of-statistical-results-and-plot" id="toc-combination-of-statistical-results-and-plot">Combination of statistical results and plot</a></li>
+<li><a href="#summary" id="toc-summary">Summary</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+</ul>
+</div>
+
+<p><img src="images/friedman-test-nonparametric-version-repeated-measures-anova.jpg" style="width:100.0%" /></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In a previous article, we showed how to perform a <a href="/blog/repeated-measures-anova-in-r/">repeated measures ANOVA in R</a> to compare a <a href="/blog/variable-types-and-examples/#quantitative">quantitative variable</a> measured on the same subjects under three or more related conditions, or at three or more points in time.</p>
+<p>As for many <a href="/blog/what-statistical-test-should-i-do/">statistical tests</a>, its results can only be trusted if some assumptions are met, in particular the <a href="/blog/do-my-data-follow-a-normal-distribution-a-note-on-the-most-widely-used-distribution-and-how-to-test-for-normality-in-r/">normality</a> of the residuals (at least for small samples) and the <strong>sphericity</strong> of the data. When they are not, or when the dependent variable is only ordinal, its nonparametric version can be used: the <strong>Friedman test</strong>, proposed by the economist Milton Friedman in 1937 in a paper whose title sums up its purpose: “The use of ranks to avoid the assumption of normality implicit in the analysis of variance” <span class="citation">(<a href="#ref-friedman1937use">Friedman 1937</a>)</span>.</p>
+<p>The article about the <a href="/blog/kruskal-wallis-test-nonparametric-version-anova/">Kruskal-Wallis test</a>, the nonparametric version of the <a href="/blog/anova-in-r/">one-way ANOVA</a>, already pointed in this direction: if the observations between samples are dependent (for instance, the same individuals measured before, during and after a treatment), the Friedman test should be preferred to take this dependency into account. The present article picks up that thread.</p>
+<p>These four tests, all used to compare three groups or more, form two pairs of parametric and nonparametric tests:</p>
+<table>
+<colgroup>
+<col width="11%" />
+<col width="48%" />
+<col width="39%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Independent samples</strong></th>
+<th><strong>Related samples</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Parametric</strong></td>
+<td><a href="/blog/anova-in-r/">One-way ANOVA</a></td>
+<td><a href="/blog/repeated-measures-anova-in-r/">Repeated measures ANOVA</a></td>
+</tr>
+<tr class="even">
+<td><strong>Nonparametric</strong></td>
+<td><a href="/blog/kruskal-wallis-test-nonparametric-version-anova/">Kruskal-Wallis test</a></td>
+<td>Friedman test</td>
+</tr>
+</tbody>
+</table>
+<p>In other words, the Friedman test is the “related-samples” counterpart of the Kruskal-Wallis test. Both work on ranks instead of raw values, but the Kruskal-Wallis test ranks all observations together, whereas the Friedman test ranks the measurements <strong>within each subject</strong>, which is how it takes the dependency between the samples into account.</p>
+<p>In the rest of the article, we show how to perform and interpret the Friedman test in R, how to follow it up with post-hoc tests, and how to present all the results on a single plot.</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>We use the same scenario as in the <a href="/blog/repeated-measures-anova-in-r/#data">repeated measures ANOVA article</a>: a treatment against chronic pain, with pain measured from 0 (no pain at all) to 100 (unbearable pain) on the same patients (i) before, (ii) during and (iii) one month after the treatment. This time, however, the data come from a small pilot study with 16 patients, and some scores are affected by flare-ups:</p>
+<pre class="r"><code># number of patients
+n &lt;- 16
+
+# each patient has its own baseline level of pain
+patient_effect &lt;- rnorm(n, mean = 0, sd = 6)
+
+# pain score at the 3 moments, with right-skewed fluctuations (flare-ups)
+before &lt;- 60 + patient_effect + rexp(n, rate = 1 / 6)
+during &lt;- 48 + patient_effect + rexp(n, rate = 1 / 6)
+after &lt;- 46 + patient_effect + rexp(n, rate = 1 / 6)
+
+# dataset in the long format
+dat &lt;- data.frame(
+  patient = factor(rep(1:n, times = 3)),
+  time = factor(rep(c(&quot;before&quot;, &quot;during&quot;, &quot;after&quot;), each = n),
+    levels = c(&quot;before&quot;, &quot;during&quot;, &quot;after&quot;)
+  ),
+  pain = round(c(before, during, after), 1)
+)
+
+head(dat)</code></pre>
+<pre><code>##   patient   time pain
+## 1       1 before 75.7
+## 2       2 before 58.8
+## 3       3 before 91.4
+## 4       4 before 67.8
+## 5       5 before 92.4
+## 6       6 before 60.7</code></pre>
+<p>(A seed has been set in the background with <code>set.seed(42)</code>, so the data and all the results below are reproducible.)</p>
+<p>As before, the term <code>patient_effect</code> creates the dependency between the three scores of a given patient, and the data are in the <strong>long format</strong> (one row per patient and per moment). The difference lies in the fluctuations around the usual level of each patient, drawn from a strongly right-skewed exponential distribution (<code>rexp()</code>) instead of a normal one. This mimics flare-ups: most patients report a score close to their usual level, but a few of them report a much higher one. With so few patients, normality cannot be taken for granted.</p>
+<p>Since we are going to use a test based on ranks, the <a href="/blog/descriptive-statistics-in-r/#median">median</a> and the <a href="/blog/descriptive-statistics-in-r/#interquartile-range">interquartile range</a> are the most relevant <a href="/blog/descriptive-statistics-in-r/">descriptive statistics</a>, but the <a href="/blog/descriptive-statistics-in-r/#mean">mean</a> is shown for comparison:</p>
+<pre class="r"><code># install.packages(&quot;dplyr&quot;)
+library(dplyr)
+
+dat %&gt;%
+  group_by(time) %&gt;%
+  summarise(
+    n = n(),
+    median = median(pain),
+    IQR = IQR(pain),
+    mean = round(mean(pain), 2)
+  ) %&gt;%
+  as.data.frame() # to print all decimals</code></pre>
+<pre><code>##     time  n median    IQR  mean
+## 1 before 16  68.50 15.325 71.14
+## 2 during 16  57.45 12.025 59.45
+## 3  after 16  52.10  7.475 55.54</code></pre>
+<p>The <a href="/blog/descriptive-statistics-in-r/#boxplot">boxplots</a> compare the three moments, and the second plot joins the successive scores of each patient:</p>
+<pre class="r"><code># install.packages(&quot;ggplot2&quot;)
+library(ggplot2)
+
+ggplot(dat) +
+  aes(x = time, y = pain, fill = time) +
+  geom_boxplot() +
+  theme(legend.position = &quot;none&quot;) +
+  labs(
+    x = &quot;Moment of the measurement&quot;,
+    y = &quot;Pain score&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(dat) +
+  aes(x = time, y = pain, group = patient) +
+  geom_line(alpha = 0.4) +
+  geom_point(alpha = 0.4) +
+  labs(
+    x = &quot;Moment of the measurement&quot;,
+    y = &quot;Pain score&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-2.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<p>In our <a href="/blog/what-is-the-difference-between-population-and-sample/">sample</a>, the median pain score decreased from 68.5 before the treatment to 57.45 during the treatment and 52.1 one month after it, and most patients follow this downward trend. Both plots also reveal two isolated high scores (one during and one after the treatment) due to flare-ups. (The low score flagged after the treatment is less extreme, and simply reflects a patient who responded particularly well.) These flare-ups pull the mean upwards (55.5 versus a median of 52.1 one month after the treatment) and would weigh heavily on a test based on means, whereas in a test based on ranks they simply count as the highest score of the patients concerned.</p>
+<p>Only a sound statistical test will tell us whether these differences can be generalized to the <a href="/blog/what-is-the-difference-between-population-and-sample/">population</a>.</p>
+</div>
+<div id="friedman-test" class="section level1">
+<h1>Friedman test</h1>
+<div id="aim-and-hypotheses" class="section level2">
+<h2>Aim and hypotheses</h2>
+<p>The Friedman test is used to compare <span class="math inline">\(k \geq 3\)</span> related conditions (or points in time) in terms of a quantitative or <a href="/blog/variable-types-and-examples/#ordinal">ordinal</a> variable measured on the same subjects. In our example, it helps us to answer the question: “Is the pain score different before, during and after the treatment?”.</p>
+<p>Its principle is simple: the <span class="math inline">\(k\)</span> measurements of each subject are ranked from 1 (the smallest) to <span class="math inline">\(k\)</span> (the largest), with tied values receiving the average of their ranks, and the ranks are then summed for each condition. If the conditions do not differ, these sums, denoted <span class="math inline">\(R_1, \dots, R_k\)</span>, should all be close to <span class="math inline">\(n(k+1)/2\)</span>, where <span class="math inline">\(n\)</span> is the number of subjects. The test statistic measures how far they are from this value:</p>
+<p><span class="math display">\[Q = \frac{12}{n k (k+1)} \sum_{j=1}^k R_j^2 - 3n(k+1)\]</span></p>
+<p>Under the null hypothesis, and if <span class="math inline">\(n\)</span> is not too small, <span class="math inline">\(Q\)</span> follows approximately a chi-square distribution with <span class="math inline">\(k - 1\)</span> degrees of freedom (with a correction in case of ties).<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> Since the ranking is done within each subject, the general level of each patient plays no role, just as the repeated measures ANOVA removes the variability between subjects from its error term.</p>
+<p>The null and alternative hypotheses of the Friedman test are:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: the <span class="math inline">\(k\)</span> related conditions have the same distribution, so no condition tends to receive higher or lower ranks than the others</li>
+<li><span class="math inline">\(H_1\)</span>: at least one condition is different from the others</li>
+</ul>
+<p>In our example, <span class="math inline">\(H_0\)</span> means that the pain score has the same distribution before, during and after the treatment, and <span class="math inline">\(H_1\)</span> that at least one of the three moments differs from the other two.</p>
+<p>Be careful that, as for the ANOVA and the Kruskal-Wallis test, the alternative hypothesis is <strong><em>not</em></strong> that all conditions are different from each other. If the null hypothesis is rejected, we only know that <em>at least</em> one moment differs from the others; post-hoc tests, covered later, tell us which ones.</p>
+<p>Note also that the Friedman test is often presented as a comparison of medians. This shortcut is only valid under additional assumptions (in particular, distributions with the same shape that only differ by a shift), which are not needed as long as the test is used to compare conditions in general, as we do here.</p>
+</div>
+<div id="assumptions" class="section level2">
+<h2>Assumptions</h2>
+<p>First, the Friedman test requires one dependent variable, at least ordinal, measured on the same subjects across <span class="math inline">\(k \geq 3\)</span> related conditions or points in time: a within-subjects design in which each subject is measured once in each condition (subjects with a missing measurement are removed by <code>friedman.test()</code>). Here, the pain score is measured at 3 moments on the same 16 patients, so this assumption is met.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>Second, the subjects must be <strong>independent from each other</strong>. Independence is required between subjects, but not within them: the <span class="math inline">\(k\)</span> measurements of a given patient are of course dependent (this is the whole point of the design, and exactly what the ranking within subjects accounts for), but the scores of one patient must not influence those of another. This is verified based on the design of the study: here, patients have been selected at random and treated individually.</p>
+<p>Third, as a nonparametric test, the Friedman test does <strong>not require normality</strong>, and since it compares neither means nor variances of differences, it does not require sphericity either. This is precisely why it is preferred over the repeated measures ANOVA when the <a href="/blog/repeated-measures-anova-in-r/#assumptions">normality or sphericity assumptions</a> of the latter are not satisfied.</p>
+<p>In our example, normality can be assessed on the residuals of a model including the moment and the patient, as in the <a href="/blog/repeated-measures-anova-in-r/#normality">repeated measures ANOVA article</a>:</p>
+<pre class="r"><code># residuals of the model, taking the patient effect into account
+res_lm &lt;- lm(pain ~ time + patient, data = dat)
+
+# install.packages(&quot;car&quot;)
+library(car)
+
+qqPlot(residuals(res_lm),
+  id = FALSE # remove point identification
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>shapiro.test(residuals(res_lm))</code></pre>
+<pre><code>## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(res_lm)
+## W = 0.89685, p-value = 0.0004984</code></pre>
+<p>Several points of the <a href="/blog/descriptive-statistics-in-r/#qq-plot">QQ-plot</a> lie far from the straight line and outside the confidence bands, and the Shapiro-Wilk test rejects the normality of the residuals (<em>p</em>-value &lt; 0.05). With only 16 patients, the central limit theorem cannot be relied upon to make this deviation harmless, so the Friedman test is the appropriate choice.</p>
+<p>This flexibility comes at a price, though: since only the order of the measurements within each subject is used, the Friedman test is generally less powerful than the repeated measures ANOVA when the assumptions of the latter are met. It is an alternative, not a default choice.</p>
+</div>
+<div id="in-r" class="section level2">
+<h2>In R</h2>
+<div id="with-base-r" class="section level3">
+<h3>With base R</h3>
+<p>In R, the Friedman test is done with the <code>friedman.test()</code> function. With data in the long format, the easiest is to use its formula interface, <code>dependent variable ~ conditions | subjects</code>:</p>
+<pre class="r"><code>friedman.test(pain ~ time | patient,
+  data = dat
+)</code></pre>
+<pre><code>## 
+## 	Friedman rank sum test
+## 
+## data:  pain and time and patient
+## Friedman chi-squared = 17.375, df = 2, p-value = 0.0001687</code></pre>
+<p>It also accepts a matrix with one row per subject and one column per condition (the wide format), which can be obtained with the <code>pivot_wider()</code> function of the <code>{tidyr}</code> package:</p>
+<pre class="r"><code># install.packages(&quot;tidyr&quot;)
+library(tidyr)
+
+# from the long format to the wide format
+dat_wide &lt;- dat %&gt;%
+  pivot_wider(names_from = time, values_from = pain)
+
+head(dat_wide)</code></pre>
+<pre><code>## # A tibble: 6 × 4
+##   patient before during after
+##   &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1 1         75.7   66.8  55.2
+## 2 2         58.8   49    52.5
+## 3 3         91.4   50.4  55  
+## 4 4         67.8   53.9  51.5
+## 5 5         92.4   52.8  51.7
+## 6 6         60.7   58.8  46.1</code></pre>
+<pre class="r"><code># Friedman test on the 3 columns of scores (without the patient column)
+friedman.test(as.matrix(dat_wide[, -1]))</code></pre>
+<pre><code>## 
+## 	Friedman rank sum test
+## 
+## data:  as.matrix(dat_wide[, -1])
+## Friedman chi-squared = 17.375, df = 2, p-value = 0.0001687</code></pre>
+<p>Both give the same results: the test statistic <span class="math inline">\(Q\)</span> (<code>Friedman chi-squared</code>), the number of degrees of freedom (<code>df</code>, equal to <span class="math inline">\(k - 1 = 2\)</span>) and the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/#a-note-on-p-value-and-significance-level-alpha"><em>p</em>-value</a>, which we interpret in the next section.</p>
+<p>For the curious reader, the test statistic can easily be recomputed from the ranks within patients:</p>
+<pre class="r"><code># rank the 3 scores within each patient
+ranks &lt;- t(apply(dat_wide[, -1], 1, rank))
+
+# sum of the ranks for each moment
+R &lt;- colSums(ranks)
+R</code></pre>
+<pre><code>## before during  after 
+##     45     29     22</code></pre>
+<pre class="r"><code># test statistic
+k &lt;- 3
+12 / (n * k * (k + 1)) * sum(R^2) - 3 * n * (k + 1)</code></pre>
+<pre><code>## [1] 17.375</code></pre>
+<p>Under the null hypothesis, each sum of ranks would be close to <span class="math inline">\(n(k+1)/2 = 32\)</span>. Here, the moment before the treatment collects much higher ranks, and we find the same statistic as <code>friedman.test()</code>.</p>
+</div>
+<div id="with-the-rstatix-package" class="section level3">
+<h3>With the {rstatix} package</h3>
+<p>For an output consistent with the tidyverse, the <code>friedman_test()</code> function of the <code>{rstatix}</code> package uses the same formula and returns a data frame:</p>
+<pre class="r"><code># install.packages(&quot;rstatix&quot;)
+library(rstatix)
+
+dat %&gt;%
+  friedman_test(pain ~ time | patient)</code></pre>
+<pre><code>## # A tibble: 1 × 6
+##   .y.       n statistic    df        p method       
+## * &lt;chr&gt; &lt;int&gt;     &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;        
+## 1 pain     16      17.4     2 0.000169 Friedman test</code></pre>
+<p>The same package provides an effect size, Kendall’s <span class="math inline">\(W\)</span>:</p>
+<pre class="r"><code>dat %&gt;%
+  friedman_effsize(pain ~ time | patient)</code></pre>
+<pre><code>## # A tibble: 1 × 5
+##   .y.       n effsize method    magnitude
+## * &lt;chr&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;ord&gt;    
+## 1 pain     16   0.543 Kendall W large</code></pre>
+<p>Kendall’s <span class="math inline">\(W\)</span>, computed as <span class="math inline">\(Q / (n(k - 1))\)</span>, ranges from 0 (no consistent ordering of the conditions across subjects) to 1 (all subjects rank the conditions in the same order). <code>{rstatix}</code> interprets it with the usual guidelines: 0.1 to &lt; 0.3 for a small effect, 0.3 to &lt; 0.5 for a moderate effect, and 0.5 or more for a large effect. Here, <span class="math inline">\(W =\)</span> 0.54, so a large effect.</p>
+</div>
+</div>
+<div id="interpretations" class="section level2">
+<h2>Interpretations</h2>
+<p>The <em>p</em>-value is smaller than the significance level <span class="math inline">\(\alpha = 0.05\)</span>, so we reject the null hypothesis and we conclude that the pain score is not the same at the three moments (<span class="math inline">\(\chi^2(2) = 17.38\)</span>, <em>p</em>-value &lt; 0.001, Kendall’s <span class="math inline">\(W = 0.54\)</span>).</p>
+<p>(<em>For the sake of illustration</em>, with a <em>p</em>-value larger than 0.05, we could not have rejected the null hypothesis, and thus could not have concluded that the pain score changed over time.)</p>
+<p>As any omnibus test, however, the Friedman test does not tell us which moments differ.</p>
+</div>
+</div>
+<div id="post-hoc-tests" class="section level1">
+<h1>Post-hoc tests</h1>
+<p>To find out, we need post-hoc tests (in Latin, “after this”, so after a significant Friedman test), which compare the conditions two by two while controlling for multiple comparisons (see more details in the <a href="/blog/anova-in-r/#post-hoc-test">one-way ANOVA</a> article). Since the data are related, these comparisons must take the within-subject structure into account: whereas the Dunn test follows a Kruskal-Wallis test, the most common post-hoc tests after a Friedman test are:</p>
+<ul>
+<li>pairwise Wilcoxon signed-rank tests</li>
+<li>the Nemenyi test</li>
+<li>the Conover test</li>
+</ul>
+<p>Unlike pairwise Wilcoxon tests, which only use the two conditions being compared, the Nemenyi and Conover tests compare the rank sums of the Friedman test itself, computed on all conditions at once. This makes it more consistent with the omnibus test, but it also has a drawback: the conclusion for a given pair of conditions can change depending on which other conditions are included in the study. For this reason, some authors, such as <span class="citation">Benavoli et al. (<a href="#ref-benavoli2016should">2016</a>)</span>, recommend pairwise Wilcoxon signed-rank tests instead. In practice, both approaches are widely used, and they often lead to the same conclusions, as in our example below.</p>
+<div id="pairwise-wilcoxon-signed-rank-tests" class="section level2">
+<h2>Pairwise Wilcoxon signed-rank tests</h2>
+<p>The <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/#paired-samples">Wilcoxon signed-rank test</a> compares two paired samples. It belongs to the same family of rank-based tests as the Friedman test, and it is actually a <a href="/blog/one-sample-wilcoxon-test-in-r/">one-sample Wilcoxon test</a> applied to the differences within subjects. Pairwise tests with the Holm adjustment are obtained with <code>pairwise_wilcox_test()</code> and the argument <code>paired = TRUE</code>:<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<pre class="r"><code>dat %&gt;%
+  pairwise_wilcox_test(pain ~ time,
+    paired = TRUE,
+    p.adjust.method = &quot;holm&quot;
+  )</code></pre>
+<pre><code>## # A tibble: 3 × 9
+##   .y.   group1 group2    n1    n2 statistic       p  p.adj p.adj.signif
+## * &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;int&gt; &lt;int&gt;     &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;       
+## 1 pain  before during    16    16       117 0.00919 0.0184 *           
+## 2 pain  before after     16    16       122 0.00336 0.0101 *           
+## 3 pain  during after     16    16        95 0.175   0.175  ns</code></pre>
+<p>(With <code>paired = TRUE</code>, observations are paired according to their order in the dataset, so the patients must appear in the same order at each moment, which is the case here.)</p>
+<p>The base R function <code>pairwise.wilcox.test()</code> gives the same <em>p</em>-values:</p>
+<pre class="r"><code>pairwise.wilcox.test(dat$pain, dat$time,
+  paired = TRUE,
+  p.adjust.method = &quot;holm&quot;
+)</code></pre>
+<pre><code>## 
+## 	Pairwise comparisons using Wilcoxon signed rank exact test 
+## 
+## data:  dat$pain and dat$time 
+## 
+##        before during
+## during 0.018  -     
+## after  0.010  0.175 
+## 
+## P value adjustment method: holm</code></pre>
+<p>Comparing the adjusted <em>p</em>-values (the <code>p.adj</code> column of the first output) to the 5% significance level, we conclude that:</p>
+<ul>
+<li>the pain score differs significantly between before and during the treatment (adjusted <em>p</em>-value = 0.018),</li>
+<li>it differs significantly between before the treatment and one month after it (adjusted <em>p</em>-value = 0.010), and</li>
+<li>it does not differ significantly between during the treatment and one month after it (adjusted <em>p</em>-value = 0.175).</li>
+</ul>
+<p>In other words, the treatment is associated with a significant decrease of the pain score (median from 68.5 to 57.45), which persists one month after the treatment (median of 52.1), while the further decrease after the treatment is not significant.</p>
+</div>
+<div id="nemenyi-test" class="section level2">
+<h2>Nemenyi test</h2>
+<p>The Nemenyi test is available in the <code>{PMCMRplus}</code> package:</p>
+<pre class="r"><code># install.packages(&quot;PMCMRplus&quot;)
+library(PMCMRplus)
+
+frdAllPairsNemenyiTest(pain ~ time | patient,
+  data = dat
+)</code></pre>
+<pre><code>##        before  during 
+## during 0.01299 -      
+## after  0.00014 0.43104</code></pre>
+<p>These <em>p</em>-values (based on the studentized range distribution, which already accounts for multiple comparisons) lead to the same conclusions: the moment before the treatment differs significantly from both other moments, while during and after do not differ significantly.</p>
+</div>
+<div id="conover-test" class="section level2">
+<h2>Conover test</h2>
+<p>Like the Nemenyi test, the Conover test compares the rank sums of the Friedman test, but it relies on a Student’s <em>t</em> distribution with an error term estimated from the ranks, which generally makes it more powerful than the Nemenyi test. It is available in the same package, with the <code>frdAllPairsConoverTest()</code> function. By default, the <em>p</em>-values are adjusted with the single-step method, but other adjustments can be chosen with the <code>p.adjust.method</code> argument. For consistency with the pairwise Wilcoxon tests, we use the Holm method. Note that, unlike <code>frdAllPairsNemenyiTest()</code>, this function does not accept a formula, so the response, the conditions and the subjects are passed as separate vectors:</p>
+<pre class="r"><code>frdAllPairsConoverTest(
+  y = dat$pain,
+  groups = dat$time,
+  blocks = dat$patient,
+  p.adjust.method = &quot;holm&quot;
+)</code></pre>
+<pre><code>##        before  during 
+## during 0.00066 -      
+## after  6.9e-06 0.08650</code></pre>
+<p>These adjusted <em>p</em>-values lead to the same conclusions: the pain score before the treatment differs significantly from the pain score during and one month after the treatment, while the pain scores during and after the treatment do not differ significantly.</p>
+</div>
+</div>
+<div id="combination-of-statistical-results-and-plot" class="section level1">
+<h1>Combination of statistical results and plot</h1>
+<p>As for the Kruskal-Wallis test, the <code>{ggstatsplot}</code> package can display the data and all the statistical results on a single plot, here with <code>ggwithinstats()</code>, designed for within-subjects designs:</p>
+<pre class="r"><code># install.packages(&quot;ggstatsplot&quot;)
+library(ggstatsplot)
+
+ggwithinstats(
+  data = dat,
+  x = time,
+  y = pain,
+  subject.id = patient,
+  type = &quot;nonparametric&quot;, # repeated measures ANOVA or Friedman test
+  pairwise.display = &quot;all&quot;, # display all pairwise comparisons
+  bf.message = FALSE
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<p>The results of the Friedman test are shown in the subtitle (the <em>p</em>-value is after <code>p =</code>), the boxplots and violin plots show the distribution at each moment, and the post-hoc tests are displayed between each pair of moments. Note that <code>ggwithinstats()</code> uses the Durbin-Conover test (with the Holm adjustment) rather than pairwise Wilcoxon tests, so its adjusted <em>p</em>-values differ from ours, but the conclusions are the same.</p>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>In this article, we presented the Friedman test, the nonparametric version of the repeated measures ANOVA, used to compare three or more related conditions in terms of a quantitative or ordinal variable. Since it ranks the measurements within each subject, it requires independence between subjects but neither normality nor sphericity. In R, it is performed with <code>friedman.test()</code> or <code>friedman_test()</code> from <code>{rstatix}</code>, and a significant result, which only indicates that at least one condition differs, is followed by post-hoc tests such as pairwise Wilcoxon signed-rank tests with adjusted <em>p</em>-values. If you hesitate between several methods, see this <a href="/blog/what-statistical-test-should-i-do/">overview of the most common statistical tests</a>.</p>
+<p>Thanks for reading.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-benavoli2016should" class="csl-entry">
+Benavoli, Alessio, Giorgio Corani, and Francesca Mangili. 2016. <span>“Should We Really Use Post-Hoc Tests Based on Mean-Ranks?”</span> <em>The Journal of Machine Learning Research</em> 17 (1): 152–61.
+</div>
+<div id="ref-friedman1937use" class="csl-entry">
+Friedman, Milton. 1937. <span>“The Use of Ranks to Avoid the Assumption of Normality Implicit in the Analysis of Variance.”</span> <em>Journal of the American Statistical Association</em> 32 (200): 675–701.
+</div>
+</div>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>A common rule of thumb is roughly <span class="math inline">\(n &gt; 10\)</span> or <span class="math inline">\(n \times k &gt; 30\)</span>. For smaller samples, exact tables or permutation <em>p</em>-values are more appropriate.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>In theory, the Friedman test can also be used with two related conditions, but it then only uses the sign of the difference within each subject (it is equivalent to the sign test). In practice, the <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/#paired-samples">Wilcoxon signed-rank test</a>, which also uses the size of the differences, is preferred for two related samples.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>The Holm method is less conservative than the Bonferroni correction, while controlling the same global error rate. See <code>?p.adjust</code> for the other available methods.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
