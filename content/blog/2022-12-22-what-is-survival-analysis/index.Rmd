@@ -38,6 +38,11 @@ library(knitr)
 library(rmarkdown)
 library(modelsummary)
 library(gt)
+
+# Use the kableExtra backend for datasummary_df() (tinytable is the default
+# since modelsummary 2.0): Pandoc then converts the $...$ math in the table
+# headers into \(...\), which MathJax can render.
+options(modelsummary_factory_default = "kableExtra")
 ```
 
 ![](images/what-is-survival-analysis.jpeg){width=100%}
@@ -352,7 +357,11 @@ datasummary_df(tab, fmt = 0)
 ```{r, echo = FALSE}
 tab[, 5] <- round((1 - (tab[, 3] / tab[, 4])), 3)
 
-datasummary_df(tab)
+# format each column: whole numbers without decimals, others with 3 decimals
+fmt_km <- function(x) {
+  if (all(x == round(x))) sprintf("%.0f", x) else sprintf("%.3f", x)
+}
+datasummary_df(tab, fmt = fmt_km)
 ```
 
 The Kaplan-Meier estimator is:
@@ -373,7 +382,7 @@ So finally, we have the survival probabilities (rounded to 3 digits):
 tab[, 6] <- round(cumprod(tab[, 5]), 3)
 
 names(tab)[6] <- "$\\hat{S}_{KM}(t)$"
-datasummary_df(tab[, c(1, 5, 6)])
+datasummary_df(tab[, c(1, 5, 6)], fmt = fmt_km)
 ```
 
 We can now represent graphically the Kaplan-Meier estimator:
