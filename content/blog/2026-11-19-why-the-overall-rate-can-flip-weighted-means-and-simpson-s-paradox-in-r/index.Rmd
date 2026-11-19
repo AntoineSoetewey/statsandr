@@ -1,0 +1,223 @@
+---
+title: 'Why the overall rate can flip: weighted means and Simpson''s paradox in R'
+author: Antoine Soetewey
+date: '2026-11-19'
+slug: why-the-overall-rate-can-flip-weighted-means-and-simpson-s-paradox-in-r
+categories: []
+tags:
+  - Collaboration
+  - Probability
+  - Statistics
+  - R
+meta_img: blog/why-the-overall-rate-can-flip-weighted-means-and-simpson-s-paradox-in-r/images/why-the-overall-rate-can-flip-weighted-means-and-simpson-s-paradox-in-r.jpg
+description: "Learn how weighted means explain Simpson's paradox in R, using the Berkeley admissions data and a simulation that shows when a group comparison flips."
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+# draft: true
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "100%",
+  tidy = "styler",
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+![](images/why-the-overall-rate-can-flip-weighted-means-and-simpson-s-paradox-in-r.jpg){width=100%}
+
+*Note: This post has been written in collaboration with the Easy Stat Calc Team.*
+
+# Introduction
+
+Most readers learn that an overall average is "just the average". The trouble starts when the data come in subgroups. An overall rate is not the plain average of the subgroup rates. It is a **weighted mean** of them, and the weights are the subgroup sizes. Change the weights and the answer changes, sometimes enough to reverse a comparison.
+
+That reversal is known as Simpson's paradox. The classic illustration is the 1973 graduate admissions data from the University of California, Berkeley [@bickel1975sex], which ship with R as `UCBAdmissions`. This article does not stop at the familiar "women do better inside departments" table. It asks three questions the table leaves open:
+
+1. How much does the re-weighted result depend on **which applicant mix** we pick as the reference?
+2. At exactly what point does a small advantage inside every subgroup get cancelled out by differences in subgroup mix, and how often does a sample of a given size show the flip near that point?
+3. When is the overall rate the right number, and when is the subgroup rate the right number?
+
+Everything below uses base R, except for the plot, which is made with the [`{ggplot2}` package](/blog/graphics-in-r-with-ggplot2/). A seed is set at the start of the simulation code to ensure reproducibility.
+
+# The data
+
+`UCBAdmissions` is a 2 x 2 x 6 table: admission status, gender and department (the six largest departments, labelled A to F). We separate admitted counts from totals and compute department-level rates.
+
+```{r data}
+adm  <- UCBAdmissions["Admitted", , ]            # admitted, by gender x department
+tot  <- apply(UCBAdmissions, c(2, 3), sum)       # all applicants, by gender x department
+rate <- adm / tot                                # admission rate, by gender x department
+
+overall <- rowSums(adm) / rowSums(tot)
+round(100 * overall, 1)
+```
+
+Across these six departments, men were admitted at 44.5% and women at 30.4%. Now look inside each department.
+
+```{r by-dept}
+round(100 * rate, 1)
+tot
+```
+
+Women have the higher admission rate in four of the six departments (A, B, D and F). Men lead in C and E, by small margins. Yet the overall rate for women is 14 points lower. The explanation is in the applicant counts: 825 of the 933 applicants to department A were men, and department A admits many applicants, while most women applied to departments C to F, where admission is much harder.
+
+```{r share-A}
+round(100 * prop.table(tot, 1)[, "A"], 1)     # share of each gender's applicants who applied to A
+```
+
+About 31% of the men applied to department A, against 6% of the women.
+
+# An overall rate is a weighted mean
+
+If department *i* has admission rate $r_i$ and a share $w_i$ of the applicants, the overall rate is
+
+$$\text{overall} = \sum_i w_i \, r_i .$$
+
+In R this is `weighted.mean(rate, weights)`. With each gender's *own* applicant counts as weights it reproduces the overall rates exactly (for a quick check outside R, readers can also use a [weighted average calculator](https://easystatcalc.com/weighted-average-calculator/){target="_blank" rel="sponsored noopener"}).
+
+```{r own-mix}
+round(100 * c(Men   = weighted.mean(rate["Male", ],   tot["Male", ]),
+              Women = weighted.mean(rate["Female", ], tot["Female", ])), 1)
+```
+
+The question is what happens when both genders are weighted by the *same* mix, so that we compare like with like.
+
+# The result depends on the reference mix
+
+There is no single correct "same mix". We can use the men's applicant mix, the women's mix, the combined mix, or equal weights. Each gives a different answer, so it is worth showing all of them rather than one re-weighted figure.
+
+```{r mixes}
+wm <- function(w) c(Men   = weighted.mean(rate["Male", ],   w),
+                    Women = weighted.mean(rate["Female", ], w))
+
+mixes <- rbind("Own mix (observed)" = c(weighted.mean(rate["Male", ],   tot["Male", ]),
+                                        weighted.mean(rate["Female", ], tot["Female", ])),
+               "Men's mix"          = wm(tot["Male", ]),
+               "Women's mix"        = wm(tot["Female", ]),
+               "Combined mix"       = wm(colSums(tot)),
+               "Equal weights"      = wm(rep(1, 6)))
+colnames(mixes) <- c("Men", "Women")
+
+data.frame(round(100 * mixes, 1),
+           Gap = round(100 * (mixes[, "Women"] - mixes[, "Men"]), 1))
+```
+
+The gap (women minus men, in percentage points) moves from -14.2 with the observed mixes to +4.3 with the combined mix, +3.6 with equal weights, +7.1 with the men's mix, and almost nothing (+0.1) with the women's mix. Only the weights changed, never the department rates.
+
+Most of this comes from one department. Department A has by far the largest gap in favour of women (82.4% vs 62.1%, about 20 points, against 5 points or less elsewhere) and holds 21% of all applicants. Under the combined mix it contributes 4.2 of the 4.3 points. Its weight also explains the spread between mixes: 31% of the men's applicants went to department A, but only 6% of the women's. Leave it out and re-weight the other five departments by their combined mix:
+
+```{r without-A}
+w5 <- colSums(tot)[2:6]
+round(100 * c(Men   = weighted.mean(rate["Male", 2:6],   w5),
+              Women = weighted.mean(rate["Female", 2:6], w5)), 1)
+```
+
+Without department A both rates are about 33% (32.7% and 32.8%). So the headline "women lead" under the combined and men's mixes is largely a department A result, and a reader who sees a single re-weighted figure would not know that.
+
+# When exactly does the comparison flip?
+
+The Berkeley data are one table. To study the mechanism we build a small model with two groups of applicants, A and B (like the two genders above), and two departments, an easy one and a hard one:
+
+| | Easy department | Hard department |
+|---|---|---|
+| Group A admission rate | 72% | 22% |
+| Group B admission rate | 70% | 20% |
+
+Group A beats group B by 2 points in both departments. The overall rate of a group is
+
+$$\text{overall} = \text{easy rate} - g \times (\text{share applying to the hard department}),$$
+
+where $g$ is the gap between the easy and the hard department rates (here 0.50 for both groups). Writing $p_A$ and $p_B$ for the shares of group A's and group B's applicants who apply to the hard department, group A is behind overall exactly when
+
+$$0.02 < g \times (p_A - p_B) \quad\Longleftrightarrow\quad p_A - p_B > \frac{0.02}{g}.$$
+
+So the flip point depends on two things only: the size of the advantage inside the departments (0.02) and the gap between the departments' admission rates ($g$). Here it is 0.02 / 0.50 = 0.04. If group B sends 10% of its applicants to the hard department, group A is behind overall once more than 14% of A's applicants go there.
+
+```{r threshold}
+easy <- c(A = 0.72, B = 0.70)
+hard <- c(A = 0.22, B = 0.20)
+pB   <- 0.10                                  # share of group B applying to the hard department
+gap  <- unname(easy["A"] - hard["A"])         # 0.50 (same for both groups)
+threshold <- 0.02 / gap
+c(threshold = threshold, flip_when_pA_above = pB + threshold)
+```
+
+The formula gives the flip point for the *true* rates. It does not tell us how often a **sample** of a given size shows the flip near that point. This probability can be computed exactly from binomial distributions, but a simulation shows it more simply: draw how many applicants of each group choose the hard department, then draw the admissions, and record how often the observed overall rate of A is below that of B.
+
+```{r simulation}
+set.seed(2026)                                # for reproducible results
+
+sim_flip <- function(n, delta, reps = 10000) {
+  pA <- pB + delta
+  hA <- rbinom(reps, n, pA)                   # group A applicants to the hard department
+  hB <- rbinom(reps, n, pB)
+  aA <- rbinom(reps, hA, hard["A"]) + rbinom(reps, n - hA, easy["A"])   # admitted from A
+  aB <- rbinom(reps, hB, hard["B"]) + rbinom(reps, n - hB, easy["B"])
+  mean(aA < aB)                               # share of samples where A is below B
+}
+
+deltas <- c(0, 0.02, 0.04, 0.06, 0.08, 0.12)  # p_A - p_B
+ns     <- c(100, 400, 1600)                   # applicants per group
+
+res <- sapply(ns, function(n) sapply(deltas, function(dl) sim_flip(n, dl)))
+dimnames(res) <- list(paste0("delta=", deltas), paste0("n=", ns))
+round(res, 3)
+```
+
+```{r plot, fig.height = 4.5}
+library(ggplot2)
+
+res_long <- data.frame(
+  delta = rep(deltas, times = ncol(res)),
+  n     = factor(rep(colnames(res), each = nrow(res)), levels = colnames(res)),
+  share = as.vector(res)
+)
+
+ggplot(res_long, aes(x = delta, y = share, colour = n, shape = n)) +
+  geom_vline(xintercept = threshold, linetype = "dashed", colour = "grey40") +
+  annotate("text", x = threshold, y = 1, label = "threshold",
+           hjust = -0.1, colour = "grey40") +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2.5) +
+  geom_text(data = subset(res_long, delta == max(delta)), aes(label = n),
+            hjust = -0.3, size = 3.5, colour = "grey20", show.legend = FALSE) +
+  scale_colour_manual(values = c("#6da7ec", "#2a78d6", "#104281")) +
+  scale_x_continuous(breaks = deltas, expand = expansion(mult = c(0.05, 0.2))) +
+  ylim(0, 1) +
+  labs(x = "Difference in share applying to the hard department",
+       y = "Share of samples where A is below B",
+       colour = "Applicants per group", shape = "Applicants per group") +
+  theme_minimal() +
+  theme(legend.position = "top", panel.grid.minor = element_blank())
+```
+
+Three things the simulation shows:
+
+1. **At the threshold the result is a coin flip for every sample size.** At a difference of 0.04, A is below B in about 47% to 49% of samples whether n is 100, 400 or 1,600. The share is slightly under 50% because samples where A and B admit exactly the same number are not counted as a flip.
+2. **Below the threshold, small samples get it wrong often.** With identical mixes (difference 0), group A is truly better in both departments, yet with 100 applicants per group, A is below B in 35% of samples. With 1,600 it drops to 11%.
+3. **Above the threshold, larger samples make the flip almost certain.** At a difference of 0.12 the flip shows in 70% of samples with n = 100 and in 99% with n = 1,600.
+
+So a larger sample sharpens whichever side of the threshold the true mix lies on. It does not move the threshold itself.
+
+# Which rate should you report?
+
+The statistics do not choose between the department-level and the overall rate. The question does.
+
+- **Department rates** describe how each department treats the applicants it receives. They are the natural numbers if the question is whether a department's admission decisions favour one gender.
+- **The overall rate** also reflects where people choose to apply. It is the natural number if the question is what share of each gender's applicants ended up admitted, whatever the reason for the difference.
+
+The Berkeley data alone cannot settle whether there was discrimination. The data are for one admission cycle, six departments and two recorded genders. The department rates show no systematic advantage for men. They do not show why women applied to the harder departments in larger numbers, or whether things that happen before an application (advising, funding, prior opportunities) played a role. Those are causal questions, and answering them takes assumptions and information beyond a table of counts.
+
+The practical habit that follows from this is simple. When you see an overall rate for a group, ask which weights produced it, say which reference mix you used for any comparison, and show how the result changes when the mix changes.
+
+Thanks for reading.
+
+As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.
+
+# References
