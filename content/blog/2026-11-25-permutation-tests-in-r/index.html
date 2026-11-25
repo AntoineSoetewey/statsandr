@@ -1,0 +1,400 @@
+---
+title: 'Permutation tests in R: let your data build its own null distribution'
+author: Antoine Soetewey
+date: '2026-11-25'
+slug: permutation-tests-in-r
+categories: []
+tags:
+  - Collaboration
+  - Hypothesis test
+  - Inferential statistics
+  - R
+  - Statistics
+meta_img: blog/permutation-tests-in-r/images/permutation-tests-in-r.jpg
+description: Learn how to perform permutation tests in R, from exact enumeration to Monte Carlo, with paired data and a simulation comparing them to Welch's t-test.
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 6
+# draft: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#example-1-two-independent-groups-plantgrowth" id="toc-example-1-two-independent-groups-plantgrowth">Example 1: two independent groups (PlantGrowth)</a></li>
+<li><a href="#a-small-simulation-study" id="toc-a-small-simulation-study">A small simulation study</a></li>
+<li><a href="#the-difference-in-medians" id="toc-the-difference-in-medians">The difference in medians</a></li>
+<li><a href="#example-2-paired-data-sleep" id="toc-example-2-paired-data-sleep">Example 2: paired data (sleep)</a></li>
+<li><a href="#when-to-use-permutation-tests-and-when-not-to" id="toc-when-to-use-permutation-tests-and-when-not-to">When to use permutation tests, and when not to</a></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
+</ul>
+</div>
+
+<p><img src="images/permutation-tests-in-r.jpg" style="width:100.0%" /></p>
+<p><em>Note: This post has been written in collaboration with Waqar Ahmad, founder of CalcMega.</em></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Every R user meets the same small anxiety early on. You have two groups, you want to know whether they really differ, and the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">t-test</a> relies on a normal-model reference distribution for small-sample inference. With 200 observations per group, that approximation is often robust. With 10 plants, it deserves scrutiny: a normality test on 10 points has little power to rule out departures, and the central limit theorem is no automatic guarantee.</p>
+<p>Permutation tests avoid a normal reference distribution, but they do not remove the need for assumptions. They were worked out in the 1930s, in the early days of modern statistics (Fisher’s <em>The Design of Experiments</em> appeared in 1935), and the idea is disarmingly simple: <strong>if the treatment did nothing, then the group labels are arbitrary, and shuffling them changes nothing that matters.</strong></p>
+<p>That last clause is the key assumption, and it has a name: <em>exchangeability</em>. In a randomized experiment, permuting assignments allowed by the design gives an exact test of the sharp null that treatment affects no individual. Without randomization, validity instead requires exchangeability under the null; equality of means alone is not enough when group distributions differ. A permutation test turns exchangeability into a recipe:</p>
+<ol style="list-style-type: decimal">
+<li>Compute your test statistic on the data as observed, say, the difference in group means.</li>
+<li>Shuffle the group labels at random and recompute the statistic.</li>
+<li>Repeat step 2 many times. The collection of shuffled statistics is the <em>permutation distribution</em>: what your statistic looks like when the labels mean nothing.</li>
+<li>The p-value is the proportion of shuffles producing a statistic at least as extreme as the one you actually observed.</li>
+</ol>
+<p>No normal reference distribution is invoked. When the design or exchangeability assumptions hold, this can provide valid inference with small or skewed samples; small sample size does not make arbitrary shuffling safe, and it can limit power and p-value resolution. One clarification before we start, because it is the most common misunderstanding of the method: a permutation p-value is <em>not</em> “the probability that the null hypothesis is true.” It is the proportion of allowed rearrangements that produce a statistic at least as extreme as yours, a statement about how surprising your data would be under the specified null. That is the same careful interpretation a t-test’s <a href="/blog/hypothesis-test-by-hand/">p-value</a> demands; permutation tests replace a distributional assumption with design or exchangeability assumptions rather than removing assumptions.</p>
+<p>In this article we work two complete examples: an independent two-sample test on the <code>PlantGrowth</code> dataset, and a paired test on the <code>sleep</code> dataset, where the shuffling turns into something even neater: flipping signs.</p>
+</div>
+<div id="example-1-two-independent-groups-plantgrowth" class="section level1">
+<h1>Example 1: two independent groups (PlantGrowth)</h1>
+<p><code>PlantGrowth</code> is one of R’s built-in datasets. Thirty plants were grown under three conditions, a control group and two treatments, and their dried weights recorded. We compare the control group against the first treatment, <code>trt1</code>, ten plants each.</p>
+<p>The label shuffling below is design-exact only if these group assignments were randomized under the sharp no-effect null. Otherwise, it relies on the groups being exchangeable under the null; the <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/PlantGrowth.html">built-in dataset description</a> does not specify the assignment procedure.</p>
+<pre class="r"><code>data(PlantGrowth)
+
+ctrl &lt;- PlantGrowth$weight[PlantGrowth$group == &quot;ctrl&quot;]
+trt1 &lt;- PlantGrowth$weight[PlantGrowth$group == &quot;trt1&quot;]
+
+length(ctrl)</code></pre>
+<pre><code>## [1] 10</code></pre>
+<pre class="r"><code>length(trt1)</code></pre>
+<pre><code>## [1] 10</code></pre>
+<pre class="r"><code>mean(ctrl)</code></pre>
+<pre><code>## [1] 5.032</code></pre>
+<pre class="r"><code>mean(trt1)</code></pre>
+<pre><code>## [1] 4.661</code></pre>
+<pre class="r"><code>sd(ctrl)</code></pre>
+<pre><code>## [1] 0.5830914</code></pre>
+<pre class="r"><code>sd(trt1)</code></pre>
+<pre><code>## [1] 0.7936757</code></pre>
+<p>The control plants average 5.032 grams against 4.661 for <code>trt1</code>. (If you would like to double-check the group means outside R, a <a href="https://calcmega.com/statistics-calculator" target="_blank" rel="sponsored noopener">statistics calculator</a> confirms them in seconds.) Our test statistic is the difference in means, treated minus control:</p>
+<pre class="r"><code>observed_diff &lt;- mean(trt1) - mean(ctrl)
+observed_diff</code></pre>
+<pre><code>## [1] -0.371</code></pre>
+<p>The treated plants came out 0.371 grams <em>lighter</em> on average. Is that gap unusual under the exchangeable-label null? To find out, pool all 20 weights, shuffle the labels, and see what differences the null model generates. One shuffle, step by step:</p>
+<pre class="r"><code>weights &lt;- c(ctrl, trt1)
+labels &lt;- rep(c(&quot;ctrl&quot;, &quot;trt1&quot;), each = 10)
+
+set.seed(1)
+shuffled &lt;- sample(labels)
+mean(weights[shuffled == &quot;trt1&quot;]) - mean(weights[shuffled == &quot;ctrl&quot;])</code></pre>
+<pre><code>## [1] -0.349</code></pre>
+<p>That shuffle produced a difference of -0.349, nearly as large as the gap we actually observed, from exactly the same 20 numbers with nothing changed but the labels. A single shuffle proves nothing, of course; it simply shows the mechanism. The evidence comes from doing it thousands of times and asking how often chance alone produces a gap like ours:</p>
+<pre class="r"><code>set.seed(123)
+n_perm &lt;- 9999
+
+perm_diffs &lt;- replicate(n_perm, {
+  shuffled &lt;- sample(labels)
+  mean(weights[shuffled == &quot;trt1&quot;]) - mean(weights[shuffled == &quot;ctrl&quot;])
+})
+
+# install.packages(&quot;ggplot2&quot;)
+library(ggplot2)
+
+ggplot(data.frame(diff = perm_diffs), aes(x = diff)) +
+  geom_histogram(bins = 40, fill = &quot;grey85&quot;, colour = &quot;white&quot;) +
+  geom_vline(xintercept = observed_diff, colour = &quot;red&quot;, linewidth = 1) +
+  labs(
+    title = &quot;Permutation distribution of the difference in means&quot;,
+    x = &quot;Difference in means (trt1 - ctrl) after shuffling labels&quot;,
+    y = &quot;Frequency&quot;
+  ) +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<p>The shuffled differences centre on zero under the exchangeable-label null, with most lying within about half a gram of zero. Our observed difference, marked in red, sits well inside that spread: noticeable, but not out in the tail where chance rarely ventures. The p-value counts how much of the distribution is at least as far from zero as what we saw, in either direction:</p>
+<pre class="r"><code>p_perm &lt;- (sum(abs(perm_diffs) &gt;= abs(observed_diff) - 1e-10) + 1) / (n_perm + 1)
+p_perm</code></pre>
+<pre><code>## [1] 0.2513</code></pre>
+<p>The <code>+ 1</code> in the numerator and denominator treats the observed arrangement as one additional member alongside the random shuffles. This standard Monte Carlo correction prevents a zero estimate. Here it barely matters. The permutation p-value is about 0.251, so differences this large turn up in roughly a quarter of the simulated shuffles. The data do not provide enough evidence to conclude that <code>trt1</code> changes the weight.</p>
+<p>A word on how many shuffles are enough. A simulated p-value is itself an estimate, with Monte Carlo error attached: with 9,999 permutations and a true p-value near 0.25, its standard error is about <span class="math inline">\(\sqrt{0.25 \times 0.75 / 9999} \approx 0.0043\)</span>. Treat the last few thousandths as simulation noise, not as exact digits. If an estimate is close to a threshold you care about, 0.048 against a 0.05 cut-off, say, use more permutations (or enumerate exactly when feasible) and report the number of permutations; do not overinterpret a decision when the Monte Carlo uncertainty spans the cutoff.</p>
+<p>Because 20 plants split into two groups of 10 in only <span class="math inline">\(\binom{20}{10}\)</span> = 184,756 ways, we can even skip the simulation and enumerate <em>every</em> split:</p>
+<pre class="r"><code>combos &lt;- combn(20, 10)
+
+exact_diffs &lt;- apply(combos, 2, function(idx) {
+  mean(weights[idx]) - mean(weights[-idx])
+})
+# the tiny tolerance catches splits that tie with the observed difference
+# but land a hair below it through floating-point rounding
+p_exact &lt;- mean(abs(exact_diffs) &gt;= abs(observed_diff) - 1e-10)
+p_exact</code></pre>
+<pre><code>## [1] 0.247927</code></pre>
+<p>The exact p-value, 0.248, matches the simulated one to two decimal places, a good reminder that 9,999 shuffles already pin the answer down tightly.</p>
+<p>One more cross-check, this time against a packaged implementation. The <code>coin</code> package runs permutation tests of exactly this kind, so its answer on the same two groups should land in the same place as our hand-rolled shuffle:</p>
+<pre class="r"><code># install.packages(&quot;coin&quot;)
+library(coin)
+
+set.seed(123)
+pg2 &lt;- droplevels(PlantGrowth[PlantGrowth$group != &quot;trt2&quot;, ])
+
+coin_test &lt;- oneway_test(weight ~ group,
+  data = pg2,
+  distribution = approximate(nresample = 9999)
+)
+
+coin_test</code></pre>
+<pre><code>## 
+## 	Approximative Two-Sample Fisher-Pitman Permutation Test
+## 
+## data:  weight by group (ctrl, trt1)
+## Z = 1.1783, p-value = 0.2449
+## alternative hypothesis: true mu is not equal to 0</code></pre>
+<p>It does: the packaged p-value, 0.245, agrees with our exact 0.248 to within simulation noise, which is reassuring about both.</p>
+<p>How does the classical test compare?</p>
+<pre class="r"><code>welch &lt;- t.test(trt1, ctrl)
+welch</code></pre>
+<pre><code>## 
+## 	Welch Two Sample t-test
+## 
+## data:  trt1 and ctrl
+## t = -1.1913, df = 16.524, p-value = 0.2504
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.0295162  0.2875162
+## sample estimates:
+## mean of x mean of y 
+##     4.661     5.032</code></pre>
+<p>The Welch t-test gives a p-value of about 0.25, close to the permutation results here. The two methods rely on different conditions: Welch’s test uses an approximate t reference distribution and allows unequal variances, while the unstudentized permutation test shown here relies on exchangeability. Neither test is automatically more trustworthy when they disagree. In particular, both tests based on means can be sensitive to outliers, and a raw permutation test need not be valid for a null hypothesis of equal means alone when variances differ. The next section compares their behaviour in several specific scenarios.</p>
+</div>
+<div id="a-small-simulation-study" class="section level1">
+<h1>A small simulation study</h1>
+<p>Claims about which test to trust are usually traded as folklore. They do not have to be: a simulation can put both tests in situations where the truth is known, because we generated the data ourselves. Here is a small one. Each scenario below generates 10,000 datasets; on every dataset, Welch’s t-test and a permutation test on the difference in means (999 shuffles, the same recipe as Example 1) each get one attempt, and we count how often each rejects at the 5% level. The permutation p-value is itself estimated from those 999 shuffles, so the results describe this Monte Carlo implementation rather than an exact permutation test.</p>
+<pre class="r"><code>perm_p &lt;- function(x, y, B = 999) {
+  pooled &lt;- c(x, y)
+  n1 &lt;- length(x)
+  N &lt;- length(pooled)
+  total &lt;- sum(pooled)
+  obs &lt;- mean(y) - mean(x)
+  shuffles &lt;- replicate(B, sample(pooled))
+  s1 &lt;- colSums(shuffles[seq_len(n1), , drop = FALSE])
+  diffs &lt;- (total - s1) / (N - n1) - s1 / n1
+  (sum(abs(diffs) &gt;= abs(obs) - 1e-10) + 1) / (B + 1)
+}
+
+run_scenario &lt;- function(gen, n_sim = 10000) {
+  hits_perm &lt;- 0
+  hits_welch &lt;- 0
+  for (i in seq_len(n_sim)) {
+    d &lt;- gen()
+    if (perm_p(d$x, d$y) &lt; 0.05) hits_perm &lt;- hits_perm + 1
+    if (t.test(d$x, d$y)$p.value &lt; 0.05) hits_welch &lt;- hits_welch + 1
+  }
+  c(permutation = hits_perm / n_sim, welch = hits_welch / n_sim)
+}</code></pre>
+<p><strong>Scenario 1: no difference, skewed data.</strong> Both groups are drawn from the same lognormal distribution, a right-skewed shape seen in incomes, weights and waiting times, with 10 observations each. The null hypothesis is true, so a well-behaved test should reject close to 5% of the time.</p>
+<pre class="r"><code>set.seed(20261118)
+
+gen_same &lt;- function() {
+  list(
+    x = rlnorm(10, meanlog = 0, sdlog = 1),
+    y = rlnorm(10, meanlog = 0, sdlog = 1)
+  )
+}
+
+sim_same &lt;- run_scenario(gen_same)
+sim_same</code></pre>
+<pre><code>## permutation       welch 
+##      0.0508      0.0272</code></pre>
+<p><strong>Scenario 2: a real difference.</strong> The same skewed distribution, but the second group is shifted up by 1.5. Now we count power: how often each test finds a difference that is really there.</p>
+<pre class="r"><code>set.seed(20261119)
+
+gen_shift &lt;- function() {
+  list(
+    x = rlnorm(10, meanlog = 0, sdlog = 1),
+    y = rlnorm(10, meanlog = 0, sdlog = 1) + 1.5
+  )
+}
+
+sim_shift &lt;- run_scenario(gen_shift)
+sim_shift</code></pre>
+<pre><code>## permutation       welch 
+##      0.5654      0.5221</code></pre>
+<p><strong>Scenario 3: no difference in means, but unequal spreads and sizes.</strong> This is the case the end of Example 1 warned about. To isolate it, the skew goes away: both groups are normal with the same mean of zero, but the small group (10 observations) has standard deviation 2 and the large group (30 observations) has standard deviation 1. The means are identical. Welch’s test is designed to maintain its level in this setting, but the raw permutation test need not: the labels carry information about spread, even though they carry none about location.</p>
+<pre class="r"><code>set.seed(20261120)
+
+gen_unequal &lt;- function() {
+  list(
+    x = rnorm(10, mean = 0, sd = 2),
+    y = rnorm(30, mean = 0, sd = 1)
+  )
+}
+
+sim_unequal &lt;- run_scenario(gen_unequal)
+sim_unequal</code></pre>
+<pre><code>## permutation       welch 
+##      0.1536      0.0507</code></pre>
+<pre class="r"><code>sim_table &lt;- data.frame(
+  scenario = c(
+    &quot;1. No difference, skewed, 10 vs 10&quot;,
+    &quot;2. Real shift of 1.5, skewed, 10 vs 10&quot;,
+    &quot;3. No mean difference, sd 2 vs 1, 10 vs 30&quot;
+  ),
+  permutation = c(
+    sim_same[[&quot;permutation&quot;]], sim_shift[[&quot;permutation&quot;]],
+    sim_unequal[[&quot;permutation&quot;]]
+  ),
+  welch = c(
+    sim_same[[&quot;welch&quot;]], sim_shift[[&quot;welch&quot;]],
+    sim_unequal[[&quot;welch&quot;]]
+  )
+)
+
+knitr::kable(sim_table,
+  digits = 3,
+  col.names = c(&quot;Scenario&quot;, &quot;Permutation&quot;, &quot;Welch&quot;)
+)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Scenario</th>
+<th align="right">Permutation</th>
+<th align="right">Welch</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1. No difference, skewed, 10 vs 10</td>
+<td align="right">0.051</td>
+<td align="right">0.027</td>
+</tr>
+<tr class="even">
+<td align="left">2. Real shift of 1.5, skewed, 10 vs 10</td>
+<td align="right">0.565</td>
+<td align="right">0.522</td>
+</tr>
+<tr class="odd">
+<td align="left">3. No mean difference, sd 2 vs 1, 10 vs 30</td>
+<td align="right">0.154</td>
+<td align="right">0.051</td>
+</tr>
+</tbody>
+</table>
+<p>These rejection rates are estimates. With 10,000 simulated datasets, the Monte Carlo standard error of a rate <span class="math inline">\(\hat p\)</span> is approximately <span class="math inline">\(\sqrt{\hat p(1-\hat p)/10000}\)</span>; near 5%, that is about 0.22 percentage points. Differences of only a few tenths of a percentage point should not be overread.</p>
+<p>Read the table from the top. In scenario 1 the permutation test rejects in 5.1% of runs, close to its nominal level and consistent with exchangeability under the common lognormal distribution. Welch’s test rejects in 2.7% of runs, showing conservatism in this particular small-sample, skewed setting. In scenario 2, the estimated power for the chosen shift of 1.5 is 56.5% for the permutation test and 52.2% for Welch’s test. These are scenario-specific estimates; the lower null rejection rate in scenario 1 does not by itself explain or predict the power difference.</p>
+<p>Scenario 3 is the reversal. The raw permutation test rejects a true equal-means null in 15.4% of runs, while Welch rejects in 5.1%. Shuffling pools the two spreads, making the null distribution of the unstudentized difference narrower than its sampling distribution under these unequal variances and group sizes; the observed differences therefore look too extreme. Welch estimates each group’s variance separately and adjusts for the unequal sizes. In this simulation it stays close to 5%, but that result is specific to these normal populations and sample sizes.</p>
+<p>Taken together, the scenarios show why neither method is universally preferable. Under the common-distribution null in scenario 1, the permutation test is calibrated by exchangeability; in scenario 3, the same unstudentized test is liberal for an equal-means null with unequal variances and sizes. For that latter setting, Welch or a studentized permutation procedure is preferable to the raw shuffle used here.</p>
+</div>
+<div id="the-difference-in-medians" class="section level1">
+<h1>The difference in medians</h1>
+<p>Every test so far has shuffled one statistic: the difference in means. Nothing in the recipe ties it to means. Go back to the PlantGrowth weights and swap in a different statistic: the difference in medians, treated minus control, exactly as before:</p>
+<pre class="r"><code>obs_med &lt;- median(trt1) - median(ctrl)
+obs_med</code></pre>
+<pre><code>## [1] -0.605</code></pre>
+<pre class="r"><code>set.seed(123)
+
+perm_meds &lt;- replicate(n_perm, {
+  shuffled &lt;- sample(labels)
+  median(weights[shuffled == &quot;trt1&quot;]) - median(weights[shuffled == &quot;ctrl&quot;])
+})
+
+p_med &lt;- (sum(abs(perm_meds) &gt;= abs(obs_med) - 1e-10) + 1) / (n_perm + 1)
+p_med</code></pre>
+<pre><code>## [1] 0.1168</code></pre>
+<p>The observed difference in medians is -0.605 grams, further from zero than the difference in means, because a median ignores how far the heaviest and lightest plants sit from the middle of their group. Its permutation p-value is 0.117, so this statistic lands further into the simulated tail than the difference in means, without crossing the 5% line. The two statistics are answering slightly different questions about the same twenty plants, so they are under no obligation to agree exactly.</p>
+<p>Two things are worth noticing. The machinery did not change at all: the same pooled weights, the same shuffles, the same counting; only the statistic moved. And the question changed with it. A difference in medians describes whether the typical plant in one group outweighs the typical plant in the other, and it is less affected by extreme values than a difference in means. With ten plants per group it is also a coarser instrument: the median of ten values is the average of the middle two, so the shuffled differences take relatively few distinct values and ties are common. This permutation calibration is exact under exchangeability; it does not, in general, test equality of population medians alone when the group distributions otherwise differ. Choose a statistic that matches the question you want answered, and check that the permutation null matches it too.</p>
+</div>
+<div id="example-2-paired-data-sleep" class="section level1">
+<h1>Example 2: paired data (sleep)</h1>
+<p>The second classic dataset is smaller and stranger. <code>sleep</code> records the effect of two soporific drugs on 10 patients: each patient has an observation under both drugs, and <code>extra</code> is the increase in hours of sleep over control. Because the same patient appears in both groups, the observations come in pairs, and pairing changes the permutation logic completely.</p>
+<pre class="r"><code>data(sleep)
+head(sleep)</code></pre>
+<pre><code>##   extra group ID
+## 1   0.7     1  1
+## 2  -1.6     1  2
+## 3  -0.2     1  3
+## 4  -1.2     1  4
+## 5  -0.1     1  5
+## 6   3.4     1  6</code></pre>
+<pre class="r"><code>sleep_wide &lt;- reshape(sleep,
+  idvar = &quot;ID&quot;, timevar = &quot;group&quot;,
+  direction = &quot;wide&quot;
+)</code></pre>
+<p>The right way to look at paired data is through the within-patient differences, drug 2 minus drug 1:</p>
+<pre class="r"><code>d &lt;- sleep_wide$extra.2 - sleep_wide$extra.1
+d</code></pre>
+<pre><code>##  [1] 1.2 2.4 1.3 1.3 0.0 1.0 1.8 0.8 4.6 1.4</code></pre>
+<pre class="r"><code>mean(d)</code></pre>
+<pre><code>## [1] 1.58</code></pre>
+<p>Drug 2 had 1.58 more extra hours of sleep on average in this sample. A sign-flip test needs its own justification: if drug order was randomized within each patient, under the sharp no-effect null the two labels could be swapped with equal probability. Otherwise, the test requires the paired differences to be symmetric around zero under the null. The <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/sleep.html"><code>sleep</code> dataset documentation</a> confirms repeated measurements on the same patients but does not state that drug order was randomized, so we use sign symmetry as the working assumption here. Instead of shuffling labels between patients, we <strong>flip the signs of the differences at random</strong>, keeping each patient’s pair intact. One random flip:</p>
+<pre class="r"><code>set.seed(2)
+d * sample(c(-1, 1), size = length(d), replace = TRUE)</code></pre>
+<pre><code>##  [1] -1.2 -2.4  1.3  1.3  0.0  1.0 -1.8 -0.8 -4.6  1.4</code></pre>
+<p>With 10 patients there are <span class="math inline">\(2^{10}\)</span> = 1,024 possible sign combinations, few enough to enumerate completely without simulation:</p>
+<pre class="r"><code>signs &lt;- expand.grid(rep(list(c(-1, 1)), length(d)))
+all_sums &lt;- apply(signs, 1, function(s) sum(s * d))
+
+observed_sum &lt;- sum(d)
+# the same small tolerance as in Example 1, so that a sum which ties with
+# the observed one is not lost to floating-point rounding
+n_extreme &lt;- sum(abs(all_sums) &gt;= abs(observed_sum) - 1e-10)
+p_paired_exact &lt;- n_extreme / length(all_sums)
+p_paired_exact</code></pre>
+<pre><code>## [1] 0.00390625</code></pre>
+<pre class="r"><code>n_extreme</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p>The observed sum of differences is 15.8. Of all 1,024 sign combinations, only 4 produce a sum at least that extreme in absolute value. The p-value is exactly 4/1024, about 0.0039. This is evidence against the sign-symmetry null (or, with randomized order, the sharp no-effect null); it is not an exact test of a zero mean alone without those conditions. One detail is worth noticing: patient 5’s difference is exactly 0, and flipping the sign of zero changes nothing, so every distinct sum in this enumeration appears twice. Zero differences carry no information about which drug is better; some implementations drop them before testing (leaving <span class="math inline">\(2^9\)</span> combinations here), which is defensible, but keeping them, as above, is exact and simpler to explain.</p>
+<p>A picture, and then the simulation version for comparison:</p>
+<pre class="r"><code>ggplot(data.frame(sum = all_sums), aes(x = sum)) +
+  geom_histogram(bins = 40, fill = &quot;grey85&quot;, colour = &quot;white&quot;) +
+  geom_vline(
+    xintercept = c(-observed_sum, observed_sum),
+    colour = &quot;red&quot;, linewidth = 1
+  ) +
+  labs(
+    title = &quot;Exact permutation distribution of signed differences&quot;,
+    x = &quot;Sum of differences after sign-flipping&quot;,
+    y = &quot;Frequency&quot;
+  ) +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-20-1.png" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>set.seed(123)
+
+n_perm &lt;- 9999
+perm_sums &lt;- replicate(n_perm, sum(d * sample(c(-1, 1), length(d), replace = TRUE)))
+
+p_paired_sim &lt;- (sum(abs(perm_sums) &gt;= abs(observed_sum) - 1e-10) + 1) / (n_perm + 1)
+p_paired_sim</code></pre>
+<pre><code>## [1] 0.0043</code></pre>
+<p>The simulation lands at about 0.0043, right next to the exact 0.0039, as it should, since it is sampling from the very distribution we enumerated. And the <a href="/blog/student-s-t-test-in-r-and-by-hand-how-to-compare-two-groups-under-different-scenarios/">paired t-test</a>?</p>
+<pre class="r"><code>paired_tt &lt;- t.test(sleep_wide$extra.2, sleep_wide$extra.1,
+  paired = TRUE
+)
+
+paired_tt</code></pre>
+<pre><code>## 
+## 	Paired t-test
+## 
+## data:  sleep_wide$extra.2 and sleep_wide$extra.1
+## t = 4.0621, df = 9, p-value = 0.002833
+## alternative hypothesis: true mean difference is not equal to 0
+## 95 percent confidence interval:
+##  0.7001142 2.4598858
+## sample estimates:
+## mean difference 
+##            1.58</code></pre>
+<p>The paired t-test estimates a mean difference of 1.58 hours and gives a p-value of about 0.0028. Its small-sample reference is exact if the paired differences are independent and normally distributed; with only 10 patients, that assumption is difficult to assess. Both procedures point to a positive difference here, but the paired t-test tests a zero mean under its model, whereas the sign-flip test uses the symmetry or randomization null described above. Patient-to-patient variability is removed by taking within-patient differences, and both analyses preserve that pairing.</p>
+</div>
+<div id="when-to-use-permutation-tests-and-when-not-to" class="section level1">
+<h1>When to use permutation tests, and when not to</h1>
+<p>Permutation tests earn their place when:</p>
+<ul>
+<li><strong>The sample is small and normality is uncertain.</strong> Permutation methods avoid a normal reference distribution, but small sample size alone does not make a shuffle valid and can limit power and p-value resolution.</li>
+<li><strong>The data are skewed or heavy-tailed</strong>, and a normal reference distribution is questionable. Exchangeability can still justify permutation calibration without normality; choose a statistic that answers the question of interest. For ordinal data, a rank-based test such as the <a href="/blog/wilcoxon-test-in-r-how-to-compare-2-groups-under-the-non-normality-assumption/">Wilcoxon test</a> may be more appropriate, but it does not necessarily test the same hypothesis as a test of means.</li>
+<li><strong>Your statistic has no convenient classical test.</strong> You can permute a difference in medians, a trimmed mean, a ratio, or another summary, but the statistic must be paired with a defensible assignment or exchangeability null.</li>
+<li><strong>The data come from a randomized experiment.</strong> Permuting assignments allowed by the design gives an exact test under the sharp null of no treatment effect on any unit.</li>
+</ul>
+<p>And their limits deserve equal honesty:</p>
+<ul>
+<li><strong>Exchangeability is an assumption, not a magic word.</strong> If observations are dependent, as with repeated measures shuffled as if independent, clustered data or time series, naive shuffling breaks the structure and invalidates the reference distribution. Preserve the design (for example, flip signs within pairs only when justified), or use a different method.</li>
+<li><strong>Permutation does not cure confounding.</strong> In observational data, unrestricted label shuffling is generally not justified unless exchangeability under the null is defensible, possibly conditional on covariates. Even a valid test of association does not establish that the grouping <em>caused</em> the outcome.</li>
+<li><strong>A raw permutation test on means is not generally an exact test of equal means alone.</strong> Its usual finite-sample justification is exchangeability (or a sharp randomization null). If spreads differ, especially with unbalanced group sizes, a significant result may reflect differences beyond the means; a studentized procedure or Welch’s test may be more suitable.</li>
+<li><strong>Tiny samples have a floor.</strong> For a two-sided sign-flip test with <span class="math inline">\(n\)</span> pairs, the theoretical minimum is <span class="math inline">\(2/2^n\)</span>, reached only when the two extreme sign patterns are the only ones as extreme as observed; ties or zero differences can make the minimum larger. With 10 pairs the floor is 2/1024 ≈ 0.00195. With 5 pairs it is 2/32 = 0.0625, so a p-value below 0.05 is impossible. Know the resolution before you start.</li>
+<li><strong>Huge enumerations need simulation.</strong> When exact enumeration is impractical, sample 9,999 or 99,999 shuffles, use the (+1)/(B+1) correction, and report the number of shuffles and Monte Carlo uncertainty. Set a seed for reproducibility within the same random-number-generator setup.</li>
+</ul>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>A permutation test builds a null reference from the assignments or sign changes justified by the design or exchangeability assumptions, then asks where the observed statistic falls inside it. On <code>PlantGrowth</code> it agreed with Welch’s t-test; the data do not provide enough evidence to conclude that <code>trt1</code> changed the weight, but that is not evidence that the effect is zero. On <code>sleep</code>, the exact sign-flip calculation found only four of 1,024 assignments as extreme as the one observed. This is evidence against the sign-symmetry null (or a randomized sharp no-effect null), not an exact test of zero mean alone. Both examples set seeds for their Monte Carlo steps; results are reproducible with the same R and random-number-generator setup. For a new dataset, first check whether the design and null justify the shuffle, then choose a statistic that answers the scientific question.</p>
+<p>As always, if you have a question or a suggestion related to the topic covered in this article, please add it as a comment so other readers can benefit from the discussion.</p>
+</div>
